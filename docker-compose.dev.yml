@@ -1,0 +1,43 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15
+    env_file: ./env/.env.dev
+    volumes:
+      - ./services/postgres/data:/var/lib/postgresql/data
+    networks: [ecom-net]
+
+  redis:
+    image: redis:7
+    networks: [ecom-net]
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    env_file: ./env/.env.dev
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./services/minio/data:/data
+    networks: [ecom-net]
+
+  backend:
+    build: ./backend
+    env_file: ./env/.env.dev
+    ports:
+      - "3001:3001"
+    depends_on: [postgres, redis, minio]
+    networks: [ecom-net]
+
+  frontend:
+    build: ./frontend
+    env_file: ./env/.env.dev
+    ports:
+      - "3000:3000"
+    depends_on: [backend]
+    networks: [ecom-net]
+
+networks:
+  ecom-net:
+
