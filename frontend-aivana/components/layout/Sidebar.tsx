@@ -18,7 +18,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
-  storeName = "Bisbat sae-kaow",
+  storeName = "Store name",
   currentPath = '/',
   onAddProductClick
 }) => {
