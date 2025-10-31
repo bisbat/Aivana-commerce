@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 
 services:
   postgres:
@@ -12,6 +12,19 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1
+    container_name: minio
+    command: server /data --console-address ":9090"
+    env_file: ./.env.dev
+    ports:
+      - "9000:9000" # s3 api
+      - "9090:9090" # console
+    volumes:
+      - ./services/minio/data:/data
+      - ./services/minio/config:/root/.minio
     restart: unless-stopped
 
   pgadmin:
@@ -28,3 +41,5 @@ services:
 
 volumes:
   postgres_data:
+
+

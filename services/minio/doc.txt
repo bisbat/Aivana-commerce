@@ -1,0 +1,18 @@
+์Necessary Command
+
+http://cp25ssi3.sit.kmutt.ac.th:9090/browser/product-images
+
+1) Verify connection
+    mc ls prod
+    (should list buckets or be empty)
+
+2) Create bucket
+    mc mb prod/<BUCKET_NAME>
+    Example:
+    mc mb prod/aivana-app
+
+3) Set bucket policy (private or public)
+    Private (default):
+      mc policy set none prod/<BUCKET_NAME>
+    Public read (if needed for static assets):
+      mc policy set download prod/<BUCKET_NAME>
