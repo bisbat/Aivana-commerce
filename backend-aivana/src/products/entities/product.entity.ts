@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
 import { User } from '../../users/entities/user.entity';
 
@@ -11,7 +11,7 @@ export class Product {
     @Column({ type: 'text', nullable: true })
     file_path: string;
 
-    @Column({ type: 'text', nullable: false, length: 255 })
+    @Column({ type: 'text', nullable: false })
     title: string;
 
     @Column({ type: 'text', nullable: true })
@@ -33,9 +33,11 @@ export class Product {
     features: string[];
 
     @ManyToOne(() => Category, (category) => category.products, { nullable: false })
+    @JoinColumn({ name: 'category_id' })
     category: Category;
 
     @ManyToOne(() => User, (user) => user.products, { nullable: false })
+    @JoinColumn({ name: 'seller_id' })
     seller: User;
 
     @CreateDateColumn({ type: 'timestamptz', default: () => 'NOW()' })

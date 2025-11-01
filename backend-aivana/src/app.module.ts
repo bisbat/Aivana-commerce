@@ -25,6 +25,7 @@ import { User } from './users/entities/user.entity';
       database: process.env.POSTGRES_DATABASE || 'mydatabase',
       entities: [Product, Category, User],
       synchronize: true, // ⚠️ เฉพาะ development only
+      dropSchema: true, // 🗑️ ลบ schema เก่าทิ้ง (development only)
       logging: true,
     }),
     ProductsModule, 

@@ -6,7 +6,7 @@ export class Category {
     @PrimaryGeneratedColumn({ type: 'bigint' })
     id: number;
     
-    @Column({ type: 'text', nullable: false, length: 255 })
+    @Column({ type: 'text', nullable: false })
     name: string;
 
     @Column({ type: 'text', nullable: true })
