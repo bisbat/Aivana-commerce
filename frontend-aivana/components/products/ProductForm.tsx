@@ -1,32 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
+import { productAPI, ProductData } from '@/lib/api/products';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Dropdown';
 import { TagInput } from '@/components/ui/TagInput';
 import { FeatureInput } from '@/components/ui/FeatureInput';
+import { Loader, CheckCircle, XCircle } from 'lucide-react';
 
-// Type definition for product data
-export interface ProductData {
-  productName: string;
-  blurb: string;
-  category: string;
-  description: string;
-  features: string[];
-  compatibility: string;
-  tags: string[];
-  price: string;
-  howToUse: string;
-  livePreview: string;
-}
-
-interface ProductFormProps {
-  onContinue: (data: ProductData) => void;
-}
-
-export const ProductForm: React.FC<ProductFormProps> = ({ onContinue }) => {
-  // State for all form fields
+export const ProductForm: React.FC = () => {
+  // Form state
   const [productName, setProductName] = useState('');
   const [blurb, setBlurb] = useState('');
   const [category, setCategory] = useState('');
@@ -38,7 +22,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({ onContinue }) => {
   const [howToUse, setHowToUse] = useState('');
   const [livePreview, setLivePreview] = useState('');
 
-  // Category options
+  // UI state
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
   const categories = [
     'Web Templates',
     'UI Kits (With Code)',
@@ -48,43 +36,77 @@ export const ProductForm: React.FC<ProductFormProps> = ({ onContinue }) => {
     'Adobe XD UI Kits'
   ];
 
-  // Handle form submission
-  const handleContinue = () => {
-    const formData: ProductData = {
-      productName,
-      blurb,
-      category,
-      description,
-      features: features.filter(f => f.trim() !== ''), // Remove empty features
-      compatibility,
-      tags,
-      price,
-      howToUse,
-      livePreview
-    };
+  const handleSubmit = async () => {
+    // Reset states
+    setIsLoading(true);
+    setError(null);
+    setSuccess(false);
 
-    onContinue(formData);
+    try {
+      // Prepare data
+      const formData: ProductData = {
+        productName,
+        blurb,
+        category,
+        description,
+        features: features.filter(f => f.trim() !== ''),
+        compatibility,
+        tags,
+        price,
+        howToUse,
+        livePreview
+      };
+
+      // Validate required fields
+      if (!formData.productName || !formData.category) {
+        throw new Error('Please fill in all required fields');
+      }
+
+      // Send to backend
+      const response = await productAPI.create(formData);
+
+      // Success!
+      setSuccess(true);
+      console.log('Product created:', response);
+
+      // Optional: Reset form or redirect
+      // resetForm();
+      // router.push('/products/success');
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create product';
+      setError(errorMessage);
+      console.error('Error:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="space-y-6">
-      {/* Step indicator */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-sm font-bold">
-            1
+      {/* Success Message */}
+      {success && (
+        <div className="bg-green-900/20 border border-green-500 rounded-lg p-4 flex items-center gap-3">
+          <CheckCircle className="text-green-400" size={24} />
+          <div>
+            <p className="text-green-400 font-bold">Success!</p>
+            <p className="text-green-300 text-sm">Product created successfully</p>
           </div>
-          <span className="text-purple-400 font-medium">Product Information</span>
         </div>
-        <div className="flex items-center gap-2 opacity-50">
-          <div className="w-8 h-8 rounded-full bg-slate-700 text-white flex items-center justify-center text-sm font-bold">
-            2
-          </div>
-          <span className="text-slate-400 font-medium">Product Images</span>
-        </div>
-      </div>
+      )}
 
-      {/* Form fields */}
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-900/20 border border-red-500 rounded-lg p-4 flex items-center gap-3">
+          <XCircle className="text-red-400" size={24} />
+          <div>
+            <p className="text-red-400 font-bold">Error</p>
+            <p className="text-red-300 text-sm">{error}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Form fields... (same as before) */}
       <Input
         label="Product Name"
         value={productName}
@@ -100,7 +122,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ onContinue }) => {
           onChange={setBlurb}
           placeholder="Short description"
         />
-
         <Select
           label="Category"
           value={category}
@@ -114,30 +135,21 @@ export const ProductForm: React.FC<ProductFormProps> = ({ onContinue }) => {
         label="Product Description"
         value={description}
         onChange={setDescription}
-        placeholder="Detailed description of your product..."
+        placeholder="Detailed description..."
         rows={5}
       />
 
-      <FeatureInput
-        features={features}
-        onChange={setFeatures}
-        maxFeatures={6}
-      />
+      <FeatureInput features={features} onChange={setFeatures} />
 
       <Textarea
         label="Compatibility"
         value={compatibility}
         onChange={setCompatibility}
-        placeholder="List compatible devices or systems..."
+        placeholder="Compatible devices..."
         rows={4}
       />
 
-      <TagInput
-        label="Tags"
-        tags={tags}
-        onChange={setTags}
-        placeholder="Type a tag and press Enter (e.g., Vue, React, Figma)"
-      />
+      <TagInput label="Tags" tags={tags} onChange={setTags} />
 
       <Input
         label="Price"
@@ -151,7 +163,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ onContinue }) => {
         label="How to use"
         value={howToUse}
         onChange={setHowToUse}
-        placeholder="Instructions on how to use this product..."
+        placeholder="Instructions..."
         rows={4}
       />
 
@@ -159,18 +171,28 @@ export const ProductForm: React.FC<ProductFormProps> = ({ onContinue }) => {
         label="Live Preview"
         value={livePreview}
         onChange={setLivePreview}
-        placeholder="https://example.com/preview"
+        placeholder="https://example.com"
         type="url"
       />
 
-      {/* Continue button */}
+      {/* Submit Button */}
       <div className="flex justify-end pt-4">
         <button
-          onClick={handleContinue}
-          className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+          onClick={handleSubmit}
+          disabled={isLoading}
+          className="px-8 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center gap-2"
         >
-          Continue
-          <span>→</span>
+          {isLoading ? (
+            <>
+              <Loader className="animate-spin" size={20} />
+              Creating...
+            </>
+          ) : (
+            <>
+              Continue
+              <span>→</span>
+            </>
+          )}
         </button>
       </div>
     </div>
