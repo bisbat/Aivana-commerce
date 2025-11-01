@@ -46,23 +46,24 @@ export const productAPI = {
       throw error;
     }
   },
-};
+
   // Get all products
-//   getAll: async (): Promise<ApiResponse<ProductData[]>> => {
-//     try {
-//       const response = await fetch(`${API_BASE_URL}/products`);
+  getAll: async (): Promise<ApiResponse<ProductData[]>> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/products`);
 
-//       if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//       }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-//       const data = await response.json();
-//       return data;
-//     } catch (error) {
-//       console.error('Error fetching products:', error);
-//       throw error;
-//     }
-//   },
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      throw error;
+    }
+  },
+};
 
   // Get single product by ID
 //   getById: async (id: string): Promise<ApiResponse<ProductData>> => {
