@@ -2,12 +2,12 @@ import React from "react";
 import { Edit2 } from "lucide-react";
 import { Product } from "@/types/product";
 
-interface ProductCartSellerProps {
+interface ProductCardSellerProps {
   product: Product;
   onEdit?: (productId: number) => void;
 }
 
-const ProductCartSeller: React.FC<ProductCartSellerProps> = ({ product, onEdit }) => {
+const ProductCardSeller: React.FC<ProductCardSellerProps> = ({ product, onEdit }) => {
   return (
     <div className="border rounded-lg p-0 shadow hover:shadow-xl transition-all duration-300 h-70 w-full overflow-hidden bg-[var(--linne-purple)]">
       {/* Image Section */}
@@ -53,4 +53,4 @@ const ProductCartSeller: React.FC<ProductCartSellerProps> = ({ product, onEdit }
   );
 };
 
-export { ProductCartSeller };
+export { ProductCardSeller };

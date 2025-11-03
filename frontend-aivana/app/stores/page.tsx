@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { ProductCartSeller } from "@/components/ui/seller/ProductCartSeller";
+import { ProductCardSeller } from "@/components/ui/seller/ProductCardSeller";
 import { productAPI } from "@/lib/api/products";
 import { Product } from "@/types/product";
 import { Loader, AlertCircle, Package } from "lucide-react";
@@ -107,7 +107,7 @@ export default function StorePage() {
         {!isLoading && !error && products.length > 0 && (
           <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {products.map((product) => (
-              <ProductCartSeller
+              <ProductCardSeller
                 key={product.id}
                 product={product}
                 onEdit={handleEditProduct}
