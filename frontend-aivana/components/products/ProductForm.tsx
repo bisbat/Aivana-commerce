@@ -16,7 +16,7 @@ export const ProductForm: React.FC = () => {
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
   const [features, setFeatures] = useState<string[]>([]);
-  const [compatibility, setCompatibility] = useState('');
+  const [installationDoc, setInstallationDoc] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [price, setPrice] = useState('');
   const [howToUse, setHowToUse] = useState('');
@@ -50,7 +50,7 @@ export const ProductForm: React.FC = () => {
         category,
         description,
         features: features.filter(f => f.trim() !== ''),
-        compatibility,
+        installationDoc,
         tags,
         price,
         howToUse,
@@ -142,10 +142,10 @@ export const ProductForm: React.FC = () => {
       <FeatureInput features={features} onChange={setFeatures} />
 
       <Textarea
-        label="Compatibility"
-        value={compatibility}
-        onChange={setCompatibility}
-        placeholder="Compatible devices..."
+        label="Installation Document"
+        value={installationDoc}
+        onChange={setInstallationDoc}
+        placeholder="Installation Document..."
         rows={4}
       />
 

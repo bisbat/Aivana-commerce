@@ -8,7 +8,7 @@ export interface ProductData {
   category: string;
   description: string;
   features: string[];
-  compatibility: string;
+  installationDoc: string;
   tags: string[];
   price: string;
   howToUse: string;
