@@ -1,47 +1,56 @@
 'use client';
-import { Sidebar } from '@/components/layout/Sidebar';
-import { ArrowLeft } from 'lucide-react';
+
+import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { Sidebar } from '@/components/layout/Sidebar';
+import { UploadFileForm } from '@/components/products/UploadFileForm';
 import { ProductForm } from '@/components/products/ProductForm';
-import { ProductData } from '@/types/product';
+import { UploadFileData } from '@/types/product';
 
 export default function AddProductPage() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const handleContinue = (data: ProductData) => {
-    console.log('Product data:', data);
-    // TODO: Save to database or move to next step
-    alert('Product data collected! Check console.');
-  };
+  // Track current step (1 = Upload File, 2 = Product Info)
+  const [currentStep, setCurrentStep] = useState(1);
   
+  // Store data from Step 1
+  const [uploadData, setUploadData] = useState<UploadFileData | null>(null);
+
+  // Handle Step 1 completion
+  const handleUploadNext = (data: UploadFileData) => {
+    setUploadData(data);
+    setCurrentStep(2);
+  };
+
+  // Handle going back to Step 1
+  const handleBack = () => {
+    setCurrentStep(1);
+  };
+
   return (
-    <div className="flex">
-      {/* Use your reusable Sidebar */}
-      <Sidebar 
-        storeName="Bisbat Sae-kow"
+    <div className="flex min-h-screen bg-slate-900">
+      {/* Sidebar */}
+      <Sidebar
+        storeName="Store Name"
         currentPath={pathname}
-        onAddProductClick={() => router.push('/products/new')}
+        onAddProductClick={() => router.push('/stores/products/new')}
       />
-      
+
       {/* Main Content */}
       <main className="flex-1 p-8">
-        {/* Header */}
-        <div className="max-w-4xl mx-auto mb-8">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4"
-          >
-            <ArrowLeft size={20} />
-            Back
-          </button>
-          <h1 className="text-3xl font-bold text-white">Add Product</h1>
-          <p className="text-slate-400 mt-2">Step 1 - Product Information</p>
-        </div>
+        <div className="max-w-4xl mx-auto">
+          {/* Conditional rendering based on current step */}
+          {currentStep === 1 && (
+            <UploadFileForm onNext={handleUploadNext} />
+          )}
 
-        {/* Form */}
-        <div className="max-w-4xl mx-auto bg-slate-800/50 rounded-lg p-8">
-          <ProductForm />
+          {currentStep === 2 && uploadData && (
+            <ProductForm 
+              uploadData={uploadData} 
+              onBack={handleBack}
+            />
+          )}
         </div>
       </main>
     </div>
