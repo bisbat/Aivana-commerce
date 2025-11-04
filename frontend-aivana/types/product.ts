@@ -32,3 +32,16 @@ export interface Category {
     updated_at: string;
     hero_image: string;
   }
+
+  export interface ProductData {
+    productName: string;
+    blurb?: string;
+    category: string;
+    description?: string;
+    features: string[];
+    installationDoc?: string;
+    tags?: string[];
+    price: string;
+    howToUse?: string;
+    livePreview?: string;
+  }

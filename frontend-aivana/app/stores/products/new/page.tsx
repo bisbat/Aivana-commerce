@@ -2,8 +2,8 @@
 import { Sidebar } from '@/components/layout/Sidebar';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
-import { ProductForm, ProductData } from '@/components/products/ProductForm';
-
+import { ProductForm } from '@/components/products/ProductForm';
+import { ProductData } from '@/types/product';
 
 export default function AddProductPage() {
   const router = useRouter();
@@ -41,7 +41,7 @@ export default function AddProductPage() {
 
         {/* Form */}
         <div className="max-w-4xl mx-auto bg-slate-800/50 rounded-lg p-8">
-          <ProductForm onContinue={handleContinue} />
+          <ProductForm />
         </div>
       </main>
     </div>

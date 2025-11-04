@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { productAPI, ProductData } from '@/lib/api/products';
+import { productAPI } from '@/lib/api/products';
+import { ProductData } from '@/types/product';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Dropdown';
@@ -19,7 +20,6 @@ export const ProductForm: React.FC = () => {
   const [installationDoc, setInstallationDoc] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [price, setPrice] = useState('');
-  const [howToUse, setHowToUse] = useState('');
   const [livePreview, setLivePreview] = useState('');
 
   // UI state
@@ -53,7 +53,6 @@ export const ProductForm: React.FC = () => {
         installationDoc,
         tags,
         price,
-        howToUse,
         livePreview
       };
 
@@ -157,14 +156,6 @@ export const ProductForm: React.FC = () => {
         onChange={setPrice}
         placeholder="0.00"
         type="number"
-      />
-
-      <Textarea
-        label="How to use"
-        value={howToUse}
-        onChange={setHowToUse}
-        placeholder="Instructions..."
-        rows={4}
       />
 
       <Input
