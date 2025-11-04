@@ -1,8 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Product } from '../../products/entities/product.entity';
+import { UserRoles } from 'src/utility/common/user-roles.enum';
 
 @Entity('users')
-export class User {
+export class UserEntity {
     @PrimaryGeneratedColumn({ type: 'bigint' })
     id: number;
 
@@ -21,8 +22,8 @@ export class User {
     @Column({ type: 'varchar', length: 50, nullable: true })
     promptpay_id: string;
 
-    @Column({ type: 'enum', enum: ['customer', 'seller', 'admin'], default: 'customer' })
-    role: string;
+    @Column({ type: 'enum', enum: UserRoles, default: UserRoles.CUSTOMER })
+    role: UserRoles;
 
     @OneToMany(() => Product, (product) => product.seller)
     products: Product[];

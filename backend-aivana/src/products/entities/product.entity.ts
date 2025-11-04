@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
-import { User } from '../../users/entities/user.entity';
+import { UserEntity } from '../../users/entities/user.entity';
 
 @Entity('products')
 
@@ -36,9 +36,15 @@ export class Product {
     @JoinColumn({ name: 'category_id' })
     category: Category;
 
-    @ManyToOne(() => User, (user) => user.products, { nullable: false })
+    // @Column()
+    // category_id: number;
+
+    @ManyToOne(() => UserEntity, (user) => user.products, { nullable: false })
     @JoinColumn({ name: 'seller_id' })
-    seller: User;
+    seller: UserEntity;
+
+    // @Column()
+    // seller_id: number;
 
     @CreateDateColumn({ type: 'timestamptz', default: () => 'NOW()' })
     created_at: Date;
