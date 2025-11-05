@@ -1,41 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { Product } from './entities/product.entity';
+import { ProductEntity } from './entities/product.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { getCallSites } from 'util';
 
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>,
-  ) {}
+    @InjectRepository(ProductEntity)
+    private productsRepository: Repository<ProductEntity>,
+  ) { }
 
-  async create(createProductDto: CreateProductDto): Promise<Product> {
-    const product = this.productRepository.create(createProductDto);
-    return await this.productRepository.save(product);
-  }
-
-  async findAll(): Promise<Product[]> {
-    return await this.productRepository.find({
-      relations: ['category', 'seller'],
+  async getAllProducts(): Promise<ProductEntity[]> {
+    const products = await this.productsRepository.find({
+       relations: ['category', 'owner'],
     });
+    return products;
   }
 
-  async findOne(id: number): Promise<Product | null> {
-    return await this.productRepository.findOne({
-      where: { id },
-      relations: ['category', 'seller'],
-    });
-  }
-
-  async update(id: number, updateProductDto: UpdateProductDto): Promise<Product | null> {
-    await this.productRepository.update(id, updateProductDto);
-    return this.findOne(id);
-  }
-
-  async remove(id: number): Promise<void> {
-    await this.productRepository.delete(id);
+  async createProduct(createProductDto: CreateProductDto): Promise<ProductEntity> {
+    const product = this.productsRepository.create(createProductDto);
+    const savedProduct = {...product, category:{id: createProductDto.categoryId}, owner:{id: createProductDto.ownerId}};
+    return await this.productsRepository.save(savedProduct);
   }
 }

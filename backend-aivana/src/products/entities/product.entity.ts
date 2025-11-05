@@ -1,52 +1,45 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
-import { Category } from '../../categories/entities/category.entity';
-import { User } from '../../users/entities/user.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { CategoryEntity } from 'src/categories/entities/category.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
 
-@Entity('products')
-
-export class Product {
+@Entity('product')
+export class ProductEntity {
     @PrimaryGeneratedColumn({ type: 'bigint' })
     id: number;
 
-    @Column({ type: 'text', nullable: true })
-    file_path: string;
+    @Column({ type: 'varchar', length: 255 })
+    name: string;
 
-    @Column({ type: 'text', nullable: false })
-    title: string;
+    @Column({type: 'text'})
+    uploaded_file_path: string;
 
-    @Column({ type: 'text', nullable: true })
+    @Column({ type: 'text' })
     description: string;
 
-    @Column({ type: 'text', nullable: true })
-    installation_doc: string;
+    @Column({ type: 'decimal', precision: 10, scale: 2 })
+    price: number;
 
     @Column({ type: 'text', nullable: true })
     blurb: string;
 
-    @Column({ type: 'text', nullable: true })
+    @Column({ type: 'text' })
+    installation_guide: string;
+
+    @Column({ type: 'text' })
     preview_url: string;
 
-    @Column({ type: 'numeric', precision: 10, scale: 2 })
-    price: number;
+    @Column({ type: 'text' })
+    hero_image_url: string;
 
-    @Column('text', { array: true, default: '{}' })
-    features: string[];
+    @Column({ type: 'text', array: true })
+    features: Array<string>;
 
-    @ManyToOne(() => Category, (category) => category.products, { nullable: false })
-    @JoinColumn({ name: 'category_id' })
-    category: Category;
+    @ManyToOne(() => CategoryEntity, category => category.products, { nullable: false })
+    @JoinColumn({ name: 'categoryId' })
+    category: CategoryEntity;
 
-    @ManyToOne(() => User, (user) => user.products, { nullable: false })
-    @JoinColumn({ name: 'seller_id' })
-    seller: User;
-
-    @CreateDateColumn({ type: 'timestamptz', default: () => 'NOW()' })
-    created_at: Date;
-
-    @UpdateDateColumn({ type: 'timestamptz', default: () => 'NOW()' })
-    updated_at: Date;
-
-    @Column({ type: 'text', nullable: true })
-    hero_image: string;
+    @ManyToOne(() => UserEntity, user => user.owned_products, { nullable: false })
+    @JoinColumn({ name: 'ownerId' })
+    owner: UserEntity;
 
 }
