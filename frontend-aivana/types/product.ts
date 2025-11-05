@@ -49,6 +49,10 @@ export interface Category {
     price: string;
     howToUse?: string;
     livePreview?: string;
+
+    // Step 3
+    heroImage: File | null;
+    detailImages: File[];
   }
 
   // NEW: Data from Step 1 (Upload File Form)
@@ -56,4 +60,9 @@ export interface Category {
     productType: 'UI Kit' | 'Coded Template';
     file: File | null;
     keywords: string;
+  }
+
+  export interface UploadImageData {
+    heroImage: File | null;
+    detailImages: File[];
   }
