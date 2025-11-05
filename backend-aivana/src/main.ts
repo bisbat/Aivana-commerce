@@ -4,6 +4,15 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  
+  // Enable CORS
+  app.enableCors({
+    origin: true,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+  
   app.useGlobalPipes(new ValidationPipe(
     {
       whitelist: true,           // ลบ fields ที่ไม่ได้ระบุใน DTO ทิ้ง
@@ -12,6 +21,6 @@ async function bootstrap() {
     }
   )); // Enable validation globally
   // app.setGlobalPrefix('api'); // Set global prefix to 'api'
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3001);
 }
 bootstrap();
