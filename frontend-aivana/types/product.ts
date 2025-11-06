@@ -34,6 +34,11 @@ export interface Category {
   }
 
   export interface ProductData {
+    // Step 1
+    productType: string;
+    file: File | null;
+    keywords: string;  
+    // Step 2
     productName: string;
     blurb?: string;
     category: string;
@@ -44,4 +49,20 @@ export interface Category {
     price: string;
     howToUse?: string;
     livePreview?: string;
+
+    // Step 3
+    heroImage: File | null;
+    detailImages: File[];
+  }
+
+  // NEW: Data from Step 1 (Upload File Form)
+  export interface UploadFileData { 
+    productType: 'UI Kit' | 'Coded Template';
+    file: File | null;
+    keywords: string;
+  }
+
+  export interface UploadImageData {
+    heroImage: File | null;
+    detailImages: File[];
   }
