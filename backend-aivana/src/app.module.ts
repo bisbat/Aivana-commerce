@@ -15,7 +15,7 @@ import { ProductsModule } from './products/products.module';
     TypeOrmModule.forRoot(dataSourceOptions),
     UsersModule,
     CategoriesModule,
-    ProductsModule
+    ProductsModule,
   ],
   controllers: [],
   providers: [],

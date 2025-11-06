@@ -3,16 +3,15 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
 @Entity('category')
 export class CategoryEntity {
-    @PrimaryGeneratedColumn({ type: 'bigint' })
-    id: number;
+  @PrimaryGeneratedColumn({ type: 'bigint' })
+  id: number;
 
-    @Column({type: 'varchar', length: 255, unique: true})
-    name: string;
+  @Column({ type: 'varchar', length: 255, unique: true })
+  name: string;
 
-    @Column({ type: 'text', nullable: true })
-    description: string;
+  @Column({ type: 'text', nullable: true })
+  description: string;
 
-    @OneToMany(() => ProductEntity, product => product.category)
-    products: ProductEntity[];
-
+  @OneToMany(() => ProductEntity, (product) => product.category)
+  products: ProductEntity[];
 }
