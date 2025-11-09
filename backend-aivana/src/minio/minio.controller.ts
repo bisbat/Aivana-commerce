@@ -20,7 +20,7 @@ export class MinioController {
     const fileName = `${timestamp}-${file.originalname}`;
 
     await this.minioService.uploadFile(file, fileName);
-    const fileUrl = await this.minioService.getFileUrl(fileName);
+    const fileUrl = this.minioService.getFileUrl(fileName);
 
     return {
       message: 'File uploaded successfully',

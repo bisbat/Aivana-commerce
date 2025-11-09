@@ -52,6 +52,25 @@ export class MinioService implements OnModuleInit {
         await this.minioClient.makeBucket(this.bucketName, 'us-east-1');
         console.log(`Bucket ${this.bucketName} created successfully`);
       }
+
+      // Set bucket policy to public read for e-commerce product images
+      const publicReadPolicy = {
+        Version: '2012-10-17',
+        Statement: [
+          {
+            Effect: 'Allow',
+            Principal: { AWS: ['*'] },
+            Action: ['s3:GetObject'],
+            Resource: [`arn:aws:s3:::${this.bucketName}/*`],
+          },
+        ],
+      };
+
+      await this.minioClient.setBucketPolicy(
+        this.bucketName,
+        JSON.stringify(publicReadPolicy),
+      );
+      console.log(`Bucket ${this.bucketName} set to public read access`);
     } catch (error) {
       console.error('Error creating bucket:', error);
     }
@@ -85,14 +104,22 @@ export class MinioService implements OnModuleInit {
     }
   }
 
-  async getFileUrl(fileName: string): Promise<string> {
+  getFileUrl(fileName: string): string {
     try {
-      const url = await this.minioClient.presignedGetObject(
-        this.bucketName,
-        fileName,
-        24 * 60 * 60, // 24 hours
-      );
-      return url;
+      // Return permanent public URL for e-commerce
+      const endpoint = this.configService.get<string>('MINIO_ENDPOINT');
+      const port = this.configService.get<string>('MINIO_PORT');
+      const useSSL =
+        (this.configService.get<string>('MINIO_USE_SSL') ?? 'false') === 'true';
+
+      const protocol = useSSL ? 'https' : 'http';
+      const portSuffix =
+        port && port !== '80' && port !== '443' ? `:${port}` : '';
+
+      // Public URL format: http://localhost:9000/bucket-name/file-path
+      const publicUrl = `${protocol}://${endpoint}${portSuffix}/${this.bucketName}/${fileName}`;
+
+      return publicUrl;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Failed to get file URL: ${message}`);

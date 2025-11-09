@@ -18,6 +18,13 @@ export class ProductsService {
     return products;
   }
 
+  async findOne(productId: number): Promise<ProductEntity | null> {
+    return await this.productsRepository.findOne({
+      where: { id: productId },
+      relations: ['category', 'owner'],
+    });
+  }
+
   async createProduct(
     createProductDto: CreateProductDto,
   ): Promise<ProductEntity> {
@@ -28,5 +35,43 @@ export class ProductsService {
       owner: { id: createProductDto.ownerId },
     };
     return await this.productsRepository.save(savedProduct);
+  }
+
+  async updateHeroImage(
+    productId: number,
+    heroImageUrl: string,
+  ): Promise<ProductEntity> {
+    const product = await this.productsRepository.findOne({
+      where: { id: productId },
+      relations: ['category', 'owner'],
+    });
+
+    if (!product) {
+      throw new Error(`Product with ID ${productId} not found`);
+    }
+
+    product.hero_image_url = heroImageUrl;
+    await this.productsRepository.save(product);
+
+    return product;
+  }
+
+  async updatePreviewUrl(
+    productId: number,
+    previewUrl: string,
+  ): Promise<ProductEntity> {
+    const product = await this.productsRepository.findOne({
+      where: { id: productId },
+      relations: ['category', 'owner'],
+    });
+
+    if (!product) {
+      throw new Error(`Product with ID ${productId} not found`);
+    }
+
+    product.preview_url = previewUrl;
+    await this.productsRepository.save(product);
+
+    return product;
   }
 }

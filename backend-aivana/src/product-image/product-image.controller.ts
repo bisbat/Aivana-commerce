@@ -1,54 +1,118 @@
 import {
   Controller,
   Post,
+  Delete,
   UploadedFile,
+  UploadedFiles,
   UseInterceptors,
   Body,
   Param,
   Get,
-  // Delete,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ProductImageService } from './product-image.service';
 import { MinioService } from '../minio/minio.service';
 import type { UploadedFileType } from '../common/interfaces/uploaded-file.interface';
 import { MINIO_FOLDERS } from '../constants/minio-folders.constant';
+import { ProductsService } from '../products/products.service';
 
 @Controller('product-images')
 export class ProductImageController {
   constructor(
     private readonly productImageService: ProductImageService,
     private readonly minioService: MinioService,
+    private readonly productsService: ProductsService,
   ) {}
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('image'))
-  async uploadProductImage(
-    @UploadedFile() file: UploadedFileType,
+  @UseInterceptors(FilesInterceptor('images', 8)) // Max 8 images per upload
+  async uploadProductImages(
+    @UploadedFiles() files: UploadedFileType[],
     @Body('product_id') productId: string,
   ) {
-    const timestamp = Date.now();
-    const fileName = `detail-${timestamp}-${file.originalname}`;
+    if (!files || files.length === 0) {
+      throw new Error('No files uploaded');
+    }
 
-    // Upload to MinIO with product-specific folder
-    const fullPath = await this.minioService.uploadFile(
-      file,
-      fileName,
-      MINIO_FOLDERS.PRODUCTS.DETAILS(productId),
+    // Check existing images count
+    const existingImages = await this.productImageService.findByProductId(
+      parseInt(productId),
     );
-    const fileUrl = await this.minioService.getFileUrl(fullPath);
+    const currentCount = existingImages.length;
+    const newFilesCount = files.length;
+    const totalCount = currentCount + newFilesCount;
 
-    // Save to database
-    const productImage = await this.productImageService.create({
-      path_image: fullPath,
-      product_id: parseInt(productId),
-    });
+    // Limit to 8 images total per product
+    if (totalCount > 8) {
+      throw new Error(
+        `Cannot upload ${newFilesCount} images. Product already has ${currentCount} image(s). Maximum 8 images allowed per product.`,
+      );
+    }
+
+    const uploadedImages: Array<{
+      image_id: number;
+      path_image: string;
+      url: string;
+    }> = [];
+
+    // Upload each file to MinIO and save to database
+    for (const file of files) {
+      const timestamp = Date.now();
+      const fileName = `detail-${timestamp}-${file.originalname}`;
+
+      // Upload to MinIO with product-specific folder
+      const fullPath = await this.minioService.uploadFile(
+        file,
+        fileName,
+        MINIO_FOLDERS.PRODUCTS.DETAILS(productId),
+      );
+      const fileUrl = this.minioService.getFileUrl(fullPath);
+
+      // Save to database
+      const productImage = await this.productImageService.create({
+        path_image: fullPath,
+        product_id: parseInt(productId),
+      });
+
+      uploadedImages.push({
+        image_id: productImage.image_id,
+        path_image: productImage.path_image,
+        url: fileUrl,
+      });
+
+      // Add small delay to ensure unique timestamps
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
 
     return {
-      message: 'Product image uploaded successfully',
-      image_id: productImage.image_id,
-      path_image: productImage.path_image,
-      url: fileUrl,
+      message: `${uploadedImages.length} image(s) uploaded successfully`,
+      product_id: parseInt(productId),
+      total_images: totalCount,
+      images: uploadedImages,
+    };
+  }
+
+  @Delete(':imageId')
+  async deleteProductImage(@Param('imageId') imageId: string) {
+    const image = await this.productImageService.findOne(parseInt(imageId));
+
+    if (!image) {
+      throw new Error(`Image with ID ${imageId} not found`);
+    }
+
+    // Delete from MinIO
+    try {
+      await this.minioService.deleteFile(image.path_image);
+    } catch (error) {
+      console.error('Failed to delete image from MinIO:', error);
+    }
+
+    // Delete from database
+    await this.productImageService.remove(parseInt(imageId));
+
+    return {
+      message: 'Product image deleted successfully',
+      image_id: imageId,
     };
   }
 
@@ -58,6 +122,39 @@ export class ProductImageController {
     @UploadedFile() file: UploadedFileType,
     @Body('product_id') productId: string,
   ) {
+    if (!file) {
+      throw new Error('No file uploaded');
+    }
+
+    // Get product to check if hero image already exists
+    const product = await this.productsService.findOne(parseInt(productId));
+
+    if (!product) {
+      throw new Error(`Product with ID ${productId} not found`);
+    }
+
+    // Delete old hero image from MinIO if exists
+    if (product.hero_image_url) {
+      try {
+        const url = new URL(product.hero_image_url);
+        const pathParts = url.pathname.split('/');
+        const bucketName = process.env.MINIO_BUCKET_NAME;
+        if (!bucketName) {
+          console.error(
+            'MINIO_BUCKET_NAME is not set. Skipping deletion of old preview file.',
+          );
+        } else {
+          const bucketIndex = pathParts.indexOf(bucketName);
+          if (bucketIndex !== -1) {
+            const filePath = pathParts.slice(bucketIndex + 1).join('/');
+            await this.minioService.deleteFile(filePath);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to delete old hero image from MinIO:', error);
+      }
+    }
+
     const timestamp = Date.now();
     const fileName = `hero-${timestamp}-${file.originalname}`;
 
@@ -67,34 +164,14 @@ export class ProductImageController {
       fileName,
       MINIO_FOLDERS.PRODUCTS.HERO(productId),
     );
-    const fileUrl = await this.minioService.getFileUrl(fullPath);
+    const fileUrl = this.minioService.getFileUrl(fullPath);
+
+    // Update hero_image_url in ProductEntity
+    await this.productsService.updateHeroImage(parseInt(productId), fileUrl);
 
     return {
       message: 'Hero image uploaded successfully',
-      fileName: fullPath,
-      url: fileUrl,
-    };
-  }
-
-  @Post('preview-file')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadPreviewFile(
-    @UploadedFile() file: UploadedFileType,
-    @Body('product_id') productId: string,
-  ) {
-    const timestamp = Date.now();
-    const fileName = `preview-${timestamp}-${file.originalname}`;
-
-    // Upload to MinIO with product-specific files folder
-    const fullPath = await this.minioService.uploadFile(
-      file,
-      fileName,
-      MINIO_FOLDERS.PRODUCTS.FILES(productId),
-    );
-    const fileUrl = await this.minioService.getFileUrl(fullPath);
-
-    return {
-      message: 'Preview file uploaded successfully',
+      product_id: parseInt(productId),
       fileName: fullPath,
       url: fileUrl,
     };
@@ -106,13 +183,11 @@ export class ProductImageController {
       parseInt(productId),
     );
 
-    const imagesWithUrls = await Promise.all(
-      images.map(async (image) => ({
-        image_id: image.image_id,
-        path_image: image.path_image,
-        url: await this.minioService.getFileUrl(image.path_image),
-      })),
-    );
+    const imagesWithUrls = images.map((image) => ({
+      image_id: image.image_id,
+      path_image: image.path_image,
+      url: this.minioService.getFileUrl(image.path_image),
+    }));
 
     return {
       product_id: productId,
@@ -124,22 +199,4 @@ export class ProductImageController {
   findOne(@Param('id') id: string) {
     return this.productImageService.findOne(+id);
   }
-
-  // @Delete(':imageId')
-  // async deleteProductImage(@Param('imageId') imageId: string) {
-  //   const image = await this.productImageService.findOne(parseInt(imageId));
-
-  //   if (image) {
-  //     // Delete from MinIO
-  //     await this.minioService.deleteFile(image.path_image);
-
-  //     // Delete from database
-  //     await this.productImageService.remove(parseInt(imageId));
-  //   }
-
-  //   return {
-  //     message: 'Product image deleted successfully',
-  //     image_id: imageId,
-  //   };
-  // }
 }

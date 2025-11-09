@@ -34,7 +34,7 @@ export class ProductEntity {
   @Column({ type: 'text' })
   preview_url: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text' })
   hero_image_url: string;
 
   @Column({ type: 'text', array: true })

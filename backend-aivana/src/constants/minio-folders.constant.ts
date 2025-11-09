@@ -21,9 +21,9 @@ export const MINIO_FOLDERS = {
     /**
      * Get files folder for a specific product
      * @param productId - Product ID
-     * @returns Path like 'products/1/files'
+     * @returns Path like 'products/1/file'
      */
-    FILES: (productId: number | string) => `products/${productId}/files`,
+    FILE: (productId: number | string) => `products/${productId}/file`,
 
     /**
      * Get root folder for a specific product
