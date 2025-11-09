@@ -25,4 +25,11 @@ export class ProductsService {
     const savedProduct = {...product, category:{id: createProductDto.categoryId}, owner:{id: createProductDto.ownerId}};
     return await this.productsRepository.save(savedProduct);
   }
+
+  async getProductById(id: number): Promise<ProductEntity | null> {
+    return await this.productsRepository.findOne({
+      where: { id },
+      relations: ['category', 'owner'],
+    });
+  }
 }
