@@ -18,7 +18,7 @@ export const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-semibold mb-4">หมวดหมู่</h4>
             <ul className="space-y-2">
-              {['UI Kits', 'UI Kits', 'UI Kits', 'UI Kits'].map((item, i) => (
+              {['UI Kits', 'Code Template'].map((item, i) => (
                 <li key={i}>
                   <Link href="#" className="text-slate-400 hover:text-purple-400 text-sm transition-colors">
                     {item}
