@@ -4,9 +4,11 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
+import { ProductImage } from 'src/product-image/entities/product-image.entity';
 
 @Entity('product')
 export class ProductEntity {
@@ -16,7 +18,7 @@ export class ProductEntity {
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   uploaded_file_path: string;
 
   @Column({ type: 'text' })
@@ -31,10 +33,10 @@ export class ProductEntity {
   @Column({ type: 'text' })
   installation_guide: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   preview_url: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   hero_image_url: string;
 
   @Column({ type: 'text', array: true })
@@ -54,4 +56,6 @@ export class ProductEntity {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
+  @OneToMany(() => ProductImage, (image) => image.product)
+  product_images: ProductImage[];
 }

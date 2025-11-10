@@ -4,12 +4,15 @@ import { ProductEntity } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { MinioService } from '../minio/minio.service';
+import { ProductWithImagesDto } from './interfaces/product-with-images.interface';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(ProductEntity)
     private productsRepository: Repository<ProductEntity>,
+    private minioService: MinioService,
   ) {}
 
   async getAllProducts(): Promise<ProductEntity[]> {
@@ -76,17 +79,6 @@ export class ProductsService {
     return product;
   }
 
-  async getProductById(id: number): Promise<ProductEntity> {
-    const product = await this.productsRepository.findOne({
-      where: { id },
-      relations: ['category', 'owner'],
-    });
-    if (!product) {
-      throw new Error('Product not found');
-    }
-    return product;
-  }
-
   async updateProduct(
     id: number,
     updateProductDto: UpdateProductDto,
@@ -110,5 +102,51 @@ export class ProductsService {
 
   async deleteProduct(id: number): Promise<void> {
     await this.productsRepository.delete(id);
+  }
+
+  async updateUploadedFilePath(
+    productId: number,
+    uploadedFilePath: string,
+  ): Promise<ProductEntity> {
+    const product = await this.productsRepository.findOne({
+      where: { id: productId },
+      relations: ['category', 'owner'],
+    });
+
+    if (!product) {
+      throw new Error(`Product with ID ${productId} not found`);
+    }
+
+    product.uploaded_file_path = uploadedFilePath;
+    await this.productsRepository.save(product);
+
+    return product;
+  }
+
+  async getProductById(id: number): Promise<ProductWithImagesDto | null> {
+    const product = await this.productsRepository.findOne({
+      where: { id },
+      relations: ['category', 'owner', 'product_images'],
+    });
+
+    if (!product) {
+      return null;
+    }
+
+    const detailImages =
+      product.product_images?.map((image) => ({
+        image_id: image.image_id,
+        path_image: image.path_image,
+        url: this.minioService.getFileUrl(image.path_image),
+      })) || [];
+
+    // Remove product_images and add detail_images with URLs
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { product_images, ...productData } = product;
+
+    return {
+      ...productData,
+      detail_images: detailImages,
+    };
   }
 }

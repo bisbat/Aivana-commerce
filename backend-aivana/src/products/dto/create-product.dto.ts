@@ -11,9 +11,9 @@ export class CreateProductDto {
   @IsString()
   name: string;
 
-  @IsNotEmpty()
   @IsString()
-  uploaded_file_path: string;
+  @IsOptional()
+  uploaded_file_path?: string;
 
   @IsString()
   description: string;
@@ -29,10 +29,12 @@ export class CreateProductDto {
   installation_guide: string;
 
   @IsString()
-  preview_url: string;
+  @IsOptional()
+  preview_url?: string;
 
   @IsString()
-  hero_image_url: string;
+  @IsOptional()
+  hero_image_url?: string;
 
   @IsArray()
   @IsString({ each: true })

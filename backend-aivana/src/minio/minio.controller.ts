@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MinioService } from './minio.service';
-import type { UploadedFileType } from '../common/interfaces/uploaded-file.interface';
+import type { UploadedFileType } from '../products/interfaces/uploaded-file.interface';
 
 @Controller('files')
 export class MinioController {

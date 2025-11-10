@@ -12,7 +12,7 @@ import {
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ProductImageService } from './product-image.service';
 import { MinioService } from '../minio/minio.service';
-import type { UploadedFileType } from '../common/interfaces/uploaded-file.interface';
+import type { UploadedFileType } from '../products/interfaces/uploaded-file.interface';
 import { MINIO_FOLDERS } from '../constants/minio-folders.constant';
 import { ProductsService } from '../products/products.service';
 

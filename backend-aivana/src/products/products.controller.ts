@@ -12,10 +12,11 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
-import type { UploadedFileType } from '../common/interfaces/uploaded-file.interface';
+import type { UploadedFileType } from './interfaces/uploaded-file.interface';
 import { MinioService } from '../minio/minio.service';
 import { MINIO_FOLDERS } from '../constants/minio-folders.constant';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductWithImagesDto } from './interfaces/product-with-images.interface';
 
 @Controller('products')
 export class ProductsController {
@@ -56,17 +57,11 @@ export class ProductsController {
       try {
         const url = new URL(product.preview_url);
         const pathParts = url.pathname.split('/');
-        const bucketName = process.env.MINIO_BUCKET_NAME;
-        if (!bucketName) {
-          console.error(
-            'MINIO_BUCKET_NAME is not set. Skipping deletion of old preview file.',
-          );
-        } else {
-          const bucketIndex = pathParts.indexOf(bucketName);
-          if (bucketIndex !== -1) {
-            const filePath = pathParts.slice(bucketIndex + 1).join('/');
-            await this.minioService.deleteFile(filePath);
-          }
+        const bucketName = process.env.MINIO_BUCKET_NAME || 'aivana-commerce';
+        const bucketIndex = pathParts.indexOf(bucketName);
+        if (bucketIndex !== -1) {
+          const filePath = pathParts.slice(bucketIndex + 1).join('/');
+          await this.minioService.deleteFile(filePath);
         }
       } catch (error) {
         console.error('Failed to delete old preview file from MinIO:', error);
@@ -95,8 +90,68 @@ export class ProductsController {
     };
   }
 
+  @Post('uploaded-file')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadProductFile(
+    @UploadedFile() file: UploadedFileType,
+    @Body('product_id') productId: string,
+  ) {
+    if (!file) {
+      throw new Error('No file uploaded');
+    }
+
+    // Get product to check if uploaded file already exists
+    const product = await this.productsService.findOne(parseInt(productId));
+
+    if (!product) {
+      throw new Error(`Product with ID ${productId} not found`);
+    }
+
+    // Delete old uploaded file from MinIO if exists
+    if (product.uploaded_file_path) {
+      try {
+        const url = new URL(product.uploaded_file_path);
+        const pathParts = url.pathname.split('/');
+        const bucketName = process.env.MINIO_BUCKET_NAME || 'aivana-commerce';
+        const bucketIndex = pathParts.indexOf(bucketName);
+        if (bucketIndex !== -1) {
+          const filePath = pathParts.slice(bucketIndex + 1).join('/');
+          await this.minioService.deleteFile(filePath);
+        }
+      } catch (error) {
+        console.error('Failed to delete old uploaded file from MinIO:', error);
+      }
+    }
+
+    const timestamp = Date.now();
+    const fileName = `uploaded-${timestamp}-${file.originalname}`;
+
+    // Upload new file to MinIO
+    const fullPath = await this.minioService.uploadFile(
+      file,
+      fileName,
+      MINIO_FOLDERS.PRODUCTS.UPLOADS(productId),
+    );
+    const fileUrl = this.minioService.getFileUrl(fullPath);
+
+    // Update uploaded_file_path in ProductEntity
+    await this.productsService.updateUploadedFilePath(
+      parseInt(productId),
+      fileUrl,
+    );
+
+    return {
+      message: 'Product file uploaded successfully',
+      product_id: parseInt(productId),
+      fileName: fullPath,
+      url: fileUrl,
+    };
+  }
+
   @Get(':id')
-  async getProductById(@Param('id') id: number) {
+  async getProductById(
+    @Param('id') id: number,
+  ): Promise<ProductWithImagesDto | null> {
     return this.productsService.getProductById(id);
   }
 
