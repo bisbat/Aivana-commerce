@@ -51,4 +51,7 @@ export class ProductEntity {
   })
   @JoinColumn({ name: 'ownerId' })
   owner: UserEntity;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  created_at: Date;
 }

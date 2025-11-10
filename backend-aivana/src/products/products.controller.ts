@@ -6,6 +6,8 @@ import {
   UploadedFile,
   UseInterceptors,
   Param,
+  Put,
+  Delete,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductsService } from './products.service';
@@ -13,6 +15,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import type { UploadedFileType } from '../common/interfaces/uploaded-file.interface';
 import { MinioService } from '../minio/minio.service';
 import { MINIO_FOLDERS } from '../constants/minio-folders.constant';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -95,5 +98,19 @@ export class ProductsController {
   @Get(':id')
   async getProductById(@Param('id') id: number) {
     return this.productsService.getProductById(id);
+  }
+
+  @Put(':id')
+  async updateProduct(
+    @Param('id') id: number,
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
+    return this.productsService.updateProduct(id, updateProductDto);
+  }
+
+  @Delete(':id')
+  async deleteProduct(@Param('id') id: number) {
+    await this.productsService.deleteProduct(id);
+    return { message: 'Product deleted successfully' };
   }
 }
