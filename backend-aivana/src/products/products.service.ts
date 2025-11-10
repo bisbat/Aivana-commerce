@@ -74,4 +74,10 @@ export class ProductsService {
 
     return product;
   }
+  async getProductById(id: number): Promise<ProductEntity | null> {
+    return await this.productsRepository.findOne({
+      where: { id },
+      relations: ['category', 'owner'],
+    });
+  }
 }

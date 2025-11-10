@@ -5,6 +5,7 @@ import {
   Body,
   UploadedFile,
   UseInterceptors,
+  Param,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductsService } from './products.service';
@@ -89,5 +90,10 @@ export class ProductsController {
       fileName: fullPath,
       url: fileUrl,
     };
+  }
+
+  @Get(':id')
+  async getProductById(@Param('id') id: number) {
+    return this.productsService.getProductById(id);
   }
 }

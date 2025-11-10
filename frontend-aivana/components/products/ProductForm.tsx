@@ -1,16 +1,39 @@
 'use client';
 
 import React, { useState } from 'react';
-import { productAPI } from '@/lib/api/products';
-import { ProductData } from '@/types/product';
+import { UploadFileData } from '@/types/product';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Dropdown';
 import { TagInput } from '@/components/ui/TagInput';
 import { FeatureInput } from '@/components/ui/FeatureInput';
-import { Loader, CheckCircle, XCircle } from 'lucide-react';
 
-export const ProductForm: React.FC = () => {
+// NEW: This component no longer submits to backend
+// It just collects data and passes to next step
+interface ProductFormProps {
+  uploadData: UploadFileData;
+  onNext: (data: ProductFormData) => void; // Changed from onBack
+  onBack: () => void;
+}
+
+// NEW: Type for data collected in this step only
+export interface ProductFormData {
+  productName: string;
+  blurb: string;
+  category: string;
+  description: string;
+  features: string[];
+  installationDoc: string;
+  tags: string[];
+  price: string;
+  livePreview: string;
+}
+
+export const ProductForm: React.FC<ProductFormProps> = ({ 
+  uploadData, 
+  onNext, 
+  onBack 
+}) => {
   // Form state
   const [productName, setProductName] = useState('');
   const [blurb, setBlurb] = useState('');
@@ -22,10 +45,7 @@ export const ProductForm: React.FC = () => {
   const [price, setPrice] = useState('');
   const [livePreview, setLivePreview] = useState('');
 
-  // UI state
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
 
   const categories = [
     'Web Templates',
@@ -36,76 +56,79 @@ export const ProductForm: React.FC = () => {
     'Adobe XD UI Kits'
   ];
 
-  const handleSubmit = async () => {
-    // Reset states
-    setIsLoading(true);
+  // Handle continue to next step
+  const handleContinue = () => {
     setError(null);
-    setSuccess(false);
 
-    try {
-      // Prepare data
-      const formData: ProductData = {
-        productName,
-        blurb,
-        category,
-        description,
-        features: features.filter(f => f.trim() !== ''),
-        installationDoc,
-        tags,
-        price,
-        livePreview
-      };
-
-      // Validate required fields
-      if (!formData.productName || !formData.category) {
-        throw new Error('Please fill in all required fields');
-      }
-
-      // Send to backend
-      const response = await productAPI.create(formData);
-
-      // Success!
-      setSuccess(true);
-      console.log('Product created:', response);
-
-      // Optional: Reset form or redirect
-      // resetForm();
-      // router.push('/products/success');
-
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create product';
-      setError(errorMessage);
-      console.error('Error:', err);
-    } finally {
-      setIsLoading(false);
+    // Validate required fields
+    if (!productName || !category) {
+      setError('Please fill in all required fields');
+      return;
     }
+
+    // Pass data to parent (page.tsx)
+    const formData: ProductFormData = {
+      productName,
+      blurb,
+      category,
+      description,
+      features: features.filter(f => f.trim() !== ''),
+      installationDoc,
+      tags,
+      price,
+      livePreview
+    };
+
+    onNext(formData);
   };
 
   return (
     <div className="space-y-6">
-      {/* Success Message */}
-      {success && (
-        <div className="bg-green-900/20 border border-green-500 rounded-lg p-4 flex items-center gap-3">
-          <CheckCircle className="text-green-400" size={24} />
-          <div>
-            <p className="text-green-400 font-bold">Success!</p>
-            <p className="text-green-300 text-sm">Product created successfully</p>
+      {/* Step Indicator */}
+      <div className="flex items-center gap-4 mb-8">
+        <button
+          onClick={onBack}
+          className="text-purple-400 hover:text-purple-300 transition-colors"
+        >
+          ← ย้อนกลับ
+        </button>
+        <div className="flex-1 flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-bold">
+            ✓
           </div>
+          <span className="text-green-400 text-sm font-medium">Upload File</span>
+          
+          <div className="h-px w-12 bg-slate-700" />
+          
+          <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-sm font-bold">
+            2
+          </div>
+          <span className="text-purple-400 text-sm font-medium">Product Information</span>
+          
+          <div className="h-px w-12 bg-slate-700" />
+          
+          <div className="w-8 h-8 rounded-full bg-slate-700 text-slate-400 flex items-center justify-center text-sm font-bold">
+            3
+          </div>
+          <span className="text-slate-400 text-sm font-medium">Product Images</span>
         </div>
-      )}
+      </div>
+
+      {/* Show uploaded file info */}
+      <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
+        <p className="text-slate-400 text-sm mb-2">Uploaded file:</p>
+        <p className="text-white font-medium">{uploadData.file?.name}</p>
+        <p className="text-slate-400 text-sm mt-1">Type: {uploadData.productType}</p>
+      </div>
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-900/20 border border-red-500 rounded-lg p-4 flex items-center gap-3">
-          <XCircle className="text-red-400" size={24} />
-          <div>
-            <p className="text-red-400 font-bold">Error</p>
-            <p className="text-red-300 text-sm">{error}</p>
-          </div>
+        <div className="bg-red-900/20 border border-red-500 rounded-lg p-4">
+          <p className="text-red-400 text-sm">{error}</p>
         </div>
       )}
 
-      {/* Form fields... (same as before) */}
+      {/* All form fields - same as before */}
       <Input
         label="Product Name"
         value={productName}
@@ -166,24 +189,14 @@ export const ProductForm: React.FC = () => {
         type="url"
       />
 
-      {/* Submit Button */}
+      {/* Continue Button - No longer submits to backend */}
       <div className="flex justify-end pt-4">
         <button
-          onClick={handleSubmit}
-          disabled={isLoading}
-          className="px-8 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+          onClick={handleContinue}
+          className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
         >
-          {isLoading ? (
-            <>
-              <Loader className="animate-spin" size={20} />
-              Creating...
-            </>
-          ) : (
-            <>
-              Continue
-              <span>→</span>
-            </>
-          )}
+          Continue
+          <span>→</span>
         </button>
       </div>
     </div>
