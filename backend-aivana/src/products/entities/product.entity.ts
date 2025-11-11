@@ -42,11 +42,8 @@ export class ProductEntity {
   @Column({ type: 'text', array: true })
   features: Array<string>;
 
-  @Column({ type: 'text', nullable: true })
-  compatibility: string;
-
-  @Column({ type: 'text', nullable: true })
-  highlights: string;
+  @Column({ type: 'text', array: true })
+  compatibility: Array<string>;
 
   @ManyToOne(() => CategoryEntity, (category) => category.products, {
     nullable: false,
