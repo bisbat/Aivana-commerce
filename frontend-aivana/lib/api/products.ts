@@ -1,4 +1,4 @@
-import { Product,ProductData } from '@/types/product';
+import { Product,ProductData } from '@/lib/api/types/product';
 // Base URL for your NestJS backend
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 // Type for API response

@@ -1,6 +1,6 @@
 import React from "react";
 import { Edit2 } from "lucide-react";
-import { Product } from "@/types/product";
+import { Product } from "@/lib/api/types/product";
 
 interface ProductCardSellerProps {
   product: Product;

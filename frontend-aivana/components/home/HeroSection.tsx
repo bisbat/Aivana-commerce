@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
+import { ProductDataForm } from '@/lib/api/types/product';
 
 export const HeroSection: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -11,6 +12,18 @@ export const HeroSection: React.FC = () => {
     console.log('Searching for:', searchQuery);
     // TODO: Implement search functionality
   };
+
+  const a: ProductDataForm = {
+    productType: '',
+    file: null,
+    keywords: '',
+    productName: '',
+    category: '',
+    features: [],
+    price: '',
+    heroImage: null,
+    detailImages: []
+  }
 
   return (
     <section className="bg-gradient-to-b from-[#1a1a2e] to-[#16213e] py-20">

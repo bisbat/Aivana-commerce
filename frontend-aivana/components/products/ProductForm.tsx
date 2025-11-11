@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { UploadFileData } from '@/types/product';
+import { UploadFileData } from '@/lib/api/types/product';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Dropdown';

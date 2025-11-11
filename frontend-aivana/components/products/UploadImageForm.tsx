@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
-import { UploadImageData } from '@/types/product';
+import { UploadImageData } from '@/lib/api/types/product';
 
 interface UploadImageFormProps {
   onPublish: (data: UploadImageData) => void;

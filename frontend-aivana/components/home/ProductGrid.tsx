@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { productAPI } from '@/lib/api/products';
-import { Product } from '@/types/product';
+import { Product } from '@/lib/api/types/product';
 import { ProductCard } from './ProductCard';
 import { Loader, AlertCircle } from 'lucide-react';
 
