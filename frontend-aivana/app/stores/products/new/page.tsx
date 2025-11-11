@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Sidebar } from '@/components/layout/Sidebar';
 import { UploadFileForm } from '@/components/products/UploadFileForm';
 import { ProductForm, ProductFormData } from '@/components/products/ProductForm';
 import { UploadImageForm } from '@/components/products/UploadImageForm';
@@ -106,12 +105,6 @@ export default function AddProductPage() {
 
   return (
     <div className="flex min-h-screen bg-slate-900">
-      {/* Sidebar */}
-      <Sidebar
-        storeName="Store Name"
-        currentPath={pathname}
-        onAddProductClick={() => router.push('/stores/products/new')}
-      />
 
       {/* Main Content */}
       <main className="flex-1 p-8">

@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { productAPI } from '@/lib/api/products';
-import { Product } from '@/lib/api/types/product';
+import { Product } from '@/lib/types/product';
+import { getAllProductsAction } from '@/lib/actions/product.actions'
 import { ProductCard } from './ProductCard';
 import { Loader, AlertCircle } from 'lucide-react';
 
@@ -20,7 +20,7 @@ export const ProductGrid: React.FC = () => {
   const fetchProducts = async () => {
     try {
       setIsLoading(true);
-      const data = await productAPI.getAll();
+      const data = await getAllProductsAction();
       setProducts(data);
     } catch (err) {
       setError('Failed to load products');
