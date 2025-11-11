@@ -25,7 +25,17 @@ const ProductInformationForm = ({ product }: { product: Product }) => {
                 <label htmlFor="name" className="block text-sm font-medium mb-1">Product Name</label>
                 <input type="text" id="name" name="name" defaultValue={product.name} className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white" required />
             </div>
-            
+            {/* tags */}
+            {/* can add and delete tags */}
+            <div>
+                <label className="block text-sm font-medium mb-1">Tags</label>
+                <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-purple-600 text-white rounded-full text-sm">UI Kit</span>
+                    <span className="px-3 py-1 bg-purple-600 text-white rounded-full text-sm">Dashboard</span>
+                    <span className="px-3 py-1 bg-purple-600 text-white rounded-full text-sm">Figma</span>
+                </div>
+            </div>
+
             {/* Blurb & Category */}
             <div className="flex space-x-4">
                 <div className="flex-1">

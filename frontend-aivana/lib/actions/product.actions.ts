@@ -3,7 +3,7 @@ import { revalidatePath } from 'next/cache';
 
 export async function createProductAction(productData: any) {
     // ส่งคำขอไปยัง API เพื่อสร้างสินค้าใหม่
-    const res = await fetch(`https://api.yourstore.com/products`, {
+    const res = await fetch(`http://localhost:3000/products`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -19,7 +19,7 @@ export async function createProductAction(productData: any) {
 
 export async function updateProductAction(productId: string, updatedData: any) {
     // ส่งคำขอไปยัง API เพื่ออัปเดตข้อมูลสินค้า
-    const res = await fetch(`https://api.yourstore.com/products/${productId}`, {
+    const res = await fetch(`http://localhost:3000/products/${productId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -35,7 +35,7 @@ export async function updateProductAction(productId: string, updatedData: any) {
 
 export async function deleteProductAction(productId: string) {
     // ส่งคำขอไปยัง API เพื่อลบสินค้า
-    const res = await fetch(`https://api.yourstore.com/products/${productId}`, {
+    const res = await fetch(`http://localhost:3000/products/${productId}`, {
         method: 'DELETE',
     });
 
