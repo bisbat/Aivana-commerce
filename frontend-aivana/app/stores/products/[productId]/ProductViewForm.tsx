@@ -14,51 +14,52 @@ type SubTab = 'information' | 'images' | 'file';
 // 1. Tab: ข้อมูลสินค้า (Product Information View)
 const ProductInformationView = ({ product }: { product: Product }) => {
 
-    // จำลองข้อมูล Tags, Compatibility และ Highlight
-    // ใน Product จริง อาจต้องมีการดึงค่าเหล่านี้จาก product object
-    const productTags = ['UI Kit', 'Dashboard', 'Figma', 'Web'];
-    const compatibility = ['Figma', 'Sketch', 'Adobe XD'];
-    const highlight = "This product is a bestseller with full component library access.";
-
-    // ฟังก์ชันสำหรับแสดงค่าในรูปแบบ View (ลบ border และใช้ bg-gray-700/800)
+    // Helper Component เพื่อแสดงค่าในรูปแบบ View (ใช้พื้นหลังเข้ม ไม่มี border)
     const ValueDisplay = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => (
-        <div className={`w-full p-2 bg-gray-800 rounded text-white ${className}`}>
+        <div className={`w-full p-3 bg-gray-800 rounded text-white ${className}`}>
             {children}
         </div>
     );
 
+    // ข้อมูลจาก JSON ใหม่
+    const productTags = product.category.name ? [product.category.name, 'Component', 'Frontend'] : ['Component', 'Frontend'];
+    const compatibilityList = product.compatibility || [];
+
+    // เนื่องจาก JSON ไม่มี 'highlights' ในระดับ root, จึงใช้ blurb/description แทนในการเน้นข้อมูล
+    const highlightText = product.blurb || product.description;
+
     return (
         <div className="space-y-6 pt-4 text-gray-200">
-            
-            {/* 1. Product Name & Highlight */}
-            <div className="flex justify-between items-center p-4 rounded-lg">
+
+            {/* 1. Product Name & Highlight (Blurb) */}
+            <div className="flex items-start">
                 <div>
                     <label className="block text-sm font-medium mb-1 text-gray-400">Product Name</label>
-                    <h2 className="text-3xl font-extrabold text-white">{product.name}</h2>
+                    <h2 className="p-3 text-3xl font-extrabold text-white">{product.name}</h2>
                 </div>
-                {/* Highlight */}
-                <div className="text-right">
-                    <label className="block text-sm font-medium mb-1 text-yellow-400">Highlight</label>
-                    <p className="text-sm italic text-yellow-300 max-w-xs">{highlight}</p>
-                </div>
+            </div>
+            {/* Blurb as Highlight */}
+            <div className="text max-w-sm">
+                <label className="block text-sm font-medium mb-1 text-gray-400">Blurb</label>
+                <p className="p-3 text-base font-semibold">{highlightText}</p>
             </div>
 
             {/* 2. Tags & Category */}
             <div className="flex space-x-6">
                 <div className="flex-1">
                     <label className="block text-sm font-medium mb-2 text-gray-400">Tags</label>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="p-3 flex flex-wrap gap-2">
                         {productTags.map((tag, index) => (
-                            <span 
-                                key={index} 
-                                className="px-3 py-1 bg-purple-700 text-white rounded-full text-xs font-medium hover:bg-purple-600"
+                            <span
+                                key={index}
+                                className="px-3 py-1 bg-purple-700 text-white rounded-full text-xs font-medium"
                             >
                                 {tag}
                             </span>
                         ))}
                     </div>
                 </div>
-                <div className="w-1/4">
+                <div className="w-1/2">
                     <label className="block text-sm font-medium mb-2 text-gray-400">Category</label>
                     <ValueDisplay className="bg-gray-700 font-medium">
                         {product.category.name}
@@ -66,38 +67,24 @@ const ProductInformationView = ({ product }: { product: Product }) => {
                 </div>
             </div>
 
-            {/* 3. Blurb */}
+            {/* 3. Product Description */}
             <div>
-                <label className="block text-sm font-medium mb-2 text-gray-400">Blurb</label>
-                <ValueDisplay className="bg-gray-700 italic">
-                    {product.blurb || '— ไม่มี Blurb —'}
-                </ValueDisplay>
-            </div>
-            
-            {/* 4. Product Description */}
-            <div>
-                <label className="block text-sm font-medium mb-2 text-gray-400">Product Description</label>
-                <ValueDisplay className="bg-gray-700 whitespace-pre-wrap min-h-[120px] text-base">
+                <label className="block text-sm font-medium mb-2 text-gray-400">Description</label>
+                <ValueDisplay className="bg-gray-700 whitespace-pre-wrap min-h-[100px] text-base">
                     {product.description}
                 </ValueDisplay>
             </div>
-            
-            {/* 5. Features & Compatibility */}
+
+            {/* 4. Features & Compatibility */}
             <div className="grid grid-cols-2 gap-6">
-                {/* Features (max 6) */}
+                {/* Features */}
                 <div>
                     <label className="block text-sm font-medium mb-2 text-gray-400">Key Features</label>
                     <div className="space-y-2">
                         {product.features.map((feature, index) => (
                             <ValueDisplay key={index} className="bg-gray-800 text-sm flex items-center">
-                                <svg className="w-4 h-4 mr-2 text-green-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path></svg>
+                                <svg className="w-4 h-4 mr-2 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path></svg>
                                 {feature}
-                            </ValueDisplay>
-                        ))}
-                        {/* หากมี feature ไม่ถึง 6 ให้แสดงช่องว่างแทน */}
-                        {Array.from({ length: 6 - product.features.length }).map((_, index) => (
-                            <ValueDisplay key={`empty-${index}`} className="bg-gray-800 text-gray-500 italic text-sm">
-                                — ว่าง —
                             </ValueDisplay>
                         ))}
                     </div>
@@ -107,9 +94,9 @@ const ProductInformationView = ({ product }: { product: Product }) => {
                 <div>
                     <label className="block text-sm font-medium mb-2 text-gray-400">Compatibility</label>
                     <div className="flex flex-wrap gap-2">
-                        {compatibility.map((item, index) => (
-                            <span 
-                                key={index} 
+                        {compatibilityList.map((item, index) => (
+                            <span
+                                key={index}
                                 className="px-3 py-1 bg-blue-700 text-white rounded text-sm font-medium"
                             >
                                 {item}
@@ -119,10 +106,26 @@ const ProductInformationView = ({ product }: { product: Product }) => {
                 </div>
             </div>
 
+            {/* 5. Installation Guide & Creation Date */}
+            <div className="grid grid-cols-2 gap-6 pt-2 border-t border-gray-700">
+                <div>
+                    <label className="block text-sm font-medium mb-2 text-gray-400">Installation Guide</label>
+                    <ValueDisplay className="bg-gray-700 font-mono text-sm">
+                        {product.installation_guide}
+                    </ValueDisplay>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium mb-2 text-gray-400">Created Date</label>
+                    <ValueDisplay className="bg-gray-700 text-sm">
+                        {new Date(product.created_at).toLocaleDateString()}
+                    </ValueDisplay>
+                </div>
+            </div>
+
             {/* 6. Price */}
-            <div className="pt-4 border-t border-gray-700">
+            <div className="pt-4">
                 <label className="block text-sm font-medium mb-2 text-gray-400">Price</label>
-                <p className="p-3 bg-green-700 rounded text-white text-3xl font-extrabold w-1/3 text-center">
+                <p className="p-3 rounded text-white text-md font-extrabold w-1/3">
                     ${product.price}
                 </p>
             </div>
@@ -132,25 +135,76 @@ const ProductInformationView = ({ product }: { product: Product }) => {
 
 // 2. Tab: รูปภาพสินค้า (Product Images View)
 const ProductImagesView = ({ product }: { product: Product }) => {
+
+    // Helper Component เพื่อแสดงรูปภาพ
+    const ImagePreview = ({ url, altText }: { url: string, altText: string }) => (
+        <div className="w-full h-48 bg-gray-800 border border-gray-700 rounded flex items-center justify-center overflow-hidden">
+            {url ? (
+                // ใช้แท็ก <img> จริง
+                <img 
+                    src={url} 
+                    alt={altText} 
+                    className="object-cover w-full h-full" 
+                />
+            ) : (
+                <span className="text-gray-500 text-sm">No Image Available</span>
+            )}
+        </div>
+    );
+    
+    // ตรวจสอบว่ามี Gallery Images หรือไม่
+    const detailImages = product.detail_images || [];
+    const hasGalleryImages = detailImages.length > 0;
+    
     return (
-        <div className="space-y-4 pt-4 text-white">
-            <h3 className="text-lg font-semibold">Hero Image</h3>
-            <p><strong>Hero Image URL:</strong> {product.hero_image_url}</p>
-            {/* แสดงรูปภาพแทน Input อัปโหลด */}
-            <div className="w-full h-48 bg-gray-700 border border-gray-600 rounded flex items-center justify-center overflow-hidden">
-                {product.hero_image_url ? (
-                    // ใช้ Image tag จริงในโค้ด React แต่ในที่นี้ใช้ div จำลอง
-                    <div className="text-gray-400">
-                        [Image Preview: {product.hero_image_url.split('/').pop()}]
-                        {/* <img src={product.hero_image_url} alt="Hero Image" className="object-cover w-full h-full" /> */}
+        <div className="space-y-6 pt-4 text-white">
+            
+            {/* -------------------- Hero Image -------------------- */}
+            <div>
+                <h3 className="text-xl font-bold mb-2">Hero Image (Main)</h3>
+                <p className="text-sm text-gray-400 mb-2">
+                    {/* Hero Image URL จะต้องถูกเพิ่มใน product object หากมี */}
+                    <strong>Hero Image URL:</strong> {product.hero_image_url || '— N/A (Using first detail image as fallback) —'}
+                </p>
+                
+                {/* แสดง Hero Image Preview (ใช้ hero_image_url หากมี หรือใช้รูปแรกจาก detail_images เป็น Fallback) */}
+                <ImagePreview 
+                    url={product.hero_image_url || (hasGalleryImages ? detailImages[0].url : '')} 
+                    altText={`Hero image of ${product.name}`} 
+                />
+            </div>
+            
+            <hr className="border-gray-700"/>
+
+            {/* -------------------- Gallery Images -------------------- */}
+            <div>
+                <h3 className="text-xl font-bold pt-4 mb-4">Gallery Images ({detailImages.length})</h3>
+                
+                {hasGalleryImages ? (
+                    // ✅ วนลูปแสดงรูปภาพ Gallery ในรูปแบบ Grid
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {detailImages.map((detail, index) => (
+                            <div key={detail.image_id || index} className="space-y-1">
+                                <ImagePreview 
+                                    url={detail.url} 
+                                    altText={`Gallery image ${index + 1}`} 
+                                    // ปรับความสูงสำหรับรูปย่อย
+                                    className="h-32"
+                                />
+                                <p className="text-xs text-gray-400 truncate">
+                                    {detail.path_image.split('/').pop()}
+                                </p>
+                            </div>
+                        ))}
                     </div>
                 ) : (
-                    <span className="text-gray-500">No Hero Image Available</span>
+                    // แสดงข้อความเมื่อไม่มีรูปภาพ
+                    <div className="p-6 bg-gray-800 rounded text-center">
+                        <span className="text-gray-500">No additional gallery images available.</span>
+                    </div>
                 )}
             </div>
 
-            <h3 className="text-lg font-semibold pt-4">Gallery Images</h3>
-            <p className="text-sm text-gray-400">This section would show gallery images if available.</p>
         </div>
     );
 };
@@ -235,17 +289,6 @@ export default function ProductViewForm({ product, onClose }: ProductViewFormPro
                 {activeSubTab === 'information' && <ProductInformationView product={product} />}
                 {activeSubTab === 'images' && <ProductImagesView product={product} />}
                 {activeSubTab === 'file' && <ProductFileView product={product} />}
-            </div>
-
-            {/* -------------------- Action Buttons (View Mode) -------------------- */}
-            <div className="flex justify-end pt-4">
-                <button
-                    type="button"
-                    onClick={onClose} // ใช้ onClose แทน setIsEditing(false)
-                    className="px-4 py-2 rounded text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-                >
-                    Close / Back
-                </button>
             </div>
         </div>
     );

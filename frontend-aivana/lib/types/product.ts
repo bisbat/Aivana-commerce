@@ -2,6 +2,7 @@ import { Category } from './category';
 import { Owner } from './seller';
 import { ProductFile } from './product_file';
 import { ProductHeroImage } from './product_hero_image';
+import { ProductImages } from './product_images';
 
 export interface Product {
     id: string;
@@ -18,4 +19,6 @@ export interface Product {
     highlights: string[];
     category: Category;
     owner: Owner;
+    created_at: string;
+    images: ProductImages;
 }

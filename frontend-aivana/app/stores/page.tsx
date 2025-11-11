@@ -48,12 +48,6 @@ export default function StorePage() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar
-        storeName="Bisbat Sae-kow"
-        currentPath={pathname}
-        onAddProductClick={() => router.push("stores/products/new")}
-      />
-
       {/* Main Content */}
       <main className="flex-1 p-10">
         {/* Avatar Section */}
