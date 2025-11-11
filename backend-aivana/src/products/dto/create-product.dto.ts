@@ -40,6 +40,14 @@ export class CreateProductDto {
   @IsString({ each: true })
   features: Array<string>;
 
+  @IsString()
+  @IsOptional()
+  compatibility: string;
+
+  @IsString()
+  @IsOptional()
+  highlights: string;
+
   @IsNumber()
   categoryId: number;
 
