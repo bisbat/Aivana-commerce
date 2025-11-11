@@ -1,4 +1,4 @@
-export interface ProductFile {
+export interface ProductFilePayload {
     productId: string;
-    filePath: File;
+    filePath: File; 
 }

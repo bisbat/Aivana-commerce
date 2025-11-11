@@ -1,4 +1,10 @@
-export interface ProductImages {
+export interface DetailImage {
+    image_id: string;
+    path_image: string; 
+    url: string; 
+}
+
+export interface ProductImagesPayload {
     productId: string;
-    imageUrl: File[];   
+    imageFiles: File[];
 }

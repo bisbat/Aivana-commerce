@@ -1,4 +1,4 @@
-export interface ProductHeroImage {
+export interface ProductHeroImagePayload {
     productId: string;
-    heroImageUrl: File;   
+    heroImageFile: File; 
 }
