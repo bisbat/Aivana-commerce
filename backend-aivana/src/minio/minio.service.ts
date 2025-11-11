@@ -158,4 +158,50 @@ export class MinioService implements OnModuleInit {
       throw new Error(`Failed to delete file: ${message}`);
     }
   }
+
+  /**
+   * Delete all files in a specific folder (prefix)
+   * @param folderPath - Folder path like 'products/1/hero' or 'products/1/upload'
+   */
+  async deleteFolder(folderPath: string): Promise<void> {
+    try {
+      const objectsStream = this.minioClient.listObjects(
+        this.bucketName,
+        folderPath,
+        true,
+      );
+
+      const objectsToDelete: string[] = [];
+
+      await new Promise<void>((resolve, reject) => {
+        objectsStream.on('data', (obj) => {
+          if (obj.name) {
+            objectsToDelete.push(obj.name);
+          }
+        });
+
+        objectsStream.on('end', () => {
+          resolve();
+        });
+
+        objectsStream.on('error', (err) => {
+          reject(err);
+        });
+      });
+
+      // Delete all objects found in the folder
+      for (const objectName of objectsToDelete) {
+        await this.minioClient.removeObject(this.bucketName, objectName);
+      }
+
+      if (objectsToDelete.length > 0) {
+        console.log(
+          `Deleted ${objectsToDelete.length} file(s) from ${folderPath}`,
+        );
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to delete folder: ${message}`);
+    }
+  }
 }

@@ -35,69 +35,30 @@ export class ProductsController {
     return this.productsService.createProduct(createProductDto);
   }
 
-  @Post('preview-file')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadPreviewFile(
-    @UploadedFile() file: UploadedFileType,
-    @Body('product_id') productId: string,
-  ) {
-    if (!file) {
-      throw new Error('No file uploaded');
-    }
-
-    // Get product to check if preview file already exists
-    const product = await this.productsService.findOne(parseInt(productId));
-
-    if (!product) {
-      throw new Error(`Product with ID ${productId} not found`);
-    }
-
-    // Delete old preview file from MinIO if exists
-    if (product.preview_url) {
-      try {
-        const url = new URL(product.preview_url);
-        const pathParts = url.pathname.split('/');
-        const bucketName = process.env.MINIO_BUCKET_NAME || 'aivana-commerce';
-        const bucketIndex = pathParts.indexOf(bucketName);
-        if (bucketIndex !== -1) {
-          const filePath = pathParts.slice(bucketIndex + 1).join('/');
-          await this.minioService.deleteFile(filePath);
-        }
-      } catch (error) {
-        console.error('Failed to delete old preview file from MinIO:', error);
-      }
-    }
-
-    const timestamp = Date.now();
-    const fileName = `preview-${timestamp}-${file.originalname}`;
-
-    // Upload new file to MinIO
-    const fullPath = await this.minioService.uploadFile(
-      file,
-      fileName,
-      MINIO_FOLDERS.PRODUCTS.FILE(productId),
-    );
-    const fileUrl = this.minioService.getFileUrl(fullPath);
-
-    // Update preview_url in ProductEntity
-    await this.productsService.updatePreviewUrl(parseInt(productId), fileUrl);
-
-    return {
-      message: 'Preview file uploaded successfully',
-      product_id: parseInt(productId),
-      fileName: fullPath,
-      url: fileUrl,
-    };
-  }
-
   @Post('uploaded-file')
   @UseInterceptors(FileInterceptor('file'))
   async uploadProductFile(
     @UploadedFile() file: UploadedFileType,
     @Body('product_id') productId: string,
   ) {
+    console.log('=== Upload Debug ===');
+    console.log('Received file:', file);
+    console.log('Received product_id:', productId);
+    console.log('File type:', typeof file);
+    console.log('===================');
+
     if (!file) {
-      throw new Error('No file uploaded');
+      throw new Error(
+        'No file uploaded. Make sure the key name is "file" and type is File (not Text) in Postman form-data',
+      );
+    }
+
+    // Validate file type - only accept .zip files
+    const fileExtension = file.originalname.split('.').pop()?.toLowerCase();
+    if (fileExtension !== 'zip') {
+      throw new Error(
+        `Invalid file type. Only .zip files are allowed. Received: .${fileExtension}`,
+      );
     }
 
     // Get product to check if uploaded file already exists
@@ -130,7 +91,7 @@ export class ProductsController {
     const fullPath = await this.minioService.uploadFile(
       file,
       fileName,
-      MINIO_FOLDERS.PRODUCTS.UPLOADS(productId),
+      MINIO_FOLDERS.PRODUCTS.UPLOAD(productId),
     );
     const fileUrl = this.minioService.getFileUrl(fullPath);
 

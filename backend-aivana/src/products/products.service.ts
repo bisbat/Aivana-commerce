@@ -6,7 +6,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { MinioService } from '../minio/minio.service';
 import { ProductWithImagesDto } from './interfaces/product-with-images.interface';
-
 @Injectable()
 export class ProductsService {
   constructor(
@@ -55,25 +54,6 @@ export class ProductsService {
     }
 
     product.hero_image_url = heroImageUrl;
-    await this.productsRepository.save(product);
-
-    return product;
-  }
-
-  async updatePreviewUrl(
-    productId: number,
-    previewUrl: string,
-  ): Promise<ProductEntity> {
-    const product = await this.productsRepository.findOne({
-      where: { id: productId },
-      relations: ['category', 'owner'],
-    });
-
-    if (!product) {
-      throw new Error(`Product with ID ${productId} not found`);
-    }
-
-    product.preview_url = previewUrl;
     await this.productsRepository.save(product);
 
     return product;

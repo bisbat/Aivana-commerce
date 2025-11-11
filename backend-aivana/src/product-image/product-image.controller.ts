@@ -133,26 +133,13 @@ export class ProductImageController {
       throw new Error(`Product with ID ${productId} not found`);
     }
 
-    // Delete old hero image from MinIO if exists
-    if (product.hero_image_url) {
-      try {
-        const url = new URL(product.hero_image_url);
-        const pathParts = url.pathname.split('/');
-        const bucketName = process.env.MINIO_BUCKET_NAME;
-        if (!bucketName) {
-          console.error(
-            'MINIO_BUCKET_NAME is not set. Skipping deletion of old preview file.',
-          );
-        } else {
-          const bucketIndex = pathParts.indexOf(bucketName);
-          if (bucketIndex !== -1) {
-            const filePath = pathParts.slice(bucketIndex + 1).join('/');
-            await this.minioService.deleteFile(filePath);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to delete old hero image from MinIO:', error);
-      }
+    // Delete all files in the hero folder to ensure only one file exists
+    const heroFolder = MINIO_FOLDERS.PRODUCTS.HERO(productId);
+    try {
+      await this.minioService.deleteFolder(heroFolder);
+      console.log(`Cleared all files from ${heroFolder}`);
+    } catch (error) {
+      console.error('Failed to clear hero folder from MinIO:', error);
     }
 
     const timestamp = Date.now();
