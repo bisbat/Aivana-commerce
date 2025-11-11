@@ -61,3 +61,4 @@ export async function getAllProductsAction() {
 
     throw new Error('Failed to fetch products');
 }
+

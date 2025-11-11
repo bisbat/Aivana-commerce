@@ -10,8 +10,8 @@ export interface Product {
     price: string; 
     blurb: string;
     installation_guide: string;
-    preview_url: string;
-    hero_image_url: string | null;
+    preview_url: string| null;
+    hero_image_url: string| null;
     features: string[];
     compatibility: string[];
     category: Category;
