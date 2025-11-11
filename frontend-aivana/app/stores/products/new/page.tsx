@@ -6,7 +6,7 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { UploadFileForm } from '@/components/products/UploadFileForm';
 import { ProductForm, ProductFormData } from '@/components/products/ProductForm';
 import { UploadImageForm } from '@/components/products/UploadImageForm';
-import { productAPI } from '@/lib/api/products';
+import { createProductAction } from '@/lib/actions/product.actions';
 import { UploadFileData, UploadImageData, ProductData } from '@/lib/api/types/product';
 import { Loader } from 'lucide-react';
 

@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ProductCardSeller } from "@/components/seller/ProductCardSeller";
-import { productAPI } from "@/lib/api/products";
-import { Product } from "@/lib/api/types/product";
+import { getAllProductsAction } from "@/lib/actions/product.actions";
+import { Product } from "@/lib/types/product";
 import { Loader, AlertCircle, Package } from "lucide-react";
 
 export default function StorePage() {
@@ -28,7 +28,7 @@ export default function StorePage() {
 
     try {
       // Call your NestJS backend
-      const data = await productAPI.getAll();
+      const data = await getAllProductsAction();
       setProducts(data);
       
     } catch (err) {

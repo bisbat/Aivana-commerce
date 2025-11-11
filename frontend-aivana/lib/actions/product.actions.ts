@@ -1,6 +1,7 @@
 "use server";
 import { revalidatePath } from 'next/cache';
 
+
 export async function createProductAction(productData: any) {
     // ส่งคำขอไปยัง API เพื่อสร้างสินค้าใหม่
     const res = await fetch(`http://localhost:3000/products`, {
@@ -43,4 +44,20 @@ export async function deleteProductAction(productId: string) {
         // 2. ✅ อัปเดตข้อมูลใน Cache
         revalidatePath(`/stores/products/${productId}`);
     }
+}
+
+export async function getAllProductsAction() {
+    const res = await fetch(`http://localhost:3000/products`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (res.ok) {
+        const data = await res.json();
+        return data;
+    }
+
+    throw new Error('Failed to fetch products');
 }
