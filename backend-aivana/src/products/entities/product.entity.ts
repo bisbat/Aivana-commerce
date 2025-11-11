@@ -42,7 +42,7 @@ export class ProductEntity {
   @Column({ type: 'text', array: true })
   features: Array<string>;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', array: true })
   compatibility: Array<string>;
 
   @ManyToOne(() => CategoryEntity, (category) => category.products, {
