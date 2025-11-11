@@ -7,7 +7,9 @@ import { UploadFileForm } from '@/components/products/UploadFileForm';
 import { ProductForm, ProductFormData } from '@/components/products/ProductForm';
 import { UploadImageForm } from '@/components/products/UploadImageForm';
 import { createProductAction } from '@/lib/actions/product.actions';
-import { UploadFileData, UploadImageData, ProductData } from '@/lib/api/types/product';
+import { ProductImages } from '@/lib/types/product_images';
+import { ProductFile } from '@/lib/types/product_file';
+import { ProductHeroImage } from '@/lib/types/product_hero_image';
 import { Loader } from 'lucide-react';
 
 export default function AddProductPage() {
@@ -18,14 +20,14 @@ export default function AddProductPage() {
   const [currentStep, setCurrentStep] = useState(1);
   
   // Store data from each step
-  const [uploadData, setUploadData] = useState<UploadFileData | null>(null);
+  const [uploadData, setUploadData] = useState<ProductFile | null>(null);
   const [productData, setProductData] = useState<ProductFormData | null>(null);
   
   // UI state for final submission
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Step 1 → Step 2
-  const handleUploadNext = (data: UploadFileData) => {
+  const handleUploadNext = (data: ProductFile) => {
     setUploadData(data);
     setCurrentStep(2);
   };
@@ -37,7 +39,7 @@ export default function AddProductPage() {
   };
 
   // Step 3 → Submit to backend
-  const handlePublish = async (imageData: UploadImageData) => {
+  const handlePublish = async (imageData: ProductImages) => {
     if (!uploadData || !productData) {
       alert('Missing data from previous steps');
       return;
