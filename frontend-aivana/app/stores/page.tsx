@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ProductCardSeller } from "@/components/seller/ProductCardSeller";
 import { productAPI } from "@/lib/api/products";
-import { Product } from "@/types/product";
+import { Product } from "@/lib/api/types/product";
 import { Loader, AlertCircle, Package } from "lucide-react";
 
 export default function StorePage() {

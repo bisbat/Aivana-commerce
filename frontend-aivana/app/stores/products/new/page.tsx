@@ -7,7 +7,7 @@ import { UploadFileForm } from '@/components/products/UploadFileForm';
 import { ProductForm, ProductFormData } from '@/components/products/ProductForm';
 import { UploadImageForm } from '@/components/products/UploadImageForm';
 import { productAPI } from '@/lib/api/products';
-import { UploadFileData, UploadImageData, ProductData } from '@/types/product';
+import { UploadFileData, UploadImageData, ProductData } from '@/lib/api/types/product';
 import { Loader } from 'lucide-react';
 
 export default function AddProductPage() {
