@@ -5,6 +5,8 @@ import { UsersModule } from './users/users.module';
 import { dataSourceOptions } from 'db/data-source';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
+import { MinioModule } from './minio/minio.module';
+import { ProductImageModule } from './product-image/product-image.module';
 
 @Module({
   imports: [
@@ -15,7 +17,9 @@ import { ProductsModule } from './products/products.module';
     TypeOrmModule.forRoot(dataSourceOptions),
     UsersModule,
     CategoriesModule,
-    ProductsModule
+    ProductsModule,
+    MinioModule,
+    ProductImageModule,
   ],
   controllers: [],
   providers: [],
