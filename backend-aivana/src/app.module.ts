@@ -7,6 +7,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
 import { MinioModule } from './minio/minio.module';
 import { ProductImageModule } from './product-image/product-image.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ProductImageModule } from './product-image/product-image.module';
     ProductsModule,
     MinioModule,
     ProductImageModule,
+    CartModule,
   ],
   controllers: [],
   providers: [],
