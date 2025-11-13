@@ -63,15 +63,40 @@ export class CartService {
 
     if (!cart) {
       return {
-        message: 'Cart is empty',
+        message: 'Cart not found for user',
         cart: null,
         items: [],
       };
     }
 
     return {
+      message: 'Cart retrieved successfully',
       ...cart,
       totalItems: cart.items.length,
+    };
+  }
+
+  async removeFromCart(userId: number, productId: number) {
+    const cart = await this.cartRepository.findOne({
+      where: { userId },
+    });
+
+    if (!cart) {
+      throw new Error('Cart not found for user');
+    }
+
+    const cartItem = await this.cartItemRepository.findOne({
+      where: { cartId: cart.cartId, productId: productId },
+    });
+
+    if (!cartItem) {
+      throw new Error('Product not found in cart');
+    }
+
+    await this.cartItemRepository.remove(cartItem);
+
+    return {
+      message: 'Product removed from cart successfully',
     };
   }
 }
