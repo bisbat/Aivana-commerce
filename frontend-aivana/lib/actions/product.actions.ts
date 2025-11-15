@@ -1,10 +1,11 @@
 "use server";
+import { parseEditProductFormData } from '@/utils/format';
 import { revalidatePath } from 'next/cache';
 
 
 export async function createProductAction(productData: any) {
     // ส่งคำขอไปยัง API เพื่อสร้างสินค้าใหม่
-    const res = await fetch(`http://localhost:3000/products`, {
+    const res = await fetch(`http://localhost:3001/products`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -19,15 +20,26 @@ export async function createProductAction(productData: any) {
 }
 
 export async function updateProductAction(productId: string, updatedData: any) {
+    const parsedData = parseEditProductFormData(updatedData);
+    console.log('Parsed Data:', parsedData);
+    const { tags, id, category_id, ...useParsedData  } = parsedData;
+    
+    const mockOwnerId = 4; // มาเปลี่ยนใช้ ownerId จริงเมื่อระบบผู้ใช้สมบูรณ์
+    
     // ส่งคำขอไปยัง API เพื่ออัปเดตข้อมูลสินค้า
-    const res = await fetch(`http://localhost:3000/products/${productId}`, {
+    
+    const res = await fetch(`http://localhost:3001/products/${productId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updatedData),
+        body: JSON.stringify({ ownerId: mockOwnerId, categoryId: Number(category_id) ,...useParsedData}),
     });
 
+    
+    
+    console.log('Update Product Response:', res);
+    
     if (res.ok) {
         // 2. ✅ อัปเดตข้อมูลใน Cache
         revalidatePath(`/stores/products/${productId}`);
@@ -36,7 +48,7 @@ export async function updateProductAction(productId: string, updatedData: any) {
 
 export async function deleteProductAction(productId: string) {
     // ส่งคำขอไปยัง API เพื่อลบสินค้า
-    const res = await fetch(`http://localhost:3000/products/${productId}`, {
+    const res = await fetch(`http://localhost:3001/products/${productId}`, {
         method: 'DELETE',
     });
 
@@ -47,7 +59,7 @@ export async function deleteProductAction(productId: string) {
 }
 
 export async function getAllProductsAction() {
-    const res = await fetch(`http://localhost:3000/products`, {
+    const res = await fetch(`http://localhost:3001/products`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
