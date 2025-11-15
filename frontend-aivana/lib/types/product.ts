@@ -18,4 +18,5 @@ export interface Product {
     highlights: string[];
     category: Category;
     owner: Owner;
+    created_at: string;
 }
