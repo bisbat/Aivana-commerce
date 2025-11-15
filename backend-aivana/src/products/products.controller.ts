@@ -4,12 +4,16 @@ import {
   Post,
   Body,
   UploadedFile,
+  UploadedFiles,
   UseInterceptors,
   Param,
   Put,
   Delete,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  FileInterceptor,
+  FileFieldsInterceptor,
+} from '@nestjs/platform-express';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import type { UploadedFileType } from './interfaces/uploaded-file.interface';
@@ -35,18 +39,66 @@ export class ProductsController {
     return this.productsService.createProduct(createProductDto);
   }
 
+  @Post('with-files')
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'heroImage', maxCount: 1 },
+      { name: 'productFile', maxCount: 1 },
+      { name: 'detailImages', maxCount: 8 },
+    ]),
+  )
+  async createProductWithFiles(
+    @Body() body: Record<string, string>,
+    @UploadedFiles()
+    files: {
+      heroImage?: UploadedFileType[];
+      productFile?: UploadedFileType[];
+      detailImages?: UploadedFileType[];
+    },
+  ) {
+    if (!files.heroImage || files.heroImage.length === 0) {
+      throw new Error('Hero image is required');
+    }
+    if (!files.productFile || files.productFile.length === 0) {
+      throw new Error('Product file is required');
+    }
+    if (!files.detailImages || files.detailImages.length === 0) {
+      throw new Error('At least one detail image is required');
+    }
+    const createProductDto: CreateProductDto = {
+      name: body.name,
+      description: body.description,
+      price: parseFloat(body.price),
+      blurb: body.blurb,
+      installation_guide: body.installation_guide,
+      features: JSON.parse(body.features) as string[],
+      compatibility: JSON.parse(body.compatibility) as string[],
+      categoryId: parseInt(body.categoryId, 10),
+      ownerId: parseInt(body.ownerId, 10),
+      tagIds: body.tagIds ? (JSON.parse(body.tagIds) as number[]) : undefined,
+    };
+
+    const result = await this.productsService.createProductWithFiles(
+      createProductDto,
+      {
+        heroImage: files.heroImage,
+        productFile: files.productFile,
+        detailImages: files.detailImages,
+      },
+    );
+
+    return {
+      message: 'Product created successfully with all files',
+      ...result,
+    };
+  }
+
   @Post('uploaded-file')
   @UseInterceptors(FileInterceptor('file'))
   async uploadProductFile(
     @UploadedFile() file: UploadedFileType,
     @Body('product_id') productId: string,
   ) {
-    console.log('=== Upload Debug ===');
-    console.log('Received file:', file);
-    console.log('Received product_id:', productId);
-    console.log('File type:', typeof file);
-    console.log('===================');
-
     if (!file) {
       throw new Error(
         'No file uploaded. Make sure the key name is "file" and type is File (not Text) in Postman form-data',
