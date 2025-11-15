@@ -5,10 +5,13 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { ProductImage } from 'src/product-image/entities/product-image.entity';
+import { TagEntity } from 'src/tags/entities/tag.entity';
 
 @Entity('product')
 export class ProductEntity {
@@ -59,6 +62,13 @@ export class ProductEntity {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
+
   @OneToMany(() => ProductImage, (image) => image.product)
   product_images: ProductImage[];
+
+  // Tags relationship can be added here when TagEntity is available
+  @ManyToMany(() => TagEntity, (tag) => tag.products, { cascade: true })
+  // cascade: true จะช่วยให้สามารถบันทึก tags ใหม่พร้อมกับ product ได้ (optional)
+  @JoinTable()
+  tags: TagEntity[];
 }

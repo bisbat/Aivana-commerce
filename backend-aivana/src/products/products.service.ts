@@ -1,22 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductEntity } from './entities/product.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { MinioService } from '../minio/minio.service';
 import { ProductWithImagesDto } from './interfaces/product-with-images.interface';
+import { TagEntity } from 'src/tags/entities/tag.entity';
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(ProductEntity)
     private productsRepository: Repository<ProductEntity>,
     private minioService: MinioService,
-  ) {}
+    @InjectRepository(TagEntity)
+    private tagRepository: Repository<TagEntity>,
+  ) { }
 
   async getAllProducts(): Promise<ProductEntity[]> {
     const products = await this.productsRepository.find({
-      relations: ['category', 'owner'],
+      relations: ['category', 'owner', 'tags'],
     });
     return products;
   }
@@ -24,21 +27,33 @@ export class ProductsService {
   async findOne(productId: number): Promise<ProductEntity | null> {
     return await this.productsRepository.findOne({
       where: { id: productId },
-      relations: ['category', 'owner'],
+      relations: ['category', 'owner', 'tags'],
     });
   }
 
-  async createProduct(
-    createProductDto: CreateProductDto,
-  ): Promise<ProductEntity> {
-    const product = this.productsRepository.create(createProductDto);
-    const savedProduct = {
-      ...product,
-      category: { id: createProductDto.categoryId },
-      owner: { id: createProductDto.ownerId },
-    };
-    return await this.productsRepository.save(savedProduct);
+  async createProduct(createProductDto: CreateProductDto): Promise<ProductEntity> {
+    const { tagIds, categoryId, ownerId, ...productData } = createProductDto;
+
+    // หา tags
+    const tags = tagIds ? await this.tagRepository.findBy({ id: In(tagIds) }) : [];
+    if (tagIds && tags.length !== tagIds.length) {
+      throw new Error('One or more tags not found');
+    }
+
+    // preload category และ owner
+    const category = { id: categoryId }; // ถ้า category มีอยู่แล้วและแค่ต้อง attach
+    const owner = { id: ownerId };       // ถ้า owner มีอยู่แล้วและแค่ attach
+
+    const product = this.productsRepository.create({
+      ...productData,
+      tags,
+      category,
+      owner,
+    });
+
+    return await this.productsRepository.save(product);
   }
+
 
   async updateHeroImage(
     productId: number,
@@ -72,7 +87,7 @@ export class ProductsService {
     await this.productsRepository.save(product);
     const updatedProduct = await this.productsRepository.findOne({
       where: { id },
-      relations: ['category', 'owner'],
+      relations: ['category', 'owner', 'tags'],
     });
     if (!updatedProduct) {
       throw new Error('Product not found after update');
