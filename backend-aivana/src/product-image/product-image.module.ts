@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ProductImageService } from './product-image.service';
 import { ProductImageController } from './product-image.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -10,9 +10,10 @@ import { ProductsModule } from '../products/products.module';
   imports: [
     TypeOrmModule.forFeature([ProductImage]),
     MinioModule,
-    ProductsModule,
+    forwardRef(() => ProductsModule),
   ],
   controllers: [ProductImageController],
   providers: [ProductImageService],
+  exports: [ProductImageService],
 })
 export class ProductImageModule {}
