@@ -2,10 +2,10 @@
 
 import React, { useState, useRef } from 'react';
 import { Upload } from 'lucide-react';
-import { UploadFileData } from '@/lib/api/types/product';
+import { UploadFileFormData } from '@/lib/types/product';
 
 interface UploadFileFormProps {
-  onNext: (data: UploadFileData) => void;
+  onNext: (data: UploadFileFormData) => void;
 }
 
 export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext }) => {
