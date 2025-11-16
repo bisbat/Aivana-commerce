@@ -5,13 +5,12 @@ import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { ProductImages } from '@/lib/types/product';
 
 interface UploadImageFormProps {
-  productId: string; // ⭐ Received from parent
+  productId?: string;
   onPublish: (data: ProductImages) => void;
   onBack: () => void;
 }
 
-export const UploadImageForm: React.FC<UploadImageFormProps> = ({ 
-  productId, 
+export const UploadImageForm: React.FC<UploadImageFormProps> = ({  
   onPublish, 
   onBack 
 }) => {
@@ -34,11 +33,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
       return;
     }
 
-    // Validate product ID
-    if (!productId) {
-      setError("Missing product ID");
-      return;
-    }
 
     // Pass data to parent
     onPublish({

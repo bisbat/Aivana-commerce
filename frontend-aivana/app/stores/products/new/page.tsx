@@ -10,12 +10,7 @@ import {
   ProductInformationForm,
   ProductImages
 } from '@/lib/types/product';
-import { 
-  createProductMetadata,
-  uploadProductFile,
-  uploadHeroImage,
-  uploadDetailImages
-} from '@/lib/actions/product.actions';
+import { createCompleteProduct } from '@/lib/actions/product.actions';
 import { Loader, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function AddProductPage() {
@@ -27,13 +22,11 @@ export default function AddProductPage() {
   // Store data from each step
   const [uploadData, setUploadData] = useState<UploadFileFormData | null>(null);
   const [productData, setProductData] = useState<ProductInformationForm | null>(null);
-  const [createdProductId, setCreatedProductId] = useState<string | null>(null);
   
   // UI state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [progressMessage, setProgressMessage] = useState('');
 
   // Step 1 → Step 2
   const handleUploadNext = (data: UploadFileFormData) => {
@@ -42,47 +35,18 @@ export default function AddProductPage() {
     setCurrentStep(2);
   };
 
-  // Step 2 → Create Product Metadata → Step 3
-  const handleProductNext = async (data: ProductInformationForm) => {
+  // Step 2 → Step 3 (NO API call, just move forward)
+  const handleProductNext = (data: ProductInformationForm) => {
     console.log('✅ Step 2 completed:', data);
     setProductData(data);
-
-    // Create product metadata FIRST before moving to step 3
-    setIsSubmitting(true);
-    setError(null);
-    setProgressMessage('Creating product...');
-
-    try {
-      // 1️⃣ Create product in database
-      const createdProduct = await createProductMetadata(data);
-      const productId = createdProduct.id;
-      
-      console.log('✅ Product created with ID:', productId);
-      setCreatedProductId(productId);
-
-      // 2️⃣ Upload product file if exists
-      if (uploadData?.file) {
-        setProgressMessage('Uploading product file...');
-        await uploadProductFile(productId, uploadData.file);
-        console.log('✅ Product file uploaded');
-      }
-
-      // Move to Step 3
-      setCurrentStep(3);
-      setIsSubmitting(false);
-      
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create product';
-      setError(errorMessage);
-      console.error('❌ Error:', err);
-      setIsSubmitting(false);
-    }
+    setCurrentStep(3); // Just move to Step 3, don't submit yet
   };
 
-  // Step 3 → Upload Images → Complete
+  // Step 3 → Submit EVERYTHING to backend
   const handlePublish = async (imageData: ProductImages) => {
-    if (!createdProductId) {
-      setError('Product ID not found. Please go back and try again.');
+    // Validate we have all data
+    if (!uploadData || !productData) {
+      setError('Missing data from previous steps');
       return;
     }
 
@@ -90,23 +54,22 @@ export default function AddProductPage() {
     setError(null);
 
     try {
-      // 3️⃣ Upload hero image
-      if (imageData.heroImage) {
-        setProgressMessage('Uploading hero image...');
-        await uploadHeroImage(createdProductId, imageData.heroImage);
-        console.log('✅ Hero image uploaded');
-      }
+      console.log('📤 Submitting complete product...');
+      console.log('Step 1 data:', uploadData);
+      console.log('Step 2 data:', productData);
+      console.log('Step 3 data:', imageData);
 
-      // 4️⃣ Upload detail images
-      if (imageData.detailImages.length > 0) {
-        setProgressMessage(`Uploading ${imageData.detailImages.length} detail images...`);
-        await uploadDetailImages(createdProductId, imageData.detailImages);
-        console.log('✅ Detail images uploaded');
-      }
+      // ✨ Single API call with all data
+      const createdProduct = await createCompleteProduct(
+        uploadData,   // Step 1: file + productType + keywords
+        productData,  // Step 2: name, price, description, features, etc.
+        imageData     // Step 3: heroImage + detailImages
+      );
 
-      // ✅ Success!
+      console.log('✅ Product created:', createdProduct);
+
+      // Success!
       setSuccess(true);
-      setProgressMessage('Product published successfully!');
       
       // Redirect after 2 seconds
       setTimeout(() => {
@@ -114,9 +77,10 @@ export default function AddProductPage() {
       }, 2000);
       
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to upload images';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create product';
       setError(errorMessage);
       console.error('❌ Error:', err);
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -151,8 +115,8 @@ export default function AddProductPage() {
       <div className="flex items-center justify-center min-h-screen bg-[var(--background)]">
         <div className="text-center">
           <Loader className="animate-spin text-[var(--primary)] mx-auto mb-4" size={48} />
-          <p className="text-white text-lg">{progressMessage}</p>
-          <p className="text-slate-400 text-sm mt-2">Please wait...</p>
+          <p className="text-white text-lg">Publishing your product...</p>
+          <p className="text-slate-400 text-sm mt-2">Uploading files, please wait...</p>
         </div>
       </div>
     );
@@ -194,9 +158,9 @@ export default function AddProductPage() {
           )}
 
           {/* Step 3: Product Images */}
-          {currentStep === 3 && createdProductId && (
+          {currentStep === 3 && (
             <UploadImageForm 
-              productId={createdProductId}
+              productId="" // Not needed anymore since we submit everything at once
               onPublish={handlePublish}
               onBack={handleBackToStep2}
             />
