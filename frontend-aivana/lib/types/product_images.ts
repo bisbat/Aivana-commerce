@@ -1,4 +1,5 @@
 export interface ProductImages {
-    productId: string;
-    imageUrl: File[];   
+    image_id: string;
+    path_image: string;
+    url: string[];
 }

@@ -168,7 +168,7 @@ export class ProductsService {
   async getProductById(id: number): Promise<ProductWithImagesDto | null> {
     const product = await this.productsRepository.findOne({
       where: { id },
-      relations: ['category', 'owner', 'product_images'],
+      relations: ['category', 'owner', 'product_images', 'tags'],
     });
 
     if (!product) {
