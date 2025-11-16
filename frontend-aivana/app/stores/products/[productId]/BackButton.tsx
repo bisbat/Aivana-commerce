@@ -5,8 +5,8 @@ export default function BackButton() {
     };
 
     return (
-        <button onClick={handleBack} className="bg-gray-500 text-white px-4 py-2 rounded">
-            Back
+        <button onClick={handleBack} className=" text-white px-4 py-2 rounded shadow hover:text-gray-300">
+            &larr; Back
         </button>
     );
 }

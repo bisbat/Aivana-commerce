@@ -1,14 +1,10 @@
-'use client'; // because we need client-side state
+'use client'; 
 import { useState } from 'react';
-
-type DetailImage = {
-    image_id: string | number;
-    url: string;
-};
+import type { ProductImages } from '@/lib/types/product_images';
 
 interface ProductImagesProps {
     heroSrc?: string | null;
-    detailImages?: DetailImage[];
+    detailImages?: ProductImages[];
 }
 
 export default function ProductImages({ heroSrc, detailImages }: ProductImagesProps) {
@@ -39,10 +35,10 @@ export default function ProductImages({ heroSrc, detailImages }: ProductImagesPr
                         {detailImages.slice(0, 8).map((img) => (
                             <img
                                 key={img.image_id}
-                                src={img.url}
+                                src={Array.isArray(img.url) ? img.url[0] : img.url}
                                 alt={`Detail ${img.image_id}`}
                                 className="w-full h-32 object-cover rounded shadow cursor-pointer"
-                                onClick={() => setModalImg(img.url)}
+                                onClick={() => setModalImg(Array.isArray(img.url) ? img.url[0] : img.url)}
                             />
                         ))}
                     </div>

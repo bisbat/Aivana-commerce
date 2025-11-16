@@ -1,6 +1,5 @@
 import { Category } from './category';
 import { Owner } from './seller';
-import { ProductHeroImage } from './product_hero_image';
 import { ProductImages } from './product_images';
 
 export interface Product {
@@ -12,7 +11,7 @@ export interface Product {
     blurb: string;
     installation_guide: string;
     preview_url: string;
-    hero_image_url: ProductHeroImage | null;
+    hero_image_url: string | null;
     features: string[];
     compatibility: string[];
     category: Category;
