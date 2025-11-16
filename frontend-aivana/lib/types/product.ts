@@ -1,5 +1,6 @@
 import { Category } from './category';
 import { Owner } from './seller';
+import { ProductImages } from './product_images';
 
 export interface Product {
     id: string;
@@ -15,4 +16,6 @@ export interface Product {
     compatibility: string[];
     category: Category;
     owner: Owner;
+    created_at: string;
+    detail_images: ProductImages[];
 }

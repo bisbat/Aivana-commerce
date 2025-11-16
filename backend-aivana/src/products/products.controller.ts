@@ -3,109 +3,82 @@ import {
   Get,
   Post,
   Body,
-  UploadedFile,
+  UploadedFiles,
   UseInterceptors,
   Param,
   Put,
   Delete,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import type { UploadedFileType } from './interfaces/uploaded-file.interface';
-import { MinioService } from '../minio/minio.service';
-import { MINIO_FOLDERS } from '../constants/minio-folders.constant';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductWithImagesDto } from './interfaces/product-with-images.interface';
 
 @Controller('products')
 export class ProductsController {
-  constructor(
-    private readonly productsService: ProductsService,
-    private readonly minioService: MinioService,
-  ) {}
+  constructor(private readonly productsService: ProductsService) {}
 
   @Get()
   async getAllProducts() {
     return this.productsService.getAllProducts();
   }
 
-  @Post()
-  async createProduct(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.createProduct(createProductDto);
-  }
-
-  @Post('uploaded-file')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadProductFile(
-    @UploadedFile() file: UploadedFileType,
-    @Body('product_id') productId: string,
+  @Post('with-files')
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'heroImage', maxCount: 1 },
+      { name: 'productFile', maxCount: 1 },
+      { name: 'detailImages', maxCount: 8 },
+    ]),
+  )
+  async createProductWithFiles(
+    @Body() body: Record<string, string>,
+    @UploadedFiles()
+    files: {
+      heroImage?: UploadedFileType[];
+      productFile?: UploadedFileType[];
+      detailImages?: UploadedFileType[];
+    },
   ) {
-    console.log('=== Upload Debug ===');
-    console.log('Received file:', file);
-    console.log('Received product_id:', productId);
-    console.log('File type:', typeof file);
-    console.log('===================');
-
-    if (!file) {
-      throw new Error(
-        'No file uploaded. Make sure the key name is "file" and type is File (not Text) in Postman form-data',
-      );
+    if (!files.heroImage || files.heroImage.length === 0) {
+      throw new Error('Hero image is required');
     }
-
-    // Validate file type - only accept .zip files
-    const fileExtension = file.originalname.split('.').pop()?.toLowerCase();
-    if (fileExtension !== 'zip') {
-      throw new Error(
-        `Invalid file type. Only .zip files are allowed. Received: .${fileExtension}`,
-      );
+    if (!files.productFile || files.productFile.length === 0) {
+      throw new Error('Product file is required');
     }
-
-    // Get product to check if uploaded file already exists
-    const product = await this.productsService.findOne(parseInt(productId));
-
-    if (!product) {
-      throw new Error(`Product with ID ${productId} not found`);
+    if (!files.detailImages || files.detailImages.length < 2) {
+      throw new Error('At least 2 detail images are required');
     }
-
-    // Delete old uploaded file from MinIO if exists
-    if (product.uploaded_file_path) {
-      try {
-        const url = new URL(product.uploaded_file_path);
-        const pathParts = url.pathname.split('/');
-        const bucketName = process.env.MINIO_BUCKET_NAME || 'aivana-commerce';
-        const bucketIndex = pathParts.indexOf(bucketName);
-        if (bucketIndex !== -1) {
-          const filePath = pathParts.slice(bucketIndex + 1).join('/');
-          await this.minioService.deleteFile(filePath);
-        }
-      } catch (error) {
-        console.error('Failed to delete old uploaded file from MinIO:', error);
-      }
+    if (files.detailImages.length > 8) {
+      throw new Error('Maximum 8 detail images allowed');
     }
+    const createProductDto: CreateProductDto = {
+      name: body.name,
+      description: body.description,
+      price: parseFloat(body.price),
+      blurb: body.blurb,
+      installation_guide: body.installation_guide,
+      features: JSON.parse(body.features) as string[],
+      compatibility: JSON.parse(body.compatibility) as string[],
+      categoryId: parseInt(body.categoryId, 10),
+      ownerId: parseInt(body.ownerId, 10),
+      tagIds: body.tagIds ? (JSON.parse(body.tagIds) as number[]) : undefined,
+    };
 
-    const timestamp = Date.now();
-    const fileName = `uploaded-${timestamp}-${file.originalname}`;
-
-    // Upload new file to MinIO
-    const fullPath = await this.minioService.uploadFile(
-      file,
-      fileName,
-      MINIO_FOLDERS.PRODUCTS.UPLOAD(productId),
-    );
-    const fileUrl = this.minioService.getFileUrl(fullPath);
-
-    // Update uploaded_file_path in ProductEntity
-    await this.productsService.updateUploadedFilePath(
-      parseInt(productId),
-      fileUrl,
+    const result = await this.productsService.createProductWithFiles(
+      createProductDto,
+      {
+        heroImage: files.heroImage,
+        productFile: files.productFile,
+        detailImages: files.detailImages,
+      },
     );
 
     return {
-      message: 'Product file uploaded successfully',
-      product_id: parseInt(productId),
-      fileName: fullPath,
-      url: fileUrl,
+      message: 'Product created successfully with all files',
+      ...result,
     };
   }
 
@@ -116,12 +89,53 @@ export class ProductsController {
     return this.productsService.getProductById(id);
   }
 
-  @Put(':id')
-  async updateProduct(
+  @Put(':id/with-files')
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'heroImage', maxCount: 1 },
+      { name: 'productFile', maxCount: 1 },
+      { name: 'detailImages', maxCount: 8 },
+    ]),
+  )
+  async updateProductWithFiles(
     @Param('id') id: number,
-    @Body() updateProductDto: UpdateProductDto,
+    @Body() body: Record<string, string>,
+    @UploadedFiles()
+    files?: {
+      heroImage?: UploadedFileType[];
+      productFile?: UploadedFileType[];
+      detailImages?: UploadedFileType[];
+    },
   ) {
-    return this.productsService.updateProduct(id, updateProductDto);
+    const updateProductDto: UpdateProductDto = {
+      ...(body.name && { name: body.name }),
+      ...(body.description && { description: body.description }),
+      ...(body.price && { price: parseFloat(body.price) }),
+      ...(body.blurb && { blurb: body.blurb }),
+      ...(body.installation_guide && {
+        installation_guide: body.installation_guide,
+      }),
+      ...(body.features && {
+        features: JSON.parse(body.features) as string[],
+      }),
+      ...(body.compatibility && {
+        compatibility: JSON.parse(body.compatibility) as string[],
+      }),
+      ...(body.categoryId && { categoryId: parseInt(body.categoryId, 10) }),
+      ...(body.ownerId && { ownerId: parseInt(body.ownerId, 10) }),
+      ...(body.tagIds && { tagIds: JSON.parse(body.tagIds) as number[] }),
+    };
+
+    const result = await this.productsService.updateProductWithFiles(
+      id,
+      updateProductDto,
+      files,
+    );
+
+    return {
+      message: 'Product updated successfully',
+      ...result,
+    };
   }
 
   @Delete(':id')

@@ -49,4 +49,9 @@ export class CreateProductDto {
 
   @IsNumber()
   ownerId: number;
+
+  @IsArray()
+  @IsNumber({}, { each: true })
+  @IsOptional()
+  tagIds?: number[];
 }
