@@ -3,6 +3,7 @@ import { Product } from '@/lib/types/product';
 import EditButton from './EditButton';
 import BackButton from './BackButton';
 import ProductImages from './ProductImages';
+import DeleteButton from './DeleteButton';
 
 async function getProductData(productId: string): Promise<Product | null> {
     const API_URL = process.env.BACKEND_API_URL || 'http://localhost:3001';
@@ -31,22 +32,16 @@ export default async function ProductStoreDetailPage(
         notFound();
     }
 
-    // Ensure we pass a string (or undefined) to the <img src> prop.
-    // If hero_image_url is already a string use it, otherwise try common fields on an object.
-    const heroSrc: string | undefined =
-        typeof initialProductData.hero_image_url === 'string'
-            ? initialProductData.hero_image_url
-            : (initialProductData.hero_image_url as any)?.url ?? (initialProductData.hero_image_url as any)?.src ?? undefined;
-
     return (
         <div className="min-h-screen bg-linne-purple text-white p-6">
             {/* Buttons */}
-            <div className="flex gap-4 mb-6">
-                <BackButton className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded shadow" />
-                <EditButton
-                    productId={productId}
-                    className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded shadow"
-                />
+            <div className="flex gap-4 mb-6 space-x-4 justify-between">
+                <BackButton />
+                <div>
+                    <DeleteButton productId={productId} />
+                    <EditButton productId={productId} />
+                </div>
+
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
@@ -98,7 +93,7 @@ export default async function ProductStoreDetailPage(
                 </div>
 
                 {/* Images */}
-                <ProductImages heroSrc={heroSrc} detailImages={initialProductData.detail_images} />
+                <ProductImages heroSrc={initialProductData.hero_image_url} detailImages={initialProductData.detail_images} />
             </div>
         </div>
 
