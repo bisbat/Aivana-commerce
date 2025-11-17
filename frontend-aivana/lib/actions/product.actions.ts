@@ -70,7 +70,7 @@ export async function createCompleteProduct(
         // Arrays as JSON strings
         formData.append('features', JSON.stringify(productInfoData.features));
         formData.append('compatibility', JSON.stringify(productInfoData.compatibility));
-        formData.append('tagIds', JSON.stringify([])); // Empty for now, add if needed
+        formData.append('tagIds', JSON.stringify(productInfoData.tagIds));
 
         // Step 1: Product File (.zip, .fig, etc.)
         if (uploadFileData.file) {
