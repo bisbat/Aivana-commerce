@@ -1,5 +1,6 @@
 import { Category } from './category';
 import { Owner } from './seller';
+import { Tag } from './tag'
 
 //product retrieve interface form back-end
 export interface Product {
@@ -17,6 +18,7 @@ export interface Product {
     category: Category;
     created_at: string;
     owner: Owner;
+    tags: Tag;
 }
 
 // Step 1: Upload File Form Data
@@ -40,8 +42,9 @@ export interface Product {
     hero_image_url: null;
   
     // Always 1 for now — fixed values
-    categoryId: 1;
+    categoryId: number;
     ownerId: 1;
+    tagIds: number[]; 
   
     features: string[];
     compatibility: string[];
