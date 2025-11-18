@@ -34,7 +34,12 @@ export class UsersService {
   async findUserByEmail(email: string): Promise<UserEntity | null> {
     return await this.userRepository.findOne({
       where: { email },
-      relations: ['products'],
+    });
+  }
+
+  async findUserName(username: string): Promise<UserEntity | null> {
+    return await this.userRepository.findOne({
+      where: { username },
     });
   }
 
