@@ -1,4 +1,4 @@
-export interface ProductTags {
+export interface Tag {
     id: string;
     name: string;
 }

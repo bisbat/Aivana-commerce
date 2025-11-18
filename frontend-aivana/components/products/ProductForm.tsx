@@ -1,32 +1,23 @@
 'use client';
 
-import React, { useState } from 'react';
-import { UploadFileData } from '@/lib/api/types/product';
+import React, { useState, useEffect } from 'react';
+import { UploadFileFormData, ProductInformationForm} from '@/lib/types/product';
+import { getAllCategories } from '@/lib/actions/category.action'
+import { getAllTags } from '@/lib/actions/tag.action'
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Dropdown';
-import { TagInput } from '@/components/ui/TagInput';
+import { CompatibilityInput } from '../ui/CompatibilityInput';
 import { FeatureInput } from '@/components/ui/FeatureInput';
+import { MultiSelectTag } from '@/components/ui/MultiSelectTag';
+import { Loader } from 'lucide-react';
 
 // NEW: This component no longer submits to backend
 // It just collects data and passes to next step
 interface ProductFormProps {
-  uploadData: UploadFileData;
-  onNext: (data: ProductFormData) => void; // Changed from onBack
+  uploadData: UploadFileFormData ;
+  onNext: (data: ProductInformationForm) => void; // Changed from onBack
   onBack: () => void;
-}
-
-// NEW: Type for data collected in this step only
-export interface ProductFormData {
-  productName: string;
-  blurb: string;
-  category: string;
-  description: string;
-  features: string[];
-  installationDoc: string;
-  tags: string[];
-  price: string;
-  livePreview: string;
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({ 
@@ -35,52 +26,101 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   onBack 
 }) => {
   // Form state
-  const [productName, setProductName] = useState('');
+  const [name, setName] = useState('');
   const [blurb, setBlurb] = useState('');
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
   const [features, setFeatures] = useState<string[]>([]);
-  const [installationDoc, setInstallationDoc] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
+  const [installation_guide, setInstallation_guide] = useState('');
   const [price, setPrice] = useState('');
   const [livePreview, setLivePreview] = useState('');
+  const [compatibility, setCompatibility] = useState<string[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+  const [categoryId, setCategoryId] = useState('');
 
+  const [categories, setCategories] = useState<Array<{ id: string; name: string; description: string | null }>>([]);
+  const [tags, setTags] = useState<Array<{ id: string; name: string }>>([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  
+  // const [tags, setTags] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const categories = [
-    'Web Templates',
-    'UI Kits (With Code)',
-    'UI Components',
-    'Figma UI Kits',
-    'Sketch UI Kits',
-    'Adobe XD UI Kits'
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoadingData(true);
+      try {
+        const [categoriesData, tagsData] = await Promise.all([
+          getAllCategories(),
+          getAllTags()
+        ]);
+
+        setCategories(categoriesData);
+        setTags(tagsData);
+
+        console.log('✅ Categories loaded:', categoriesData);
+        console.log('✅ Tags loaded:', tagsData);
+
+      } catch (err) {
+        console.error('❌ Error loading categories/tags:', err);
+        setError('Failed to load categories and tags. Please refresh the page.');
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Handle continue to next step
   const handleContinue = () => {
     setError(null);
 
     // Validate required fields
-    if (!productName || !category) {
+    if ( !name ) {
       setError('Please fill in all required fields');
+      return;
+    }
+    
+    if (!categoryId) {
+      setError('Please select a category');
+      return;
+    }
+
+    if (!price || Number(price) <= 0) {
+      setError('Please enter a valid price');
       return;
     }
 
     // Pass data to parent (page.tsx)
-    const formData: ProductFormData = {
-      productName,
+    const formData: ProductInformationForm = {
+      name,
       blurb,
-      category,
+      categoryId: Number(categoryId),
+      ownerId: 1,
       description,
       features: features.filter(f => f.trim() !== ''),
-      installationDoc,
-      tags,
-      price,
-      livePreview
+      installation_guide,
+      price: Number(price),
+      preview_url: livePreview || null,
+      compatibility: compatibility.filter(f => f.trim() !== ''),
+      uploaded_file_path: null,
+      hero_image_url: null,
+      tagIds: selectedTagIds
     };
 
     onNext(formData);
   };
+
+  if (isLoadingData) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <Loader className="animate-spin text-purple-400 mx-auto mb-4" size={48} />
+          <p className="text-white">Loading categories and tags...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -131,8 +171,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       {/* All form fields - same as before */}
       <Input
         label="Product Name"
-        value={productName}
-        onChange={setProductName}
+        value={name}
+        onChange={setName}
         placeholder="Enter product name"
         required
       />
@@ -146,9 +186,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         />
         <Select
           label="Category"
-          value={category}
-          onChange={setCategory}
-          options={categories}
+          value={categoryId}
+          onChange={setCategoryId}
+          options={categories.map(cat => ({
+            value: cat.id,
+            label: cat.name
+          }))}
+          placeholder="Select a category"
           required
         />
       </div>
@@ -165,29 +209,38 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
       <Textarea
         label="Installation Document"
-        value={installationDoc}
-        onChange={setInstallationDoc}
+        value={installation_guide}
+        onChange={setInstallation_guide}
         placeholder="Installation Document..."
         rows={4}
       />
 
-      <TagInput label="Tags" tags={tags} onChange={setTags} />
+      <CompatibilityInput compatibility={compatibility} onChange={setCompatibility} />
 
-      <Input
-        label="Price"
-        value={price}
-        onChange={setPrice}
-        placeholder="0.00"
-        type="number"
+      <MultiSelectTag
+        label="Tags"
+        tags={tags}
+        selectedTagIds={selectedTagIds}
+        onChange={setSelectedTagIds}
       />
 
-      <Input
-        label="Live Preview"
-        value={livePreview}
-        onChange={setLivePreview}
-        placeholder="https://example.com"
-        type="url"
-      />
+      <div className="grid grid-cols-2 gap-4">
+        <Input
+          label="Price"
+          value={price}
+          onChange={setPrice}
+          placeholder="0.00"
+          type="number"
+          required
+        />
+        <Input
+          label="Live Preview"
+          value={livePreview}
+          onChange={setLivePreview}
+          placeholder="https://example.com"
+          type="url"
+        />
+      </div>
 
       {/* Continue Button - No longer submits to backend */}
       <div className="flex justify-end pt-4">

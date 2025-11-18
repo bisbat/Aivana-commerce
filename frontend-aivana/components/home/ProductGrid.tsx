@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getAllProductsAction } from '@/lib/actions/product.actions';
 import { Product } from '@/lib/types/product/Product';
+import { getAllProductsAction } from '@/lib/actions/product.actions'
 import { ProductCard } from './ProductCard';
 import { Loader, AlertCircle } from 'lucide-react';
 
