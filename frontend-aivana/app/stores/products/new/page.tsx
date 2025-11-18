@@ -160,7 +160,6 @@ export default function AddProductPage() {
           {/* Step 3: Product Images */}
           {currentStep === 3 && (
             <UploadImageForm 
-              productId="" // Not needed anymore since we submit everything at once
               onPublish={handlePublish}
               onBack={handleBackToStep2}
             />
