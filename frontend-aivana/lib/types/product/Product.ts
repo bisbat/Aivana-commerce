@@ -20,7 +20,7 @@ export interface Product {
     created_at: string;
     detail_images: ProductImages[];
     owner: Owner;
-    tags: Tag;
+    tags: Tag[];
 }
   
   
