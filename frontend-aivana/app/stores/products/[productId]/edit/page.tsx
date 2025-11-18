@@ -17,6 +17,8 @@ import { FeatureInput } from '@/components/ui/FeatureInput';
 import { CompatibilityInput } from '@/components/ui/CompatibilityInput';
 
 import EditProductImages from './EditProductImages';
+import EditProductHeroImage from './EditProductHeroImage';
+import EditProductFile from './EditProductFile';
 
 export default function EditProductPage() {
   const params = useParams();
@@ -43,6 +45,14 @@ export default function EditProductPage() {
   // States for handling detail images
   const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
   const [deletedImageIds, setDeletedImageIds] = useState<string[]>([]);
+  
+  // States for handling hero image
+  const [currentHeroImage, setCurrentHeroImage] = useState<string | null>(null);
+  const [newHeroImageFile, setNewHeroImageFile] = useState<File | null>(null);
+  
+  // States for handling product file
+  const [currentProductFile, setCurrentProductFile] = useState<string | null>(null);
+  const [newProductFile, setNewProductFile] = useState<File | null>(null);
 
   useEffect(() => {
     async function fetchFormData() {
@@ -80,6 +90,8 @@ export default function EditProductPage() {
       setCategoryId(productData.category?.id?.toString() || '');
       setSelectedTagIds(productData.tags?.map(tag => Number(tag.id)) || []);
       setDetailImages(productData.detail_images || []);
+      setCurrentHeroImage(productData.hero_image_url || null);
+      setCurrentProductFile(productData.uploaded_file_path || null);
       
     }
   }, [productData]);
@@ -112,6 +124,28 @@ export default function EditProductPage() {
     setNewImageFiles(prev => prev.filter((_, i) => i !== index));
   };
 
+  // Handler for hero image change
+  const handleHeroImageChange = (file: File | null) => {
+    setNewHeroImageFile(file);
+  };
+
+  // Handler for removing hero image
+  const handleRemoveHeroImage = () => {
+    setCurrentHeroImage(null);
+    setNewHeroImageFile(null);
+  };
+
+  // Handler for product file change
+  const handleProductFileChange = (file: File | null) => {
+    setNewProductFile(file);
+  };
+
+  // Handler for removing product file
+  const handleRemoveProductFile = () => {
+    setCurrentProductFile(null);
+    setNewProductFile(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -136,19 +170,31 @@ export default function EditProductPage() {
       formData.append('tagIds', JSON.stringify(selectedTagIds));
       formData.append('deletedImageIds', JSON.stringify(deletedImageIds));
       
-      // Add new image files
+      // Add new detail image files
       newImageFiles.forEach((file, index) => {
-        formData.append('newDetailImages', file);
+        formData.append('detailImages', file);
       });
+
+      // Add hero image file if changed
+      if (newHeroImageFile) {
+        formData.append('heroImage', newHeroImageFile);
+      }
+
+      // Add product file if changed
+      if (newProductFile) {
+        formData.append('productFile', newProductFile);
+      }
 
       console.log('Updated Product Data:', {
         name, blurb, description, installation_guide,
         compatibility, price, livePreview, features,
         categoryId, selectedTagIds, 
-        newImageFiles: newImageFiles
+        newDetailImages: newImageFiles.length,
+        hasNewHeroImage: !!newHeroImageFile,
+        hasNewProductFile: !!newProductFile
       });
 
-      // await updateProductAction(productId, formData);
+      await updateProductAction(productId, formData);
       
       // Redirect to product detail or products list
       // router.push(`/stores/products/${productId}`);
@@ -234,6 +280,32 @@ export default function EditProductPage() {
           placeholder="https://example.com"
           type="url"
         />
+
+        {/* Product File Management */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Product File
+          </label>
+          <EditProductFile
+            currentFile={currentProductFile}
+            newFile={newProductFile}
+            onFileChange={handleProductFileChange}
+            onRemoveFile={handleRemoveProductFile}
+          />
+        </div>
+
+        {/* Hero Image Management */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Hero Image
+          </label>
+          <EditProductHeroImage
+            currentImage={currentHeroImage}
+            newImageFile={newHeroImageFile}
+            onImageChange={handleHeroImageChange}
+            onRemoveImage={handleRemoveHeroImage}
+          />
+        </div>
 
         {/* Detail Images Management */}
         <div className="mb-6">
