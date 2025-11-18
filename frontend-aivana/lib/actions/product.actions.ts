@@ -2,8 +2,7 @@
 import { revalidatePath } from 'next/cache';
 import { ProductInformationFormData } from '../types/formCreateProduct/ProductInformationFormData';
 import { UploadFileFormData } from '../types/formCreateProduct/UploadFileFormData'; 
-import { ProductImages } from '../types/product/product_images';  
-
+import { UploadImageFormData } from '../types/formCreateProduct/UploadImageFormData';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -54,7 +53,7 @@ export async function getAllProductsAction() {
 export async function createCompleteProduct(
     uploadFileData: UploadFileFormData,      // Step 1 data
     productInfoData: ProductInformationFormData, // Step 2 data
-    imageData: ProductImages                 // Step 3 data
+    imageData: UploadImageFormData               // Step 3 data
 ) {
     try {
         // Create FormData with ALL information
@@ -95,7 +94,7 @@ export async function createCompleteProduct(
         console.log('📤 Sending complete product to backend...');
 
         // ✨ Single API call with everything
-        const response = await fetch(`${API_BASE_URL}/products/with-files`, {
+        const response = await fetch(`${API_BASE_URL}/products`, {
             method: 'POST',
             body: formData,
             // No Content-Type header - browser sets it automatically for FormData
@@ -110,7 +109,7 @@ export async function createCompleteProduct(
         console.log('✅ Product created successfully:', createdProduct);
 
         // Revalidate cache
-        revalidatePath('/stores/products');
+        revalidatePath('/stores');
 
         return createdProduct;
 
