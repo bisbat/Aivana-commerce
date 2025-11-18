@@ -11,7 +11,7 @@ export default function DeleteButton({ productId }: { productId: string }) {
     const handleDelete = async () => {
         await deleteProductAction(productId);
         toast.success("Product deleted successfully.");
-        window.location.href = '/stores/products';
+        window.location.href = '/stores';
     };
 
     return (
