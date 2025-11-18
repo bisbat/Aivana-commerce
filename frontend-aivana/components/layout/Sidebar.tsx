@@ -24,9 +24,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const router = useRouter(); // ✅ initialize router
 
   const navItems: NavItem[] = [
-    { label: "Home", icon: <Home size={20} />, href: "/" },
+    { label: "MarketPlace", icon: <Home size={20} />, href: "/" },
     { label: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/dashboard" },
-    { label: "Product", icon: <Package size={20} />, href: "/products" },
+    { label: "Product", icon: <Package size={20} />, href: "/stores" },
     { label: "Earning", icon: <DollarSign size={20} />, href: "/earning" },
   ];
 
