@@ -77,7 +77,7 @@ export default async function ProductStoreDetailPage(
                     <p>
                         Preview URL:{' '}
                         {initialProductData.preview_url ? (
-                            <a href={initialProductData.preview_url} className="text-primary hover:underline">
+                            <a href={initialProductData.preview_url} className="text-primary hover:underline" target='_blank'>
                                 {initialProductData.preview_url}
                             </a>
                         ) : (

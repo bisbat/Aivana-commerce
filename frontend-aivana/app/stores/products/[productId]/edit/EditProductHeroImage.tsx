@@ -1,0 +1,92 @@
+'use client';
+import { useState } from 'react';
+
+interface EditProductHeroImageProps {
+  currentImage: string | null;
+  newImageFile: File | null;
+  onImageChange: (file: File | null) => void;
+  onRemoveImage: () => void;
+}
+
+export default function EditProductHeroImage({
+  currentImage,
+  newImageFile,
+  onImageChange,
+  onRemoveImage
+}: EditProductHeroImageProps) {
+  
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      onImageChange(file);
+    }
+  };
+
+  const handleRemove = () => {
+    onRemoveImage();
+    // Clear the input
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (input) input.value = '';
+  };
+
+  // Determine which image to show
+  const displayImage = newImageFile 
+    ? URL.createObjectURL(newImageFile)
+    : currentImage;
+
+  return (
+    <div className="space-y-4">
+      {/* Current/Preview Hero Image */}
+      {displayImage && (
+        <div className="relative">
+          <div className="relative group w-full max-w-md">
+            <img
+              src={displayImage}
+              alt="Hero image"
+              className="w-full h-48 object-cover rounded-lg border-2 border-gray-200"
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
+              >
+                Remove Image
+              </button>
+            </div>
+          </div>
+          {newImageFile && (
+            <p className="text-sm text-green-600 mt-2">
+              ✓ New image selected (will replace current image when saved)
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Upload New Hero Image */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          {displayImage ? 'Replace Hero Image' : 'Add Hero Image'}
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileSelect}
+          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+        />
+        <p className="text-xs text-gray-500 mt-1">
+          Recommended: 1200x600px or higher. Supported formats: JPG, PNG, GIF
+        </p>
+      </div>
+
+      {!displayImage && (
+        <div className="w-full max-w-md h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-500">
+          <div className="text-center">
+            <p className="text-sm">No hero image set</p>
+            <p className="text-xs">Upload an image above</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
