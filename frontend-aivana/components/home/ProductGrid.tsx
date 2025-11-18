@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import { Product } from '@/lib/types/product/Product';
@@ -10,7 +10,7 @@ export const ProductGrid: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<'latest' | 'price'>('latest');
+  const [sortBy, setSortBy] = useState<"latest" | "price">("latest");
 
   // Fetch products on mount
   useEffect(() => {
@@ -23,7 +23,7 @@ export const ProductGrid: React.FC = () => {
       const data = await getAllProductsAction();
       setProducts(data);
     } catch (err) {
-      setError('Failed to load products');
+      setError("Failed to load products");
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -32,7 +32,7 @@ export const ProductGrid: React.FC = () => {
 
   // Sort products
   const sortedProducts = [...products].sort((a, b) => {
-    if (sortBy === 'price') {
+    if (sortBy === "price") {
       return parseFloat(a.price) - parseFloat(b.price);
     }
     // Sort by created_at (latest first)
@@ -45,11 +45,11 @@ export const ProductGrid: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold text-purple-400">เลือกซื้อ</h2>
-          
+
           {/* Sort Dropdown */}
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as 'latest' | 'price')}
+            onChange={(e) => setSortBy(e.target.value as "latest" | "price")}
             className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-purple-500"
           >
             <option value="latest">คำสั่งบนแถง</option>
