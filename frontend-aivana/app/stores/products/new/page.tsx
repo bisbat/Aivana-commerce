@@ -7,7 +7,7 @@ import { UploadFileForm } from '@/components/products/UploadFileForm';
 import { ProductForm, ProductFormData } from '@/components/products/ProductForm';
 import { UploadImageForm } from '@/components/products/UploadImageForm';
 import { createProductAction } from '@/lib/actions/product.actions';
-import { ProductImages } from '@/lib/types/product_images';
+import { ProductImages } from '@/lib/types/product/product_images';
 import { ProductFile } from '@/lib/types/product_file';
 import { ProductHeroImage } from '@/lib/types/product_hero_image';
 import { Loader } from 'lucide-react';

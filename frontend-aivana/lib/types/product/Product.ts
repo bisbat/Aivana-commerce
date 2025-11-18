@@ -1,6 +1,7 @@
-import { Category } from './category';
-import { Owner } from './seller';
+import { Category } from '../category';
+import { Owner } from '../seller';
 import { ProductImages } from './product_images';
+import { ProductTags } from './product_tags';
 
 export interface Product {
     id: string;
@@ -18,4 +19,5 @@ export interface Product {
     owner: Owner;
     created_at: string;
     detail_images: ProductImages[];
+    tags: ProductTags[];
 }

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { Product } from '@/lib/types/product';
+import { Product } from '@/lib/types/product/Product';
 import EditButton from './EditButton';
 import BackButton from './BackButton';
 import ProductImages from './ProductImages';
@@ -73,6 +73,7 @@ export default async function ProductStoreDetailPage(
                     </div>
 
                     <p>Category: <span className="text-primary">{initialProductData.category.name}</span></p>
+                    <p>Tags: {initialProductData.tags.map(tag => tag.name).join(', ')}</p>
                     <p>Preview URL: <a href={initialProductData.preview_url} className="text-primary hover:underline">{initialProductData.preview_url}</a></p>
 
                     {/* Uploaded file */}
