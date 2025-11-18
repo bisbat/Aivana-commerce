@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { ProductCardSeller } from "@/components/seller/ProductCardSeller";
+import { ProductCardSeller } from "@/components/products/ProductCardSeller";
 import { getAllProductsAction } from "@/lib/actions/product.actions";
 import { Product } from "@/lib/types/product";
 import { Loader, AlertCircle, Package } from "lucide-react";
@@ -48,11 +47,7 @@ export default function StorePage() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar
-        storeName="Bisbat Sae-kow"
-        currentPath={pathname}
-        onAddProductClick={() => router.push("stores/products/new")}
-      />
+
 
       {/* Main Content */}
       <main className="flex-1 p-10">
