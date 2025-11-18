@@ -42,12 +42,11 @@ export default function StorePage() {
 
   // Handle edit button click
   const handleEditProduct = (productId: number) => {
-    router.push(`stores/products/edit/${productId}`);
+    router.push(`stores/products/${productId}/edit`);
   };
 
   return (
     <div className="flex min-h-screen">
-
 
       {/* Main Content */}
       <main className="flex-1 p-10">
