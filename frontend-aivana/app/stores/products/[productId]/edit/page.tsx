@@ -19,6 +19,7 @@ import { CompatibilityInput } from '@/components/ui/CompatibilityInput';
 import EditProductImages from './EditProductImages';
 import EditProductHeroImage from './EditProductHeroImage';
 import EditProductFile from './EditProductFile';
+import BackButton from '../BackButton';
 
 export default function EditProductPage() {
   const params = useParams();
@@ -208,8 +209,8 @@ export default function EditProductPage() {
 
   return (
     <div>
-      <button onClick={() => router.back()}>Back</button>
-      <h1>Edit page</h1>
+      <BackButton/>
+      <h1 className='text-3xl font-bold text-primary mb-4'>Edit page</h1>
 
       <form onSubmit={handleSubmit}>
         <Input
