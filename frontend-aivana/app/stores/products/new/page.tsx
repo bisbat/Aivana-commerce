@@ -71,7 +71,7 @@ export default function AddProductPage() {
       
       // Redirect after 2 seconds
       setTimeout(() => {
-        router.push('/stores/products');
+        router.push('/stores');
       }, 2000);
       
     } catch (err) {
