@@ -74,7 +74,16 @@ export default async function ProductStoreDetailPage(
 
                     <p>Category: <span className="text-primary">{initialProductData.category.name}</span></p>
                     <p>Tags: {initialProductData.tags.map(tag => tag.name).join(', ')}</p>
-                    <p>Preview URL: <a href={initialProductData.preview_url} className="text-primary hover:underline">{initialProductData.preview_url}</a></p>
+                    <p>
+                        Preview URL:{' '}
+                        {initialProductData.preview_url ? (
+                            <a href={initialProductData.preview_url} className="text-primary hover:underline">
+                                {initialProductData.preview_url}
+                            </a>
+                        ) : (
+                            <span className="text-gray-400">No preview available</span>
+                        )}
+                    </p>
 
                     {/* Uploaded file */}
                     <div className="mt-4">
