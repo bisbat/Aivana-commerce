@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { UploadFileFormData } from '@/lib/types/product/Product';
-import { ProductInformationForm } from '@/lib/types/product/Product';
-import { getAllCategories } from '@/lib/actions/category.action'
-import { getAllTags } from '@/lib/actions/tag.action'
+import { UploadFileFormData } from '@/lib/types/formCreateProduct/UploadFileFormData';
+import { ProductInformationFormData } from '@/lib/types/formCreateProduct/ProductInformationFormData';
+import { getAllCategories } from '@/lib/actions/category.actions'
+import { getAllTagsAction } from '@/lib/actions/tag.actions'
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Dropdown';
@@ -17,7 +17,7 @@ import { Loader } from 'lucide-react';
 // It just collects data and passes to next step
 interface ProductFormProps {
   uploadData: UploadFileFormData ;
-  onNext: (data: ProductInformationForm) => void; // Changed from onBack
+  onNext: (data: ProductInformationFormData) => void; // Changed from onBack
   onBack: () => void;
 }
 
@@ -52,7 +52,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       try {
         const [categoriesData, tagsData] = await Promise.all([
           getAllCategories(),
-          getAllTags()
+          getAllTagsAction()
         ]);
 
         setCategories(categoriesData);
@@ -93,7 +93,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     }
 
     // Pass data to parent (page.tsx)
-    const formData: ProductInformationForm = {
+    const formData: ProductInformationFormData = {
       name,
       blurb,
       categoryId: Number(categoryId),

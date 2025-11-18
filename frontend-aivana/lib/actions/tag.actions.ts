@@ -1,6 +1,6 @@
 "use server";
 import { revalidatePath } from 'next/cache';
-import { CreateProductTagsDTO } from '../types/product/product_tags';
+import { CreateProductTagsDTO } from '../types/tag'
 
 export async function createTagAction(tagData: CreateProductTagsDTO) {
     // ส่งคำขอไปยัง API เพื่อสร้างแท็กใหม่

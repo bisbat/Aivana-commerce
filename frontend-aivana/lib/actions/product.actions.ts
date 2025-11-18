@@ -1,6 +1,9 @@
 "use server";
 import { revalidatePath } from 'next/cache';
-import { ProductInformationForm, UploadFileFormData, ProductImages } from '@/lib/types/product';
+import { ProductInformationFormData } from '../types/formCreateProduct/ProductInformationFormData';
+import { UploadFileFormData } from '../types/formCreateProduct/UploadFileFormData'; 
+import { ProductImages } from '../types/product/product_images';  
+
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -50,7 +53,7 @@ export async function getAllProductsAction() {
 
 export async function createCompleteProduct(
     uploadFileData: UploadFileFormData,      // Step 1 data
-    productInfoData: ProductInformationForm, // Step 2 data
+    productInfoData: ProductInformationFormData, // Step 2 data
     imageData: ProductImages                 // Step 3 data
 ) {
     try {

@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
-import { ProductImages } from '@/lib/types/product';
+import { ProductImages } from '@/lib/types/product/product_images';
 
 interface UploadImageFormProps {
   onPublish: (data: ProductImages) => void;
@@ -10,7 +10,6 @@ interface UploadImageFormProps {
 }
 
 export const UploadImageForm: React.FC<UploadImageFormProps> = ({ 
-  productId, 
   onPublish, 
   onBack 
 }) => {
@@ -105,12 +104,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
     // Validate hero image
     if (!heroImage) {
       setError("Hero image is required");
-      return;
-    }
-
-    // Validate product ID
-    if (!productId) {
-      setError("Missing product ID");
       return;
     }
 
