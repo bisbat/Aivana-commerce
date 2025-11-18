@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Product } from '@/lib/types/product';
+import { Product } from '@/lib/types/product/Product';
 
 interface ProductCardProps {
   product: Product;

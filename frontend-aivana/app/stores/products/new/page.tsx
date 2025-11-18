@@ -5,11 +5,9 @@ import { useRouter } from 'next/navigation';
 import { UploadFileForm } from '@/components/products/UploadFileForm';
 import { ProductForm } from '@/components/products/ProductForm';
 import { UploadImageForm } from '@/components/products/UploadImageForm';
-import { 
-  UploadFileFormData, 
-  ProductInformationForm,
-  ProductImages
-} from '@/lib/types/product';
+import { ProductImages } from '@/lib/types/product/product_images';
+import { UploadFileFormData } from '@/lib/types/formCreateProduct/UploadFileFormData'
+import { ProductInformationFormData } from '@/lib/types/formCreateProduct/ProductInformationFormData'
 import { createCompleteProduct } from '@/lib/actions/product.actions';
 import { Loader, CheckCircle, AlertCircle } from 'lucide-react';
 
@@ -21,7 +19,7 @@ export default function AddProductPage() {
   
   // Store data from each step
   const [uploadData, setUploadData] = useState<UploadFileFormData | null>(null);
-  const [productData, setProductData] = useState<ProductInformationForm | null>(null);
+  const [productData, setProductData] = useState<ProductInformationFormData | null>(null);
   
   // UI state
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,7 +34,7 @@ export default function AddProductPage() {
   };
 
   // Step 2 → Step 3 (NO API call, just move forward)
-  const handleProductNext = (data: ProductInformationForm) => {
+  const handleProductNext = (data: ProductInformationFormData) => {
     console.log('✅ Step 2 completed:', data);
     setProductData(data);
     setCurrentStep(3); // Just move to Step 3, don't submit yet
@@ -158,9 +156,8 @@ export default function AddProductPage() {
           )}
 
           {/* Step 3: Product Images */}
-          {currentStep === 3 && createdProductId && (
+          {currentStep === 3 && (
             <UploadImageForm 
-              productId={createdProductId}
               onPublish={handlePublish}
               onBack={handleBackToStep2}
             />
