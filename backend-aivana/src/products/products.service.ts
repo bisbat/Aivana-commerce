@@ -201,17 +201,10 @@ export class ProductsService {
     },
   ): Promise<{
     product: ProductWithImagesDto | null;
-    uploadedFiles: { hero: string; file: string; details: string[] };
   }> {
     // 1. Create product first (with tags, category, owner relations)
     const product = await this.createProduct(createProductDto);
     const productId = product.id.toString();
-
-    const uploadedFiles: {
-      hero: string;
-      file: string;
-      details: string[];
-    } = { hero: '', file: '', details: [] };
 
     // 2. Upload hero image
     const heroFile = files.heroImage[0];
@@ -230,7 +223,6 @@ export class ProductsService {
     const heroFileUrl = this.minioService.getFileUrl(heroFullPath);
 
     await this.updateHeroImage(product.id, heroFileUrl);
-    uploadedFiles.hero = heroFileUrl;
 
     // 3. Upload product file (.zip)
     const productFile = files.productFile[0];
@@ -261,7 +253,6 @@ export class ProductsService {
     const fileUrl = this.minioService.getFileUrl(fileFullPath);
 
     await this.updateUploadedFilePath(product.id, fileUrl);
-    uploadedFiles.file = fileUrl;
 
     // 4. Upload detail images (min 2, max 8)
     const detailFiles = files.detailImages;
@@ -283,14 +274,11 @@ export class ProductsService {
         detailFileName,
         MINIO_FOLDERS.PRODUCTS.DETAILS(productId),
       );
-      const detailFileUrl = this.minioService.getFileUrl(fullPath);
 
       await this.productImageService.create({
         path_image: fullPath,
         product_id: product.id,
       });
-
-      uploadedFiles.details.push(detailFileUrl);
 
       // Small delay to ensure unique timestamps
       await new Promise((resolve) => setTimeout(resolve, 10));
@@ -298,7 +286,6 @@ export class ProductsService {
 
     return {
       product: await this.getProductById(product.id),
-      uploadedFiles,
     };
   }
 
@@ -312,17 +299,10 @@ export class ProductsService {
     },
   ): Promise<{
     product: ProductWithImagesDto | null;
-    uploadedFiles: { hero?: string; file?: string; details: string[] };
   }> {
     // 1. Update product data first
     const product = await this.updateProduct(id, updateProductDto);
     const productId = product.id.toString();
-
-    const uploadedFiles: {
-      hero?: string;
-      file?: string;
-      details: string[];
-    } = { details: [] };
 
     // 2. Upload hero image if provided
     if (files?.heroImage && files.heroImage.length > 0) {
@@ -342,7 +322,6 @@ export class ProductsService {
       const heroFileUrl = this.minioService.getFileUrl(heroFullPath);
 
       await this.updateHeroImage(product.id, heroFileUrl);
-      uploadedFiles.hero = heroFileUrl;
     }
 
     // 3. Upload product file (.zip) if provided
@@ -375,7 +354,6 @@ export class ProductsService {
       const fileUrl = this.minioService.getFileUrl(fileFullPath);
 
       await this.updateUploadedFilePath(product.id, fileUrl);
-      uploadedFiles.file = fileUrl;
     }
 
     // 4. Add detail images if provided (total max 8)
@@ -413,14 +391,11 @@ export class ProductsService {
           detailFileName,
           MINIO_FOLDERS.PRODUCTS.DETAILS(productId),
         );
-        const detailFileUrl = this.minioService.getFileUrl(fullPath);
 
         await this.productImageService.create({
           path_image: fullPath,
           product_id: product.id,
         });
-
-        uploadedFiles.details.push(detailFileUrl);
 
         // Small delay to ensure unique timestamps
         await new Promise((resolve) => setTimeout(resolve, 10));
@@ -429,7 +404,6 @@ export class ProductsService {
 
     return {
       product: await this.getProductById(product.id),
-      uploadedFiles,
     };
   }
 }

@@ -11,10 +11,12 @@ import {
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
 import type { UploadedFileType } from './interfaces/uploaded-file.interface';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductWithImagesDto } from './interfaces/product-with-images.interface';
+import { BadRequestException } from '@nestjs/common/exceptions';
+import { plainToInstance } from 'class-transformer';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -25,7 +27,7 @@ export class ProductsController {
     return this.productsService.getAllProducts();
   }
 
-  @Post('with-files')
+  @Post()
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'heroImage', maxCount: 1 },
@@ -42,38 +44,13 @@ export class ProductsController {
       detailImages?: UploadedFileType[];
     },
   ) {
-    if (!files.heroImage || files.heroImage.length === 0) {
-      throw new Error('Hero image is required');
-    }
-    if (!files.productFile || files.productFile.length === 0) {
-      throw new Error('Product file is required');
-    }
-    if (!files.detailImages || files.detailImages.length < 2) {
-      throw new Error('At least 2 detail images are required');
-    }
-    if (files.detailImages.length > 8) {
-      throw new Error('Maximum 8 detail images allowed');
-    }
-    const createProductDto: CreateProductDto = {
-      name: body.name,
-      description: body.description,
-      price: parseFloat(body.price),
-      blurb: body.blurb,
-      installation_guide: body.installation_guide,
-      features: JSON.parse(body.features) as string[],
-      compatibility: JSON.parse(body.compatibility) as string[],
-      categoryId: parseInt(body.categoryId, 10),
-      ownerId: parseInt(body.ownerId, 10),
-      tagIds: body.tagIds ? (JSON.parse(body.tagIds) as number[]) : undefined,
-    };
+    const validatedFiles = this.validateAndTypeFiles(files);
+
+    const createProductDto = plainToInstance(CreateProductDto, body);
 
     const result = await this.productsService.createProductWithFiles(
       createProductDto,
-      {
-        heroImage: files.heroImage,
-        productFile: files.productFile,
-        detailImages: files.detailImages,
-      },
+      validatedFiles,
     );
 
     return {
@@ -89,7 +66,7 @@ export class ProductsController {
     return this.productsService.getProductById(id);
   }
 
-  @Put(':id/with-files')
+  @Put(':id')
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'heroImage', maxCount: 1 },
@@ -107,24 +84,7 @@ export class ProductsController {
       detailImages?: UploadedFileType[];
     },
   ) {
-    const updateProductDto: UpdateProductDto = {
-      ...(body.name && { name: body.name }),
-      ...(body.description && { description: body.description }),
-      ...(body.price && { price: parseFloat(body.price) }),
-      ...(body.blurb && { blurb: body.blurb }),
-      ...(body.installation_guide && {
-        installation_guide: body.installation_guide,
-      }),
-      ...(body.features && {
-        features: JSON.parse(body.features) as string[],
-      }),
-      ...(body.compatibility && {
-        compatibility: JSON.parse(body.compatibility) as string[],
-      }),
-      ...(body.categoryId && { categoryId: parseInt(body.categoryId, 10) }),
-      ...(body.ownerId && { ownerId: parseInt(body.ownerId, 10) }),
-      ...(body.tagIds && { tagIds: JSON.parse(body.tagIds) as number[] }),
-    };
+    const updateProductDto = plainToInstance(UpdateProductDto, body);
 
     const result = await this.productsService.updateProductWithFiles(
       id,
@@ -142,5 +102,34 @@ export class ProductsController {
   async deleteProduct(@Param('id') id: number) {
     await this.productsService.deleteProduct(id);
     return { message: 'Product deleted successfully' };
+  }
+
+  private validateAndTypeFiles(files: {
+    heroImage?: UploadedFileType[];
+    productFile?: UploadedFileType[];
+    detailImages?: UploadedFileType[];
+  }): {
+    heroImage: UploadedFileType[];
+    productFile: UploadedFileType[];
+    detailImages: UploadedFileType[];
+  } {
+    if (!files.heroImage?.length) {
+      throw new BadRequestException('Hero image is required');
+    }
+    if (!files.productFile?.length) {
+      throw new BadRequestException('Product file is required');
+    }
+    if (!files.detailImages || files.detailImages.length < 2) {
+      throw new BadRequestException('At least 2 detail images are required');
+    }
+    if (files.detailImages.length > 8) {
+      throw new BadRequestException('Maximum 8 detail images allowed');
+    }
+
+    return {
+      heroImage: files.heroImage,
+      productFile: files.productFile,
+      detailImages: files.detailImages,
+    };
   }
 }
