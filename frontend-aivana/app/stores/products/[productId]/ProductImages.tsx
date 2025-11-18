@@ -1,6 +1,6 @@
 'use client'; 
 import { useState } from 'react';
-import type { ProductImages } from '@/lib/types/product_images';
+import type { ProductImages } from '@/lib/types/product/product_images';
 
 interface ProductImagesProps {
     heroSrc?: string | null;

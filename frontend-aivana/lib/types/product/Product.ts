@@ -1,6 +1,6 @@
-import { Category } from './category';
-import { Owner } from './seller';
-import { Tag } from './tag'
+import { Category } from '../category';
+import { Owner } from '../seller';
+import { Tag } from '../tag';
 
 //product retrieve interface form back-end
 export interface Product {
@@ -17,6 +17,7 @@ export interface Product {
     compatibility: string[];
     category: Category;
     created_at: string;
+    detail_images: ProductImages[];
     owner: Owner;
     tags: Tag;
 }
@@ -62,6 +63,7 @@ export interface Product {
     images: File[];   
   }
 
+  // Renamed to avoid conflict with imported ProductImages type
   export interface ProductImages {
     heroImage: File | null;
     detailImages: File[];

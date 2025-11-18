@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { UploadFileFormData, ProductInformationForm} from '@/lib/types/product';
+import { UploadFileFormData } from '@/lib/types/product/Product';
+import { ProductInformationForm } from '@/lib/types/product/Product';
 import { getAllCategories } from '@/lib/actions/category.action'
 import { getAllTags } from '@/lib/actions/tag.action'
 import { Input } from '@/components/ui/Input';

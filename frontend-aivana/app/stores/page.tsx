@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { ProductCardSeller } from "@/components/products/ProductCardSeller";
 import { getAllProductsAction } from "@/lib/actions/product.actions";
-import { Product } from "@/lib/types/product";
+import { Product } from "@/lib/types/product/Product";
 import { Loader, AlertCircle, Package } from "lucide-react";
 
 export default function StorePage() {
