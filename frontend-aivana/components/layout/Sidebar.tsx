@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation"; // ✅ import router
-import { Home, LayoutDashboard, Package, DollarSign } from "lucide-react";
+import { Home, LayoutDashboard, Package, DollarSign, Store } from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -24,7 +24,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const router = useRouter(); // ✅ initialize router
 
   const navItems: NavItem[] = [
-    { label: "MarketPlace", icon: <Home size={20} />, href: "/" },
+    { label: "Market Place", icon: <Store size={20} />, href: "/" },
     { label: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/dashboard" },
     { label: "Product", icon: <Package size={20} />, href: "/stores" },
     { label: "Earning", icon: <DollarSign size={20} />, href: "/earning" },
@@ -64,11 +64,7 @@ const NavLink: React.FC<NavItem> = ({ label, icon, href, isActive }) => {
   return (
     <Link
       href={href}
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-        isActive
-          ? "text-white bg-[var(--linne-purple-hover-2)]"
-          : "text-gray-300 hover:text-white hover:bg-[var(--linne-purple-hover)]"
-      }`}
+      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:text-white hover:bg-[var(--linne-purple-hover)]`}
     >
       {icon}
       <span>{label}</span>
