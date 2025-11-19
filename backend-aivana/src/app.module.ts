@@ -11,6 +11,7 @@ import { CartModule } from './cart/cart.module';
 import { TagsModule } from './tags/tags.module';
 import { SellersModule } from './sellers/sellers.module';
 import { CustomersModule } from './customers/customers.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { CustomersModule } from './customers/customers.module';
     TagsModule,
     SellersModule,
     CustomersModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
