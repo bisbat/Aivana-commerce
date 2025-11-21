@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { UploadFileForm } from '@/components/products/UploadFileForm';
 import { ProductForm } from '@/components/products/ProductForm';
 import { UploadImageForm } from '@/components/products/UploadImageForm';
-import { ProductImages } from '@/lib/types/product/product_images';
+import { UploadImageFormData } from '@/lib/types/formCreateProduct/UploadImageFormData';
 import { UploadFileFormData } from '@/lib/types/formCreateProduct/UploadFileFormData'
 import { ProductInformationFormData } from '@/lib/types/formCreateProduct/ProductInformationFormData'
 import { createCompleteProduct } from '@/lib/actions/product.actions';
@@ -41,7 +41,7 @@ export default function AddProductPage() {
   };
 
   // Step 3 → Submit EVERYTHING to backend
-  const handlePublish = async (imageData: ProductImages) => {
+  const handlePublish = async (imageData: UploadImageFormData) => {
     // Validate we have all data
     if (!uploadData || !productData) {
       setError('Missing data from previous steps');
@@ -71,7 +71,7 @@ export default function AddProductPage() {
       
       // Redirect after 2 seconds
       setTimeout(() => {
-        router.push('/stores/products');
+        router.push('/stores');
       }, 2000);
       
     } catch (err) {
