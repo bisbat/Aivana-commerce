@@ -7,6 +7,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { formatPrice, formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { Loader } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
+import { addToCart } from "@/lib/actions/cart.actions";
 
 interface DetailImage {
   image_id: string;
@@ -25,6 +26,53 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<ProductWithImages | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({ show: false, message: "", type: "success" });
+
+  const handleAddToCart = async () => {
+    try {
+      setAddingToCart(true);
+      // TODO: Replace with actual userId from auth context
+      const userId = 1;
+
+      await addToCart({
+        userId,
+        productId: parseInt(productId),
+      });
+
+      setToast({
+        show: true,
+        message: "เพิ่มสินค้าเข้าตะกร้าสำเร็จ!",
+        type: "success",
+      });
+      setTimeout(
+        () => setToast({ show: false, message: "", type: "success" }),
+        3000
+      );
+    } catch (err: unknown) {
+      // Check for specific error code instead of message string
+      const errorMessage =
+        err instanceof Error && err.message === "PRODUCT_ALREADY_IN_CART"
+          ? "สินค้านี้มีอยู่ในตะกร้าแล้ว"
+          : "ไม่สามารถเพิ่มสินค้าเข้าตะกร้าได้ กรุณาลองใหม่อีกครั้ง";
+
+      setToast({
+        show: true,
+        message: errorMessage,
+        type: "error",
+      });
+      setTimeout(
+        () => setToast({ show: false, message: "", type: "error" }),
+        3000
+      );
+    } finally {
+      setAddingToCart(false);
+    }
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -69,6 +117,53 @@ export default function ProductDetailPage() {
   return (
     <div className="min-h-screen">
       <Navbar />
+
+      {/* Toast Notification */}
+      {toast.show && (
+        <div className="fixed top-20 right-4 z-50 animate-in slide-in-from-top-5 duration-300">
+          <div
+            className={`rounded-lg px-6 py-4 shadow-lg ${
+              toast.type === "success"
+                ? "bg-green-500 text-white"
+                : "bg-red-500 text-white"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              {toast.type === "success" ? (
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              )}
+              <p className="font-medium">{toast.message}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Header Product Name */}
         <div className="space-y-4">
@@ -81,8 +176,14 @@ export default function ProductDetailPage() {
               <button className="px-4 py-2 border-2 border-white text-white rounded-lg hover:bg-white/10 transition-colors font-medium text-sm cursor-pointer">
                 คลิกเพื่อดูตัวอย่าง
               </button>
-              <button className="px-4 py-2 bg-(--primary) text-white rounded-lg hover:bg-(--primary-hover) transition-colors font-medium text-sm cursor-pointer">
-                เพิ่มลงตะกร้า {formatPriceWithCurrency(product.price)}
+              <button
+                onClick={handleAddToCart}
+                disabled={addingToCart}
+                className="px-4 py-2 bg-(--primary) text-white rounded-lg hover:bg-(--primary-hover) transition-colors font-medium text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {addingToCart
+                  ? "กำลังเพิ่ม..."
+                  : `เพิ่มลงตะกร้า ${formatPriceWithCurrency(product.price)}`}
               </button>
             </div>
           </div>

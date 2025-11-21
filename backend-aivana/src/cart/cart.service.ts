@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AddToCartDto } from './dto/add-to-cart.dto';
@@ -37,7 +37,7 @@ export class CartService {
     });
 
     if (existingItem) {
-      throw new Error('Product already in cart');
+      throw new ConflictException('Product already in cart');
     }
 
     // Only create and save if validation passed
