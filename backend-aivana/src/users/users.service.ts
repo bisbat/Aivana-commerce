@@ -32,12 +32,12 @@ export class UsersService {
   //   });
   // }
 
-  // async findOne(id: number): Promise<UserEntity | null> {
-  //   return await this.userRepository.findOne({
-  //     where: { id },
-  //     relations: ['products'],
-  //   });
-  // }
+  async findOne(id: number): Promise<UserEntity | null> {
+    return await this.userRepository.findOne({
+      where: { id },
+      relations: ['products'],
+    });
+  }
 
   // async update(id: number, updateUserDto: UpdateUserDto): Promise<UserEntity | null> {
   //   await this.userRepository.update(id, updateUserDto);
