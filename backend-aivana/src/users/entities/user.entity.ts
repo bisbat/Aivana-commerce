@@ -1,11 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn, OneToOne } from 'typeorm';
 import { UserRoles } from 'src/constants/user-roles.enum';
 import { ProductEntity } from 'src/products/entities/product.entity';
+import { SellerEntity } from 'src/sellers/entities/seller.entity';
+import { CustomerEntity } from 'src/customers/entities/customer.entity';
 
 @Entity('users')
 export class UserEntity {
-  @PrimaryGeneratedColumn({ type: 'bigint' })
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar', length: 255, unique: true })
   email: string;
@@ -13,18 +15,30 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 255 })
   password: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  first_name: string;
+  @Column({ type: 'varchar', length: 100, unique: true })
+  username: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  last_name: string;
+  @Column({ type: 'varchar', length: 100, })
+  firstName: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
-  promptpay_id: string;
+  @Column({ type: 'varchar', length: 100 })
+  lastName: string;
+
+  @Column({ nullable: true })
+  avatarUrl: string;
 
   @Column({ type: 'enum', enum: UserRoles, default: UserRoles.CUSTOMER })
   role: UserRoles;
 
-  @OneToMany(() => ProductEntity, (product) => product.owner)
-  owned_products: ProductEntity[];
+  @OneToOne(() => SellerEntity, (seller) => seller.user, { nullable: true })
+  sellerProfile: SellerEntity;
+
+  @OneToOne(() => CustomerEntity, (customer) => customer.user, { nullable: true })
+  customerProfile: CustomerEntity;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

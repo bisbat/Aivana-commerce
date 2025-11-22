@@ -41,7 +41,7 @@ export class UpdateProductDto {
   @IsOptional()
   @Transform(({ value }) => parseInt(value as string, 10))
   @IsNumber()
-  ownerId?: number;
+  sellerId?: number;
 
   @IsOptional()
   @Transform(({ value }) => JSON.parse(value as string) as number[])

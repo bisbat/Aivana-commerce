@@ -54,7 +54,7 @@ export class CreateProductDto {
 
   @Transform(({ value }) => parseInt(value as string, 10))
   @IsNumber()
-  ownerId: number;
+  sellerId: string;
 
   @Transform(({ value }) =>
     value ? (JSON.parse(value as string) as number[]) : undefined,
