@@ -12,6 +12,7 @@ import type { UploadedFileType } from './interfaces/uploaded-file.interface';
 import { ProductImageService } from '../product-image/product-image.service';
 import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
+import { SellerEntity } from 'src/sellers/entities/seller.entity';
 
 @Injectable()
 export class ProductsService {
@@ -41,13 +42,13 @@ export class ProductsService {
   async createProduct(
     createProductDto: CreateProductDto,
   ): Promise<ProductEntity> {
-    const { tagIds, categoryId, ownerId, ...productData } = createProductDto;
+    const { tagIds, categoryId, sellerId, ...productData } = createProductDto;
 
     // Check if seller already has a product with this name
     const existingProduct = await this.productsRepository.findOne({
       where: {
         name: productData.name,
-        owner: { id: ownerId },
+        seller: { id: sellerId },
       },
     });
 
@@ -65,15 +66,15 @@ export class ProductsService {
       throw new Error('One or more tags not found');
     }
 
-    // preload category และ owner
+    // preload category และ seller
     const category = { id: categoryId }; // ถ้า category มีอยู่แล้วและแค่ต้อง attach
-    const owner = { id: ownerId }; // ถ้า owner มีอยู่แล้วและแค่ attach
+    const seller = { id: sellerId }; // ถ้า seller มีอยู่แล้วและแค่ attach
 
     const product = this.productsRepository.create({
       ...productData,
       tags,
       category,
-      owner,
+      seller,
     });
 
     return await this.productsRepository.save(product);
@@ -107,7 +108,7 @@ export class ProductsService {
       throw new Error('Product not found');
     }
 
-    const { tagIds, categoryId, ownerId, ...productData } = updateProductDto;
+    const { tagIds, categoryId, sellerId, ...productData } = updateProductDto;
 
     // Update tags if provided
     if (tagIds) {
@@ -123,9 +124,9 @@ export class ProductsService {
       product.category = { id: categoryId } as CategoryEntity;
     }
 
-    // Update owner if provided
-    if (ownerId) {
-      product.owner = { id: ownerId } as UserEntity;
+    // Update seller if provided
+    if (sellerId) {
+      product.seller = { id: sellerId } as any; // Partial entity for relation
     }
 
     // Update other fields
