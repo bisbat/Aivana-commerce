@@ -1,7 +1,7 @@
 import { IsEmail, IsNotEmpty, IsEnum, IsOptional } from 'class-validator';
 import { UserRoles } from '../../constants/user-roles.enum';
 
-export class CreateUserDto {
+export class RegisterDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
