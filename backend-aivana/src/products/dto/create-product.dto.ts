@@ -51,9 +51,9 @@ export class CreateProductDto {
   @Transform(({ value }) => parseInt(value as string, 10))
   @IsNumber()
   categoryId: number;
-
-  @Transform(({ value }) => parseInt(value as string, 10))
-  @IsNumber()
+  
+  @IsNotEmpty()
+  @IsString()
   sellerId: string;
 
   @Transform(({ value }) =>
