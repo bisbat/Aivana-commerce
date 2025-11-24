@@ -8,23 +8,23 @@ export class SellerEntity {
     id: string;
 
     @OneToOne(() => UserEntity, (user) => user.sellerProfile, { onDelete: 'CASCADE' })
-    @JoinColumn()
+    @JoinColumn({ name: 'userId' })
     user: UserEntity;
 
     @Column({ type: 'text', nullable: true })
-    bio: string;
+    bio?: string;
 
     @Column({ nullable: true })
-    location: string;
+    location?: string;
 
     @Column('simple-array', { nullable: true })
-    skills: string[];
+    skills?: string[];
 
     @Column('simple-array', { nullable: true })
-    tools: string[];
+    tools?: string[];
 
     @Column('json', { nullable: true })
-    socialLinks: Record<string, string>;
+    socialLinks?: Record<string, string>;
 
     @Column({ nullable: false })
     bankName: string;

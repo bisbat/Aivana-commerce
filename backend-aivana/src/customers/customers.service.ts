@@ -18,7 +18,7 @@ export class CustomersService {
   }
 
   async getAllCustomers(): Promise<CustomerEntity[]> {
-    return await this.customerRepository.find();
+    return await this.customerRepository.find({relations: ['user']});
   }
 
   async getCustomerById(id: string): Promise<CustomerEntity | null> {
