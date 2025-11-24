@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductEntity } from './entities/product.entity';
-import { In, Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { MinioService } from '../minio/minio.service';
@@ -23,11 +23,13 @@ export class ProductsService {
     @InjectRepository(TagEntity)
     private tagRepository: Repository<TagEntity>,
     private productImageService: ProductImageService,
-  ) {}
+    @InjectRepository(SellerEntity)
+    private sellerRepository: Repository<SellerEntity>,
+  ) { }
 
   async getAllProducts(): Promise<ProductEntity[]> {
     const products = await this.productsRepository.find({
-      relations: ['category', 'owner', 'tags'],
+      relations: ['category', 'seller', 'tags'],
     });
     return products;
   }
@@ -35,7 +37,7 @@ export class ProductsService {
   async findOne(productId: number): Promise<ProductEntity | null> {
     return await this.productsRepository.findOne({
       where: { id: productId },
-      relations: ['category', 'owner', 'tags'],
+      relations: ['category', 'seller', 'tags'],
     });
   }
 
@@ -63,12 +65,15 @@ export class ProductsService {
       ? await this.tagRepository.findBy({ id: In(tagIds) })
       : [];
     if (tagIds && tags.length !== tagIds.length) {
-      throw new Error('One or more tags not found');
+      throw new NotFoundException('One or more tags not found');
     }
 
     // preload category และ seller
     const category = { id: categoryId }; // ถ้า category มีอยู่แล้วและแค่ต้อง attach
-    const seller = { id: sellerId }; // ถ้า seller มีอยู่แล้วและแค่ attach
+    const seller = await this.sellerRepository.findOne({ where: { id: sellerId } });
+    if (!seller) {
+      throw new NotFoundException(`Seller with ID ${sellerId} not found`);
+    }
 
     const product = this.productsRepository.create({
       ...productData,
@@ -86,7 +91,7 @@ export class ProductsService {
   ): Promise<ProductEntity> {
     const product = await this.productsRepository.findOne({
       where: { id: productId },
-      relations: ['category', 'owner'],
+      relations: ['category', 'seller'],
     });
 
     if (!product) {
@@ -135,7 +140,7 @@ export class ProductsService {
     await this.productsRepository.save(product);
     const updatedProduct = await this.productsRepository.findOne({
       where: { id },
-      relations: ['category', 'owner', 'tags'],
+      relations: ['category', 'seller', 'tags'],
     });
     if (!updatedProduct) {
       throw new Error('Product not found after update');
@@ -153,7 +158,7 @@ export class ProductsService {
   ): Promise<ProductEntity> {
     const product = await this.productsRepository.findOne({
       where: { id: productId },
-      relations: ['category', 'owner'],
+      relations: ['category', 'seller'],
     });
 
     if (!product) {
@@ -169,7 +174,7 @@ export class ProductsService {
   async getProductById(id: number): Promise<ProductWithImagesDto | null> {
     const product = await this.productsRepository.findOne({
       where: { id },
-      relations: ['category', 'owner', 'product_images', 'tags'],
+      relations: ['category', 'seller', 'product_images', 'tags'],
     });
 
     if (!product) {

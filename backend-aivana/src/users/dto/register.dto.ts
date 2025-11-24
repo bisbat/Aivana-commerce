@@ -5,20 +5,14 @@ export class RegisterDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
-
   @IsNotEmpty()
-  password: string;
-
+  password: string
+  @IsNotEmpty()
+  username: string
+  @IsNotEmpty()
+  firstName: string
+  @IsNotEmpty()
+  lastName: string
   @IsOptional()
-  first_name?: string;
-
-  @IsOptional()
-  last_name?: string;
-
-  @IsOptional()
-  promptpay_id?: string;
-
-  @IsEnum(UserRoles, { message: 'Role must be admin, seller, or customer' })
-  @IsOptional()
-  role?: UserRoles;
+  avatarUrl?: string
 }

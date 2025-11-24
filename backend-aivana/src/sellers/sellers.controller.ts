@@ -7,14 +7,18 @@ import { UpdateSellerDto } from './dto/update-seller.dto';
 export class SellersController {
   constructor(private readonly sellersService: SellersService) {}
 
-  @Post()
-  create(@Body() createSellerDto: CreateSellerDto) {
-    console.log('Received CreateSellerDto:', createSellerDto);
-    return this.sellersService.createSeller(createSellerDto);
+  @Post('upgrade/:userId')
+  upgradeToSeller(@Param('userId') userId: string, @Body() createSellerDto: CreateSellerDto) {
+    return this.sellersService.upgradeToSeller(userId, createSellerDto);
   }
 
   @Get()
   getAllSellers() {
     return this.sellersService.getAllSellers();
+  }
+
+  @Get(':id')
+  getSellerById(@Param('id') id: string) {
+    return this.sellersService.getSellerById(id);
   }
 }

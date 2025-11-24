@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from 'typeorm';
 import { UserRoles } from 'src/constants/user-roles.enum';
 import { ProductEntity } from 'src/products/entities/product.entity';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
@@ -31,9 +31,11 @@ export class UserEntity {
   role: UserRoles;
 
   @OneToOne(() => SellerEntity, (seller) => seller.user, { nullable: true })
+  @JoinColumn({ name: 'sellerId' })
   sellerProfile: SellerEntity;
 
   @OneToOne(() => CustomerEntity, (customer) => customer.user, { nullable: true })
+  @JoinColumn()
   customerProfile: CustomerEntity;
 
   @CreateDateColumn()

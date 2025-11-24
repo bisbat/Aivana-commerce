@@ -7,11 +7,8 @@ export class CustomerEntity {
     id: string;
 
     @OneToOne(() => UserEntity, (user) => user.customerProfile, { onDelete: 'CASCADE' })
-    @JoinColumn()
+    @JoinColumn({ name: 'userId' })
     user: UserEntity;
-
-    @Column({ nullable: true })
-    avatarUrl: string;
 
     @CreateDateColumn()
     createdAt: Date;
