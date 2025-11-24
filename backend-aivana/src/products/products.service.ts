@@ -27,7 +27,7 @@ export class ProductsService {
 
   async getAllProducts(): Promise<ProductEntity[]> {
     const products = await this.productsRepository.find({
-      relations: ['category', 'owner', 'tags'],
+      relations: ['category', 'seller', 'tags'],
     });
     return products;
   }
@@ -35,7 +35,7 @@ export class ProductsService {
   async findOne(productId: number): Promise<ProductEntity | null> {
     return await this.productsRepository.findOne({
       where: { id: productId },
-      relations: ['category', 'owner', 'tags'],
+      relations: ['category', 'seller', 'tags'],
     });
   }
 
@@ -86,7 +86,7 @@ export class ProductsService {
   ): Promise<ProductEntity> {
     const product = await this.productsRepository.findOne({
       where: { id: productId },
-      relations: ['category', 'owner'],
+      relations: ['category', 'seller'],
     });
 
     if (!product) {
@@ -135,7 +135,7 @@ export class ProductsService {
     await this.productsRepository.save(product);
     const updatedProduct = await this.productsRepository.findOne({
       where: { id },
-      relations: ['category', 'owner', 'tags'],
+      relations: ['category', 'seller', 'tags'],
     });
     if (!updatedProduct) {
       throw new Error('Product not found after update');
@@ -153,7 +153,7 @@ export class ProductsService {
   ): Promise<ProductEntity> {
     const product = await this.productsRepository.findOne({
       where: { id: productId },
-      relations: ['category', 'owner'],
+      relations: ['category', 'seller'],
     });
 
     if (!product) {
@@ -169,7 +169,7 @@ export class ProductsService {
   async getProductById(id: number): Promise<ProductWithImagesDto | null> {
     const product = await this.productsRepository.findOne({
       where: { id },
-      relations: ['category', 'owner', 'product_images', 'tags'],
+      relations: ['category', 'seller', 'product_images', 'tags'],
     });
 
     if (!product) {
