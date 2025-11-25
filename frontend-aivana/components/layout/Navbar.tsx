@@ -83,7 +83,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </Link>
               {userRole === "customer" && (
                 <Link
-                  href="/register"
+                  href="/seller/become"
                   className="px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-hover)] transition-colors text-sm font-medium"
                 >
                   สมัครเป็นผู้ขาย
