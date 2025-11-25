@@ -9,8 +9,6 @@ import { MinioModule } from './minio/minio.module';
 import { ProductImageModule } from './product-image/product-image.module';
 import { CartModule } from './cart/cart.module';
 import { TagsModule } from './tags/tags.module';
-import { SellersModule } from './sellers/sellers.module';
-import { CustomersModule } from './customers/customers.module';
 import { AuthModule } from './auth/auth.module';
 import { SellersModule } from './sellers/sellers.module';
 import { CustomersModule } from './customers/customers.module';

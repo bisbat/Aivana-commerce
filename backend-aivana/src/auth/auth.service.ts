@@ -10,7 +10,7 @@ type AuthResult = {accessToken: string; userId: string; username: string};  // C
 @Injectable()
 export class AuthService {
 
-  constructor(private userService: UsersService,private jwtService: JwtService) { }
+  constructor(private userService: UsersService, private jwtService: JwtService) { }
 
   async authenticate(input: AuthInput): Promise<AuthResult>{
     const user = await this.validateUser(input);
@@ -23,7 +23,7 @@ export class AuthService {
   }
 
   async validateUser(input: AuthInput): Promise<SignInData | null> {
-    const user = await this.userService.findUserName(input.username);
+    const user = await this.userService.findUserByName(input.username);
 
     if (user && user.password === input.password) {
       // const { password, ...result } = user;
