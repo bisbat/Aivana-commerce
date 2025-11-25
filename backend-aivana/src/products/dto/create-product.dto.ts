@@ -14,7 +14,7 @@ export class CreateProductDto {
 
   @IsString()
   @IsOptional()
-  uploaded_file_path?: string;
+  uploadedFilePath?: string;
 
   @IsString()
   description: string;
@@ -28,16 +28,16 @@ export class CreateProductDto {
   blurb: string;
 
   @IsString()
-  installation_guide: string;
+  installationGuide: string;
 
   @IsString()
   @IsOptional()
-  preview_url?: string;
+  previewUrl?: string;
 
   @IsString()
   @IsOptional()
-  hero_image_url?: string;
-
+  heroImageUrl?: string;
+  
   @Transform(({ value }) => JSON.parse(value as string) as string[])
   @IsArray()
   @IsString({ each: true })

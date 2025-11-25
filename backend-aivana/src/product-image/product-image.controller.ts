@@ -50,8 +50,8 @@ export class ProductImageController {
     }
 
     const uploadedImages: Array<{
-      image_id: number;
-      path_image: string;
+      imageId: number;
+      pathImage: string;
       url: string;
     }> = [];
 
@@ -70,13 +70,13 @@ export class ProductImageController {
 
       // Save to database
       const productImage = await this.productImageService.create({
-        path_image: fullPath,
-        product_id: parseInt(productId),
+        pathImage: fullPath,
+        productId: parseInt(productId),
       });
 
       uploadedImages.push({
-        image_id: productImage.image_id,
-        path_image: productImage.path_image,
+        imageId: productImage.imageId,
+        pathImage: productImage.pathImage,
         url: fileUrl,
       });
 
@@ -102,7 +102,7 @@ export class ProductImageController {
 
     // Delete from MinIO
     try {
-      await this.minioService.deleteFile(image.path_image);
+      await this.minioService.deleteFile(image.pathImage);
     } catch (error) {
       console.error('Failed to delete image from MinIO:', error);
     }
@@ -112,7 +112,7 @@ export class ProductImageController {
 
     return {
       message: 'Product image deleted successfully',
-      image_id: imageId,
+      imageId: imageId,
     };
   }
 
@@ -171,9 +171,9 @@ export class ProductImageController {
     );
 
     const imagesWithUrls = images.map((image) => ({
-      image_id: image.image_id,
-      path_image: image.path_image,
-      url: this.minioService.getFileUrl(image.path_image),
+      imageId: image.imageId,
+      pathImage: image.pathImage,
+      url: this.minioService.getFileUrl(image.pathImage),
     }));
 
     return {

@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CreateSellerDto } from './dto/create-seller.dto';
-import { UpdateSellerDto } from './dto/update-seller.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SellerEntity } from './entities/seller.entity';
 import { Repository } from 'typeorm';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { UserRoles } from 'src/constants/user-roles.enum';
+import { plainToInstance } from 'class-transformer';
+import { ResponseSellerDto } from './dto/response-seller.dto';
 
 @Injectable()
 export class SellersService {
@@ -16,7 +17,7 @@ export class SellersService {
     private readonly userRepository: Repository<UserEntity>,
   ) { }
 
-  async upgradeToSeller(userId: string, sellerData: CreateSellerDto): Promise<SellerEntity> {
+  async upgradeToSeller(userId: string, sellerData: CreateSellerDto): Promise<string> {
     // ตรวจสอบว่า user มีอยู่จริง
     const user = await this.userRepository.findOne({
       where: { id: userId },
@@ -57,18 +58,21 @@ export class SellersService {
       relations: ['user']
     });
 
-    return reloadedSeller || savedSeller;
+    return 'Seller upgraded successfully';
   }
 
-  async getAllSellers(): Promise<SellerEntity[]> {
-    return await this.sellerRepository.find({relations: ['user']});
+  async getAllSellers(): Promise<ResponseSellerDto[]> {
+    const sellers = await this.sellerRepository.find({ relations: ['user'] });
+    return sellers.map(seller => plainToInstance(ResponseSellerDto, seller, { excludeExtraneousValues: true }));
   }
 
-  async getSellerById(id: string): Promise<SellerEntity | null> {
-    return await this.sellerRepository.findOne({
-      where: { id },
-      relations: ['user', 'products'],
-    });
+  async getSellerByUsername(username: string): Promise<ResponseSellerDto | null> {
+    const seller = await this.sellerRepository
+      .createQueryBuilder('seller')
+      .leftJoinAndSelect('seller.user', 'user')
+      .where('user.username = :username', { username })
+      .leftJoinAndSelect('seller.products', 'products')
+      .getOne();
+    return seller ? plainToInstance(ResponseSellerDto, seller, { excludeExtraneousValues: true }) : null;
   }
-
 }

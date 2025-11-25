@@ -9,7 +9,8 @@ export class SellersController {
 
   @Post('upgrade/:userId')
   upgradeToSeller(@Param('userId') userId: string, @Body() createSellerDto: CreateSellerDto) {
-    return this.sellersService.upgradeToSeller(userId, createSellerDto);
+    this.sellersService.upgradeToSeller(userId, createSellerDto);
+    // return seller response dto
   }
 
   @Get()
@@ -17,8 +18,8 @@ export class SellersController {
     return this.sellersService.getAllSellers();
   }
 
-  @Get(':id')
-  getSellerById(@Param('id') id: string) {
-    return this.sellersService.getSellerById(id);
+  @Get(':username')
+  getSellerById(@Param('username') username: string) {
+    return this.sellersService.getSellerByUsername(username);
   }
 }

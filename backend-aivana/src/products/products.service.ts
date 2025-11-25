@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductEntity } from './entities/product.entity';
-import { In, Not, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { MinioService } from '../minio/minio.service';
@@ -11,8 +11,8 @@ import { MINIO_FOLDERS } from '../constants/minio-folders.constant';
 import type { UploadedFileType } from './interfaces/uploaded-file.interface';
 import { ProductImageService } from '../product-image/product-image.service';
 import { CategoryEntity } from 'src/categories/entities/category.entity';
-import { UserEntity } from 'src/users/entities/user.entity';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class ProductsService {
@@ -65,8 +65,7 @@ export class ProductsService {
       ? await this.tagRepository.findBy({ id: In(tagIds) })
       : [];
     if (tagIds && tags.length !== tagIds.length) {
-      throw new NotFoundException('One or more tags not found');
-    }
+        throw new NotFoundException('One or more tags not found');    }
 
     // preload category และ seller
     const category = { id: categoryId }; // ถ้า category มีอยู่แล้วและแค่ต้อง attach
@@ -74,7 +73,6 @@ export class ProductsService {
     if (!seller) {
       throw new NotFoundException(`Seller with ID ${sellerId} not found`);
     }
-
     const product = this.productsRepository.create({
       ...productData,
       tags,
@@ -98,7 +96,7 @@ export class ProductsService {
       throw new Error(`Product with ID ${productId} not found`);
     }
 
-    product.hero_image_url = heroImageUrl;
+    product.heroImageUrl = heroImageUrl;
     await this.productsRepository.save(product);
 
     return product;
@@ -165,7 +163,7 @@ export class ProductsService {
       throw new Error(`Product with ID ${productId} not found`);
     }
 
-    product.uploaded_file_path = uploadedFilePath;
+    product.uploadedFilePath = uploadedFilePath;
     await this.productsRepository.save(product);
 
     return product;
@@ -182,19 +180,19 @@ export class ProductsService {
     }
 
     const detailImages =
-      product.product_images?.map((image) => ({
-        image_id: image.image_id,
-        path_image: image.path_image,
-        url: this.minioService.getFileUrl(image.path_image),
+      product.productImages?.map((image) => ({
+        imageId: image.imageId,
+        pathImage: image.pathImage,
+        url: this.minioService.getFileUrl(image.pathImage),
       })) || [];
 
     // Remove product_images and add detail_images with URLs
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { product_images, ...productData } = product;
+    const { productImages, ...productData } = product;
 
     return {
       ...productData,
-      detail_images: detailImages,
+      detailImages: detailImages,
     };
   }
 
@@ -282,8 +280,8 @@ export class ProductsService {
       );
 
       await this.productImageService.create({
-        path_image: fullPath,
-        product_id: product.id,
+        pathImage: fullPath,
+        productId: product.id,
       });
 
       // Small delay to ensure unique timestamps
@@ -369,10 +367,10 @@ export class ProductsService {
       // Check existing detail images count
       const existingProduct = await this.productsRepository.findOne({
         where: { id },
-        relations: ['product_images'],
+        relations: ['productImages'],
       });
 
-      const existingCount = existingProduct?.product_images?.length || 0;
+      const existingCount = existingProduct?.productImages?.length || 0;
       const totalCount = existingCount + detailFiles.length;
 
       if (totalCount < 2) {
@@ -399,8 +397,8 @@ export class ProductsService {
         );
 
         await this.productImageService.create({
-          path_image: fullPath,
-          product_id: product.id,
+          pathImage: fullPath,
+          productId: product.id,
         });
 
         // Small delay to ensure unique timestamps
