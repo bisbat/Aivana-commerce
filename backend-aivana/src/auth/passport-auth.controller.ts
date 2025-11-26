@@ -9,8 +9,8 @@ export class PassportAuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   @UseGuards(PassportLocalGuard)
-  login(){
-    return 'success'
+  login(@Request() request){
+    return this.authService.signIn(request.user)
   }
 
   @Get('me')
