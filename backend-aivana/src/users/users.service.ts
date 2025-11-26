@@ -1,9 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RegisterDto } from './dto/register.dto';
 import { UserEntity } from './entities/user.entity';
 import { CustomerEntity } from 'src/customers/entities/customer.entity';
+import { UserRoles } from 'src/constants/user-roles.enum';
+import * as bcrypt from 'bcrypt';
+import { ResponseUserDto } from './dto/response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -14,18 +18,36 @@ export class UsersService {
     private readonly customerRepository: Repository<CustomerEntity>,
   ) { }
 
-  async createUser(registerDto: RegisterDto): Promise<UserEntity> {
-    // 1. Create user first
-    const user = this.userRepository.create(registerDto);
+  async createUser(registerDto: RegisterDto): Promise<ResponseUserDto> {
+    const { email, username, password, firstName, lastName, avatarUrl } = registerDto;
+
+    const existing = await this.userRepository.findOne({
+      where: [{ email }, { username }],
+    });
+
+    if (existing) {
+      throw new BadRequestException('Email or username already exists');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = this.userRepository.create({
+      email,
+      username,
+      password: hashedPassword,
+      firstName,
+      lastName,
+      avatarUrl,
+      role: UserRoles.CUSTOMER, // default as in your entity
+    });
+
     await this.userRepository.save(user);
 
-    // 2. Create customer profile linked to user
-    const customer = this.customerRepository.create({
-      user: user
-    });
-    await this.customerRepository.save(customer);
+    await this.customerRepository.save({ user });
 
-    return user;
+    return plainToInstance(ResponseUserDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 
 
