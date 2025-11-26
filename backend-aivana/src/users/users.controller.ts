@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegisterDto } from './dto/register.dto';
+import { ResponseUserDto } from './dto/response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('users')
 export class UsersController {
@@ -14,7 +16,10 @@ export class UsersController {
 
   @Get()
   getAllUsers() {
-    return this.usersService.getAllUsers();
+    const user = this.usersService.getAllUsers();
+    return plainToInstance(ResponseUserDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 
   // @Post()
