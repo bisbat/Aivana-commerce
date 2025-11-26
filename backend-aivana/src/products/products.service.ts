@@ -29,17 +29,62 @@ export class ProductsService {
     private categoryRepository: Repository<CategoryEntity>,
   ) { }
 
-  async getAllProducts(): Promise<ProductEntity[]> {
+  async getAllProducts(): Promise<ResponseProductDto[]> {
     const products = await this.productsRepository.find({
       relations: ['category', 'seller', 'tags', 'productImages'],
     });
-    return products;
+    
+    return products.map(product => {
+      // Transform productImages to detailImages with URLs
+      const detailImages = product.productImages?.map(image => ({
+        imageId: image.imageId.toString(),
+        url: this.minioService.getFileUrl(image.pathImage)
+      })) || [];
+      
+      // Prepare data for transformation
+      const productData = {
+        ...product,
+        id: product.id.toString(),
+        categoryId: product.category?.id,
+        sellerId: product.seller?.id,
+        tags: product.tags?.map(tag => tag.name) || [],
+        detailImages
+      };
+      
+      return plainToInstance(ResponseProductDto, productData, {
+        excludeExtraneousValues: true
+      });
+    });
   }
 
-  async findOne(productId: number): Promise<ProductEntity | null> {
-    return await this.productsRepository.findOne({
+  async findOne(productId: number): Promise<ResponseProductDto | null> {
+    const product = await this.productsRepository.findOne({
       where: { id: productId },
       relations: ['category', 'seller', 'tags', 'productImages'],
+    });
+    
+    if (!product) {
+      return null;
+    }
+    
+    // Transform productImages to detailImages with URLs
+    const detailImages = product.productImages?.map(image => ({
+      imageId: image.imageId.toString(),
+      url: this.minioService.getFileUrl(image.pathImage)
+    })) || [];
+    
+    // Prepare data for transformation
+    const productData = {
+      ...product,
+      id: product.id.toString(),
+      categoryId: product.category?.id,
+      sellerId: product.seller?.id,
+      tags: product.tags?.map(tag => tag.name) || [],
+      detailImages
+    };
+    
+    return plainToInstance(ResponseProductDto, productData, {
+      excludeExtraneousValues: true
     });
   }
 
@@ -199,7 +244,7 @@ export class ProductsService {
     // แปลง productImages → detailImages (เติม URL จาก Minio)
     const detailImages = product.productImages?.map((image) => ({
       imageId: image.imageId.toString(),
-      pathImage: this.minioService.getFileUrl(image.pathImage),
+      url: this.minioService.getFileUrl(image.pathImage),
     })) || [];
 
     // inject detailImages เข้าไปใน product object และแปลงข้อมูล
