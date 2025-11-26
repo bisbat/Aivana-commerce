@@ -9,6 +9,7 @@ import { MinioModule } from './minio/minio.module';
 import { ProductImageModule } from './product-image/product-image.module';
 import { CartModule } from './cart/cart.module';
 import { TagsModule } from './tags/tags.module';
+import { AuthModule } from './auth/auth.module';
 import { SellersModule } from './sellers/sellers.module';
 import { CustomersModule } from './customers/customers.module';
 
@@ -26,6 +27,9 @@ import { CustomersModule } from './customers/customers.module';
     ProductImageModule,
     CartModule,
     TagsModule,
+    SellersModule,
+    CustomersModule,
+    AuthModule,
     SellersModule,
     CustomersModule,
   ],
