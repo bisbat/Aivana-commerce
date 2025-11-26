@@ -3,8 +3,6 @@ import { UsersService } from './users.service';
 import { ResponseUserDto } from './dto/response-user.dto';
 import { plainToInstance } from 'class-transformer';
 import { RegisterDto } from './dto/register.dto';
-import { ResponseUserDto } from './dto/response.dto';
-import { plainToInstance } from 'class-transformer';
 
 @Controller('users')
 export class UsersController {
