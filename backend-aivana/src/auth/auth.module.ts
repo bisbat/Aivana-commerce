@@ -7,6 +7,7 @@ import { JWT_SECRET } from './config/jwt-secret';
 import { PassportModule } from '@nestjs/passport';
 import { PassportAuthController } from './passport-auth.controller'
 import { LocalStrategy } from './strategies/local.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [UsersModule,JwtModule.register({
@@ -17,6 +18,6 @@ import { LocalStrategy } from './strategies/local.strategy';
   PassportModule
 ],
   controllers: [AuthController,PassportAuthController],
-  providers: [AuthService, LocalStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
 })
 export class AuthModule {}
