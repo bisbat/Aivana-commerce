@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductImage } from './entities/product-image.entity';
+import { ProductEntity } from '../products/entities/product.entity';
 
 @Injectable()
 export class ProductImageService {
@@ -16,7 +17,7 @@ export class ProductImageService {
   }): Promise<ProductImage> {
     const productImage = this.productImageRepository.create({
       pathImage: data.pathImage,
-      product: { id: data.productId },
+      product: { id: data.productId } as ProductEntity,
     });
     return await this.productImageRepository.save(productImage);
   }
@@ -31,6 +32,7 @@ export class ProductImageService {
   async findByProductId(productId: number): Promise<ProductImage[]> {
     return await this.productImageRepository.find({
       where: { product: { id: productId } },
+      relations: ['product'],
     });
   }
 

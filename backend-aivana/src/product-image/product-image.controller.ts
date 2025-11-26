@@ -12,9 +12,9 @@ import {
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ProductImageService } from './product-image.service';
 import { MinioService } from '../minio/minio.service';
-import type { UploadedFileType } from '../products/interfaces/uploaded-file.interface';
 import { MINIO_FOLDERS } from '../constants/minio-folders.constant';
 import { ProductsService } from '../products/products.service';
+import { UploadedFileType } from 'src/products/interfaces/uploaded-file.interface';
 
 @Controller('product-images')
 export class ProductImageController {
@@ -119,7 +119,7 @@ export class ProductImageController {
   @Post('hero')
   @UseInterceptors(FileInterceptor('image'))
   async uploadHeroImage(
-    @UploadedFile() file: UploadedFileType,
+    @UploadedFile() file: UploadedFileType[],
     @Body('product_id') productId: string,
   ) {
     if (!file) {
@@ -143,11 +143,11 @@ export class ProductImageController {
     }
 
     const timestamp = Date.now();
-    const fileName = `hero-${timestamp}-${file.originalname}`;
+    const fileName = `hero-${timestamp}-${file[0].originalname}`;
 
     // Upload to MinIO with product-specific hero folder
     const fullPath = await this.minioService.uploadFile(
-      file,
+      file[0],
       fileName,
       MINIO_FOLDERS.PRODUCTS.HERO(productId),
     );

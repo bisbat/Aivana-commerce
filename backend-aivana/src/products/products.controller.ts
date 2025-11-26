@@ -12,11 +12,11 @@ import {
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ProductsService } from './products.service';
 import type { UploadedFileType } from './interfaces/uploaded-file.interface';
-import { ProductWithImagesDto } from './interfaces/product-with-images.interface';
 import { BadRequestException } from '@nestjs/common/exceptions';
 import { plainToInstance } from 'class-transformer';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ResponseProductDto } from './dto/response-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -62,7 +62,7 @@ export class ProductsController {
   @Get(':id')
   async getProductById(
     @Param('id') id: number,
-  ): Promise<ProductWithImagesDto | null> {
+  ): Promise<ResponseProductDto | null> {
     return this.productsService.getProductById(id);
   }
 

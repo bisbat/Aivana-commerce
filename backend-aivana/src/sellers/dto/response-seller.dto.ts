@@ -1,5 +1,6 @@
 import { Expose, Type } from "class-transformer";
 import { ResponseUserDto } from "src/users/dto/response-user.dto";
+import { ProductEntity } from "src/products/entities/product.entity";
 import { ResponseProductDto } from "src/products/dto/response-product.dto";
 
 export class ResponseSellerDto {
