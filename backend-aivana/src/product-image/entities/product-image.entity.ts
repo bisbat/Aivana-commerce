@@ -15,7 +15,7 @@ export class ProductImage {
   @Column({ type: 'varchar', length: 255, nullable: true, name: 'pathImage' })
   pathImage: string;
 
-  @ManyToOne(() => ProductEntity, {
+  @ManyToOne(() => ProductEntity, (product) => product.productImages, {
     nullable: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',

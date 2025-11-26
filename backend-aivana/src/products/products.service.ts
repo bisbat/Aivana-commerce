@@ -5,7 +5,6 @@ import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { MinioService } from '../minio/minio.service';
-import { ProductWithImagesDto } from './interfaces/product-with-images.interface';
 import { TagEntity } from 'src/tags/entities/tag.entity';
 import { MINIO_FOLDERS } from '../constants/minio-folders.constant';
 import type { UploadedFileType } from './interfaces/uploaded-file.interface';
@@ -13,6 +12,7 @@ import { ProductImageService } from '../product-image/product-image.service';
 import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
 import { plainToInstance } from 'class-transformer';
+import { ResponseProductDto } from './dto/response-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -25,11 +25,13 @@ export class ProductsService {
     private productImageService: ProductImageService,
     @InjectRepository(SellerEntity)
     private sellerRepository: Repository<SellerEntity>,
+    @InjectRepository(CategoryEntity)
+    private categoryRepository: Repository<CategoryEntity>,
   ) { }
 
   async getAllProducts(): Promise<ProductEntity[]> {
     const products = await this.productsRepository.find({
-      relations: ['category', 'seller', 'tags'],
+      relations: ['category', 'seller', 'tags', 'productImages'],
     });
     return products;
   }
@@ -37,7 +39,7 @@ export class ProductsService {
   async findOne(productId: number): Promise<ProductEntity | null> {
     return await this.productsRepository.findOne({
       where: { id: productId },
-      relations: ['category', 'seller', 'tags'],
+      relations: ['category', 'seller', 'tags', 'productImages'],
     });
   }
 
@@ -46,7 +48,7 @@ export class ProductsService {
   ): Promise<ProductEntity> {
     const { tagIds, categoryId, sellerId, ...productData } = createProductDto;
 
-    // Check if seller already has a product with this name
+    // 1. Prevent duplicate product name under same seller
     const existingProduct = await this.productsRepository.findOne({
       where: {
         name: productData.name,
@@ -60,28 +62,45 @@ export class ProductsService {
       );
     }
 
-    // หา tags
-    const tags = tagIds
-      ? await this.tagRepository.findBy({ id: In(tagIds) })
-      : [];
-    if (tagIds && tags.length !== tagIds.length) {
-        throw new NotFoundException('One or more tags not found');    }
+    // 2. Validate seller
+    const seller = await this.sellerRepository.findOne({
+      where: { id: sellerId },
+    });
 
-    // preload category และ seller
-    const category = { id: categoryId }; // ถ้า category มีอยู่แล้วและแค่ต้อง attach
-    const seller = await this.sellerRepository.findOne({ where: { id: sellerId } });
     if (!seller) {
       throw new NotFoundException(`Seller with ID ${sellerId} not found`);
     }
+
+    // 3. Validate category
+    const category = await this.categoryRepository.findOne({
+      where: { id: categoryId },
+    });
+
+    if (!category) {
+      throw new NotFoundException(`Category with ID ${categoryId} not found`);
+    }
+
+    // 4. Validate tag IDs
+    let tags: TagEntity[] = [];
+    if (tagIds?.length) {
+      tags = await this.tagRepository.findBy({ id: In(tagIds) });
+
+      if (tags.length !== tagIds.length) {
+        throw new NotFoundException('One or more tags not found');
+      }
+    }
+
+    // 5. Create & save product
     const product = this.productsRepository.create({
       ...productData,
-      tags,
-      category,
       seller,
+      category,
+      tags,
     });
 
     return await this.productsRepository.save(product);
   }
+
 
   async updateHeroImage(
     productId: number,
@@ -89,7 +108,7 @@ export class ProductsService {
   ): Promise<ProductEntity> {
     const product = await this.productsRepository.findOne({
       where: { id: productId },
-      relations: ['category', 'seller'],
+      relations: ['category', 'seller', 'productImages'],
     });
 
     if (!product) {
@@ -138,7 +157,7 @@ export class ProductsService {
     await this.productsRepository.save(product);
     const updatedProduct = await this.productsRepository.findOne({
       where: { id },
-      relations: ['category', 'seller', 'tags'],
+      relations: ['category', 'seller', 'tags', 'productImages'],
     });
     if (!updatedProduct) {
       throw new Error('Product not found after update');
@@ -169,32 +188,35 @@ export class ProductsService {
     return product;
   }
 
-  async getProductById(id: number): Promise<ProductWithImagesDto | null> {
+  async getProductById(id: number): Promise<ResponseProductDto | null> {
     const product = await this.productsRepository.findOne({
       where: { id },
-      relations: ['category', 'seller', 'product_images', 'tags'],
+      relations: ['category', 'seller', 'productImages', 'tags'],
     });
 
-    if (!product) {
-      return null;
-    }
+    if (!product) return null;
 
-    const detailImages =
-      product.productImages?.map((image) => ({
-        imageId: image.imageId,
-        pathImage: image.pathImage,
-        url: this.minioService.getFileUrl(image.pathImage),
-      })) || [];
+    // แปลง productImages → detailImages (เติม URL จาก Minio)
+    const detailImages = product.productImages?.map((image) => ({
+      imageId: image.imageId.toString(),
+      pathImage: this.minioService.getFileUrl(image.pathImage),
+    })) || [];
 
-    // Remove product_images and add detail_images with URLs
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { productImages, ...productData } = product;
-
-    return {
-      ...productData,
-      detailImages: detailImages,
+    // inject detailImages เข้าไปใน product object และแปลงข้อมูล
+    const productWithDetailImages = {
+      ...product,
+      id: product.id.toString(),
+      categoryId: product.category?.id,
+      sellerId: product.seller?.id,
+      tags: product.tags?.map(tag => tag.name) || [],
+      detailImages,
     };
+
+    return plainToInstance(ResponseProductDto, productWithDetailImages, {
+      excludeExtraneousValues: true,
+    });
   }
+
 
   async createProductWithFiles(
     createProductDto: CreateProductDto,
@@ -203,18 +225,19 @@ export class ProductsService {
       productFile: UploadedFileType[];
       detailImages: UploadedFileType[];
     },
-  ): Promise<{
-    product: ProductWithImagesDto | null;
-  }> {
+  ): Promise<{ product: ResponseProductDto | null }> {
     // 1. Create product first (with tags, category, owner relations)
     const product = await this.createProduct(createProductDto);
     const productId = product.id.toString();
 
-    // 2. Upload hero image
+    /* ------------------------------------------------------
+     * 2. Upload hero image
+     * ------------------------------------------------------ */
     const heroFile = files.heroImage[0];
     const heroTimestamp = Date.now();
     const heroFileName = `hero-${heroTimestamp}-${heroFile.originalname}`;
 
+    // Clear old hero folder
     await this.minioService.deleteFolder(
       MINIO_FOLDERS.PRODUCTS.HERO(productId),
     );
@@ -224,22 +247,18 @@ export class ProductsService {
       heroFileName,
       MINIO_FOLDERS.PRODUCTS.HERO(productId),
     );
-    const heroFileUrl = this.minioService.getFileUrl(heroFullPath);
 
+    const heroFileUrl = this.minioService.getFileUrl(heroFullPath);
     await this.updateHeroImage(product.id, heroFileUrl);
 
-    // 3. Upload product file (.zip)
+    /* ------------------------------------------------------
+     * 3. Upload product file (.zip)
+     * ------------------------------------------------------ */
     const productFile = files.productFile[0];
+    const fileExtension = productFile.originalname.split('.').pop()?.toLowerCase();
 
-    // Validate .zip file
-    const fileExtension = productFile.originalname
-      .split('.')
-      .pop()
-      ?.toLowerCase();
     if (fileExtension !== 'zip') {
-      throw new Error(
-        `Invalid file type. Only .zip files are allowed. Received: .${fileExtension}`,
-      );
+      throw new Error(`Invalid file type. Only .zip allowed. Received .${fileExtension}`);
     }
 
     const fileTimestamp = Date.now();
@@ -254,17 +273,18 @@ export class ProductsService {
       fileName,
       MINIO_FOLDERS.PRODUCTS.UPLOAD(productId),
     );
-    const fileUrl = this.minioService.getFileUrl(fileFullPath);
 
+    const fileUrl = this.minioService.getFileUrl(fileFullPath);
     await this.updateUploadedFilePath(product.id, fileUrl);
 
-    // 4. Upload detail images (min 2, max 8)
+    /* ------------------------------------------------------
+     * 4. Upload detail images (min 2, max 8)
+     * ------------------------------------------------------ */
     const detailFiles = files.detailImages;
 
     if (detailFiles.length < 2) {
       throw new Error('At least 2 detail images are required');
     }
-
     if (detailFiles.length > 8) {
       throw new Error('Maximum 8 detail images allowed');
     }
@@ -284,12 +304,17 @@ export class ProductsService {
         productId: product.id,
       });
 
-      // Small delay to ensure unique timestamps
+      // Make sure timestamps differ
       await new Promise((resolve) => setTimeout(resolve, 10));
     }
 
+    /* ------------------------------------------------------
+     * 5. Final response → return DTO format
+     * ------------------------------------------------------ */
+    const savedProduct = await this.getProductById(product.id);
+
     return {
-      product: await this.getProductById(product.id),
+      product: savedProduct,
     };
   }
 
@@ -301,19 +326,23 @@ export class ProductsService {
       productFile?: UploadedFileType[];
       detailImages?: UploadedFileType[];
     },
-  ): Promise<{
-    product: ProductWithImagesDto | null;
-  }> {
-    // 1. Update product data first
+  ): Promise<{ product: ResponseProductDto | null }> {
+
+    /* ------------------------------------------------------
+     * 1. Update basic product fields first
+     * ------------------------------------------------------ */
     const product = await this.updateProduct(id, updateProductDto);
     const productId = product.id.toString();
 
-    // 2. Upload hero image if provided
-    if (files?.heroImage && files.heroImage.length > 0) {
+    /* ------------------------------------------------------
+     * 2. Update hero image if new file provided
+     * ------------------------------------------------------ */
+    if (files?.heroImage?.length) {
       const heroFile = files.heroImage[0];
       const heroTimestamp = Date.now();
       const heroFileName = `hero-${heroTimestamp}-${heroFile.originalname}`;
 
+      // Clean old hero folder
       await this.minioService.deleteFolder(
         MINIO_FOLDERS.PRODUCTS.HERO(productId),
       );
@@ -323,72 +352,67 @@ export class ProductsService {
         heroFileName,
         MINIO_FOLDERS.PRODUCTS.HERO(productId),
       );
-      const heroFileUrl = this.minioService.getFileUrl(heroFullPath);
 
+      const heroFileUrl = this.minioService.getFileUrl(heroFullPath);
       await this.updateHeroImage(product.id, heroFileUrl);
     }
 
-    // 3. Upload product file (.zip) if provided
-    if (files?.productFile && files.productFile.length > 0) {
+    /* ------------------------------------------------------
+     * 3. Update uploaded .zip file
+     * ------------------------------------------------------ */
+    if (files?.productFile?.length) {
       const productFile = files.productFile[0];
+      const fileExtension = productFile.originalname.split('.').pop()?.toLowerCase();
 
-      // Validate .zip file
-      const fileExtension = productFile.originalname
-        .split('.')
-        .pop()
-        ?.toLowerCase();
       if (fileExtension !== 'zip') {
-        throw new Error(
-          `Invalid file type. Only .zip files are allowed. Received: .${fileExtension}`,
-        );
+        throw new Error(`Invalid file type. Only .zip allowed. Received .${fileExtension}`);
       }
 
-      const fileTimestamp = Date.now();
-      const fileName = `uploaded-${fileTimestamp}-${productFile.originalname}`;
+      const timestamp = Date.now();
+      const fileName = `uploaded-${timestamp}-${productFile.originalname}`;
 
+      // Clean old uploaded folder
       await this.minioService.deleteFolder(
         MINIO_FOLDERS.PRODUCTS.UPLOAD(productId),
       );
 
-      const fileFullPath = await this.minioService.uploadFile(
+      const fullPath = await this.minioService.uploadFile(
         productFile,
         fileName,
         MINIO_FOLDERS.PRODUCTS.UPLOAD(productId),
       );
-      const fileUrl = this.minioService.getFileUrl(fileFullPath);
 
+      const fileUrl = this.minioService.getFileUrl(fullPath);
       await this.updateUploadedFilePath(product.id, fileUrl);
     }
 
-    // 4. Add detail images if provided (total max 8)
-    if (files?.detailImages && files.detailImages.length > 0) {
+    /* ------------------------------------------------------
+     * 4. Add new detail images (validate min/max count)
+     * ------------------------------------------------------ */
+    if (files?.detailImages?.length) {
       const detailFiles = files.detailImages;
 
-      // Check existing detail images count
-      const existingProduct = await this.productsRepository.findOne({
+      const existing = await this.productsRepository.findOne({
         where: { id },
         relations: ['productImages'],
       });
 
-      const existingCount = existingProduct?.productImages?.length || 0;
+      const existingCount = existing?.productImages?.length || 0;
       const totalCount = existingCount + detailFiles.length;
 
       if (totalCount < 2) {
-        throw new Error(
-          `Product must have at least 2 detail images. Currently has ${existingCount}, adding ${detailFiles.length}. Total would be ${totalCount}.`,
-        );
+        throw new Error(`Product must have at least 2 detail images.`);
       }
-
       if (totalCount > 8) {
         throw new Error(
-          `Cannot add ${detailFiles.length} images. Product already has ${existingCount} detail images. Maximum total is 8 images.`,
+          `Too many images. Already ${existingCount}. Adding ${detailFiles.length} causes total ${totalCount}, max is 8.`,
         );
       }
 
-      // Upload new detail images
+      // Upload new images
       for (const file of detailFiles) {
-        const timestamp = Date.now();
-        const detailFileName = `detail-${timestamp}-${file.originalname}`;
+        const ts = Date.now();
+        const detailFileName = `detail-${ts}-${file.originalname}`;
 
         const fullPath = await this.minioService.uploadFile(
           file,
@@ -401,13 +425,21 @@ export class ProductsService {
           productId: product.id,
         });
 
-        // Small delay to ensure unique timestamps
-        await new Promise((resolve) => setTimeout(resolve, 10));
+        await new Promise((r) => setTimeout(r, 10)); // ensure unique timestamps
       }
     }
 
+    /* ------------------------------------------------------
+     * 5. Load updated product + convert to Response DTO
+     * ------------------------------------------------------ */
+    const updatedProduct = await this.getProductById(product.id);
+
     return {
-      product: await this.getProductById(product.id),
+      product: updatedProduct
+        ? plainToInstance(ResponseProductDto, updatedProduct, {
+          excludeExtraneousValues: true,
+        })
+        : null,
     };
   }
 }
