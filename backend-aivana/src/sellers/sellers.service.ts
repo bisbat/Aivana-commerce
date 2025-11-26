@@ -44,13 +44,20 @@ export class SellersService {
     seller.bankAccountNumber = sellerData.bankAccountNumber;
     seller.bankAccountName = sellerData.bankAccountName;
 
-    await this.sellerRepository.save(seller);
+    const savedSeller = await this.sellerRepository.save(seller);
 
-    // อัพเดท user role
+    // อัพเดท user role และ link seller profile
     user.role = UserRoles.SELLER;
+    user.sellerProfile = savedSeller;
     await this.userRepository.save(user);
 
-    return seller;
+    // Reload seller with user relationship
+    const reloadedSeller = await this.sellerRepository.findOne({
+      where: { id: savedSeller.id },
+      relations: ['user']
+    });
+
+    return reloadedSeller || savedSeller;
   }
 
   async getAllSellers(): Promise<SellerEntity[]> {
@@ -60,6 +67,7 @@ export class SellersService {
   async getSellerById(id: string): Promise<SellerEntity | null> {
     return await this.sellerRepository.findOne({
       where: { id },
+      relations: ['user', 'products'],
     });
   }
 
