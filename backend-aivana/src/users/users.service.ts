@@ -39,7 +39,7 @@ export class UsersService {
     });
 
     await this.userRepository.save(user);
-    
+
     return plainToInstance(ResponseUserDto, user, {
       excludeExtraneousValues: true,
     });

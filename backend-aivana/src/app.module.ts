@@ -12,7 +12,6 @@ import { TagsModule } from './tags/tags.module';
 import { AuthModule } from './auth/auth.module';
 import { SellersModule } from './sellers/sellers.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
