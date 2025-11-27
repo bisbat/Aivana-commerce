@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { SellersService } from './sellers.service';
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { UpdateSellerDto } from './dto/update-seller.dto';
@@ -8,9 +16,11 @@ export class SellersController {
   constructor(private readonly sellersService: SellersService) {}
 
   @Post('upgrade/:userId')
-  upgradeToSeller(@Param('userId') userId: string, @Body() createSellerDto: CreateSellerDto) {
-    this.sellersService.upgradeToSeller(userId, createSellerDto);
-    // return seller response dto
+  upgradeToSeller(
+    @Param('userId') userId: string,
+    @Body() createSellerDto: CreateSellerDto,
+  ) {
+    return this.sellersService.upgradeToSeller(userId, createSellerDto);
   }
 
   @Get()

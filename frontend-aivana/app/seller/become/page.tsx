@@ -1,15 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { becomeSeller } from "@/lib/actions/seller.actions";
-import {
-  saveAuthData,
-  getAuthData,
-  getCurrentUser,
-} from "@/lib/actions/auth.actions";
+import { saveAuthData, getAuthData } from "@/lib/actions/auth.actions";
 
 const SOCIAL_PLATFORMS = [
   { value: "github", label: "GitHub" },
@@ -184,8 +179,8 @@ export default function BecomeSellerPage() {
       newErrors.tools = "กรุณากรอกเครื่องมืออย่างน้อย 1 รายการ";
     }
 
-    if (!formData.bankName.trim()) {
-      newErrors.bankName = "กรุณากรอกชื่อธนาคาร";
+    if (!formData.bankName) {
+      newErrors.bankName = "กรุณาเลือกธนาคาร";
     }
 
     if (!formData.bankAccountNumber.trim()) {
@@ -224,15 +219,20 @@ export default function BecomeSellerPage() {
         bankAccountName: formData.bankAccountName,
       };
 
+      const authData = getAuthData();
+      if (!authData.accessToken || !authData.user) {
+        throw new Error("Not authenticated");
+      }
+
       // Call backend API to become seller
       await becomeSeller(submitData);
 
-      // Update user role in localStorage - fetch fresh data from backend
-      const userInfo = await getCurrentUser();
-      const authData = getAuthData();
-      if (authData.accessToken) {
-        saveAuthData({ accessToken: authData.accessToken }, userInfo);
-      }
+      // Update user role in localStorage
+      const updatedUser = {
+        ...authData.user,
+        role: "seller",
+      };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
 
       router.push("/");
     } catch (error) {

@@ -55,7 +55,7 @@ export class CartService {
   /**
    * Get cart by user ID with all items and product details
    */
-  async getCartByUserId(userId: number) {
+  async getCartByUserId(userId: string) {
     const cart = await this.cartRepository.findOne({
       where: { userId },
       relations: ['items', 'items.product'],
@@ -76,7 +76,7 @@ export class CartService {
     };
   }
 
-  async removeFromCart(userId: number, productId: number) {
+  async removeFromCart(userId: string, productId: number) {
     const cart = await this.cartRepository.findOne({
       where: { userId },
     });

@@ -1,6 +1,13 @@
-import { LoginRequest, LoginResponse, UserProfile } from "@/lib/types/auth";
+import {
+  LoginRequest,
+  LoginResponse,
+  UserProfile,
+  decodeJWT,
+} from "@/lib/types/auth";
 
-export async function login(data: LoginRequest): Promise<LoginResponse> {
+export async function login(
+  data: LoginRequest
+): Promise<{ token: LoginResponse; user: UserProfile }> {
   const response = await fetch("http://localhost:3001/auth/login", {
     method: "POST",
     headers: {
@@ -13,12 +20,14 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
     throw new Error("Login failed");
   }
 
-  const result = await response.json();
-  return result;
+  const result: LoginResponse = await response.json();
+  const userInfo = decodeJWT(result.accessToken);
+
+  return { token: result, user: userInfo };
 }
 
-export function saveAuthData(data: LoginResponse, userInfo: UserProfile): void {
-  localStorage.setItem("accessToken", data.accessToken);
+export function saveAuthData(token: string, userInfo: UserProfile): void {
+  localStorage.setItem("accessToken", token);
   localStorage.setItem(
     "user",
     JSON.stringify({
@@ -48,23 +57,43 @@ export function getAuthData(): {
   };
 }
 
-export async function getCurrentUser(): Promise<UserProfile> {
+export function getCurrentUserFromToken(): UserProfile | null {
   const { accessToken } = getAuthData();
 
   if (!accessToken) {
-    throw new Error("Not authenticated");
+    return null;
   }
 
-  const response = await fetch("http://localhost:3001/auth/me", {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  try {
+    const decoded = decodeJWT(accessToken);
 
-  if (!response.ok) {
-    throw new Error("Failed to get user profile");
+    // Check if token is expired
+    if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+      clearAuthData();
+      return null;
+    }
+
+    return decoded;
+  } catch (error) {
+    clearAuthData();
+    return null;
+  }
+}
+
+// Validate token by making API call
+export async function validateTokenWithBackend(): Promise<boolean> {
+  const { accessToken } = getAuthData();
+
+  if (!accessToken) {
+    return false;
   }
 
-  return response.json();
+  try {
+    await fetch("http://localhost:3001/auth/me", {
+      method: "GET",
+    });
+    return true;
+  } catch (error) {
+    return false;
+  }
 }

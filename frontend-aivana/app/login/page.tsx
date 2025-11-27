@@ -3,11 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  login,
-  saveAuthData,
-  getCurrentUser,
-} from "@/lib/actions/auth.actions";
+import { login, saveAuthData } from "@/lib/actions/auth.actions";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -56,17 +52,15 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const data = await login({
+      const { token, user } = await login({
         username: formData.username,
         password: formData.password,
       });
 
-      // Get user info from /auth/me
-      const userInfo = await getCurrentUser();
+      // Store token and user data
+      saveAuthData(token.accessToken, user);
 
-      // Save both token and user info
-      saveAuthData(data, userInfo);
-
+      console.log("Login success:", { token, user });
       router.push("/");
     } catch (error) {
       console.error("Login error:", error);
@@ -131,7 +125,7 @@ export default function LoginPage() {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                placeholder="bisbat123"
+                placeholder="username"
                 className={`w-full pl-10 pr-4 py-3 rounded-lg bg-slate-800/50 border ${
                   errors.username
                     ? "border-red-500"

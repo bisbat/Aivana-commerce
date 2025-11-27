@@ -13,7 +13,7 @@ export class CartController {
 
   @Get('user/:userId')
   getCartByUserId(@Param('userId') userId: string) {
-    return this.cartService.getCartByUserId(+userId);
+    return this.cartService.getCartByUserId(userId);
   }
 
   @Delete('user/:userId/product/:productId')
@@ -21,6 +21,6 @@ export class CartController {
     @Param('userId') userId: string,
     @Param('productId') productId: string,
   ) {
-    return this.cartService.removeFromCart(+userId, +productId);
+    return this.cartService.removeFromCart(userId, +productId);
   }
 }

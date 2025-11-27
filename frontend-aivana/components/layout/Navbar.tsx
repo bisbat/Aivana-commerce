@@ -6,24 +6,26 @@ import { usePathname } from "next/navigation";
 import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
 import { ProfileModal } from "./ProfileModal";
 import { CartModal } from "../cart/CartModal";
+import { getAuthData } from "@/lib/actions/auth.actions";
 
-interface NavbarProps {
-  isAuthenticated?: boolean;
-  userRole?: "customer" | "seller" | "admin";
-}
-
-export const Navbar: React.FC<NavbarProps> = ({
-  isAuthenticated = true,
-  userRole = "customer",
-}) => {
+export const Navbar: React.FC = () => {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  // Check authentication status on mount and when pathname changes
+  useEffect(() => {
+    const authData = getAuthData();
+    setIsAuthenticated(!!authData.accessToken && !!authData.user);
+    setUserRole(authData.user?.role || null);
+  }, [pathname]);
 
   // Show search bar only on product-related pages
   const showSearchBar = pathname?.startsWith("/products");
@@ -163,7 +165,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 ลงทะเบียน
               </Link>
-              )
             </div>
           )}
 
@@ -223,9 +224,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   เข้าสู่ระบบ
                 </Link>
+                <Link
+                  href="/register"
+                  className="block text-white hover:text-[var(--primary)]"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  ลงทะเบียน
+                </Link>
                 {userRole === "customer" && (
                   <Link
-                    href="/register"
+                    href="/seller/become"
                     className="block text-white hover:text-[var(--primary)]"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >

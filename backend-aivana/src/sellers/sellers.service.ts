@@ -15,13 +15,16 @@ export class SellersService {
     private readonly sellerRepository: Repository<SellerEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-  ) { }
+  ) {}
 
-  async upgradeToSeller(userId: string, sellerData: CreateSellerDto): Promise<string> {
+  async upgradeToSeller(
+    userId: string,
+    sellerData: CreateSellerDto,
+  ): Promise<ResponseSellerDto> {
     // ตรวจสอบว่า user มีอยู่จริง
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      relations: ['sellerProfile']
+      relations: ['sellerProfile'],
     });
 
     if (!user) {
@@ -55,24 +58,36 @@ export class SellersService {
     // Reload seller with user relationship
     const reloadedSeller = await this.sellerRepository.findOne({
       where: { id: savedSeller.id },
-      relations: ['user']
+      relations: ['user'],
     });
 
-    return 'Seller upgraded successfully';
+    return plainToInstance(ResponseSellerDto, reloadedSeller, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async getAllSellers(): Promise<ResponseSellerDto[]> {
     const sellers = await this.sellerRepository.find({ relations: ['user'] });
-    return sellers.map(seller => plainToInstance(ResponseSellerDto, seller, { excludeExtraneousValues: true }));
+    return sellers.map((seller) =>
+      plainToInstance(ResponseSellerDto, seller, {
+        excludeExtraneousValues: true,
+      }),
+    );
   }
 
-  async getSellerByUsername(username: string): Promise<ResponseSellerDto | null> {
+  async getSellerByUsername(
+    username: string,
+  ): Promise<ResponseSellerDto | null> {
     const seller = await this.sellerRepository
       .createQueryBuilder('seller')
       .leftJoinAndSelect('seller.user', 'user')
       .where('user.username = :username', { username })
       .leftJoinAndSelect('seller.products', 'products')
       .getOne();
-    return seller ? plainToInstance(ResponseSellerDto, seller, { excludeExtraneousValues: true }) : null;
+    return seller
+      ? plainToInstance(ResponseSellerDto, seller, {
+          excludeExtraneousValues: true,
+        })
+      : null;
   }
 }

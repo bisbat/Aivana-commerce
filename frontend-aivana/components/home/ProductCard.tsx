@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { Product } from '@/lib/types/product/Product';
+import Link from "next/link";
+import { Product } from "@/lib/types/product/Product";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+
   // Convert price string to number for display
   const price = parseFloat(product.price);
 
@@ -17,9 +17,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="group cursor-pointer">
         {/* Image Container */}
         <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-800 mb-3">
-          {product.hero_image_url ? (
+          {product.heroImageUrl ? (
             <img
-              src={product.hero_image_url}
+              src={product.heroImageUrl}
               alt={product.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
@@ -31,7 +31,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
 
-
         {/* Product Info */}
         <div className="space-y-2">
           {/* Title */}
@@ -41,7 +40,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           {/* Creator & Category */}
           <div className="flex items-center gap-2 text-sm text-slate-400">
-            <span>{product.owner?.first_name || 'Unknown'}</span>
+            <span>{product.sellerId}</span>
             {product.category && (
               <>
                 <span>•</span>
@@ -54,9 +53,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           {/* Price */}
           <div className="flex items-center justify-between">
-            <span className="text-white font-bold text-lg">
-              {price}฿
-            </span>
+            <span className="text-white font-bold text-lg">{price}฿</span>
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 export interface GetCartResponse {
   message: string;
   cartId: number;
-  userId: number;
+  userId: string; // UUID
   items: Array<{
     cartItemId: number;
     cartId: number;
@@ -10,10 +10,10 @@ export interface GetCartResponse {
       id: number;
       name: string;
       price: number;
-      hero_image_url: string;
-      owner?: {
-        first_name: string;
-        last_name: string;
+      heroImageUrl: string;
+      seller?: {
+        firstName: string;
+        lastName: string;
       };
     };
   }>;

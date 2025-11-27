@@ -24,7 +24,7 @@ export async function addToCart(
   return response.json();
 }
 
-export async function getCart(userId: number): Promise<GetCartResponse> {
+export async function getCart(userId: string): Promise<GetCartResponse> {
   const response = await fetch(`http://localhost:3001/cart/user/${userId}`, {
     method: "GET",
     headers: {
@@ -40,7 +40,7 @@ export async function getCart(userId: number): Promise<GetCartResponse> {
 }
 
 export async function removeFromCart(
-  userId: number,
+  userId: string,
   productId: number
 ): Promise<{ message: string }> {
   const response = await fetch(

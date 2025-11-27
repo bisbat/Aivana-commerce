@@ -1,29 +1,16 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Search } from 'lucide-react';
-import { ProductDataForm } from '@/lib/api/types/product';
+import React, { useState } from "react";
+import { Search } from "lucide-react";
 
 export const HeroSection: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Searching for:', searchQuery);
+    console.log("Searching for:", searchQuery);
     // TODO: Implement search functionality
   };
-
-  const a: ProductDataForm = {
-    productType: '',
-    file: null,
-    keywords: '',
-    productName: '',
-    category: '',
-    features: [],
-    price: '',
-    heroImage: null,
-    detailImages: []
-  }
 
   return (
     <section className="bg-gradient-to-b from-[#1a1a2e] to-[#16213e] py-20">
@@ -37,7 +24,8 @@ export const HeroSection: React.FC = () => {
         <p className="text-slate-300 text-lg mb-8 max-w-3xl mx-auto leading-relaxed">
           ค้นหาและแปลงปัญหาคอมโพแนนต์ Frontend ที่พร้อมใช้งานสำหรับทุกโปรเจกต์
           ไม่ว่าคุณจะเป็นนักพัฒนาหรือนักออกแบบ ที่สามารถซื้อขายได้อย่างรวดเร็ว
-          คุณภาพสูงที่ช่วยให้คุณสามารถเริ่มต้นการทำงานได้เร็ว และส่งมอบผลงานอย่างมืออาชีพ
+          คุณภาพสูงที่ช่วยให้คุณสามารถเริ่มต้นการทำงานได้เร็ว
+          และส่งมอบผลงานอย่างมืออาชีพ
         </p>
 
         {/* Search Bar */}

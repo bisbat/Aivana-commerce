@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Product } from '@/lib/types/product/Product';
-import { getAllProductsAction } from '@/lib/actions/product.actions'
-import { ProductCard } from './ProductCard';
-import { Loader, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Product } from "@/lib/types/product/Product";
+import { getAllProductsAction } from "@/lib/actions/product.actions";
+import { ProductCard } from "./ProductCard";
+import { Loader, AlertCircle } from "lucide-react";
 
 export const ProductGrid: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -36,7 +36,7 @@ export const ProductGrid: React.FC = () => {
       return parseFloat(a.price) - parseFloat(b.price);
     }
     // Sort by created_at (latest first)
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
   return (

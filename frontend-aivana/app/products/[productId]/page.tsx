@@ -8,15 +8,15 @@ import { formatPrice, formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { Loader } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
 import { addToCart } from "@/lib/actions/cart.actions";
+import { getAuthData } from "@/lib/actions/auth.actions";
 
 interface DetailImage {
-  image_id: string;
-  path_image: string;
+  imageId: string;
   url: string;
 }
 
-interface ProductWithImages extends Omit<Product, "detail_images"> {
-  detail_images: DetailImage[];
+interface ProductWithImages extends Omit<Product, "detailImages"> {
+  detailImages: DetailImage[];
 }
 
 export default function ProductDetailPage() {
@@ -36,11 +36,23 @@ export default function ProductDetailPage() {
   const handleAddToCart = async () => {
     try {
       setAddingToCart(true);
-      // TODO: Replace with actual userId from auth context
-      const userId = 1;
+
+      const authData = getAuthData();
+      if (!authData.user) {
+        setToast({
+          show: true,
+          message: "กรุณาเข้าสู่ระบบก่อนเพิ่มสินค้าลงตะกร้า",
+          type: "error",
+        });
+        setTimeout(
+          () => setToast({ show: false, message: "", type: "error" }),
+          3000
+        );
+        return;
+      }
 
       await addToCart({
-        userId,
+        userId: authData.user.id,
         productId: parseInt(productId),
       });
 
@@ -116,8 +128,6 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen">
-      <Navbar />
-
       {/* Toast Notification */}
       {toast.show && (
         <div className="fixed top-20 right-4 z-50 animate-in slide-in-from-top-5 duration-300">
@@ -194,10 +204,10 @@ export default function ProductDetailPage() {
           {/* Left Side - Hero Image */}
           <div className="lg:col-span-5 space-y-4">
             <div className="aspect-[17/11] rounded-xl overflow-hidden bg-slate-800">
-              {product.hero_image_url ? (
+              {product.heroImageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={product.hero_image_url}
+                  src={product.heroImageUrl}
                   alt={product.name}
                   className="w-full h-full object-cover"
                 />
@@ -209,17 +219,17 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Thumbnails */}
-            {product.detail_images && product.detail_images.length > 0 && (
+            {product.detailImages && product.detailImages.length > 0 && (
               <div className="grid grid-cols-6 gap-2">
-                {product.detail_images.slice(0, 6).map((img) => (
+                {product.detailImages.slice(0, 6).map((img) => (
                   <div
-                    key={img.image_id}
+                    key={img.imageId}
                     className="aspect-square rounded-lg overflow-hidden bg-slate-800 border-2 border-slate-700 hover:border-purple-500 transition-colors cursor-pointer"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={img.url}
-                      alt={`Detail ${img.image_id}`}
+                      alt={`Detail ${img.imageId}`}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -241,13 +251,13 @@ export default function ProductDetailPage() {
                     </div>
                   </div>
 
-                  {product.installation_guide && (
+                  {product.installationGuide && (
                     <div>
                       <h2 className="text-xl font-bold text-white mb-4">
                         วิธีใช้
                       </h2>
                       <div className="text-slate-300 leading-relaxed whitespace-pre-line">
-                        {product.installation_guide}
+                        {product.installationGuide}
                       </div>
                     </div>
                   )}
@@ -288,26 +298,6 @@ export default function ProductDetailPage() {
 
           {/* Right Side - Product Details */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Seller Info */}
-            <div className="bg-(--linne-purple) rounded-lg p-4 space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-slate-700 flex items-center justify-center text-xl font-bold text-white shrink-0">
-                  {product.owner.first_name[0]}
-                </div>
-                <div className="flex-1">
-                  <div className="text-lg font-semibold text-white">
-                    {product.owner.first_name} {product.owner.last_name}
-                  </div>
-                  <div className="text-sm text-slate-400">
-                    Professional UX/UI Designer
-                  </div>
-                </div>
-              </div>
-              <button className="w-full px-5 py-2.5 bg-(--primary) text-white rounded-lg hover:bg-(--primary-hover) transition-colors font-medium text-sm cursor-pointer">
-                เข้าถึงโปรไฟล์
-              </button>
-            </div>
-
             {/* Product Details */}
             <div className="bg-(--linne-purple) rounded-lg p-5 space-y-3">
               <h3 className="text-lg font-bold text-white">คุณสมบัติ</h3>

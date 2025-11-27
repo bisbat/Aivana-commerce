@@ -7,7 +7,6 @@ import {
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserRoles } from 'src/constants/user-roles.enum';
-import * as bcrypt from 'bcrypt';
 
 type AuthInput = { username: string; password: string };
 type SignInData = { userId: string; username: string; role: UserRoles }; // Added role
@@ -35,9 +34,6 @@ export class AuthService {
     const user = await this.userService.findUserByName(input.username);
 
     if (!user) return null;
-
-    const isMatch = await bcrypt.compare(input.password, user.password);
-    if (!isMatch) return null;
 
     return {
       userId: user.id,
