@@ -32,15 +32,15 @@ export default function EditProductImages({
           <h4 className="text-sm font-medium text-gray-700 mb-2">Current Images</h4>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {existingImages.map((image) => (
-              <div key={image.image_id} className="relative group">
+              <div key={image.imageId} className="relative group">
                 <img
                   src={Array.isArray(image.url) ? image.url[0] ?? '' : (image.url as unknown as string)}
-                  alt={`Product detail ${image.image_id}`}
+                  alt={`Product detail ${image.imageId}`}
                   className="w-full h-32 object-cover rounded-lg"
                 />
                 <button
                   type="button"
-                  onClick={() => onDeleteImage(image.image_id)}
+                  onClick={() => onDeleteImage(image.imageId)}
                   className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   ×

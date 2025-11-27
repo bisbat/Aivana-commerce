@@ -1,6 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from 'typeorm';
 import { UserRoles } from 'src/constants/user-roles.enum';
-import { ProductEntity } from 'src/products/entities/product.entity';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
 
 @Entity('users')
