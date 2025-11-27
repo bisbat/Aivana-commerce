@@ -52,7 +52,7 @@ export default async function ProductStoreDetailPage(
                     <p className="text-gray-200">{initialProductData.description}</p>
                     <p className="font-semibold">Price: <span className="text-primary">{initialProductData.price}</span></p>
                     <p>Blurb: {initialProductData.blurb}</p>
-                    <p>Installation Guide: {initialProductData.installation_guide}</p>
+                    <p>Installation Guide: {initialProductData.installationGuide}</p>
 
                     <div>
                         <h3 className="font-semibold text-lg">Features</h3>
@@ -76,9 +76,9 @@ export default async function ProductStoreDetailPage(
                     <p>Tags: {initialProductData.tags.map(tag => tag.name).join(', ')}</p>
                     <p>
                         Preview URL:{' '}
-                        {initialProductData.preview_url ? (
-                            <a href={initialProductData.preview_url} className="text-primary hover:underline" target='_blank'>
-                                {initialProductData.preview_url}
+                        {initialProductData.previewUrl ? (
+                            <a href={initialProductData.previewUrl} className="text-primary hover:underline" target='_blank'>
+                                {initialProductData.previewUrl}
                             </a>
                         ) : (
                             <span className="text-gray-400">No preview available</span>
@@ -88,9 +88,9 @@ export default async function ProductStoreDetailPage(
                     {/* Uploaded file */}
                     <div className="mt-4">
                         <h3 className="font-semibold text-lg">Uploaded File</h3>
-                        {initialProductData.uploaded_file_path ? (
+                        {initialProductData.uploadedFilePath ? (
                             <a
-                                href={initialProductData.uploaded_file_path}
+                                href={initialProductData.uploadedFilePath}
                                 download
                                 className="text-primary hover:underline"
                             >
@@ -103,7 +103,7 @@ export default async function ProductStoreDetailPage(
                 </div>
 
                 {/* Images */}
-                <ProductImages heroSrc={initialProductData.hero_image_url} detailImages={initialProductData.detail_images} />
+                <ProductImages heroSrc={initialProductData.heroImageUrl} detailImages={initialProductData.detailImages} />
             </div>
         </div>
 

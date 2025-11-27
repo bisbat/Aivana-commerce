@@ -9,13 +9,13 @@ import { ProductEntity } from '../../products/entities/product.entity';
 
 @Entity('product_image')
 export class ProductImage {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'image_id' })
-  image_id: number;
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'imageId' })
+  imageId: number;
 
-  @Column({ type: 'varchar', length: 255, nullable: true, name: 'path_image' })
-  path_image: string;
+  @Column({ type: 'varchar', length: 255, nullable: true, name: 'pathImage' })
+  pathImage: string;
 
-  @ManyToOne(() => ProductEntity, {
+  @ManyToOne(() => ProductEntity, (product) => product.productImages, {
     nullable: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',

@@ -26,7 +26,7 @@ export async function updateProductAction(productId: string, updatedData: any) {
 }
 
 // ฟังก์ชันสำหรับลบ detail image
-export async function deleteProductImageAction(imageId: string) {
+export async function deleteProductImageAction(imageId: number) {
     const res = await fetch(`${API_BASE_URL}/product-images/${imageId}`, {
         method: 'DELETE',
     });
