@@ -2,7 +2,6 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, Up
 import { UserRoles } from 'src/constants/user-roles.enum';
 import { ProductEntity } from 'src/products/entities/product.entity';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
-import { CustomerEntity } from 'src/customers/entities/customer.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -33,10 +32,6 @@ export class UserEntity {
   @OneToOne(() => SellerEntity, (seller) => seller.user, { nullable: true })
   @JoinColumn({ name: 'sellerId' })
   sellerProfile: SellerEntity;
-
-  @OneToOne(() => CustomerEntity, (customer) => customer.user, { nullable: true })
-  @JoinColumn()
-  customerProfile: CustomerEntity;
 
   @CreateDateColumn()
   createdAt: Date;
