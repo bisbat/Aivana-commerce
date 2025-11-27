@@ -4,7 +4,7 @@ import { PassportLocalGuard } from './guards/passport-local.guard';
 import { PassportJwtAuthGuard } from './guards/passport-jwt.guard';
 
 
-@Controller('auth-v2')
+@Controller('auth')
 export class PassportAuthController {
   constructor(private readonly authService: AuthService) {}
 
