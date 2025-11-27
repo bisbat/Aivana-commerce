@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RegisterDto } from './dto/register.dto';
@@ -7,12 +7,15 @@ import { UserRoles } from 'src/constants/user-roles.enum';
 import * as bcrypt from 'bcrypt';
 import { ResponseUserDto } from './dto/response.dto';
 import { plainToInstance } from 'class-transformer';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService
   ) { }
 
   async createUser(registerDto: RegisterDto): Promise<ResponseUserDto> {
@@ -38,11 +41,20 @@ export class UsersService {
       role: UserRoles.CUSTOMER, // default as in your entity
     });
 
-    await this.userRepository.save(user);
 
-    return plainToInstance(ResponseUserDto, user, {
+    const savedUser = await this.userRepository.save(user);
+
+    const token = await this.authService.signIn({
+      userId: savedUser.id,
+      username: savedUser.username,
+      role: savedUser.role,
+    });
+
+    const userTransform = plainToInstance(ResponseUserDto, user ,{
       excludeExtraneousValues: true,
     });
+
+    return {...userTransform, ...token}
   }
 
 

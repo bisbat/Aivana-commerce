@@ -10,8 +10,8 @@ export class UsersController {
 
   @Post('/register')
   create(@Body() registerDto: RegisterDto) {
-    console.log('Received RegisterDto:', registerDto);
     return this.usersService.createUser(registerDto);
+
   }
 
   @Get()
