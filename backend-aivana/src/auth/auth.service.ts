@@ -5,7 +5,7 @@ import { UserRoles } from 'src/constants/user-roles.enum';
 
 type AuthInput = {username: string; password: string};
 type SignInData = {userId: string; username: string; role: UserRoles};  // Added role
-type AuthResult = {accessToken: string; userId: string; username: string; role: UserRoles};  // Added role
+type AuthResult = {accessToken: string};  // Added role
 
 
 @Injectable()
@@ -47,10 +47,7 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync(tokenPayload);
 
     return {
-      accessToken, 
-      username: user.username, 
-      userId: user.userId,
-      role: user.role  // Added role to return
+      accessToken
     };
   }
 
