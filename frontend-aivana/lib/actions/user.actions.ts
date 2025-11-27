@@ -25,7 +25,7 @@ export async function updateSellerProfileAction(sellerId: string, data: {
     bankAccountName?: string;
 }) {
     const res = await fetch(`http://localhost:3001/sellers/${sellerId}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },

@@ -82,6 +82,10 @@ export class SellersService {
     if (!seller) {
       throw new Error('Seller not found');
     }
+    if(updateData.user) {
+      Object.assign(seller.user, updateData.user);
+      await this.userRepository.save(seller.user);
+    }
     Object.assign(seller, updateData);
     const updatedSeller = await this.sellerRepository.save(seller);
     return plainToInstance(ResponseSellerDto, updatedSeller, { excludeExtraneousValues: true });

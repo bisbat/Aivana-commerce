@@ -5,6 +5,7 @@ import { updateUserDto } from 'src/users/dto/update-user.dto';
 
 export class UpdateSellerDto {
     @IsOptional()
+    @IsObject()
     user: updateUserDto;
     @IsOptional()
     @IsString()
