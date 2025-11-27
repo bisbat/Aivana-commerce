@@ -20,7 +20,7 @@ export class SellersService {
     // ตรวจสอบว่า user มีอยู่จริง
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      relations: ['customerProfile', 'sellerProfile']
+      relations: [ 'sellerProfile']
     });
 
     if (!user) {
