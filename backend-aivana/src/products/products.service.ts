@@ -33,24 +33,36 @@ export class ProductsService {
     const products = await this.productsRepository.find({
       relations: ['category', 'seller', 'tags', 'productImages'],
     });
-    
+
     return products.map(product => {
       // Transform productImages to detailImages with URLs
       const detailImages = product.productImages?.map(image => ({
         imageId: image.imageId.toString(),
         url: this.minioService.getFileUrl(image.pathImage)
       })) || [];
-      
+
+      // Transform tags to ResponseTagDto format
+      const tags = product.tags?.map(tag => ({
+        id: tag.id,
+        name: tag.name
+      })) || [];
+
+      // Transform category to ResponseCategoryDto format
+      const category = product.category ? {
+        id: product.category.id,
+        name: product.category.name
+      } : null;
+
       // Prepare data for transformation
       const productData = {
         ...product,
         id: product.id.toString(),
-        categoryId: product.category?.id,
         sellerId: product.seller?.id,
-        tags: product.tags?.map(tag => tag.name) || [],
+        category,
+        tags,
         detailImages
       };
-      
+
       return plainToInstance(ResponseProductDto, productData, {
         excludeExtraneousValues: true
       });
@@ -62,27 +74,39 @@ export class ProductsService {
       where: { id: productId },
       relations: ['category', 'seller', 'tags', 'productImages'],
     });
-    
+
     if (!product) {
       return null;
     }
-    
+
     // Transform productImages to detailImages with URLs
     const detailImages = product.productImages?.map(image => ({
       imageId: image.imageId.toString(),
       url: this.minioService.getFileUrl(image.pathImage)
     })) || [];
-    
+
+    // Transform tags to ResponseTagDto format
+    const tags = product.tags?.map(tag => ({
+      id: tag.id,
+      name: tag.name
+    })) || [];
+
+    // Transform category to ResponseCategoryDto format
+    const category = product.category ? {
+      id: product.category.id,
+      name: product.category.name
+    } : null;
+
     // Prepare data for transformation
     const productData = {
       ...product,
       id: product.id.toString(),
-      categoryId: product.category?.id,
       sellerId: product.seller?.id,
-      tags: product.tags?.map(tag => tag.name) || [],
+      category,
+      tags,
       detailImages
     };
-    
+
     return plainToInstance(ResponseProductDto, productData, {
       excludeExtraneousValues: true
     });
@@ -247,13 +271,18 @@ export class ProductsService {
       url: this.minioService.getFileUrl(image.pathImage),
     })) || [];
 
+    const tags = product.tags?.map(tag => ({
+      id: tag.id,
+      name: tag.name
+    })) || [];
+
     // inject detailImages เข้าไปใน product object และแปลงข้อมูล
     const productWithDetailImages = {
       ...product,
       id: product.id.toString(),
       categoryId: product.category?.id,
       sellerId: product.seller?.id,
-      tags: product.tags?.map(tag => tag.name) || [],
+      tags,
       detailImages,
     };
 

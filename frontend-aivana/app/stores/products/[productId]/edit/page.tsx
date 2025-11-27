@@ -83,16 +83,16 @@ export default function EditProductPage() {
       setName(productData.name || '');
       setBlurb(productData.blurb || '');
       setDescription(productData.description || '');
-      setInstallation_guide(productData.installation_guide || '');
+      setInstallation_guide(productData.installationGuide || '');
       setCompatibility(productData.compatibility || []);
       setPrice(productData.price || '');
-      setLivePreview(productData.preview_url || '');
+      setLivePreview(productData.previewUrl || '');
       setFeatures(productData.features || []);
       setCategoryId(productData.category?.id?.toString() || '');
       setSelectedTagIds(productData.tags?.map(tag => Number(tag.id)) || []);
-      setDetailImages(productData.detail_images || []);
-      setCurrentHeroImage(productData.hero_image_url || null);
-      setCurrentProductFile(productData.uploaded_file_path || null);
+      setDetailImages(productData.detailImages || []);
+      setCurrentHeroImage(productData.heroImageUrl || null);
+      setCurrentProductFile(productData.uploadedFilePath || null);
       
     }
   }, [productData]);
@@ -105,7 +105,7 @@ export default function EditProductPage() {
   };
 
   // Handler for removing existing image
-  const handleDeleteImage = async (imageId: string) => {
+  const handleDeleteImage = async (imageId: number) => {
     try {
       // เรียก API เพื่อลบรูปจริงๆ
       await deleteProductImageAction(imageId);

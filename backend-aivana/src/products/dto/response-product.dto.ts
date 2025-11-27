@@ -1,5 +1,7 @@
 import { Expose, Type } from 'class-transformer';
 import { ResponseProductImageDto } from 'src/product-image/dto/response-product-image.dto';
+import { ResponseCategoryDto } from 'src/categories/dto/response-category.dto';
+import { ResponseTagDto } from 'src/tags/dto/response-tag.dto';
 
 export class ResponseProductDto {
   @Expose()
@@ -25,11 +27,13 @@ export class ResponseProductDto {
   @Expose()
   compatibility: Array<string>;
   @Expose()
-  categoryId: number;
-  @Expose()
   sellerId: string;
   @Expose()
-  tags: Array<string>;
+  @Type(() => ResponseCategoryDto)
+  category: ResponseCategoryDto;
+  @Expose()
+  @Type(() => ResponseTagDto)
+  tags: Array<ResponseTagDto>;
   @Expose()
   @Type(() => ResponseProductImageDto)
   detailImages: Array<ResponseProductImageDto>;

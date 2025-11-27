@@ -1,11 +1,11 @@
-'use client'; 
+'use client';
 import { ProductImages } from '@/lib/types/product/product_images';
 
 interface EditProductImagesProps {
   existingImages: ProductImages[];
   newImageFiles: File[];
   onAddImages: (files: File[]) => void;
-  onDeleteImage: (imageId: string) => void;
+  onDeleteImage: (imageId: number) => void;
   onRemoveNewImage: (index: number) => void;
 }
 
@@ -34,7 +34,7 @@ export default function EditProductImages({
             {existingImages.map((image) => (
               <div key={image.image_id} className="relative group">
                 <img
-                  src={image.url}
+                  src={Array.isArray(image.url) ? image.url[0] ?? '' : (image.url as unknown as string)}
                   alt={`Product detail ${image.image_id}`}
                   className="w-full h-32 object-cover rounded-lg"
                 />
@@ -48,6 +48,7 @@ export default function EditProductImages({
               </div>
             ))}
           </div>
+
         </div>
       )}
 
