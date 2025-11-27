@@ -28,7 +28,6 @@ import { SellersModule } from './sellers/sellers.module';
     TagsModule,
     SellersModule,
     AuthModule,
-    SellersModule,
   ],
   controllers: [],
   providers: [],
