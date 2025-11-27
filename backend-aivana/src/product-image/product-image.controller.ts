@@ -12,9 +12,9 @@ import {
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ProductImageService } from './product-image.service';
 import { MinioService } from '../minio/minio.service';
-import type { UploadedFileType } from '../products/interfaces/uploaded-file.interface';
 import { MINIO_FOLDERS } from '../constants/minio-folders.constant';
 import { ProductsService } from '../products/products.service';
+import { UploadedFileType } from 'src/products/interfaces/uploaded-file.interface';
 
 @Controller('product-images')
 export class ProductImageController {
@@ -50,8 +50,8 @@ export class ProductImageController {
     }
 
     const uploadedImages: Array<{
-      image_id: number;
-      path_image: string;
+      imageId: number;
+      pathImage: string;
       url: string;
     }> = [];
 
@@ -70,13 +70,13 @@ export class ProductImageController {
 
       // Save to database
       const productImage = await this.productImageService.create({
-        path_image: fullPath,
-        product_id: parseInt(productId),
+        pathImage: fullPath,
+        productId: parseInt(productId),
       });
 
       uploadedImages.push({
-        image_id: productImage.image_id,
-        path_image: productImage.path_image,
+        imageId: productImage.imageId,
+        pathImage: productImage.pathImage,
         url: fileUrl,
       });
 
@@ -102,7 +102,7 @@ export class ProductImageController {
 
     // Delete from MinIO
     try {
-      await this.minioService.deleteFile(image.path_image);
+      await this.minioService.deleteFile(image.pathImage);
     } catch (error) {
       console.error('Failed to delete image from MinIO:', error);
     }
@@ -112,14 +112,14 @@ export class ProductImageController {
 
     return {
       message: 'Product image deleted successfully',
-      image_id: imageId,
+      imageId: imageId,
     };
   }
 
   @Post('hero')
   @UseInterceptors(FileInterceptor('image'))
   async uploadHeroImage(
-    @UploadedFile() file: UploadedFileType,
+    @UploadedFile() file: UploadedFileType[],
     @Body('product_id') productId: string,
   ) {
     if (!file) {
@@ -143,11 +143,11 @@ export class ProductImageController {
     }
 
     const timestamp = Date.now();
-    const fileName = `hero-${timestamp}-${file.originalname}`;
+    const fileName = `hero-${timestamp}-${file[0].originalname}`;
 
     // Upload to MinIO with product-specific hero folder
     const fullPath = await this.minioService.uploadFile(
-      file,
+      file[0],
       fileName,
       MINIO_FOLDERS.PRODUCTS.HERO(productId),
     );
@@ -171,9 +171,9 @@ export class ProductImageController {
     );
 
     const imagesWithUrls = images.map((image) => ({
-      image_id: image.image_id,
-      path_image: image.path_image,
-      url: this.minioService.getFileUrl(image.path_image),
+      imageId: image.imageId,
+      pathImage: image.pathImage,
+      url: this.minioService.getFileUrl(image.pathImage),
     }));
 
     return {

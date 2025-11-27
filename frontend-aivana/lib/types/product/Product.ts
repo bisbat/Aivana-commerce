@@ -7,18 +7,18 @@ import { ProductImages } from "./product_images";
 export interface Product {
   id: string;
   name: string;
-  uploaded_file_path: string;
+  uploadedFilePath: string;
   description: string;
   price: string;
   blurb: string;
-  installation_guide: string;
-  preview_url: string | null;
-  hero_image_url: string | null;
+  installationGuide: string;
+  previewUrl: string | null;
+  heroImageUrl: string | null;
   features: string[];
   compatibility: string[];
   category: Category;
-  created_at: string;
-  detail_images: ProductImages[];
+  createdAt: string;
+  detailImages: ProductImages[];
   owner: Owner;
   tags: Tag[];
 }

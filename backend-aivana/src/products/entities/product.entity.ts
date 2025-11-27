@@ -9,7 +9,6 @@ import {
   JoinTable,
 } from 'typeorm';
 import { CategoryEntity } from 'src/categories/entities/category.entity';
-import { UserEntity } from 'src/users/entities/user.entity';
 import { ProductImage } from 'src/product-image/entities/product-image.entity';
 import { TagEntity } from 'src/tags/entities/tag.entity';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
@@ -23,7 +22,7 @@ export class ProductEntity {
   name: string;
 
   @Column({ type: 'text', nullable: true })
-  uploaded_file_path: string;
+  uploadedFilePath: string;
 
   @Column({ type: 'text' })
   description: string;
@@ -35,13 +34,13 @@ export class ProductEntity {
   blurb: string;
 
   @Column({ type: 'text' })
-  installation_guide: string;
+  installationGuide: string;
 
   @Column({ type: 'text', nullable: true })
-  preview_url: string;
+  previewUrl: string;
 
   @Column({ type: 'text', nullable: true })
-  hero_image_url: string;
+  heroImageUrl: string;
 
   @Column({ type: 'text', array: true })
   features: Array<string>;
@@ -63,10 +62,10 @@ export class ProductEntity {
   seller: SellerEntity;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  createdAt: Date;
 
   @OneToMany(() => ProductImage, (image) => image.product)
-  product_images: ProductImage[];
+  productImages: ProductImage[];
 
   // Tags relationship
   @ManyToMany(() => TagEntity, (tag) => tag.products, { cascade: true })
