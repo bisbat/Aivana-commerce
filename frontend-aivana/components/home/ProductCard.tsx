@@ -17,9 +17,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="group cursor-pointer">
         {/* Image Container */}
         <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-800 mb-3">
-          {product.hero_image_url ? (
+          {product.heroImageUrl ? (
             <img
-              src={product.hero_image_url}
+              src={product.heroImageUrl}
               alt={product.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
