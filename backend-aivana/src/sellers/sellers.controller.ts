@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
 import { SellersService } from './sellers.service';
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { UpdateSellerDto } from './dto/update-seller.dto';
@@ -21,5 +21,13 @@ export class SellersController {
   @Get(':username')
   getSellerById(@Param('username') username: string) {
     return this.sellersService.getSellerByUsername(username);
+  }
+
+  @Put(':sellerId')
+  updateSellerProfile(
+    @Param('sellerId') sellerId: string,
+    @Body() updateSellerDto: UpdateSellerDto,
+  ) {
+    return this.sellersService.updateSellerProfile(sellerId, updateSellerDto);
   }
 }
