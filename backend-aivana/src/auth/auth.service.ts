@@ -5,9 +5,8 @@ import { UserRoles } from 'src/constants/user-roles.enum';
 import * as bcrypt from 'bcrypt';
 
 type AuthInput = { username: string; password: string };
-type SignInData = { userId: string; username: string; role: UserRoles };  // Added role
-type AuthResult = { accessToken: string };  // Added role
-
+type SignInData = { userId: string; username: string; role: UserRoles }; // Added role
+type AuthResult = { accessToken: string }; // Added role
 
 @Injectable()
 export class AuthService {
@@ -15,8 +14,6 @@ export class AuthService {
     private userService: UsersService,
     private jwtService: JwtService,
   ) {}
-
-  constructor(private userService: UsersService, private jwtService: JwtService) { }
 
   async authenticate(input: AuthInput): Promise<AuthResult> {
     const user = await this.validateUser(input);
@@ -47,13 +44,13 @@ export class AuthService {
     const tokenPayload = {
       sub: user.userId,
       username: user.username,
-      role: user.role, 
+      role: user.role,
     };
 
     const accessToken = await this.jwtService.signAsync(tokenPayload);
 
     return {
-      accessToken
+      accessToken,
     };
   }
 }

@@ -3,11 +3,16 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  login,
+  saveAuthData,
+  getCurrentUser,
+} from "@/lib/actions/auth.actions";
 
 export default function LoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -31,10 +36,8 @@ export default function LoginPage() {
   const validate = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.email.trim()) {
-      newErrors.email = "กรุณากรอกอีเมล";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "รูปแบบอีเมลไม่ถูกต้อง";
+    if (!formData.username.trim()) {
+      newErrors.username = "กรุณากรอกชื่อผู้ใช้";
     }
 
     if (!formData.password) {
@@ -53,22 +56,21 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData),
-      // });
+      const data = await login({
+        username: formData.username,
+        password: formData.password,
+      });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Get user info from /auth/me
+      const userInfo = await getCurrentUser();
 
-      // Mock success
-      console.log("Login data:", formData);
+      // Save both token and user info
+      saveAuthData(data, userInfo);
+
       router.push("/");
     } catch (error) {
       console.error("Login error:", error);
-      setErrors({ submit: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" });
+      setErrors({ submit: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });
     } finally {
       setIsLoading(false);
     }
@@ -105,9 +107,9 @@ export default function LoginPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
+          {/* Username */}
           <div>
-            <label className="block text-white text-sm mb-2">อีเมล</label>
+            <label className="block text-white text-sm mb-2">ชื่อผู้ใช้</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg
@@ -125,20 +127,20 @@ export default function LoginPage() {
                 </svg>
               </div>
               <input
-                type="email"
-                name="email"
-                value={formData.email}
+                type="text"
+                name="username"
+                value={formData.username}
                 onChange={handleChange}
-                placeholder="example@gmail.com"
+                placeholder="bisbat123"
                 className={`w-full pl-10 pr-4 py-3 rounded-lg bg-slate-800/50 border ${
-                  errors.email
+                  errors.username
                     ? "border-red-500"
                     : "border-slate-700 focus:border-[var(--primary)]"
                 } text-white placeholder:text-slate-400 focus:outline-none transition-colors`}
               />
             </div>
-            {errors.email && (
-              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+            {errors.username && (
+              <p className="text-red-500 text-xs mt-1">{errors.username}</p>
             )}
           </div>
 

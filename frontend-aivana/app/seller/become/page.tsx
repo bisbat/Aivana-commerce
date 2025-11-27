@@ -4,6 +4,12 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { becomeSeller } from "@/lib/actions/seller.actions";
+import {
+  saveAuthData,
+  getAuthData,
+  getCurrentUser,
+} from "@/lib/actions/auth.actions";
 
 const SOCIAL_PLATFORMS = [
   { value: "github", label: "GitHub" },
@@ -218,14 +224,24 @@ export default function BecomeSellerPage() {
         bankAccountName: formData.bankAccountName,
       };
 
-      // TODO: Replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Call backend API to become seller
+      await becomeSeller(submitData);
 
-      console.log("Seller data:", submitData);
-      router.push("/seller/dashboard");
+      // Update user role in localStorage - fetch fresh data from backend
+      const userInfo = await getCurrentUser();
+      const authData = getAuthData();
+      if (authData.accessToken) {
+        saveAuthData({ accessToken: authData.accessToken }, userInfo);
+      }
+
+      router.push("/");
     } catch (error) {
       console.error("Become seller error:", error);
-      setErrors({ submit: "เกิดข้อผิดพลาดในการสมัครเป็นผู้ขาย" });
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "เกิดข้อผิดพลาดในการสมัครเป็นผู้ขาย";
+      setErrors({ submit: errorMessage });
     } finally {
       setIsLoading(false);
     }
