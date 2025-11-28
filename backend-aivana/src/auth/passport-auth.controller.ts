@@ -8,14 +8,15 @@ import {
   Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { PassportLocalGuard } from './guards/passport-local.guard';
-import { PassportJwtAuthGuard } from './guards/passport-jwt.guard';
-
+import { PassportLocalGuard } from '../common/guards/passport-local.guard';
+import { PassportJwtAuthGuard } from '../common/guards/passport-jwt.guard';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @Controller('auth')
 export class PassportAuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @Post('login')
   @UseGuards(PassportLocalGuard)
