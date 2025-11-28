@@ -34,9 +34,9 @@ export default function ProductImages({ heroSrc, detailImages }: ProductImagesPr
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                         {detailImages.slice(0, 8).map((img) => (
                             <img
-                                key={img.image_id}
+                                key={img.imageId}
                                 src={Array.isArray(img.url) ? img.url[0] : img.url}
-                                alt={`Detail ${img.image_id}`}
+                                alt={`Detail ${img.imageId}`}
                                 className="w-full h-32 object-cover rounded shadow cursor-pointer"
                                 onClick={() => setModalImg(Array.isArray(img.url) ? img.url[0] : img.url)}
                             />

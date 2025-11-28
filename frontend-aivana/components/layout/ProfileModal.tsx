@@ -92,7 +92,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         <div>
           {/* โปรไฟล์ของฉัน */}
           <Link
-            href="/profile"
+            href={`/seller/${getAuthData().user?.username ?? ""}`}
             onClick={onClose}
             className="flex items-center gap-3 px-6 py-3 text-white hover:bg-slate-700 transition-colors"
           >

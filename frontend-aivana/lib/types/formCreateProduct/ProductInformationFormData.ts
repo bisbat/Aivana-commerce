@@ -3,12 +3,12 @@ export interface ProductInformationFormData {
     description: string;
     price: number;
     blurb: string;
-    installation_guide: string;
-    preview_url: string | null;
+    installationGuide: string;
+    previewUrl: string | null;
   
     // These always start as null during Step 2
-    uploaded_file_path: null;
-    hero_image_url: null;
+    uploadedFilePath: null;
+    heroImageUrl: null;
   
     // Always 1 for now — fixed values
     categoryId: number;
