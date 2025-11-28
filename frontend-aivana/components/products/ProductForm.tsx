@@ -32,7 +32,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
   const [features, setFeatures] = useState<string[]>([]);
-  const [installation_guide, setInstallation_guide] = useState('');
+  const [installationGuide, setInstallationGuide] = useState('');
   const [price, setPrice] = useState('');
   const [livePreview, setLivePreview] = useState('');
   const [compatibility, setCompatibility] = useState<string[]>([]);
@@ -100,12 +100,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       ownerId: 1,
       description,
       features: features.filter(f => f.trim() !== ''),
-      installation_guide,
+      installationGuide,
       price: Number(price),
-      preview_url: livePreview || null,
+      previewUrl: livePreview || null,
       compatibility: compatibility.filter(f => f.trim() !== ''),
-      uploaded_file_path: null,
-      hero_image_url: null,
+      uploadedFilePath: null,
+      heroImageUrl: null,
       tagIds: selectedTagIds
     };
 
@@ -210,8 +210,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
       <Textarea
         label="Installation Document"
-        value={installation_guide}
-        onChange={setInstallation_guide}
+        value={installationGuide}
+        onChange={setInstallationGuide}
         placeholder="Installation Document..."
         rows={4}
       />

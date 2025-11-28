@@ -96,8 +96,8 @@ export async function createCompleteProduct(
         formData.append('description', productInfoData.description);
         formData.append('price', productInfoData.price.toString());
         formData.append('blurb', productInfoData.blurb);
-        formData.append('installation_guide', productInfoData.installation_guide);
-        formData.append('preview_url', productInfoData.preview_url || '');
+        formData.append('installationGuide', productInfoData.installationGuide);
+        formData.append('previewUrl', productInfoData.previewUrl || '');
         formData.append('categoryId', productInfoData.categoryId.toString());
         formData.append('ownerId', productInfoData.ownerId.toString());
 
