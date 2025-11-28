@@ -9,7 +9,6 @@ import { UsersService } from './users.service';
 import { ResponseUserDto } from './dto/response-user.dto';
 import { plainToInstance } from 'class-transformer';
 import { RegisterDto } from './dto/register.dto';
-import { PassportJwtAuthGuard } from 'src/common/guards/passport-jwt.guard';
 import { Public } from 'src/common/decorators/public.decorator';
 
 
