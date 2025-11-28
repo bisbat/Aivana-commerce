@@ -34,6 +34,16 @@ export function clearAuthData(): void {
   localStorage.removeItem("accessToken");
 }
 
+export function getAuthData(): {
+  accessToken: string | null;
+} {
+  const accessToken = localStorage.getItem("accessToken");
+
+  return {
+    accessToken,
+  };
+}
+
 export function getCurrentUserFromToken(): UserProfile | null {
   const accessToken = localStorage.getItem("accessToken");
 
