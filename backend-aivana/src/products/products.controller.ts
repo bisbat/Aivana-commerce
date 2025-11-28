@@ -17,11 +17,13 @@ import { plainToInstance } from 'class-transformer';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ResponseProductDto } from './dto/response-product.dto';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @Public()
   @Get()
   async getAllProducts(): Promise<ResponseProductDto[]> {
     return this.productsService.getAllProducts();
@@ -59,6 +61,7 @@ export class ProductsController {
     };
   }
 
+  @Public()
   @Get(':id')
   async getProductById(
     @Param('id') id: number,
