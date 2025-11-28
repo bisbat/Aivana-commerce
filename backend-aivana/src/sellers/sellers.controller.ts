@@ -25,6 +25,11 @@ export class SellersController {
     return this.sellersService.getSellerByUsername(username);
   }
 
+  @Get(':sellerId/products')
+  getProductsBySellerId(@Param('sellerId') sellerId: string) {
+    return this.sellersService.getProductsBySellerId(sellerId);
+  }
+
   @Put(':sellerId')
   updateSellerProfile(
     @Param('sellerId') sellerId: string,
