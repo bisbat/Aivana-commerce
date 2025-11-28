@@ -35,6 +35,6 @@ import { PassportJwtAuthGuard } from './common/guards/passport-jwt.guard';
   providers: [{
     provide: APP_GUARD,
     useClass: PassportJwtAuthGuard,
-  },],
+  }],
 })
 export class AppModule {}
