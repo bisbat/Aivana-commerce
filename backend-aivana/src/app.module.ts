@@ -11,6 +11,8 @@ import { CartModule } from './cart/cart.module';
 import { TagsModule } from './tags/tags.module';
 import { AuthModule } from './auth/auth.module';
 import { SellersModule } from './sellers/sellers.module';
+import { APP_GUARD } from '@nestjs/core';
+import { PassportJwtAuthGuard } from './common/guards/passport-jwt.guard';
 
 @Module({
   imports: [
@@ -30,6 +32,9 @@ import { SellersModule } from './sellers/sellers.module';
     UsersModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [{
+    provide: APP_GUARD,
+    useClass: PassportJwtAuthGuard,
+  },],
 })
 export class AppModule {}
