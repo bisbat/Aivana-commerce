@@ -105,4 +105,17 @@ export class SellersService {
     const updatedSeller = await this.sellerRepository.save(seller);
     return plainToInstance(ResponseSellerDto, updatedSeller, { excludeExtraneousValues: true });
   }
+
+  async getProductsBySellerId(sellerId: string) {
+    const seller = await this.sellerRepository.findOne({
+      where: { id: sellerId },
+      relations: [
+        'products', 
+        'products.category', 
+        'products.productImages', 
+        'products.tags'
+      ],
+    });
+    return seller ? seller.products : [];
+  }
 }
