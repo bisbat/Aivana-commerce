@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getCart, removeFromCart } from "@/lib/actions/cart.actions";
+import { getAuthData } from "@/lib/actions/auth.actions";
 import { GetCartResponse } from "@/lib/types/cart/GetCart";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 
@@ -17,13 +18,15 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
   const [loading, setLoading] = useState(false);
   const [removingItemId, setRemovingItemId] = useState<number | null>(null);
 
-  // FIXME: Replace with actual userId from auth context
-  const userId = 1;
-
   const fetchCart = async () => {
     try {
       setLoading(true);
-      const data = await getCart(userId);
+      const authData = getAuthData();
+      if (!authData.user) {
+        setCartData(null);
+        return;
+      }
+      const data = await getCart(authData.user.id);
       setCartData(data);
     } catch (error) {
       console.error("Failed to fetch cart:", error);
@@ -35,7 +38,10 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
   const handleRemoveItem = async (productId: number) => {
     try {
       setRemovingItemId(productId);
-      await removeFromCart(userId, productId);
+      const authData = getAuthData();
+      if (!authData.user) return;
+
+      await removeFromCart(authData.user.id, productId);
       // Refresh cart after removing
       await fetchCart();
     } catch (error) {
@@ -58,8 +64,9 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
     };
   }, [isOpen]);
 
-  const total =
-    cartData?.items.reduce((sum, item) => sum + item.product.price, 0) || 0;
+const total =
+  cartData?.items.reduce((sum, item) => sum + Number(item.product.price), 0) ||
+  0;
 
   if (!isOpen) return null;
 
@@ -114,7 +121,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={
-                            item.product.hero_image_url ||
+                            item.product.heroImageUrl ||
                             "https://via.placeholder.com/200x150"
                           }
                           alt={item.product.name}
@@ -128,8 +135,8 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
                           {item.product.name}
                         </h3>
                         <p className="text-gray-500 text-xs">
-                          by {item.product.owner?.first_name || "Unknown"}{" "}
-                          {item.product.owner?.last_name || ""}
+                          by {item.product.seller?.firstName || "Unknown"}{" "}
+                          {item.product.seller?.lastName || ""}
                         </p>
                       </div>
 
@@ -183,7 +190,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
             </div>
 
             {/* Footer - Total and Checkout */}
-            {!loading && cartData?.items && cartData.items.length > 0 && (
+            {!loading && cartData && (
               <div className="p-4 pt-3 border-t border-gray-200">
                 <div className="bg-white rounded-lg p-3 flex items-center justify-between gap-4 shadow-sm">
                   <div className="flex items-center gap-2">
@@ -192,7 +199,10 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
                       {formatPriceWithCurrency(total)}
                     </span>
                   </div>
-                  <button className="px-6 py-2 bg-black text-white text-sm font-semibold rounded-full hover:bg-gray-800 transition-colors">
+                  <button
+                    className="px-6 py-2 bg-black text-white text-sm font-semibold rounded-full hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={cartData.items.length === 0}
+                  >
                     Checkout
                   </button>
                 </div>

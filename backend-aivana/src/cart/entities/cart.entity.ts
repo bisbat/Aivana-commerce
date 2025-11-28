@@ -15,8 +15,8 @@ export class Cart {
   @PrimaryGeneratedColumn({ name: 'cart_id' })
   cartId: number;
 
-  @Column({ name: 'user_id', type: 'bigint' })
-  userId: number;
+  @Column()
+  userId: string; // UUID
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

@@ -1,5 +1,5 @@
 export interface AddToCartRequest {
-  userId: number;
+  userId: string; // UUID
   productId: number;
 }
 

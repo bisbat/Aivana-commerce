@@ -8,9 +8,11 @@ export class SellersController {
   constructor(private readonly sellersService: SellersService) {}
 
   @Post('upgrade/:userId')
-  upgradeToSeller(@Param('userId') userId: string, @Body() createSellerDto: CreateSellerDto) {
-    this.sellersService.upgradeToSeller(userId, createSellerDto);
-    // return seller response dto
+  upgradeToSeller(
+    @Param('userId') userId: string,
+    @Body() createSellerDto: CreateSellerDto,
+  ) {
+    return this.sellersService.upgradeToSeller(userId, createSellerDto);
   }
 
   @Get()

@@ -1,5 +1,4 @@
 import { Category } from "../category";
-import { Owner } from "../seller";
 import { Tag } from "../tag";
 import { ProductImages } from "./product_images";
 
@@ -16,9 +15,9 @@ export interface Product {
   heroImageUrl: string | null;
   features: string[];
   compatibility: string[];
+  sellerId: string;
   category: Category;
   createdAt: string;
   detailImages: ProductImages[];
-  owner: Owner;
   tags: Tag[];
 }

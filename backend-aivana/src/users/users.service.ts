@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, Inject, forwardRef } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RegisterDto } from './dto/register.dto';
@@ -15,11 +20,12 @@ export class UsersService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     @Inject(forwardRef(() => AuthService))
-    private readonly authService: AuthService
-  ) { }
+    private readonly authService: AuthService,
+  ) {}
 
   async createUser(registerDto: RegisterDto): Promise<ResponseUserDto> {
-    const { email, username, password, firstName, lastName, avatarUrl } = registerDto;
+    const { email, username, password, firstName, lastName, avatarUrl } =
+      registerDto;
 
     const existing = await this.userRepository.findOne({
       where: [{ email }, { username }],
@@ -41,7 +47,6 @@ export class UsersService {
       role: UserRoles.CUSTOMER, // default as in your entity
     });
 
-
     const savedUser = await this.userRepository.save(user);
 
     const token = await this.authService.signIn({
@@ -50,13 +55,12 @@ export class UsersService {
       role: savedUser.role,
     });
 
-    const userTransform = plainToInstance(ResponseUserDto, user ,{
+    const userTransform = plainToInstance(ResponseUserDto, user, {
       excludeExtraneousValues: true,
     });
 
-    return {...userTransform, ...token}
+    return { ...userTransform, ...token };
   }
-
 
   async getAllUsers(): Promise<UserEntity[]> {
     return await this.userRepository.find({ relations: ['sellerProfile'] });
@@ -69,4 +73,10 @@ export class UsersService {
     });
   }
 
+  async findUserById(userId: string): Promise<UserEntity | null> {
+    return await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['customerProfile', 'sellerProfile'],
+    });
+  }
 }
