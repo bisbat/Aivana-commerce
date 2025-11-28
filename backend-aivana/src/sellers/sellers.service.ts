@@ -7,6 +7,7 @@ import { UserEntity } from 'src/users/entities/user.entity';
 import { UserRoles } from 'src/constants/user-roles.enum';
 import { plainToInstance } from 'class-transformer';
 import { ResponseSellerDto } from './dto/response-seller.dto';
+import { UpdateSellerDto } from './dto/update-seller.dto';
 
 @Injectable()
 export class SellersService {
@@ -89,5 +90,19 @@ export class SellersService {
           excludeExtraneousValues: true,
         })
       : null;
+  }
+
+  async updateSellerProfile(sellerId: string, updateData: UpdateSellerDto): Promise<ResponseSellerDto> {
+    const seller = await this.sellerRepository.findOne({ where: { id: sellerId }, relations: ['user'] });
+    if (!seller) {
+      throw new Error('Seller not found');
+    }
+    if(updateData.user) {
+      Object.assign(seller.user, updateData.user);
+      await this.userRepository.save(seller.user);
+    }
+    Object.assign(seller, updateData);
+    const updatedSeller = await this.sellerRepository.save(seller);
+    return plainToInstance(ResponseSellerDto, updatedSeller, { excludeExtraneousValues: true });
   }
 }

@@ -14,9 +14,9 @@ const ProductCardSeller: React.FC<ProductCardSellerProps> = ({ product, onEdit }
       <div className="border rounded-lg p-0 shadow hover:shadow-xl transition-all duration-300 h-70 w-full overflow-hidden bg-[var(--linne-purple)]">
         {/* Image Section */}
         <div className="relative h-48 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 overflow-hidden">
-          {product.hero_image_url ? (
+          {product.heroImageUrl ? (
             <img
-              src={product.hero_image_url}
+              src={product.heroImageUrl}
               alt={product.name}
               className="w-full h-full object-cover"
             />

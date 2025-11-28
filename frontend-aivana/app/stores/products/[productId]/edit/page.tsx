@@ -111,7 +111,7 @@ export default function EditProductPage() {
       await deleteProductImageAction(imageId);
       
       // อัปเดต UI
-      setDetailImages(prev => prev.filter(img => img.image_id !== imageId));
+      setDetailImages(prev => prev.filter(img => img.imageId !== imageId));
       
       console.log(`Deleted image: ${imageId}`);
     } catch (error) {
