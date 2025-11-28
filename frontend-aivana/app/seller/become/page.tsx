@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { becomeSeller } from "@/lib/actions/seller.actions";
-import { saveAuthData, getAuthData } from "@/lib/actions/auth.actions";
+import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
 
 const SOCIAL_PLATFORMS = [
   { value: "github", label: "GitHub" },
@@ -63,12 +63,10 @@ export default function BecomeSellerPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
 
-  // Get selected platforms to filter out from available options
   const getSelectedPlatforms = () => {
     return formData.socialLinks.map((link) => link.platform).filter(Boolean);
   };
 
-  // Get available platforms for a specific index
   const getAvailablePlatforms = (currentIndex: number) => {
     const selectedPlatforms = getSelectedPlatforms();
     const currentPlatform = formData.socialLinks[currentIndex].platform;
@@ -219,8 +217,8 @@ export default function BecomeSellerPage() {
         bankAccountName: formData.bankAccountName,
       };
 
-      const authData = getAuthData();
-      if (!authData.accessToken || !authData.user) {
+      const user = getCurrentUserFromToken();
+      if (!user) {
         throw new Error("Not authenticated");
       }
 
@@ -229,7 +227,8 @@ export default function BecomeSellerPage() {
 
       // Update user role in localStorage
       const updatedUser = {
-        ...authData.user,
+        id: user.sub,
+        username: user.username,
         role: "seller",
       };
       localStorage.setItem("user", JSON.stringify(updatedUser));

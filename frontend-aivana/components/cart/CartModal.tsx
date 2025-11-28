@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getCart, removeFromCart } from "@/lib/actions/cart.actions";
-import { getAuthData } from "@/lib/actions/auth.actions";
 import { GetCartResponse } from "@/lib/types/cart/GetCart";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
+import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
 
 interface CartModalProps {
   isOpen: boolean;
@@ -21,12 +21,12 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
   const fetchCart = async () => {
     try {
       setLoading(true);
-      const authData = getAuthData();
-      if (!authData.user) {
+      const user = getCurrentUserFromToken();
+      if (!user) {
         setCartData(null);
         return;
       }
-      const data = await getCart(authData.user.id);
+      const data = await getCart(user.sub);
       setCartData(data);
     } catch (error) {
       console.error("Failed to fetch cart:", error);
@@ -38,11 +38,10 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
   const handleRemoveItem = async (productId: number) => {
     try {
       setRemovingItemId(productId);
-      const authData = getAuthData();
-      if (!authData.user) return;
+      const user = getCurrentUserFromToken();
+      if (!user) return;
 
-      await removeFromCart(authData.user.id, productId);
-      // Refresh cart after removing
+      await removeFromCart(user.sub, productId);
       await fetchCart();
     } catch (error) {
       console.error("Failed to remove item:", error);
@@ -64,9 +63,11 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
     };
   }, [isOpen]);
 
-const total =
-  cartData?.items.reduce((sum, item) => sum + Number(item.product.price), 0) ||
-  0;
+  const total =
+    cartData?.items.reduce(
+      (sum, item) => sum + Number(item.product.price),
+      0
+    ) || 0;
 
   if (!isOpen) return null;
 

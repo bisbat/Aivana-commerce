@@ -1,14 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Product } from "@/lib/types/product/Product";
-import { Navbar } from "@/components/layout/Navbar";
-import { formatPrice, formatPriceWithCurrency } from "@/lib/utils/formatPrice";
+import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { Loader } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
 import { addToCart } from "@/lib/actions/cart.actions";
-import { getAuthData } from "@/lib/actions/auth.actions";
+import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
 
 interface DetailImage {
   imageId: string;
@@ -37,8 +36,8 @@ export default function ProductDetailPage() {
     try {
       setAddingToCart(true);
 
-      const authData = getAuthData();
-      if (!authData.user) {
+      const user = getCurrentUserFromToken();
+      if (!user) {
         setToast({
           show: true,
           message: "กรุณาเข้าสู่ระบบก่อนเพิ่มสินค้าลงตะกร้า",
@@ -52,7 +51,7 @@ export default function ProductDetailPage() {
       }
 
       await addToCart({
-        userId: authData.user.id,
+        userId: user.sub,
         productId: parseInt(productId),
       });
 
@@ -61,6 +60,7 @@ export default function ProductDetailPage() {
         message: "เพิ่มสินค้าเข้าตะกร้าสำเร็จ!",
         type: "success",
       });
+
       setTimeout(
         () => setToast({ show: false, message: "", type: "success" }),
         3000

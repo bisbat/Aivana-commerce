@@ -1,4 +1,4 @@
-import { getAuthData } from "./auth.actions";
+import { getCurrentUserFromToken } from "./auth.actions";
 
 export interface CreateSellerRequest {
   bio: string;
@@ -32,14 +32,13 @@ export interface SellerInfo {
 export async function becomeSeller(
   data: CreateSellerRequest
 ): Promise<SellerProfile> {
-  const authData = getAuthData();
-
-  if (!authData.accessToken || !authData.user) {
+  const user = getCurrentUserFromToken();
+  if (!user) {
     throw new Error("User is not authenticated");
   }
 
   const response = await fetch(
-    `http://localhost:3001/sellers/upgrade/${authData.user.id}`,
+    `http://localhost:3001/sellers/upgrade/${user.sub}`,
     {
       method: "POST",
       headers: {

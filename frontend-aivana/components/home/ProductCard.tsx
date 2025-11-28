@@ -8,7 +8,6 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-
   // Convert price string to number for display
   const price = parseFloat(product.price);
 
