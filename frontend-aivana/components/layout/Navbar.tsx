@@ -159,12 +159,6 @@ export const Navbar: React.FC = () => {
               >
                 เข้าสู่ระบบ
               </Link>
-              <Link
-                href="/register"
-                className="px-4 py-2 text-white hover:text-[var(--primary)] transition-colors text-sm font-medium"
-              >
-                ลงทะเบียน
-              </Link>
             </div>
           )}
 
@@ -208,7 +202,7 @@ export const Navbar: React.FC = () => {
                   ตะกร้า
                 </button>
                 <Link
-                  href="/profile"
+                  href={`/seller/${getAuthData().user?.id ?? ""}`}
                   className="block text-white hover:text-[var(--primary)]"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
