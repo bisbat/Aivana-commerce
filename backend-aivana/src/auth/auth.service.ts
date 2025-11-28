@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserRoles } from 'src/constants/user-roles.enum';
 
 type AuthInput = { username: string; password: string };
-type SignInData = { userId: string; username: string; role: UserRoles }; // Added role
+type SignInData = { userId: string; username: string; role: UserRoles, sellerId?: string | null; }; // Added role
 type AuthResult = { accessToken: string }; // Added role
 
 @Injectable()
@@ -39,6 +39,7 @@ export class AuthService {
       userId: user.id,
       username: user.username,
       role: user.role,
+      sellerId: user.sellerProfile?.id ?? null, 
     };
   }
 
@@ -47,7 +48,12 @@ export class AuthService {
       sub: user.userId,
       username: user.username,
       role: user.role,
-    };
+      sellerId: user.sellerId ?? null
+    }
+
+    if (user.role === UserRoles.SELLER && user.sellerId) {
+      tokenPayload.sellerId = user.sellerId;
+    }
 
     const accessToken = await this.jwtService.signAsync(tokenPayload);
 
