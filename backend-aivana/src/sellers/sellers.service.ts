@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SellerEntity } from './entities/seller.entity';
-import { Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { UserRoles } from 'src/constants/user-roles.enum';
 import { plainToInstance } from 'class-transformer';
@@ -39,6 +39,7 @@ export class SellersService {
 
     // สร้าง seller profile
     const seller = this.sellerRepository.create();
+    seller.storeName = user.username + "'s Store";
     seller.user = user;
     Object.assign(seller, sellerData);
 
