@@ -13,6 +13,7 @@ export interface UserProfile {
   role: string;
   iat?: number;
   exp?: number;
+  sellerId?: string;
 }
 
 // Helper function to decode JWT token
