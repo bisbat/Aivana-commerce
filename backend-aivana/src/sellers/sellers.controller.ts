@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/
 import { SellersService } from './sellers.service';
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { UpdateSellerDto } from './dto/update-seller.dto';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @Controller('seller')
 export class SellersController {
@@ -20,6 +21,7 @@ export class SellersController {
     return this.sellersService.getAllSellers();
   }
 
+  @Public()
   @Get(':sellerId')
   getSellerById(@Param('sellerId') sellerId: string) {
     return this.sellersService.getSellerById(sellerId);
