@@ -41,9 +41,6 @@ export class CreateSellerDto {
     @Type(() => UserEntity)
     user?: UserEntity;
 
-    @IsString()
-    storeName: string;
-
     @IsOptional()
     @IsString()
     bio?: string;
