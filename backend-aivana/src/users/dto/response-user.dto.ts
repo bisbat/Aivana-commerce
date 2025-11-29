@@ -17,6 +17,12 @@ export class ResponseUserDto {
   lastName?: string;
 
   @Expose()
+  avatarUrl?: string;
+
+  @Expose()
+  role: string;
+
+  @Expose()
   createdAt: Date;
 
   @Expose()

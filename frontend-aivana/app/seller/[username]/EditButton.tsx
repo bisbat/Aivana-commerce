@@ -1,13 +1,13 @@
 'use client';
-export default function EditButton({ username }: { username: string}) {
+export default function EditButton({ sellerId }: { sellerId: string}) {
     const handleEdit = () => {
-        window.location.href = `/seller/${username}/edit`;
+        window.location.href = `/seller/${sellerId}/edit`;
     };
 
     return (
         <button
             onClick={handleEdit}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            className="px-4 py-2 text-sm bg-blue-600 rounded-md hover:bg-blue-700 transition"
         >
             Edit
         </button>

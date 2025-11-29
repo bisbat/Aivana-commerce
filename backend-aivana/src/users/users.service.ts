@@ -10,7 +10,7 @@ import { RegisterDto } from './dto/register.dto';
 import { UserEntity } from './entities/user.entity';
 import { UserRoles } from 'src/constants/user-roles.enum';
 import * as bcrypt from 'bcrypt';
-import { ResponseUserDto } from './dto/response.dto';
+import { ResponseUserDto } from './dto/response-user.dto';
 import { plainToInstance } from 'class-transformer';
 import { AuthService } from 'src/auth/auth.service';
 
