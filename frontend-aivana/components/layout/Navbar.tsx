@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
 import { ProfileModal } from "./ProfileModal";
 import { CartModal } from "../cart/CartModal";
-import { getAuthData } from "@/lib/actions/auth.actions";
+import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
@@ -22,9 +22,9 @@ export const Navbar: React.FC = () => {
 
   // Check authentication status on mount and when pathname changes
   useEffect(() => {
-    const authData = getAuthData();
-    setIsAuthenticated(!!authData.accessToken && !!authData.user);
-    setUserRole(authData.user?.role || null);
+    const user = getCurrentUserFromToken();
+    setIsAuthenticated(!!user);
+    setUserRole(user?.role || null);
   }, [pathname]);
 
   // Show search bar only on product-related pages
@@ -202,7 +202,7 @@ export const Navbar: React.FC = () => {
                   ตะกร้า
                 </button>
                 <Link
-                  href={`/seller/${getAuthData().user?.id ?? ""}`}
+                  href={`/seller/${getCurrentUserFromToken()?.sub ?? ""}`}
                   className="block text-white hover:text-[var(--primary)]"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >

@@ -3,19 +3,20 @@ import {
   Get,
   Post,
   Body,
-  UseGuards,
   Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ResponseUserDto } from './dto/response-user.dto';
 import { plainToInstance } from 'class-transformer';
 import { RegisterDto } from './dto/register.dto';
-import { PassportJwtAuthGuard } from 'src/auth/guards/passport-jwt.guard';
+import { Public } from 'src/common/decorators/public.decorator';
+
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Public()
   @Post('/register')
   create(@Body() registerDto: RegisterDto) {
     return this.usersService.createUser(registerDto);
@@ -30,7 +31,6 @@ export class UsersController {
   }
 
   @Get('profile')
-  @UseGuards(PassportJwtAuthGuard)
   async getProfile(@Request() req) {
     const userId = req.user.sub;
     const user = await this.usersService.findUserById(userId);

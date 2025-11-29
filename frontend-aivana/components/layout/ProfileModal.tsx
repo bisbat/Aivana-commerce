@@ -5,7 +5,6 @@ import Link from "next/link";
 import { User, Store, Settings, LogOut } from "lucide-react";
 import {
   clearAuthData,
-  getAuthData,
   getCurrentUserFromToken,
 } from "@/lib/actions/auth.actions";
 import { useRouter } from "next/navigation";
@@ -41,9 +40,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         return;
       }
 
-      const authData = getAuthData();
-      if (authData.user) {
-        setUserData(authData.user);
+      if (currentUser) {
+        setUserData({
+          id: currentUser.sub,
+          username: currentUser.username,
+          role: currentUser.role,
+        });
       } else {
         // If no user data, redirect to login
         onClose();
@@ -92,7 +94,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         <div>
           {/* โปรไฟล์ของฉัน */}
           <Link
-            href={`/seller/${getAuthData().user?.username ?? ""}`}
+            href={`/seller/${userData?.username ?? ""}`}
             onClick={onClose}
             className="flex items-center gap-3 px-6 py-3 text-white hover:bg-slate-700 transition-colors"
           >

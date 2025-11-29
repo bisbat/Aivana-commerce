@@ -1,20 +1,19 @@
 "use server";
-import { getAuthData } from "./auth.actions";
 import { SellerProfile } from "../types/user.ts/sellerProfile";
 import { CreateSellerProfileDto } from "../types/user.ts/sellerCreate";
 import { Product } from "../types/product/Product";
+import { getCurrentUserFromToken } from "./auth.actions";
 
 export async function becomeSeller(
   data: CreateSellerProfileDto
 ): Promise<SellerProfile> {
-  const authData = getAuthData();
-
-  if (!authData.accessToken || !authData.user) {
+  const user = getCurrentUserFromToken();
+  if (!user) {
     throw new Error("User is not authenticated");
   }
 
   const response = await fetch(
-    `http://localhost:3001/seller/upgrade/${authData.user.id}`,
+    `http://localhost:3001/sellers/upgrade/${user.sub}`,
     {
       method: "POST",
       headers: {
