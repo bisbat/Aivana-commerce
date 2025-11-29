@@ -13,7 +13,7 @@ export async function becomeSeller(
   }
 
   const response = await fetch(
-    `http://localhost:3001/sellers/upgrade/${user.sub}`,
+    `http://localhost:3001/seller/upgrade/${user.sub}`,
     {
       method: "POST",
       headers: {
@@ -52,7 +52,7 @@ export async function getProductsBySellerId(
 }
 
 export async function getSellerById(sellerId: string): Promise<SellerProfile> {
-  const response = await fetch(`http://localhost:3001/sellers/${sellerId}`, {
+  const response = await fetch(`http://localhost:3001/seller/${sellerId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
