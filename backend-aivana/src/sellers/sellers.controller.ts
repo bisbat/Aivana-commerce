@@ -3,7 +3,7 @@ import { SellersService } from './sellers.service';
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { UpdateSellerDto } from './dto/update-seller.dto';
 
-@Controller('sellers')
+@Controller('seller')
 export class SellersController {
   constructor(private readonly sellersService: SellersService) {}
 
@@ -20,9 +20,9 @@ export class SellersController {
     return this.sellersService.getAllSellers();
   }
 
-  @Get(':username')
-  getSellerById(@Param('username') username: string) {
-    return this.sellersService.getSellerByUsername(username);
+  @Get(':sellerId')
+  getSellerById(@Param('sellerId') sellerId: string) {
+    return this.sellersService.getSellerById(sellerId);
   }
 
   @Get(':sellerId/products')

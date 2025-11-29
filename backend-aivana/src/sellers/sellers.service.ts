@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SellerEntity } from './entities/seller.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { UserRoles } from 'src/constants/user-roles.enum';
 import { plainToInstance } from 'class-transformer';
@@ -16,7 +16,7 @@ export class SellersService {
     private readonly sellerRepository: Repository<SellerEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-  ) {}
+  ) { }
 
   async upgradeToSeller(
     userId: string,
@@ -40,19 +40,13 @@ export class SellersService {
     // สร้าง seller profile
     const seller = this.sellerRepository.create();
     seller.user = user;
-    seller.bio = sellerData.bio;
-    seller.location = sellerData.location;
-    seller.skills = sellerData.skills;
-    seller.tools = sellerData.tools;
-    seller.socialLinks = sellerData.socialLinks;
-    seller.bankName = sellerData.bankName;
-    seller.bankAccountNumber = sellerData.bankAccountNumber;
-    seller.bankAccountName = sellerData.bankAccountName;
+    Object.assign(seller, sellerData);
 
     const savedSeller = await this.sellerRepository.save(seller);
 
     // อัพเดท user role และ link seller profile
-    user.role = UserRoles.SELLER;
+    user.role =
+      UserRoles.SELLER;
     user.sellerProfile = savedSeller;
     await this.userRepository.save(user);
 
@@ -76,20 +70,20 @@ export class SellersService {
     );
   }
 
-  async getSellerByUsername(
-    username: string,
-  ): Promise<ResponseSellerDto | null> {
-    const seller = await this.sellerRepository
-      .createQueryBuilder('seller')
-      .leftJoinAndSelect('seller.user', 'user')
-      .where('user.username = :username', { username })
-      .leftJoinAndSelect('seller.products', 'products')
-      .getOne();
-    return seller
-      ? plainToInstance(ResponseSellerDto, seller, {
-          excludeExtraneousValues: true,
-        })
-      : null;
+  async getSellerById(sellerId: string): Promise<ResponseSellerDto> {
+    const seller = await this.sellerRepository.findOne({
+      where: { id: sellerId },
+      relations: ['user'],
+    });
+
+    if (!seller) {
+      throw new NotFoundException('Seller not found');
+    }
+
+    return plainToInstance(ResponseSellerDto, seller, {
+      excludeExtraneousValues: true,
+    });
+
   }
 
   async updateSellerProfile(sellerId: string, updateData: UpdateSellerDto): Promise<ResponseSellerDto> {
@@ -97,7 +91,7 @@ export class SellersService {
     if (!seller) {
       throw new Error('Seller not found');
     }
-    if(updateData.user) {
+    if (updateData) {
       Object.assign(seller.user, updateData.user);
       await this.userRepository.save(seller.user);
     }
@@ -110,12 +104,13 @@ export class SellersService {
     const seller = await this.sellerRepository.findOne({
       where: { id: sellerId },
       relations: [
-        'products', 
-        'products.category', 
-        'products.productImages', 
+        'products',
+        'products.category',
+        'products.productImages',
         'products.tags'
       ],
     });
     return seller ? seller.products : [];
   }
+
 }

@@ -28,8 +28,7 @@ export class UserEntity {
   @Column({ type: 'enum', enum: UserRoles, default: UserRoles.CUSTOMER })
   role: UserRoles;
 
-  @OneToOne(() => SellerEntity, (seller) => seller.user, { nullable: true })
-  @JoinColumn({ name: 'sellerId' })
+  @OneToOne(() => SellerEntity, (seller) => seller.user)
   sellerProfile: SellerEntity;
 
   @CreateDateColumn()
