@@ -3,11 +3,33 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface LoginResponse {
+export interface TokenResponse {
   accessToken: string;
 }
 
-export interface UserProfile {
+export interface RegisterRequest {
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  avatar: File | null;
+  password: string;
+}
+
+export interface RegisterResponse {
+  id: string;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
+  accessToken: string;
+}
+
+export interface TokenPayload {
   sub: string;
   username: string;
   role: string;
@@ -17,7 +39,7 @@ export interface UserProfile {
 }
 
 // Helper function to decode JWT token
-export function decodeJWT(token: string): UserProfile {
+export function decodeJWT(token: string): TokenPayload {
   try {
     const base64Url = token.split(".")[1];
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");

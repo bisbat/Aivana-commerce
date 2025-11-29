@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { Cart } from './entities/cart.entity';
 import { CartItem } from './entities/cart-item.entity';
+import { plainToInstance } from 'class-transformer';
+import { CartResponseDto } from './dto/response-cart.dto';
 
 @Injectable()
 export class CartService {
@@ -55,25 +57,51 @@ export class CartService {
   /**
    * Get cart by user ID with all items and product details
    */
-  async getCartByUserId(userId: string) {
+  async getCartByUserId(userId: string): Promise<CartResponseDto> {
     const cart = await this.cartRepository.findOne({
       where: { userId },
-      relations: ['items', 'items.product'],
+      relations: [
+        'items',
+        'items.product',
+        'items.product.seller',
+        'items.product.seller.user',
+      ],
     });
 
     if (!cart) {
-      return {
+      return plainToInstance(CartResponseDto, {
         message: 'Cart not found for user',
-        cart: null,
+        cartId: 0,
+        userId,
         items: [],
-      };
+        totalItems: 0,
+      });
     }
 
-    return {
+    const cartData = {
       message: 'Cart retrieved successfully',
-      ...cart,
+      cartId: cart.cartId,
+      userId: cart.userId,
       totalItems: cart.items.length,
+      items: cart.items.map((item) => ({
+        cartItemId: item.cartItemId,
+        cartId: item.cartId,
+        product: {
+          id: item.product.id,
+          name: item.product.name,
+          price: item.product.price,
+          heroImageUrl: item.product.heroImageUrl,
+          seller: {
+            id: item.product.seller.id,
+            firstName: item.product.seller.user.firstName,
+            lastName: item.product.seller.user.lastName,
+          },
+        },
+      })),
     };
+
+    // ลบ excludeExtraneousValues ออก
+    return plainToInstance(CartResponseDto, cartData);
   }
 
   async removeFromCart(userId: string, productId: number) {

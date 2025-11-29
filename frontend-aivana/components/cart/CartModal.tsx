@@ -113,7 +113,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
                       key={item.cartItemId}
                       className="bg-white rounded-lg p-3 flex items-center gap-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                       onClick={() => {
-                        router.push(`/products/${item.productId}`);
+                        router.push(`/products/${item.product.id}`);
                         onClose();
                       }}
                     >
@@ -150,13 +150,13 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleRemoveItem(item.productId);
+                          handleRemoveItem(item.product.id);
                         }}
-                        disabled={removingItemId === item.productId}
+                        disabled={removingItemId === item.product.id}
                         className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Remove item"
                       >
-                        {removingItemId === item.productId ? (
+                        {removingItemId === item.product.id ? (
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
                         ) : (
                           <svg

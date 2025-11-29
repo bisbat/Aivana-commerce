@@ -1,6 +1,7 @@
 import { Controller, Post, Body, Get, Param, Delete } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
+import { CartResponseDto } from './dto/response-cart.dto';
 
 @Controller('cart')
 export class CartController {
@@ -12,7 +13,8 @@ export class CartController {
   }
 
   @Get('user/:userId')
-  getCartByUserId(@Param('userId') userId: string) {
+  getCartByUserId(@Param('userId') userId: string): Promise<CartResponseDto> {
+    // ← เปลี่ยนจาก CartItemDto[]
     return this.cartService.getCartByUserId(userId);
   }
 

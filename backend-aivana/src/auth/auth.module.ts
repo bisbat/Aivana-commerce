@@ -7,6 +7,7 @@ import { PassportAuthController } from './passport-auth.controller';
 import { LocalStrategy } from 'src/common/strategies/local.strategy';
 import { JwtStrategy } from 'src/common/strategies/jwt.strategy';
 import { UsersModule } from 'src/users/users.module';
+import { MinioModule } from 'src/minio/minio.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UsersModule } from 'src/users/users.module';
     }),
     PassportModule,
     forwardRef(() => UsersModule),
+    MinioModule,
   ],
   controllers: [PassportAuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy],

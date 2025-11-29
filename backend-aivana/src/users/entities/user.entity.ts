@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { UserRoles } from 'src/constants/user-roles.enum';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
 
@@ -16,15 +25,15 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 100, unique: true })
   username: string;
 
-  @Column({ type: 'varchar', length: 100, })
+  @Column({ type: 'varchar', length: 100 })
   firstName: string;
 
   @Column({ type: 'varchar', length: 100 })
   lastName: string;
 
-  @Column({ nullable: true })
-  avatarUrl: string;
-
+  @Column({ type: 'text', nullable: true })
+  avatarUrl: string | null;
+  
   @Column({ type: 'enum', enum: UserRoles, default: UserRoles.CUSTOMER })
   role: UserRoles;
 

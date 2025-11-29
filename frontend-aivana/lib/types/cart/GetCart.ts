@@ -12,9 +12,10 @@ export interface GetCartResponse {
       price: number;
       heroImageUrl: string;
       seller?: {
+        id: string;
         firstName: string;
         lastName: string;
-      };
+      } | null;
     };
   }>;
   totalItems: number;

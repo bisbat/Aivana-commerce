@@ -8,14 +8,18 @@ export interface Product {
   name: string;
   uploadedFilePath: string;
   description: string;
-  price: string;
+  price: number;
   blurb: string;
   installationGuide: string;
   previewUrl: string | null;
   heroImageUrl: string | null;
   features: string[];
   compatibility: string[];
-  sellerId: string;
+  seller: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  } | null;
   category: Category;
   createdAt: string;
   detailImages: ProductImages[];

@@ -1,13 +1,11 @@
 import {
   LoginRequest,
-  LoginResponse,
-  UserProfile,
+  TokenResponse,
+  TokenPayload,
   decodeJWT,
 } from "@/lib/types/auth";
 
-export async function login(
-  data: LoginRequest
-): Promise<{ token: LoginResponse; user: UserProfile }> {
+export async function login(data: LoginRequest): Promise<TokenResponse> {
   const response = await fetch("http://localhost:3001/auth/login", {
     method: "POST",
     headers: {
@@ -20,18 +18,41 @@ export async function login(
     throw new Error("Login failed");
   }
 
-  const result: LoginResponse = await response.json();
-  const userInfo = decodeJWT(result.accessToken);
+  const result: TokenResponse = await response.json();
 
-  return { token: result, user: userInfo };
+  return result;
 }
 
 export function saveAuthData(token: string): void {
   localStorage.setItem("accessToken", token);
+  window.dispatchEvent(new Event("authStateChanged"));
 }
 
 export function clearAuthData(): void {
   localStorage.removeItem("accessToken");
+  window.dispatchEvent(new Event("authStateChanged"));
+}
+
+export async function register(data: FormData): Promise<TokenResponse> {
+  const response = await fetch("http://localhost:3001/auth/register", {
+    method: "POST",
+    headers:
+      data instanceof FormData
+        ? {}
+        : {
+            "Content-Type": "application/json",
+          },
+    body: data instanceof FormData ? data : JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Registration failed");
+  }
+
+  const result: TokenResponse = await response.json();
+
+  return result; // ← return โดยตรง ไม่ wrap ใน object
 }
 
 export function getAuthData(): {
@@ -44,7 +65,7 @@ export function getAuthData(): {
   };
 }
 
-export function getCurrentUserFromToken(): UserProfile | null {
+export function getCurrentUserFromToken(): TokenPayload | null {
   const accessToken = localStorage.getItem("accessToken");
 
   if (!accessToken) {

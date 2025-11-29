@@ -8,16 +8,12 @@ import {
   getCurrentUserFromToken,
 } from "@/lib/actions/auth.actions";
 import { useRouter } from "next/navigation";
+import { getUserByUserId } from "@/lib/actions/user.actions";
+import { UserProfile } from "@/lib/types/user.ts/user";
 
 interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-}
-
-interface UserData {
-  id: string;
-  username: string;
-  role: string;
 }
 
 export const ProfileModal: React.FC<ProfileModalProps> = ({
@@ -25,31 +21,28 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   onClose,
 }) => {
   const router = useRouter();
-  const [userData, setUserData] = useState<UserData | null>(null);
+  const [userData, setUserData] = useState<UserProfile | null>(null);
 
   useEffect(() => {
+    const fetchUser = async (userId: string) => {
+      const profile = await getUserByUserId(userId);
+      if (profile) {
+        setUserData(profile);
+      }
+    };
+
     if (isOpen) {
-      // Validate token first
       const currentUser = getCurrentUserFromToken();
 
       if (!currentUser) {
-        // Token expired or invalid, clear data and redirect
         clearAuthData();
         onClose();
         router.push("/login");
         return;
       }
 
-      if (currentUser) {
-        setUserData({
-          id: currentUser.sub,
-          username: currentUser.username,
-          role: currentUser.role,
-        });
-      } else {
-        // If no user data, redirect to login
-        onClose();
-        router.push("/login");
+      if (currentUser?.sub) {
+        fetchUser(currentUser.sub);
       }
     }
   }, [isOpen, router, onClose]);
@@ -76,9 +69,21 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         {/* Profile Section */}
         <div className="p-4 text-center border-slate-600">
           {/* Avatar */}
-          <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-[var(--background)] border-2 border-slate-500 flex items-center justify-center overflow-hidden">
-            <User size={48} className="text-slate-300" />
-          </div>
+            <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-[var(--background)] border-2 border-slate-500 flex items-center justify-center overflow-hidden">
+            {userData?.avatarUrl ? (
+              <img
+              src={userData.avatarUrl}
+              alt="Avatar"
+              className="w-full h-full object-cover"
+              />
+            ) : userData?.username ? (
+              <span className="text-3xl font-bold text-slate-300">
+              {userData.username.charAt(0).toUpperCase()}
+              </span>
+            ) : (
+              <User size={48} className="text-slate-300" />
+            )}
+            </div>
 
           {/* User Info */}
           <h3 className="text-xl font-bold text-white mb-1">
