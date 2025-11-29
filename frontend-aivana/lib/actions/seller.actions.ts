@@ -32,7 +32,8 @@ export async function becomeSeller(
 }
 
 export async function getProductsBySellerId(
-  sellerId: string
+  sellerId: string,
+  token: string 
 ): Promise<Product[]> {
   const response = await fetch(
     `http://localhost:3001/seller/${sellerId}/products`,
@@ -40,9 +41,11 @@ export async function getProductsBySellerId(
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`, 
       },
     }
   );
+
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || "Failed to fetch products");
@@ -51,11 +54,13 @@ export async function getProductsBySellerId(
   return await response.json();
 }
 
-export async function getSellerById(sellerId: string): Promise<SellerProfile> {
+
+export async function getSellerById(sellerId: string, token: string): Promise<SellerProfile> {
   const response = await fetch(`http://localhost:3001/seller/${sellerId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`, 
     },
   });
   if (!response.ok) {

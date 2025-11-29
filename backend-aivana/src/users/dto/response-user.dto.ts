@@ -17,10 +17,10 @@ export class ResponseUserDto {
   lastName?: string;
 
   @Expose()
-  role: string;
+  avatarUrl?: string;
 
   @Expose()
-  avatarUrl?: string;
+  role: string;
 
   @Expose()
   createdAt: Date;

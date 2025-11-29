@@ -1,128 +1,139 @@
 'use client';
 import { useState, useEffect } from 'react';
-// import { getSellerProfileAction } from '@/lib/actions/user.actions';
-import { useParams } from 'next/dist/client/components/navigation';
-// import { sellerProfile } from '@/lib/types/user.ts/seller';
-import { ProductGrid } from '@/components/home/ProductGrid';
+import { getSellerById } from '@/lib/actions/seller.actions';
+import { SellerProfile } from '@/lib/types/user.ts/sellerProfile';
 import EditButton from './EditButton';
-
+import { getCurrentUserFromToken, getAuthData } from '@/lib/actions/auth.actions';
+import { ProductGrid } from '@/components/home/ProductGrid';
+import { getProductsBySellerId } from '@/lib/actions/seller.actions';
+import { Product } from '@/lib/types/product/Product';
 
 export default function SellerProfilePage() {
-
-    const params = useParams();
-    const username = Array.isArray(params.username)
-        ? params.username[0]
-        : params.username;
-
-    const [seller, setSeller] = useState<sellerProfile | null>(null);
+    const sellerId = getCurrentUserFromToken()?.sellerId;
+    const [seller, setSeller] = useState<SellerProfile | null>(null);
+    const [products, setProducts] = useState<Product[]>([]);
 
     useEffect(() => {
         async function fetchData() {
-            if (!username) return;
-            const profileData = await getSellerProfileAction(username);
+            if (!sellerId) return;
+            const token = getAuthData()?.accessToken;
+            if (!token) return;
+
+            const profileData = await getSellerById(sellerId, token);
             setSeller(profileData);
+
+            const productsData = await getProductsBySellerId(sellerId, token);
+            setProducts(productsData);
         }
         fetchData();
-    }, [username]);
+    }, [sellerId]);
 
     if (!seller) return <div>Loading...</div>;
 
     return (
-        <div className="min-h-screen p-6">
-            {/* Profile Card */}
-            <div className="max-w-5xl mx-auto shadow-md rounded-xl p-6 border border-[var(--linne-purple)]">
-                {/* Header */}
-                <div className="flex justify-between items-start">
-                    <div className='flex items-center gap-6'>
-                        <div className="w-20 h-20 bg-[var(--primary)] text-white rounded-full flex items-center justify-center text-2xl font-bold">
-                            {seller.user.firstName}
-                        </div>
+        <div className="p-8 max-w-6xl mx-auto space-y-8">
 
-                        <div>
-                            <h1 className="text-2xl font-semibold text-white">
-                                {seller.user.firstName} {seller.user.lastName}
-                            </h1>
-                            <p className="text-gray-500">@{seller.user.username}</p>
-                            <p className="mt-2">{seller.bio}</p>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
 
-                            {/* Socials */}
-                            <div className="flex gap-3 mt-3">
-                                {seller.socialLinks?.portfolio && (
-                                    <a
-                                        href={seller.socialLinks.portfolio}
-                                        className="text-[var(--primary)] hover:underline"
-                                    >
-                                        Portfolio
-                                    </a>
-                                )}
-                                {seller.socialLinks?.instagram && (
-                                    <a
-                                        href={`https://instagram.com/${seller.socialLinks.instagram.replace(
-                                            "@",
-                                            ""
-                                        )}`}
-                                        className="text-[var(--primary)] hover:underline"
-                                    >
-                                        Instagram
-                                    </a>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+                {/* Left section */}
+                <div className="flex items-center gap-4">
+                    {/* Back Button */}
+                    <button
+                        onClick={() => window.history.back()}
+                        className="px-3 py-1 border rounded-md text-sm text-gray-300 hover:bg-neutral-800 transition"
+                    >
+                        ← Back
+                    </button>
 
+                    {/* Avatar */}
+                    <img
+                        src={seller.user.avatarUrl || '/default-avatar.png'}
+                        className="w-16 h-16 rounded-full object-cover bg-neutral-800"
+                        alt="seller avatar"
+                    />
+
+                    {/* Seller Info */}
                     <div>
-                        {username && <EditButton username={username} />}
+                        <h1 className="text-2xl font-semibold">{seller.storeName}</h1>
+                        <p className="text-gray-400 text-sm">
+                            {seller.user.firstName} {seller.user.lastName} • @{seller.user.username}
+                        </p>
                     </div>
                 </div>
 
-                {/* Location */}
-                <p className="mt-4 text-white">
-                    📍 <span>{seller.location}</span>
-                </p>
+                {/* Right Section Buttons */}
+                <div className="flex items-center gap-3">
 
-                {/* Skills & Tools */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                    <div>
-                        <h3 className="font-semibold text-lg text-white">
-                            Skills
-                        </h3>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {seller.skills?.map((skill: string) => (
-                                <span
-                                    key={skill}
-                                    className="px-3 py-1 bg-[var(--linne-purple)] text-white text-sm rounded-lg"
-                                >
-                                    {skill}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
+                    {/* Contact Button */}
+                    <button className="px-4 py-2 text-sm border rounded-md hover:bg-neutral-800 transition">
+                        Contact
+                    </button>
 
-                    <div>
-                        <h3 className="font-semibold text-lg text-white">
-                            Tools
-                        </h3>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {seller.tools?.map((tool: string) => (
-                                <span
-                                    key={tool}
-                                    className="px-3 py-1 bg-[var(--primary)] text-white text-sm rounded-lg"
-                                >
-                                    {tool}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
+                    {/* Edit Button */}
+                    <EditButton sellerId={seller.id} />
+                </div>
+
+            </div>
+
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="p-4 rounded-xl bg-neutral-900/40">
+                    <p className="text-lg font-semibold">{seller.totalProducts}</p>
+                    <p className="text-gray-400 text-sm">Products</p>
+                </div>
+                <div className="p-4 rounded-xl bg-neutral-900/40">
+                    <p className="text-lg font-semibold">{seller.totalSales}</p>
+                    <p className="text-gray-400 text-sm">Sales</p>
+                </div>
+                <div className="p-4 rounded-xl bg-neutral-900/40">
+                    <p className="text-lg font-semibold">{seller.averageRating}</p>
+                    <p className="text-gray-400 text-sm">Rating</p>
+                </div>
+                <div className="p-4 rounded-xl bg-neutral-900/40">
+                    <p className="text-lg font-semibold">{seller.totalReviews}</p>
+                    <p className="text-gray-400 text-sm">Reviews</p>
                 </div>
             </div>
-            {/* product grid */}
-            <div className="max-w-5xl mx-auto mt-10">
-                <h2 className="text-2xl font-semibold text-white mb-6">Products by {seller.user.firstName}</h2>
-                {seller.products && seller.products.length > 0 ? (
-                    <ProductGrid products={seller.products} />
-                ) : (
-                    <p className="text-gray-500">This seller has no products listed.</p>
-                )}
+
+            {/* About */}
+            <div className="space-y-2">
+                <h2 className="text-xl font-semibold">About</h2>
+                <p className="text-gray-300">{seller.bio}</p>
+            </div>
+
+            {/* Skills */}
+            <div>
+                <h2 className="text-xl font-semibold mb-2">Skills</h2>
+                <div className="flex gap-2 flex-wrap">
+                    {seller.skills.map((skill) => (
+                        <span
+                            key={skill}
+                            className="px-3 py-1 rounded-full bg-neutral-900/60 text-gray-200 text-sm"
+                        >
+                            {skill}
+                        </span>
+                    ))}
+                </div>
+            </div>
+
+            {/* Socials */}
+            <div>
+                <h2 className="text-xl font-semibold mb-2">Socials</h2>
+                <div className="flex gap-4 text-blue-400 underline text-sm">
+                    {Object.entries(seller.socials).map(([key, url]) => (
+                        <a key={key} href={url} target="_blank" rel="noopener noreferrer">
+                            {key}
+                        </a>
+                    ))}
+                </div>
+            </div>
+
+            {/* Products */}
+            <div className="mt-6">
+                <h2 className="text-xl font-semibold mb-4">Products</h2>
+                <ProductGrid products={products} />
             </div>
         </div>
     );
