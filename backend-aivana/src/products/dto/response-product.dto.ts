@@ -2,6 +2,7 @@ import { Expose, Type } from 'class-transformer';
 import { ResponseProductImageDto } from 'src/product-image/dto/response-product-image.dto';
 import { ResponseCategoryDto } from 'src/categories/dto/response-category.dto';
 import { ResponseTagDto } from 'src/tags/dto/response-tag.dto';
+import { MinimalSellerDto } from 'src/sellers/dto/minimal-seller.dto';
 
 export class ResponseProductDto {
   @Expose()
@@ -27,7 +28,8 @@ export class ResponseProductDto {
   @Expose()
   compatibility: Array<string>;
   @Expose()
-  sellerId: string;
+  @Type(() => MinimalSellerDto)
+  seller: MinimalSellerDto;
   @Expose()
   @Type(() => ResponseCategoryDto)
   category: ResponseCategoryDto;

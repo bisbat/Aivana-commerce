@@ -27,44 +27,57 @@ export class ProductsService {
     private sellerRepository: Repository<SellerEntity>,
     @InjectRepository(CategoryEntity)
     private categoryRepository: Repository<CategoryEntity>,
-  ) { }
+  ) {}
 
   async getAllProducts(): Promise<ResponseProductDto[]> {
     const products = await this.productsRepository.find({
-      relations: ['category', 'seller', 'tags', 'productImages'],
+      relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'], // ← เพิ่ม 'seller.user'
     });
 
-    return products.map(product => {
+    return products.map((product) => {
       // Transform productImages to detailImages with URLs
-      const detailImages = product.productImages?.map(image => ({
-        imageId: image.imageId.toString(),
-        url: this.minioService.getFileUrl(image.pathImage)
-      })) || [];
+      const detailImages =
+        product.productImages?.map((image) => ({
+          imageId: image.imageId.toString(),
+          url: this.minioService.getFileUrl(image.pathImage),
+        })) || [];
 
       // Transform tags to ResponseTagDto format
-      const tags = product.tags?.map(tag => ({
-        id: tag.id,
-        name: tag.name
-      })) || [];
+      const tags =
+        product.tags?.map((tag) => ({
+          id: tag.id,
+          name: tag.name,
+        })) || [];
 
       // Transform category to ResponseCategoryDto format
-      const category = product.category ? {
-        id: product.category.id,
-        name: product.category.name
-      } : null;
+      const category = product.category
+        ? {
+            id: product.category.id,
+            name: product.category.name,
+          }
+        : null;
+
+      // Transform seller to MinimalSellerDto format with user data
+      const seller = product.seller
+        ? {
+            id: product.seller.id,
+            firstName: product.seller.user?.firstName,
+            lastName: product.seller.user?.lastName,
+          }
+        : null;
 
       // Prepare data for transformation
       const productData = {
         ...product,
         id: product.id.toString(),
-        sellerId: product.seller?.id,
+        seller, // ← ใช้ seller object ที่ transform แล้ว
         category,
         tags,
-        detailImages
+        detailImages,
       };
 
       return plainToInstance(ResponseProductDto, productData, {
-        excludeExtraneousValues: true
+        excludeExtraneousValues: true,
       });
     });
   }
@@ -72,7 +85,7 @@ export class ProductsService {
   async findOne(productId: number): Promise<ResponseProductDto | null> {
     const product = await this.productsRepository.findOne({
       where: { id: productId },
-      relations: ['category', 'seller', 'tags', 'productImages'],
+      relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'], // ← มีอยู่แล้ว
     });
 
     if (!product) {
@@ -80,35 +93,48 @@ export class ProductsService {
     }
 
     // Transform productImages to detailImages with URLs
-    const detailImages = product.productImages?.map(image => ({
-      imageId: image.imageId.toString(),
-      url: this.minioService.getFileUrl(image.pathImage)
-    })) || [];
+    const detailImages =
+      product.productImages?.map((image) => ({
+        imageId: image.imageId.toString(),
+        url: this.minioService.getFileUrl(image.pathImage),
+      })) || [];
 
     // Transform tags to ResponseTagDto format
-    const tags = product.tags?.map(tag => ({
-      id: tag.id,
-      name: tag.name
-    })) || [];
+    const tags =
+      product.tags?.map((tag) => ({
+        id: tag.id,
+        name: tag.name,
+      })) || [];
 
     // Transform category to ResponseCategoryDto format
-    const category = product.category ? {
-      id: product.category.id,
-      name: product.category.name
-    } : null;
+    const category = product.category
+      ? {
+          id: product.category.id,
+          name: product.category.name,
+        }
+      : null;
+
+    // Transform seller to MinimalSellerDto format with user data
+    const seller = product.seller
+      ? {
+          id: product.seller.id,
+          firstName: product.seller.user?.firstName,
+          lastName: product.seller.user?.lastName,
+        }
+      : null;
 
     // Prepare data for transformation
     const productData = {
       ...product,
       id: product.id.toString(),
-      sellerId: product.seller?.id,
+      seller, // ← ใช้ seller object ที่ transform แล้ว
       category,
       tags,
-      detailImages
+      detailImages,
     };
 
     return plainToInstance(ResponseProductDto, productData, {
-      excludeExtraneousValues: true
+      excludeExtraneousValues: true,
     });
   }
 
@@ -169,7 +195,6 @@ export class ProductsService {
 
     return await this.productsRepository.save(product);
   }
-
 
   async updateHeroImage(
     productId: number,
@@ -266,15 +291,17 @@ export class ProductsService {
     if (!product) return null;
 
     // แปลง productImages → detailImages (เติม URL จาก Minio)
-    const detailImages = product.productImages?.map((image) => ({
-      imageId: image.imageId.toString(),
-      url: this.minioService.getFileUrl(image.pathImage),
-    })) || [];
+    const detailImages =
+      product.productImages?.map((image) => ({
+        imageId: image.imageId.toString(),
+        url: this.minioService.getFileUrl(image.pathImage),
+      })) || [];
 
-    const tags = product.tags?.map(tag => ({
-      id: tag.id,
-      name: tag.name
-    })) || [];
+    const tags =
+      product.tags?.map((tag) => ({
+        id: tag.id,
+        name: tag.name,
+      })) || [];
 
     // inject detailImages เข้าไปใน product object และแปลงข้อมูล
     const productWithDetailImages = {
@@ -290,7 +317,6 @@ export class ProductsService {
       excludeExtraneousValues: true,
     });
   }
-
 
   async createProductWithFiles(
     createProductDto: CreateProductDto,
@@ -329,10 +355,15 @@ export class ProductsService {
      * 3. Upload product file (.zip)
      * ------------------------------------------------------ */
     const productFile = files.productFile[0];
-    const fileExtension = productFile.originalname.split('.').pop()?.toLowerCase();
+    const fileExtension = productFile.originalname
+      .split('.')
+      .pop()
+      ?.toLowerCase();
 
     if (fileExtension !== 'zip') {
-      throw new Error(`Invalid file type. Only .zip allowed. Received .${fileExtension}`);
+      throw new Error(
+        `Invalid file type. Only .zip allowed. Received .${fileExtension}`,
+      );
     }
 
     const fileTimestamp = Date.now();
@@ -401,7 +432,6 @@ export class ProductsService {
       detailImages?: UploadedFileType[];
     },
   ): Promise<{ product: ResponseProductDto | null }> {
-
     /* ------------------------------------------------------
      * 1. Update basic product fields first
      * ------------------------------------------------------ */
@@ -436,10 +466,15 @@ export class ProductsService {
      * ------------------------------------------------------ */
     if (files?.productFile?.length) {
       const productFile = files.productFile[0];
-      const fileExtension = productFile.originalname.split('.').pop()?.toLowerCase();
+      const fileExtension = productFile.originalname
+        .split('.')
+        .pop()
+        ?.toLowerCase();
 
       if (fileExtension !== 'zip') {
-        throw new Error(`Invalid file type. Only .zip allowed. Received .${fileExtension}`);
+        throw new Error(
+          `Invalid file type. Only .zip allowed. Received .${fileExtension}`,
+        );
       }
 
       const timestamp = Date.now();
@@ -511,8 +546,8 @@ export class ProductsService {
     return {
       product: updatedProduct
         ? plainToInstance(ResponseProductDto, updatedProduct, {
-          excludeExtraneousValues: true,
-        })
+            excludeExtraneousValues: true,
+          })
         : null,
     };
   }

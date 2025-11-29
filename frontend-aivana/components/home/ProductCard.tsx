@@ -2,15 +2,13 @@
 
 import Link from "next/link";
 import { Product } from "@/lib/types/product/Product";
+import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  // Convert price string to number for display
-  const price = parseFloat(product.price);
-
   return (
     <Link href={`/products/${product.id}`}>
       <div className="group cursor-pointer">
@@ -39,7 +37,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           {/* Creator & Category */}
           <div className="flex items-center gap-2 text-sm text-slate-400">
-            <span>{product.sellerId}</span>
+            <span>
+              {product.seller?.firstName} {product.seller?.lastName}
+            </span>
             {product.category && (
               <>
                 <span>•</span>
@@ -52,7 +52,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           {/* Price */}
           <div className="flex items-center justify-between">
-            <span className="text-white font-bold text-lg">{price}฿</span>
+            <span className="text-white font-bold text-lg">
+              {formatPriceWithCurrency(product.price)}
+            </span>
           </div>
         </div>
       </div>
