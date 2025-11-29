@@ -1,10 +1,8 @@
 import { Expose, Type } from "class-transformer";
 import { ResponseUserDto } from "src/users/dto/response-user.dto";
-import { ProductEntity } from "src/products/entities/product.entity";
 import { ResponseProductDto } from "src/products/dto/response-product.dto";
 
 export class ResponseSellerDto {
-
   @Expose()
   id: string;
 
@@ -13,32 +11,48 @@ export class ResponseSellerDto {
   user: ResponseUserDto;
 
   @Expose()
+  storeName: string;
+
+  @Expose()
   bio?: string;
 
   @Expose()
   location?: string;
 
   @Expose()
-  skills?: string[];
-
-  @Expose()
-  tools?: string[];
-
-  @Expose()
-  socialLinks?: Record<string, string>;
-
-  @Expose()
   @Type(() => ResponseProductDto)
   products: ResponseProductDto[];
 
   @Expose()
-  bankName: string;
+  totalProducts: number;
 
   @Expose()
-  bankAccountNumber: string;
+  totalSales: number;
 
   @Expose()
-  bankAccountName: string;
+  averageRating: number;
+
+  @Expose()
+  totalReviews: number;
+
+  @Expose()
+  skills?: string[];
+
+  @Expose()
+  socials?: {
+    instagram?: string;
+    facebook?: string;
+    tiktok?: string;
+    github?: string;
+    linkedin?: string;
+  };
+
+  @Expose()
+  bankInfo?: {
+    bankName: string;
+    accountNumber: string;
+    accountName: string;
+  };
 
   @Expose()
   createdAt: Date;

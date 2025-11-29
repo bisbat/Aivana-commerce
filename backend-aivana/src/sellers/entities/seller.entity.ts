@@ -11,29 +11,45 @@ export class SellerEntity {
     @JoinColumn({ name: 'userId' })
     user: UserEntity;
 
-    @Column({ type: 'text', nullable: true })
-    bio?: string;
+    @Column({ nullable: false })
+    storeName: string;
+
+    @Column({ type: "text", nullable: true })
+    bio: string;
 
     @Column({ nullable: true })
-    location?: string;
+    location: string;
 
-    @Column('simple-array', { nullable: true })
-    skills?: string[];
+    @Column({ type: "int", default: 0 })
+    totalProducts: number;
 
-    @Column('simple-array', { nullable: true })
-    tools?: string[];
+    @Column({ type: "int", default: 0 })
+    totalSales: number;
 
-    @Column('json', { nullable: true })
-    socialLinks?: Record<string, string>;
+    @Column({ type: "float", default: 0 })
+    averageRating: number;
 
-    @Column({ nullable: false })
-    bankName: string;
+    @Column({ type: "int", default: 0 })
+    totalReviews: number;
 
-    @Column({ nullable: false })
-    bankAccountNumber: string;
+    @Column({ type: "text", array: true, default: [] })
+    skills: string[];
 
-    @Column({ nullable: false })
-    bankAccountName: string; 
+    @Column({ type: 'jsonb', nullable: true })
+    socials: {
+        instagram?: string;
+        facebook?: string;
+        tiktok?: string;
+        github?: string;
+        linkedin?: string;
+    };
+
+    @Column({ type: 'jsonb', nullable: true })
+    bankInfo: {
+        bankName: string;
+        accountNumber: string;
+        accountName: string;
+    };
 
     @OneToMany(() => ProductEntity, (product) => product.seller)
     products: ProductEntity[];

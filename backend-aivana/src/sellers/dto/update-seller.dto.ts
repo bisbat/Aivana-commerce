@@ -1,34 +1,94 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateSellerDto } from './create-seller.dto';
-import { IsOptional, IsString, IsArray, IsObject } from 'class-validator';
-import { updateUserDto } from 'src/users/dto/update-user.dto';
+import { IsString, IsOptional, IsArray, IsNumber, IsUrl, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+import { UserEntity } from 'src/users/entities/user.entity';
 
-export class UpdateSellerDto {
+class SocialsDto {
     @IsOptional()
-    @IsObject()
-    user: updateUserDto;
+    @IsUrl()
+    instagram?: string;
+
     @IsOptional()
-    @IsString()
-    bio?: string;
+    @IsUrl()
+    facebook?: string;
+
     @IsOptional()
-    @IsString()
-    location?: string;
+    @IsUrl()
+    tiktok?: string;
+
     @IsOptional()
-    @IsArray()
-    skills?: string[];
+    @IsUrl()
+    github?: string;
+
     @IsOptional()
-    @IsArray()
-    tools?: string[];
-    @IsOptional()
-    @IsObject()
-    socialLinks?: Record<string, string>;
+    @IsUrl()
+    linkedin?: string;
+}
+
+class BankInfoDto {
     @IsOptional()
     @IsString()
     bankName?: string;
+
     @IsOptional()
     @IsString()
-    bankAccountNumber?: string;
+    accountNumber?: string;
+
     @IsOptional()
     @IsString()
-    bankAccountName?: string;
+    accountName?: string;
+}
+
+export class UpdateSellerDto {
+
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => UserEntity)
+    user?: UserEntity;
+
+    @IsOptional()
+    @IsString()
+    storeName?: string;
+
+    @IsOptional()
+    @IsString()
+    bio?: string;
+
+    @IsOptional()
+    @IsString()
+    location?: string;
+
+    @IsOptional()
+    @IsUrl()
+    avatar?: string;
+
+    @IsOptional()
+    @IsArray()
+    @IsString({ each: true })
+    skills?: string[];
+
+    @IsOptional()
+    @IsNumber()
+    totalProducts?: number;
+
+    @IsOptional()
+    @IsNumber()
+    totalSales?: number;
+
+    @IsOptional()
+    @IsNumber()
+    averageRating?: number;
+
+    @IsOptional()
+    @IsNumber()
+    totalReviews?: number;
+
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => SocialsDto)
+    socials?: SocialsDto;
+
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => BankInfoDto)
+    bankInfo?: BankInfoDto;
 }
