@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getSellerProfileAction } from '@/lib/actions/user.actions';
+// import { getSellerProfileAction } from '@/lib/actions/user.actions';
 import { useParams } from 'next/dist/client/components/navigation';
-import { sellerProfile } from '@/lib/types/user.ts/seller';
+// import { sellerProfile } from '@/lib/types/user.ts/seller';
 import { ProductGrid } from '@/components/home/ProductGrid';
 import EditButton from './EditButton';
 

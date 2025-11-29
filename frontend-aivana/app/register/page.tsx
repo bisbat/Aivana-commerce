@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import { register, saveAuthData } from "@/lib/actions/auth.actions";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
@@ -131,7 +131,6 @@ export default function RegisterPage() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -140,27 +139,34 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/auth/register', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     firstName: formData.firstName,
-      //     lastName: formData.lastName,
-      //     email: formData.email,
-      //     password: formData.password,
-      //   }),
-      // });
+      const formPayload = new FormData();
+      formPayload.append("firstName", formData.firstName);
+      formPayload.append("lastName", formData.lastName);
+      formPayload.append("username", formData.username);
+      formPayload.append("email", formData.email);
+      formPayload.append("password", formData.password);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      if (fileInputRef.current?.files?.[0]) {
+        formPayload.append("avatar", fileInputRef.current.files[0]);
+      }
 
-      // Mock success
-      console.log("Register data:", formData);
-      router.push("/login");
-    } catch (error) {
-      console.error("Registration error:", error);
-      setErrors({ submit: "เกิดข้อผิดพลาดในการสมัครสมาชิก" });
+      const tokenResponse = await register(formPayload);
+
+      saveAuthData(tokenResponse.accessToken);
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      router.push("/");
+    } catch (error: any) {
+      console.error("Register error:", error);
+
+      if (error.message) {
+        setErrors({ submit: error.message });
+      } else {
+        setErrors({
+          submit: "เกิดข้อผิดพลาดในการสมัครสมาชิก กรุณาลองใหม่อีกครั้ง",
+        });
+      }
     } finally {
       setIsLoading(false);
     }

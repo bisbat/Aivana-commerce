@@ -20,7 +20,6 @@ export default function LoginPage() {
       ...prev,
       [name]: value,
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -52,15 +51,13 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const { token, user } = await login({
+      const tokenResponse = await login({
         username: formData.username,
         password: formData.password,
       });
 
-      // Store token and user data
-      saveAuthData(token.accessToken, user);
+      saveAuthData(tokenResponse.accessToken);
 
-      console.log("Login success:", { token, user });
       router.push("/");
     } catch (error) {
       console.error("Login error:", error);

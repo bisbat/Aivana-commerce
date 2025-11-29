@@ -1,8 +1,8 @@
-import { userProfile } from "./user";
+import { UserProfile } from "./user";
 
 export interface SellerProfile {
   id: string;
-  user: userProfile;
+  user: UserProfile;
   storeName: string;
   bio: string;
   location: string;

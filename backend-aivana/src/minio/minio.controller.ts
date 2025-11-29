@@ -36,22 +36,4 @@ export class MinioController {
       files,
     };
   }
-
-  // @Get(':fileName')
-  // async getFileUrl(@Param('fileName') fileName: string) {
-  //   const url = await this.minioService.getFileUrl(fileName);
-  //   return {
-  //     fileName,
-  //     url,
-  //   };
-  // }
-
-  // @Delete(':fileName')
-  // async deleteFile(@Param('fileName') fileName: string) {
-  //   await this.minioService.deleteFile(fileName);
-  //   return {
-  //     message: 'File deleted successfully',
-  //     fileName,
-  //   };
-  // }
 }

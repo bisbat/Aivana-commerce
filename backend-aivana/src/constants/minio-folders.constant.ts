@@ -33,6 +33,11 @@ export const MINIO_FOLDERS = {
     ROOT: (productId: number | string) => `products/${productId}`,
   },
   USERS: {
-    AVATARS: 'users/avatars',
+    /**
+     * Get avatars folder for a specific user
+     * @param userId - User ID
+     * @returns Path like 'users/{userId}/avatars'
+     */
+    AVATARS: (userId: number | string) => `users/${userId}/avatars`,
   },
 } as const;
