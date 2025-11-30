@@ -3,31 +3,43 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { ProductCardSeller } from "@/components/products/ProductCardSeller";
-import { getAllProductsAction } from "@/lib/actions/product.actions";
 import { Product } from "@/lib/types/product/Product";
 import { Loader, AlertCircle, Package } from "lucide-react";
+import { getProductsBySellerId } from "@/lib/actions/seller.actions";
+import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
+import { getAuthData } from "@/lib/actions/auth.actions";
 
 export default function StorePage() {
   const router = useRouter();
   const pathname = usePathname();
+  const [sellerId, setSellerId] = useState<string | null>(null);
+  const token = getAuthData()?.accessToken || '';
 
   // State for products
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    async function fetchCurrentUser() {
+      const user = await getCurrentUserFromToken();
+      setSellerId(user?.sellerId ?? null);
+    }
+    fetchCurrentUser();
+  }, [])
+
   // Fetch products when component mounts
   useEffect(() => {
     fetchProducts();
-  }, []); // Empty dependency array = run once on mount
+  }, [sellerId]); // Run when sellerId changes
 
   const fetchProducts = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Call your NestJS backend
-      const data = await getAllProductsAction();
+      if (!sellerId) return;
+      const data = await getProductsBySellerId(sellerId,token);
       setProducts(data);
       
     } catch (err) {
@@ -89,7 +101,7 @@ export default function StorePage() {
             <h3 className="text-slate-700 font-bold text-xl mb-2">No Products Yet</h3>
             <p className="text-slate-500 text-sm mb-6">Start by adding your first product</p>
             <button
-              onClick={() => router.push("/products/new")}
+              onClick={() => router.push("stores/products/new")}
               className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
             >
               Add Product
