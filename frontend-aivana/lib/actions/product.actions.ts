@@ -125,7 +125,7 @@ export async function createCompleteProduct(
     formData.append("installationGuide", productInfoData.installationGuide);
     formData.append("previewUrl", productInfoData.previewUrl || "");
     formData.append("categoryId", productInfoData.categoryId.toString());
-    formData.append("ownerId", productInfoData.ownerId.toString());
+    formData.append("sellerId", productInfoData.sellerId.toString());
 
     // Arrays as JSON strings
     formData.append("features", JSON.stringify(productInfoData.features));

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { UploadFileForm } from "@/components/products/UploadFileForm";
 import { ProductForm } from "@/components/products/ProductForm";
@@ -11,9 +11,21 @@ import { ProductInformationFormData } from "@/lib/types/formCreateProduct/Produc
 import { createCompleteProduct } from "@/lib/actions/product.actions";
 import { Loader, CheckCircle, AlertCircle } from "lucide-react";
 import { getAuthData } from "@/lib/actions/auth.actions";
+import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
 
 export default function AddProductPage() {
   const router = useRouter();
+  const [sellerId, setSellerId] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchUser() {
+      const user = await getCurrentUserFromToken();
+      setSellerId(user?.sellerId || null);
+      console.log("Fetched user:", user);
+      console.log("Seller ID:", user?.sellerId);
+    }
+    fetchUser();
+  },[])
 
   // Track current step (1, 2, or 3)
   const [currentStep, setCurrentStep] = useState(1);
@@ -162,6 +174,7 @@ export default function AddProductPage() {
           {/* Step 2: Product Information */}
           {currentStep === 2 && uploadData && (
             <ProductForm
+              sellerId={sellerId ?? ""}
               uploadData={uploadData}
               onNext={handleProductNext}
               onBack={handleBackToStep1}

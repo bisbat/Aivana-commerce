@@ -12,7 +12,7 @@ export interface ProductInformationFormData {
   
     // Always 1 for now — fixed values
     categoryId: number;
-    ownerId: 1;
+    sellerId: string;
     tagIds: number[]; 
   
     features: string[];
