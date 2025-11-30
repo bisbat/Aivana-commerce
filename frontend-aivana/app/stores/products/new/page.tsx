@@ -10,6 +10,7 @@ import { UploadFileFormData } from '@/lib/types/formCreateProduct/UploadFileForm
 import { ProductInformationFormData } from '@/lib/types/formCreateProduct/ProductInformationFormData'
 import { createCompleteProduct } from '@/lib/actions/product.actions';
 import { Loader, CheckCircle, AlertCircle } from 'lucide-react';
+import { getAuthData } from '@/lib/actions/auth.actions';
 
 export default function AddProductPage() {
   const router = useRouter();
@@ -57,11 +58,14 @@ export default function AddProductPage() {
       console.log('Step 2 data:', productData);
       console.log('Step 3 data:', imageData);
 
+      const accessToken = getAuthData()?.accessToken;
+
       // ✨ Single API call with all data
       const createdProduct = await createCompleteProduct(
         uploadData,   // Step 1: file + productType + keywords
         productData,  // Step 2: name, price, description, features, etc.
-        imageData     // Step 3: heroImage + detailImages
+        imageData,
+        accessToken || "",     // Step 3: heroImage + detailImages
       );
 
       console.log('✅ Product created:', createdProduct);

@@ -6,12 +6,14 @@ import { UploadImageFormData } from '../types/formCreateProduct/UploadImageFormD
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-export async function updateProductAction(productId: string, updatedData: any) {
+export async function updateProductAction(productId: string, updatedData: any,accessToken?: string) {
     // ส่งคำขอไปยัง API เพื่ออัปเดตข้อมูลสินค้า
     const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
         method: 'PUT',
         headers: updatedData instanceof FormData ? {} : {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+            
         },
         body: updatedData instanceof FormData ? updatedData : JSON.stringify(updatedData),
     });
@@ -26,9 +28,13 @@ export async function updateProductAction(productId: string, updatedData: any) {
 }
 
 // ฟังก์ชันสำหรับลบ detail image
-export async function deleteProductImageAction(imageId: number) {
+export async function deleteProductImageAction(imageId: number, accessToken?: string) {
     const res = await fetch(`${API_BASE_URL}/product-images/${imageId}`, {
         method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+        },
     });
 
     if (res.ok) {
@@ -39,10 +45,14 @@ export async function deleteProductImageAction(imageId: number) {
     throw new Error('Failed to delete image');
 }
 
-export async function deleteProductAction(productId: string) {
+export async function deleteProductAction(productId: string, accessToken?: string) {
     // ส่งคำขอไปยัง API เพื่อลบสินค้า
     const res = await fetch(`http://localhost:3001/products/${productId}`, {
         method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+        },
     });
 
     if (res.ok) {
@@ -72,6 +82,7 @@ export async function getProductByIdAction(productId: string) {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
+            
         },
     });
 
@@ -85,7 +96,8 @@ export async function getProductByIdAction(productId: string) {
 export async function createCompleteProduct(
     uploadFileData: UploadFileFormData,      // Step 1 data
     productInfoData: ProductInformationFormData, // Step 2 data
-    imageData: UploadImageFormData               // Step 3 data
+    imageData: UploadImageFormData,
+    accessToken?: string | undefined              // Step 3 data
 ) {
     try {
         // Create FormData with ALL information
@@ -129,6 +141,10 @@ export async function createCompleteProduct(
         const response = await fetch(`${API_BASE_URL}/products`, {
             method: 'POST',
             body: formData,
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+            }
             // No Content-Type header - browser sets it automatically for FormData
         });
 

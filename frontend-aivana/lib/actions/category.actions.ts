@@ -21,11 +21,12 @@ export async function getAllCategories(): Promise<Category[]> {
   return await response.json();
 }
 
-export async function createCategory(name: string, description: string): Promise<Category> {
+export async function createCategory(name: string, description: string, accessToken?: string): Promise<Category> {
   const response = await fetch(`${API_BASE_URL}/category`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
     },
     body: JSON.stringify({ name, description }),
   });

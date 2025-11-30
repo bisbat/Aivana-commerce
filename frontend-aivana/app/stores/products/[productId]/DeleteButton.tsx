@@ -4,12 +4,15 @@ import ConfirmModal from '@/components/common/ConfirmModal';
 import { useConfirmModal } from '@/hooks/useConfirmModal';
 import { deleteProductAction } from '@/lib/actions/product.actions';
 import toast from 'react-hot-toast';
+import { getAuthData } from '@/lib/actions/auth.actions';
 
 export default function DeleteButton({ productId }: { productId: string }) {
     const { isOpen, open, close, callback } = useConfirmModal();
 
     const handleDelete = async () => {
-        await deleteProductAction(productId);
+        const accessToken = getAuthData()?.accessToken || "";
+        await deleteProductAction(productId,accessToken);
+        
         toast.success("Product deleted successfully.");
         window.location.href = '/stores';
     };

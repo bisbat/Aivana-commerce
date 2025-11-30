@@ -8,6 +8,7 @@ import { Loader } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
 import { addToCart } from "@/lib/actions/cart.actions";
 import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
+import { getAuthData } from "@/lib/actions/auth.actions";
 
 interface DetailImage {
   imageId: string;
@@ -49,10 +50,12 @@ export default function ProductDetailPage() {
         );
         return;
       }
+      const accessToken = getAuthData()?.accessToken || "";
 
       await addToCart({
         userId: user.id,
         productId: parseInt(productId),
+        accessToken: accessToken
       });
 
       setToast({

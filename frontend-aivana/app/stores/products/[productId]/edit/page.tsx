@@ -24,6 +24,7 @@ import EditProductImages from "./EditProductImages";
 import EditProductHeroImage from "./EditProductHeroImage";
 import EditProductFile from "./EditProductFile";
 import BackButton from "../BackButton";
+import { getAuthData } from "@/lib/actions/auth.actions";
 
 export default function EditProductPage() {
   const params = useParams();
@@ -67,7 +68,8 @@ export default function EditProductPage() {
         const product: Product = await getProductByIdAction(productId);
         setProductData(product);
 
-        const tags: Tag[] = await getAllTagsAction();
+        const accessToken = getAuthData()?.accessToken || "";
+        const tags: Tag[] = await getAllTagsAction(accessToken);
         setTags(tags);
 
         const categories: Category[] = await getAllCategories();
@@ -112,8 +114,9 @@ export default function EditProductPage() {
   // Handler for removing existing image
   const handleDeleteImage = async (imageId: number) => {
     try {
+      const accessToken = getAuthData().accessToken || "";
       // เรียก API เพื่อลบรูปจริงๆ
-      await deleteProductImageAction(imageId);
+      await deleteProductImageAction(imageId,accessToken);
 
       // อัปเดต UI
       setDetailImages((prev) => prev.filter((img) => img.imageId !== imageId));
@@ -207,7 +210,9 @@ export default function EditProductPage() {
         hasNewProductFile: !!newProductFile,
       });
 
-      await updateProductAction(productId, formData);
+      const accessToken = getAuthData()?.accessToken || "";
+
+      await updateProductAction(productId, formData,accessToken);
 
       // Redirect to product detail or products list
       // router.push(`/stores/products/${productId}`);
