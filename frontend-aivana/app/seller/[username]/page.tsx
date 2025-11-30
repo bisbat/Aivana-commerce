@@ -1,169 +1,150 @@
-'use client';
+"use client";
+import { useState, useEffect } from "react";
+import { getSellerById } from "@/lib/actions/seller.actions";
+import { SellerProfile } from "@/lib/types/user.ts/sellerProfile";
+import EditButton from "./EditButton";
+import {
+  getCurrentUserFromToken,
+  getAuthData,
+} from "@/lib/actions/auth.actions";
+import { ProductGrid } from "@/components/home/ProductGrid";
+import { getProductsBySellerId } from "@/lib/actions/seller.actions";
+import { Product } from "@/lib/types/product/Product";
+import BackgroundAivana from "@/components/common/BackgroundAivana";
+import { useRouter } from "next/navigation";
 
-import { getCurrentUserFromToken, getAuthData } from '@/lib/actions/auth.actions';
-import { useEffect, useState } from 'react';
-import { SellerProfile } from '@/lib/types/user.ts/sellerProfile';
-import { getSellerById } from '@/lib/actions/seller.actions';
-import { UserProfile } from '@/lib/types/user.ts/user';
-import { getUserByUserId } from '@/lib/actions/user.actions';
-import { updateSellerProfile } from '@/lib/actions/seller.actions';
-
-
-export default function EditSellerPage() {
-
-  const [sellerData, setSellerData] = useState<SellerProfile | null>(null);
-  const [userData, setUserData] = useState<UserProfile | null>(null);
-  const [formData, setFormData] = useState<Partial<SellerProfile>>({});
-
-  const user = getCurrentUserFromToken();
-  if (!user) return <div>Please log in to edit your seller profile.</div>;
-  const token = getAuthData()?.accessToken;
+export default function SellerProfilePage() {
+  const router = useRouter();
+  const [sellerId, setSellerId] = useState<string | null>(null);
 
   useEffect(() => {
-    async function load() {
-      const userProfile = await getCurrentUserFromToken(); 
-      if (!userProfile || !userProfile.sellerId) return;
+    getCurrentUserFromToken().then((user) =>
+      setSellerId(user?.sellerId ?? null)
+    );
+  }, []);
 
+  const [seller, setSeller] = useState<SellerProfile | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      if (!sellerId) return;
       const token = getAuthData()?.accessToken;
       if (!token) return;
 
-      const sellerProfile = await getSellerById(userProfile.sellerId, token);
+      const profileData = await getSellerById(sellerId, token);
+      setSeller(profileData);
 
-      setSellerData(sellerProfile);
-      setUserData(userProfile);
-      setFormData({
-        bio: sellerProfile.bio,
-        location: sellerProfile.location,
-        skills: sellerProfile.skills,
-        socials: sellerProfile.socials,
-        bankInfo: sellerProfile.bankInfo
-      });
+      const productsData = await getProductsBySellerId(sellerId, token);
+      setProducts(productsData);
     }
+    fetchData();
+  }, [sellerId]);
 
-    load();
-  }, []);
-
-
-
-  if (!sellerData || !userData) {
-    return <div>Loading...</div>;
-  }
-
+  if (!seller) return <div>Loading...</div>;
 
   return (
-    <div>Edit page</div>
-        // <div className="max-w-3xl mx-auto p-6">
-        //     <h1 className="text-2xl font-semibold mb-6">Edit Seller Profile</h1>
-        //     <form onSubmit={handleSave}>
-        //         {/* Store Info */}
-        //         <section className="mb-8">
-        //             <h2 className="text-xl font-medium mb-4">Store Info</h2>
-        //             <div className="grid grid-cols-2 gap-4">
-        //                 <div>
-        //                     <label className="block text-sm font-medium mb-1">Store Name</label>
-        //                     <input
-        //                         type="text"
-        //                         className="border border-gray-300 rounded px-3 py-2 w-full"
-        //                         value={formData.storeName || ''}
-        //                         onChange={e => handleChange('storeName', e.target.value)}
-        //                     />
-        //                 </div>
-        //                 <div>
-        //                     <label className="block text-sm font-medium mb-1">Location</label>
-        //                     <input
-        //                         type="text"
-        //                         className="border border-gray-300 rounded px-3 py-2 w-full"
-        //                         value={formData.location || ''}
-        //                         onChange={e => handleChange('location', e.target.value)}
-        //                     />
-        //                 </div>
-        //                 <div className="col-span-2">
-        //                     <label className="block text-sm font-medium mb-1">Bio</label>
-        //                     <textarea
-        //                         className="border border-gray-300 rounded px-3 py-2 w-full"
-        //                         rows={4}
-        //                         value={formData.bio || ''}
-        //                         onChange={e => handleChange('bio', e.target.value)}
-        //                     />
-        //                 </div>
-        //             </div>
-        //         </section>
+    <div className="p-8 max-w-6xl mx-auto space-y-8">
+      <BackgroundAivana />
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        {/* Left section */}
+        <div className="flex items-center gap-4">
+          {/* Back Button */}
+          <button
+            onClick={()=> router.push('/')}
+            className="px-3 py-1 border rounded-md text-sm text-gray-300 hover:bg-neutral-800 transition"
+          >
+            ← Back
+          </button>
 
-        //         {/* Social Links */}
-        //         <section className="mb-8">
-        //             <h2 className="text-xl font-medium mb-4">Social Links</h2>
-        //             <div className="grid grid-cols-2 gap-4">
-        //                 <div>
-        //                     <label className="block text-sm font-medium mb-1">Facebook</label>
-        //                     <input
-        //                         type="url"
-        //                         className="border border-gray-300 rounded px-3 py-2 w-full"
-        //                         value={formData.socials?.facebook || ''}
-        //                         onChange={e => handleNestedChange('socials', 'facebook', e.target.value)}
-        //                     />
-        //                 </div>
-        //                 <div>
-        //                     <label className="block text-sm font-medium mb-1">Instagram</label>
-        //                     <input
-        //                         type="url"
-        //                         className="border border-gray-300 rounded px-3 py-2 w-full"
-        //                         value={formData.socials?.instagram || ''}
-        //                         onChange={e => handleNestedChange('socials', 'instagram', e.target.value)}
-        //                     />
-        //                 </div>
-        //                 <div>
-        //                     <label className="block text-sm font-medium mb-1">TikTok</label>
-        //                     <input
-        //                         type="url"
-        //                         className="border border-gray-300 rounded px-3 py-2 w-full"
-        //                         value={formData.socials?.tiktok || ''}
-        //                         onChange={e => handleNestedChange('socials', 'tiktok', e.target.value)}
-        //                     />
-        //                 </div>
-        //             </div>
-        //         </section>
+          {/* Avatar */}
+          <img
+            src={seller.user.avatarUrl || "/default-avatar.png"}
+            className="w-16 h-16 rounded-full object-cover bg-neutral-800"
+            alt="seller avatar"
+          />
 
-        //         {/* Bank Info */}
-        //         <section className="mb-8">
-        //             <h2 className="text-xl font-medium mb-4">Bank Info</h2>
-        //             <div className="grid grid-cols-2 gap-4">
-        //                 <div>
-        //                     <label className="block text-sm font-medium mb-1">Bank Name</label>
-        //                     <input
-        //                         type="text"
-        //                         className="border border-gray-300 rounded px-3 py-2 w-full"
-        //                         value={formData.bankInfo?.bankName || ''}
-        //                         onChange={e => handleNestedChange('bankInfo', 'bankName', e.target.value)}
-        //                     />
-        //                 </div>
-        //                 <div>
-        //                     <label className="block text-sm font-medium mb-1">Account Name</label>
-        //                     <input
-        //                         type="text"
-        //                         className="border border-gray-300 rounded px-3 py-2 w-full"
-        //                         value={formData.bankInfo?.accountName || ''}
-        //                         onChange={e => handleNestedChange('bankInfo', 'accountName', e.target.value)}
-        //                     />
-        //                 </div>
-        //                 <div className="col-span-2">
-        //                     <label className="block text-sm font-medium mb-1">Account Number</label>
-        //                     <input
-        //                         type="text"
-        //                         className="border border-gray-300 rounded px-3 py-2 w-full"
-        //                         value={formData.bankInfo?.accountNumber || ''}
-        //                         onChange={e => handleNestedChange('bankInfo', 'accountNumber', e.target.value)}
-        //                     />
-        //                 </div>
-        //             </div>
-        //         </section>
+          {/* Seller Info */}
+          <div>
+            <h1 className="text-2xl font-semibold">{seller.storeName}</h1>
+            <p className="text-gray-400 text-sm">
+              {seller.user.firstName} {seller.user.lastName} • @
+              {seller.user.username}
+            </p>
+          </div>
+        </div>
 
-        //         <button
-        //             type="submit"
-        //             className="px-6 py-2 border border-gray-700 rounded font-medium"
-        //         >
-        //             Save Changes
-        //         </button>
-        //     </form>
-        // </div>
-    );
+        {/* Right Section Buttons */}
+        <div className="flex items-center gap-3">
+          {/* Contact Button */}
+          <button className="px-4 py-2 text-sm border rounded-md hover:bg-neutral-800 transition">
+            Contact
+          </button>
+
+          {/* Edit Button */}
+          <EditButton username={seller.user.username} />
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="p-4 rounded-xl bg-neutral-900/40">
+          <p className="text-lg font-semibold">{seller.totalProducts}</p>
+          <p className="text-gray-400 text-sm">Products</p>
+        </div>
+        <div className="p-4 rounded-xl bg-neutral-900/40">
+          <p className="text-lg font-semibold">{seller.totalSales}</p>
+          <p className="text-gray-400 text-sm">Sales</p>
+        </div>
+        <div className="p-4 rounded-xl bg-neutral-900/40">
+          <p className="text-lg font-semibold">{seller.averageRating}</p>
+          <p className="text-gray-400 text-sm">Rating</p>
+        </div>
+        <div className="p-4 rounded-xl bg-neutral-900/40">
+          <p className="text-lg font-semibold">{seller.totalReviews}</p>
+          <p className="text-gray-400 text-sm">Reviews</p>
+        </div>
+      </div>
+
+      {/* About */}
+      <div className="space-y-2">
+        <h2 className="text-xl font-semibold">About</h2>
+        <p className="text-gray-300">{seller.bio}</p>
+      </div>
+
+      {/* Skills */}
+      <div>
+        <h2 className="text-xl font-semibold mb-2">Skills</h2>
+        <div className="flex gap-2 flex-wrap">
+          {seller.skills.map((skill) => (
+            <span
+              key={skill}
+              className="px-3 py-1 rounded-full bg-neutral-900/60 text-gray-200 text-sm"
+            >
+              {skill}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Socials */}
+      <div>
+        <h2 className="text-xl font-semibold mb-2">Socials</h2>
+        <div className="flex gap-4 text-blue-400 underline text-sm">
+          {Object.entries(seller.socials).map(([key, url]) => (
+            <a key={key} href={url} target="_blank" rel="noopener noreferrer">
+              {key}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* Products */}
+      <div className="mt-6">
+        <h2 className="text-xl font-semibold mb-4">Products</h2>
+        <ProductGrid products={products} />
+      </div>
+    </div>
+  );
 }

@@ -1,195 +1,220 @@
 'use client';
 
-import { getCurrentUserFromToken, getAuthData } from '@/lib/actions/auth.actions';
 import { useEffect, useState } from 'react';
+import { getCurrentUserFromToken, getAuthData } from '@/lib/actions/auth.actions';
+import { getSellerById, updateSellerProfile } from '@/lib/actions/seller.actions';
 import { SellerProfile } from '@/lib/types/user.ts/sellerProfile';
-import { getSellerById } from '@/lib/actions/seller.actions';
-import { UserProfile } from '@/lib/types/user.ts/user';
-import { getUserByUserId } from '@/lib/actions/user.actions';
-import { updateSellerProfile } from '@/lib/actions/seller.actions';
+import { SocialLink } from '@/lib/types/user.ts/sellerProfile';
+import { Skills } from './SkillsProps';
+import { SocialLinks } from './SocialLinks';
+import BankInfoSection from './BankInfoSection';
+import { BankInfo } from '@/lib/types/user.ts/sellerProfile';
+import { useRouter } from 'next/navigation';
 
-
-export default function EditSellerPage() {
-
+export default function EditSellerSellerInfo() {
+    const router = useRouter();
     const [sellerData, setSellerData] = useState<SellerProfile | null>(null);
-    const [userData, setUserData] = useState<UserProfile | null>(null);
-    const [formData, setFormData] = useState<Partial<SellerProfile>>({});
-
-    const user = getCurrentUserFromToken();
-    if (!user) return <div>Please log in to edit your seller profile.</div>;
-    const token = getAuthData()?.accessToken;
-
-    useEffect(() => {
-        const user = getCurrentUserFromToken();
-        const token = getAuthData()?.accessToken;
-
-        if (!user || !token) return;
-
-        async function load() {
-            if (!user || !token || !user.sellerId) return;
-            const [sellerProfile, userProfile] = await Promise.all([
-                getSellerById(user.sellerId, token),
-                getUserByUserId(user.sub, token),
-            ]);
-
-            setSellerData(sellerProfile);
-            setUserData(userProfile);
-            setFormData({
-                bio: sellerProfile.bio,
-                location: sellerProfile.location,
-                skills: sellerProfile.skills,
-                socials: sellerProfile.socials,
-                bankInfo: sellerProfile.bankInfo,
-            })
+    const [formData, setFormData] = useState({
+        bio: '',
+        location: '',
+        skills: [""],
+        socials: {} as SocialLink,
+        bankInfo: {
+            bankName: "",
+            accountNumber: "",
+            accountName: ""
         }
+    });
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
 
+    // load seller
+    useEffect(() => {
+        async function load() {
+            setLoading(true);
+            const token = getAuthData()?.accessToken;
+            const user = await getCurrentUserFromToken();
+            if (!user || !token || !user.sellerId) {
+                setLoading(false);
+                return;
+            }
+            const seller = await getSellerById(user.sellerId, token);
+            if (!seller) {
+                setLoading(false);
+                return;
+            }
+            setSellerData(seller);
+            setFormData({
+                bio: seller.bio || '',
+                location: seller.location || '',
+                skills: seller.skills || [],
+                socials: seller.socials || {},
+                bankInfo: seller.bankInfo || {
+                    bankName: "",
+                    accountNumber: "",
+                    accountName: ""
+                }
+            });
+            setLoading(false);
+        }
         load();
-    }, [user.sellerId, user.sub, token]);
 
-    if (!sellerData || !userData) {
-        return <div>Loading...</div>;
+    }, []);
+
+    console.log(formData);
+    console.log(formData.bankInfo);
+
+    // simple handler for normal fields
+    function handleChange(field: 'bio' | 'location', value: string) {
+        setFormData(prev => ({ ...prev, [field]: value }));
     }
 
-    // Handle input changes
-    const handleChange = (field: string, value: any) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-    };
+    // build payload for updateSellerProfile
+    function buildUpdatePayload() {
+        // convert skills -> string[]
+        const skills = formData.skills
+            .map(s => s.trim())
+            .filter(Boolean); // remove empty strings
 
+        return {
+            bio: formData.bio,
+            location: formData.location,
+            skills,
+            socials: formData.socials,
+            bankInfo: {
+                bankName: formData.bankInfo.bankName,
+                accountNumber: formData.bankInfo.accountNumber,
+                accountName: formData.bankInfo.accountName
+            }
+        } as Partial<SellerProfile>;
+    }
 
-    const handleNestedChange = (parent: string, key: string, value: any) => {
-        setFormData(prev => ({
-            ...prev,
-            [parent]: { ...(prev[parent as keyof SellerProfile] as any), [key]: value },
-        }));
-    };
-
-    const handleSave = async (e: React.FormEvent) => {
+    async function handleSave(e: React.FormEvent) {
         e.preventDefault();
-        if (!user.sellerId) return;
-        if (!token) return;
+        if (!sellerData) return;
+        const token = getAuthData()?.accessToken;
+        if (!token) return alert('Not authenticated');
+
+        const payload = buildUpdatePayload();
 
         try {
-            await updateSellerProfile(user.sellerId, formData, token);
-            alert('Profile updated successfully!');
+            setSaving(true);
+            // call update API: (sellerId, payload, token)
+            const updated = await updateSellerProfile(sellerData.id, payload, token);
+
+            // update local state with returned data (best if API returns updated seller)
+            if (updated) {
+                setSellerData(prev => ({ ...(prev as SellerProfile), ...(updated as any) }));
+                setFormData({
+                    bio: updated.bio || '',
+                    location: updated.location || '',
+                    skills: updated.skills || [],
+                    socials: updated.socials || {},
+                    bankInfo: updated.bankInfo as BankInfo
+                });
+                console.log('Updated seller:', updated);
+            }
+
+            router.push(`/seller/${sellerData.user.username}`);
         } catch (err) {
             console.error(err);
-            alert('Failed to update profile');
+            alert('Failed to update');
+        } finally {
+            setSaving(false);
         }
-    };
+    }
 
+    if (loading) return <div>Loading seller...</div>;
+    if (!sellerData) return <div>No seller profile found.</div>;
 
     return (
-        <div className="max-w-3xl mx-auto p-6">
-            <h1 className="text-2xl font-semibold mb-6">Edit Seller Profile</h1>
-            <form onSubmit={handleSave}>
-                {/* Store Info */}
-                <section className="mb-8">
-                    <h2 className="text-xl font-medium mb-4">Store Info</h2>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Store Name</label>
-                            <input
-                                type="text"
-                                className="border border-gray-300 rounded px-3 py-2 w-full"
-                                value={formData.storeName || ''}
-                                onChange={e => handleChange('storeName', e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Location</label>
-                            <input
-                                type="text"
-                                className="border border-gray-300 rounded px-3 py-2 w-full"
-                                value={formData.location || ''}
-                                onChange={e => handleChange('location', e.target.value)}
-                            />
-                        </div>
-                        <div className="col-span-2">
-                            <label className="block text-sm font-medium mb-1">Bio</label>
-                            <textarea
-                                className="border border-gray-300 rounded px-3 py-2 w-full"
-                                rows={4}
-                                value={formData.bio || ''}
-                                onChange={e => handleChange('bio', e.target.value)}
-                            />
-                        </div>
-                    </div>
-                </section>
+        <div className="max-w-2xl mx-auto p-6">
+            <h1 className="text-2xl font-semibold mb-6">Edit Seller — Store Info</h1>
 
-                {/* Social Links */}
-                <section className="mb-8">
-                    <h2 className="text-xl font-medium mb-4">Social Links</h2>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Facebook</label>
-                            <input
-                                type="url"
-                                className="border border-gray-300 rounded px-3 py-2 w-full"
-                                value={formData.socials?.facebook || ''}
-                                onChange={e => handleNestedChange('socials', 'facebook', e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Instagram</label>
-                            <input
-                                type="url"
-                                className="border border-gray-300 rounded px-3 py-2 w-full"
-                                value={formData.socials?.instagram || ''}
-                                onChange={e => handleNestedChange('socials', 'instagram', e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">TikTok</label>
-                            <input
-                                type="url"
-                                className="border border-gray-300 rounded px-3 py-2 w-full"
-                                value={formData.socials?.tiktok || ''}
-                                onChange={e => handleNestedChange('socials', 'tiktok', e.target.value)}
-                            />
-                        </div>
-                    </div>
-                </section>
+            <form onSubmit={handleSave} className="space-y-6">
+                <div>
+                    <label className="block text-sm font-medium mb-1">Store Name</label>
+                    <input
+                        type="text"
+                        value={sellerData.storeName}
+                        className="w-full border rounded px-3 py-2 cursor-not-allowed bg-white/0"
+                        disabled
+                    />
+                </div>
 
-                {/* Bank Info */}
-                <section className="mb-8">
-                    <h2 className="text-xl font-medium mb-4">Bank Info</h2>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Bank Name</label>
-                            <input
-                                type="text"
-                                className="border border-gray-300 rounded px-3 py-2 w-full"
-                                value={formData.bankInfo?.bankName || ''}
-                                onChange={e => handleNestedChange('bankInfo', 'bankName', e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Account Name</label>
-                            <input
-                                type="text"
-                                className="border border-gray-300 rounded px-3 py-2 w-full"
-                                value={formData.bankInfo?.accountName || ''}
-                                onChange={e => handleNestedChange('bankInfo', 'accountName', e.target.value)}
-                            />
-                        </div>
-                        <div className="col-span-2">
-                            <label className="block text-sm font-medium mb-1">Account Number</label>
-                            <input
-                                type="text"
-                                className="border border-gray-300 rounded px-3 py-2 w-full"
-                                value={formData.bankInfo?.accountNumber || ''}
-                                onChange={e => handleNestedChange('bankInfo', 'accountNumber', e.target.value)}
-                            />
-                        </div>
-                    </div>
-                </section>
+                <div>
+                    <label className="block text-sm font-medium mb-1">Location</label>
+                    <input
+                        type="text"
+                        value={formData.location}
+                        onChange={e => handleChange('location', e.target.value)}
+                        className="w-full border rounded px-3 py-2"
+                    />
+                </div>
 
-                <button
-                    type="submit"
-                    className="px-6 py-2 border border-gray-700 rounded font-medium"
-                >
-                    Save Changes
-                </button>
+                <div>
+                    <label className="block text-sm font-medium mb-1">Bio</label>
+                    <textarea
+                        value={formData.bio}
+                        onChange={e => handleChange('bio', e.target.value)}
+                        rows={4}
+                        className="w-full border rounded px-3 py-2"
+                    />
+                </div>
+
+                <Skills
+                    skills={formData.skills || []}
+                    onChange={(updatedSkills) =>
+                        setFormData(prev => ({ ...prev, skills: updatedSkills }))
+                    }
+                />
+
+                <SocialLinks
+                    socials={formData.socials || {}}
+                    onChange={(updated) =>
+                        setFormData((prev) => ({ ...prev, socials: updated }))
+                    }
+                />
+
+                <BankInfoSection
+                    bankInfo={formData.bankInfo || { bankName: "", accountNumber: "", accountName: "" }}
+                    onChange={(value) =>
+                        setFormData(prev => ({
+                            ...prev,
+                            bankInfo: { ...prev.bankInfo, ...value }
+                        }))
+
+                    }
+                />
+
+
+                <div className="flex gap-3">
+                    <button
+                        type="submit"
+                        disabled={saving}
+                        className="px-4 py-2 border rounded font-medium disabled:opacity-60"
+                    >
+                        {saving ? 'Saving...' : 'Save Changes'}
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => {
+                            // reset to last saved
+                            if (!sellerData) return;
+                            setFormData({
+                                bio: sellerData.bio || '',
+                                location: sellerData.location || '',
+                                skills: sellerData.skills,
+                                socials: sellerData.socials || {},
+                                bankInfo: sellerData.bankInfo as BankInfo
+                            });
+                        }}
+                        className="px-4 py-2 border rounded text-sm"
+                    >
+                        Reset
+                    </button>
+                </div>
             </form>
         </div>
     );
