@@ -143,7 +143,6 @@ export async function createCompleteProduct(
             body: formData,
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`,
             }
             // No Content-Type header - browser sets it automatically for FormData
         });
