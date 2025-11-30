@@ -228,7 +228,7 @@ export default function BecomeSellerPage() {
       };
 
       const user = await getCurrentUserFromToken();
-      const accessToken = getAuthData()?.accessToken;
+      const accessToken = getAuthData()?.accessToken || "";
       if (!user) {
         throw new Error("Not authenticated");
       }
