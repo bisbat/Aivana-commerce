@@ -6,7 +6,7 @@ import { getCart, removeFromCart } from "@/lib/actions/cart.actions";
 import { GetCartResponse } from "@/lib/types/cart/GetCart";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
-
+import { getAuthData } from "@/lib/actions/auth.actions";
 interface CartModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -21,12 +21,15 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
   const fetchCart = async () => {
     try {
       setLoading(true);
-      const user = getCurrentUserFromToken();
+      const user = await getCurrentUserFromToken();
       if (!user) {
         setCartData(null);
         return;
       }
-      const data = await getCart(user.sub);
+      const accessToken = getAuthData()?.accessToken || "";
+
+
+      const data = await getCart(user.id, accessToken);
       setCartData(data);
     } catch (error) {
       console.error("Failed to fetch cart:", error);
@@ -38,10 +41,12 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
   const handleRemoveItem = async (productId: number) => {
     try {
       setRemovingItemId(productId);
-      const user = getCurrentUserFromToken();
+      const user = await getCurrentUserFromToken();
       if (!user) return;
 
-      await removeFromCart(user.sub, productId);
+      const accessToken = getAuthData()?.accessToken || "";
+
+      await removeFromCart(user.id, productId, accessToken);
       await fetchCart();
     } catch (error) {
       console.error("Failed to remove item:", error);

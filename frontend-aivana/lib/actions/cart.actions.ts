@@ -2,12 +2,14 @@ import { AddToCartResponse, AddToCartRequest } from "@/lib/types/cart/AddCart";
 import { GetCartResponse } from "@/lib/types/cart/GetCart";
 
 export async function addToCart(
-  data: AddToCartRequest
+  data: AddToCartRequest,
+  accessToken?: string
 ): Promise<AddToCartResponse> {
   const response = await fetch("http://localhost:3001/cart/add", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
     },
     body: JSON.stringify(data),
   });
@@ -24,11 +26,12 @@ export async function addToCart(
   return response.json();
 }
 
-export async function getCart(userId: string): Promise<GetCartResponse> {
+export async function getCart(userId: string, accessToken?: string): Promise<GetCartResponse> {
   const response = await fetch(`http://localhost:3001/cart/user/${userId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
     },
   });
 
@@ -41,7 +44,8 @@ export async function getCart(userId: string): Promise<GetCartResponse> {
 
 export async function removeFromCart(
   userId: string,
-  productId: number
+  productId: number,
+  accessToken?: string
 ): Promise<{ message: string }> {
   const response = await fetch(
     `http://localhost:3001/cart/user/${userId}/product/${productId}`,
@@ -49,6 +53,7 @@ export async function removeFromCart(
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
       },
     }
   );

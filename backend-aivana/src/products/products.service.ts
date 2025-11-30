@@ -386,7 +386,6 @@ export class ProductsService {
      * 4. Upload detail images (min 2, max 8)
      * ------------------------------------------------------ */
     const detailFiles = files.detailImages;
-
     if (detailFiles.length < 2) {
       throw new Error('At least 2 detail images are required');
     }
@@ -404,15 +403,17 @@ export class ProductsService {
         MINIO_FOLDERS.PRODUCTS.DETAILS(productId),
       );
 
+      console.log('Uploaded detail image to:', fullPath);
+
+      const imageUrl = this.minioService.getFileUrl(fullPath);
+
       await this.productImageService.create({
-        pathImage: fullPath,
+        pathImage: imageUrl, 
         productId: product.id,
       });
 
-      // Make sure timestamps differ
       await new Promise((resolve) => setTimeout(resolve, 10));
     }
-
     /* ------------------------------------------------------
      * 5. Final response → return DTO format
      * ------------------------------------------------------ */
