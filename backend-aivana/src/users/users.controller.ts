@@ -1,11 +1,13 @@
-import { Controller, Get, Post, Body, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Request, Put, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ResponseUserDto } from './dto/response-user.dto';
 import { plainToInstance } from 'class-transformer';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Get()
   getAllUsers() {
@@ -23,4 +25,19 @@ export class UsersController {
       excludeExtraneousValues: true,
     });
   }
+
+  @Put('/:userId')
+  async updateUser(
+    @Param('userId') userId: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    console.log('email:', updateUserDto.email);
+
+    const updatedUser = await this.usersService.updateUser(userId, updateUserDto);
+
+    return plainToInstance(ResponseUserDto, updatedUser, {
+      excludeExtraneousValues: true,
+    });
+  }
+
 }

@@ -10,8 +10,11 @@ import {
 import { ProductGrid } from "@/components/home/ProductGrid";
 import { getProductsBySellerId } from "@/lib/actions/seller.actions";
 import { Product } from "@/lib/types/product/Product";
+import BackgroundAivana from "@/components/common/BackgroundAivana";
+import { useRouter } from "next/navigation";
 
 export default function SellerProfilePage() {
+  const router = useRouter();
   const [sellerId, setSellerId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -42,13 +45,14 @@ export default function SellerProfilePage() {
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-8">
+      <BackgroundAivana />
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         {/* Left section */}
         <div className="flex items-center gap-4">
           {/* Back Button */}
           <button
-            onClick={() => window.history.back()}
+            onClick={()=> router.push('/')}
             className="px-3 py-1 border rounded-md text-sm text-gray-300 hover:bg-neutral-800 transition"
           >
             ← Back
@@ -79,7 +83,7 @@ export default function SellerProfilePage() {
           </button>
 
           {/* Edit Button */}
-          <EditButton sellerId={seller.id} />
+          <EditButton username={seller.user.username} />
         </div>
       </div>
 

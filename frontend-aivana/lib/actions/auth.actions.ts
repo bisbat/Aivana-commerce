@@ -77,7 +77,7 @@ export async function getCurrentUserFromToken(): Promise<UserProfile | null> {
       return null;
     }
 
-    const userProfile = await getUserByUserId(decoded.sub);
+    const userProfile = await getUserByUserId(decoded.sub, accessToken);
 
     if (!userProfile) {
       return null;

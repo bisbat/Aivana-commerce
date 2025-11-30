@@ -27,7 +27,7 @@ export interface SocialLink {
   tiktok?: string;
   github?: string;
   linkedin?: string;
-}
+};
 
 export interface BankInfo {
   bankName: string;

@@ -1,7 +1,7 @@
 'use client';
-export default function EditButton({ sellerId }: { sellerId: string}) {
+export default function EditButton({ username }: { username: string}) {
     const handleEdit = () => {
-        window.location.href = `/seller/${sellerId}/edit`;
+        window.location.href = `/seller/${username}/edit`;
     };
 
     return (
