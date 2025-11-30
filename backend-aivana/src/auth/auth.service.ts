@@ -10,11 +10,10 @@ import { JwtService } from '@nestjs/jwt';
 import { UserRoles } from 'src/constants/user-roles.enum';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
-import { AuthInput, SignInData, AuthResult, JwtPayload } from './interfaces';
+import { AuthInput, SignInData } from './interfaces';
 import { MinioService } from 'src/minio/minio.service';
 import { MINIO_FOLDERS } from 'src/constants/minio-folders.constant';
 import { UploadedFileType } from 'src/products/interfaces/uploaded-file.interface';
-import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
@@ -28,8 +27,7 @@ export class AuthService {
   async register(
     registerDto: RegisterDto,
     avatarFile?: UploadedFileType,
-  ): Promise<AuthResult> {
-
+  ): Promise<{ accessToken: string }> {
     // 1. ตรวจสอบว่า email ซ้ำหรือไม่
     const existingUserByEmail = await this.userService.findUserByEmail(
       registerDto.email,
@@ -89,7 +87,7 @@ export class AuthService {
     return this.signIn(userData);
   }
 
-  async authenticate(input: AuthInput): Promise<AuthResult> {
+  async authenticate(input: AuthInput): Promise<{ accessToken: string }> {
     const user = await this.validateUser(input);
 
     if (!user) {
@@ -119,20 +117,13 @@ export class AuthService {
     };
   }
 
-  async signIn(user: SignInData): Promise<AuthResult> {
-    const tokenPayload: JwtPayload = {
+  async signIn(user: SignInData): Promise<{ accessToken: string }> {
+    const tokenPayload = {
       sub: user.userId,
-      email: user.email,
-      username: user.username,
-      role: user.role,
-      sellerId: user.sellerId ?? null,
     };
 
     const accessToken = await this.jwtService.signAsync(tokenPayload);
 
-    return {
-      accessToken,
-      user,
-    };
+    return { accessToken };
   }
 }

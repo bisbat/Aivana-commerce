@@ -1,9 +1,6 @@
-import {
-  LoginRequest,
-  TokenResponse,
-  TokenPayload,
-  decodeJWT,
-} from "@/lib/types/auth";
+import { LoginRequest, TokenResponse, decodeJWT } from "@/lib/types/auth";
+import { UserProfile } from "@/lib/types/user.ts/user";
+import { getUserByUserId } from "./user.actions";
 
 export async function login(data: LoginRequest): Promise<TokenResponse> {
   const response = await fetch("http://localhost:3001/auth/login", {
@@ -52,7 +49,7 @@ export async function register(data: FormData): Promise<TokenResponse> {
 
   const result: TokenResponse = await response.json();
 
-  return result; // ← return โดยตรง ไม่ wrap ใน object
+  return result;
 }
 
 export function getAuthData(): {
@@ -65,7 +62,7 @@ export function getAuthData(): {
   };
 }
 
-export function getCurrentUserFromToken(): TokenPayload | null {
+export async function getCurrentUserFromToken(): Promise<UserProfile | null> {
   const accessToken = localStorage.getItem("accessToken");
 
   if (!accessToken) {
@@ -80,7 +77,12 @@ export function getCurrentUserFromToken(): TokenPayload | null {
       return null;
     }
 
-    return decoded;
+    const userProfile = await getUserByUserId(decoded.sub);
+
+    if (!userProfile) {
+      return null;
+    }
+    return userProfile;
   } catch (error) {
     clearAuthData();
     return null;

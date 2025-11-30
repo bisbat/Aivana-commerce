@@ -1,6 +1,6 @@
-import { Expose, Type } from "class-transformer";
-import { ResponseUserDto } from "src/users/dto/response-user.dto";
-import { ResponseProductDto } from "src/products/dto/response-product.dto";
+import { Expose, Type } from 'class-transformer';
+import { ResponseUserDto } from 'src/users/dto/response-user.dto';
+import { ResponseProductDto } from 'src/products/dto/response-product.dto';
 
 export class ResponseSellerDto {
   @Expose()
@@ -49,6 +49,7 @@ export class ResponseSellerDto {
 
   @Expose()
   bankInfo?: {
+    bankCode: string;
     bankName: string;
     accountNumber: string;
     accountName: string;

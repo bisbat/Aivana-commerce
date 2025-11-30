@@ -22,9 +22,11 @@ export interface SellerProfile {
 }
 
 export interface SocialLink {
-  tiktok?: string;
-  facebook?: string;
   instagram?: string;
+  facebook?: string;
+  tiktok?: string;
+  github?: string;
+  linkedin?: string;
 }
 
 export interface BankInfo {
