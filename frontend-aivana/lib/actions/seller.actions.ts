@@ -2,22 +2,19 @@
 import { SellerProfile } from "../types/user.ts/sellerProfile";
 import { CreateSellerProfileDto } from "../types/user.ts/sellerCreate";
 import { Product } from "../types/product/Product";
-import { getCurrentUserFromToken } from "./auth.actions";
 
 export async function becomeSeller(
-  data: CreateSellerProfileDto
+  data: CreateSellerProfileDto,
+  userId: string,
+  accessToken?: string
 ): Promise<SellerProfile> {
-  const user = getCurrentUserFromToken();
-  if (!user) {
-    throw new Error("User is not authenticated");
-  }
-
   const response = await fetch(
-    `http://localhost:3001/seller/upgrade/${user.sub}`,
+    `http://localhost:3001/seller/upgrade/${userId}`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify(data),
     }
@@ -33,7 +30,7 @@ export async function becomeSeller(
 
 export async function getProductsBySellerId(
   sellerId: string,
-  token: string 
+  token: string
 ): Promise<Product[]> {
   const response = await fetch(
     `http://localhost:3001/seller/${sellerId}/products`,
@@ -41,7 +38,7 @@ export async function getProductsBySellerId(
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`, 
+        Authorization: `Bearer ${token}`,
       },
     }
   );
@@ -54,15 +51,10 @@ export async function getProductsBySellerId(
   return await response.json();
 }
 
-
 export async function getSellerById(
-  sellerId: string | null,
-  token: string | null
-): Promise<SellerProfile | null> {
-
-  if (!sellerId) return null;
-  if (!token) return null;
-
+  sellerId: string,
+  token: string
+): Promise<SellerProfile> {
   const response = await fetch(`http://localhost:3001/seller/${sellerId}`, {
     method: "GET",
     headers: {

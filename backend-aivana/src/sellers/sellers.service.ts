@@ -16,7 +16,7 @@ export class SellersService {
     private readonly sellerRepository: Repository<SellerEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-  ) { }
+  ) {}
 
   async upgradeToSeller(
     userId: string,
@@ -46,8 +46,7 @@ export class SellersService {
     const savedSeller = await this.sellerRepository.save(seller);
 
     // อัพเดท user role และ link seller profile
-    user.role =
-      UserRoles.SELLER;
+    user.role = UserRoles.SELLER;
     user.sellerProfile = savedSeller;
     await this.userRepository.save(user);
 
@@ -84,11 +83,16 @@ export class SellersService {
     return plainToInstance(ResponseSellerDto, seller, {
       excludeExtraneousValues: true,
     });
-
   }
 
-  async updateSellerProfile(sellerId: string, updateData: UpdateSellerDto): Promise<ResponseSellerDto> {
-    const seller = await this.sellerRepository.findOne({ where: { id: sellerId }, relations: ['user'] });
+  async updateSellerProfile(
+    sellerId: string,
+    updateData: UpdateSellerDto,
+  ): Promise<ResponseSellerDto> {
+    const seller = await this.sellerRepository.findOne({
+      where: { id: sellerId },
+      relations: ['user'],
+    });
     if (!seller) {
       throw new Error('Seller not found');
     }
@@ -98,7 +102,9 @@ export class SellersService {
     }
     Object.assign(seller, updateData);
     const updatedSeller = await this.sellerRepository.save(seller);
-    return plainToInstance(ResponseSellerDto, updatedSeller, { excludeExtraneousValues: true });
+    return plainToInstance(ResponseSellerDto, updatedSeller, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async getProductsBySellerId(sellerId: string) {
@@ -108,10 +114,9 @@ export class SellersService {
         'products',
         'products.category',
         'products.productImages',
-        'products.tags'
+        'products.tags',
       ],
     });
     return seller ? seller.products : [];
   }
-
 }

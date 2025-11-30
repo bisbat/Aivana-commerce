@@ -4,15 +4,17 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { becomeSeller } from "@/lib/actions/seller.actions";
-import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
+import {
+  getAuthData,
+  getCurrentUserFromToken,
+} from "@/lib/actions/auth.actions";
+import { CreateSellerProfileDto } from "@/lib/types/user.ts/sellerCreate";
 
 const SOCIAL_PLATFORMS = [
   { value: "github", label: "GitHub" },
   { value: "linkedin", label: "LinkedIn" },
   { value: "facebook", label: "Facebook" },
-  { value: "twitter", label: "Twitter (X)" },
   { value: "instagram", label: "Instagram" },
-  { value: "youtube", label: "YouTube" },
   { value: "tiktok", label: "TikTok" },
 ];
 
@@ -54,9 +56,8 @@ export default function BecomeSellerPage() {
     bio: "",
     location: "",
     skills: [""],
-    tools: [""],
     socialLinks: [{ platform: "", url: "" }],
-    bankName: "",
+    bankCode: "",
     bankAccountNumber: "",
     bankAccountName: "",
   });
@@ -93,11 +94,7 @@ export default function BecomeSellerPage() {
     }
   };
 
-  const handleArrayChange = (
-    index: number,
-    value: string,
-    field: "skills" | "tools"
-  ) => {
+  const handleArrayChange = (index: number, value: string, field: "skills") => {
     const newArray = [...formData[field]];
     newArray[index] = value;
     setFormData((prev) => ({
@@ -119,7 +116,7 @@ export default function BecomeSellerPage() {
     }));
   };
 
-  const addArrayItem = (field: "skills" | "tools") => {
+  const addArrayItem = (field: "skills") => {
     const maxLimit = field === "skills" ? MAX_SKILLS : MAX_TOOLS;
     if (formData[field].length >= maxLimit) return;
 
@@ -138,7 +135,7 @@ export default function BecomeSellerPage() {
     }));
   };
 
-  const removeArrayItem = (index: number, field: "skills" | "tools") => {
+  const removeArrayItem = (index: number, field: "skills") => {
     if (formData[field].length > 1) {
       const newArray = formData[field].filter((_, i) => i !== index);
       setFormData((prev) => ({
@@ -173,12 +170,21 @@ export default function BecomeSellerPage() {
       newErrors.skills = "กรุณากรอกทักษะอย่างน้อย 1 รายการ";
     }
 
-    if (formData.tools.every((t) => !t.trim())) {
-      newErrors.tools = "กรุณากรอกเครื่องมืออย่างน้อย 1 รายการ";
-    }
+    formData.socialLinks.forEach((link, index) => {
+      const hasPlatform = link.platform.trim();
+      const hasUrl = link.url.trim();
 
-    if (!formData.bankName) {
-      newErrors.bankName = "กรุณาเลือกธนาคาร";
+      if (hasPlatform && !hasUrl) {
+        newErrors[`socialLink_${index}`] =
+          "กรุณากรอก URL สำหรับแพลตฟอร์มที่เลือก";
+      } else if (!hasPlatform && hasUrl) {
+        newErrors[`socialLink_${index}`] =
+          "กรุณาเลือกแพลตฟอร์มสำหรับ URL ที่กรอก";
+      }
+    });
+
+    if (!formData.bankCode) {
+      newErrors.bankCode = "กรุณาเลือกธนาคาร";
     }
 
     if (!formData.bankAccountNumber.trim()) {
@@ -195,43 +201,40 @@ export default function BecomeSellerPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validate()) return;
 
     setIsLoading(true);
 
     try {
-      const submitData = {
+      const submitData: CreateSellerProfileDto = {
         bio: formData.bio,
         location: formData.location,
+
         skills: formData.skills.filter((s) => s.trim()),
-        tools: formData.tools.filter((t) => t.trim()),
-        socialLinks: formData.socialLinks
+
+        socials: formData.socialLinks
           .filter((link) => link.platform.trim() && link.url.trim())
           .reduce((acc, link) => {
             acc[link.platform.toLowerCase()] = link.url;
             return acc;
           }, {} as Record<string, string>),
-        bankName: formData.bankName,
-        bankAccountNumber: formData.bankAccountNumber,
-        bankAccountName: formData.bankAccountName,
+
+        bankInfo: {
+          bankName: BANKS.find((b) => b.code === formData.bankCode)?.name || "",
+          bankCode: formData.bankCode,
+          accountNumber: formData.bankAccountNumber,
+          accountName: formData.bankAccountName,
+        },
       };
 
-      const user = getCurrentUserFromToken();
+      const user = await getCurrentUserFromToken();
+      const accessToken = getAuthData()?.accessToken;
       if (!user) {
         throw new Error("Not authenticated");
       }
 
       // Call backend API to become seller
-      await becomeSeller(submitData);
-
-      // Update user role in localStorage
-      const updatedUser = {
-        id: user.sub,
-        username: user.username,
-        role: "seller",
-      };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+      await becomeSeller(submitData, user.id, accessToken || "");
 
       router.push("/");
     } catch (error) {
@@ -281,7 +284,7 @@ export default function BecomeSellerPage() {
               name="bio"
               value={formData.bio}
               onChange={handleChange}
-              placeholder="I'm a freelance designer..."
+              placeholder="เล่าเกี่ยวกับตัวคุณ ประสบการณ์ และสิ่งที่ทำให้คุณเป็นผู้ขายที่ยอดเยี่ยม"
               rows={3}
               className={`w-full px-4 py-3 rounded-lg bg-slate-800/50 border ${
                 errors.bio
@@ -304,7 +307,7 @@ export default function BecomeSellerPage() {
               name="location"
               value={formData.location}
               onChange={handleChange}
-              placeholder="Bangkok, Thailand"
+              placeholder="กรุงเทพมหานคร, ประเทศไทย"
               className={`w-full px-4 py-3 rounded-lg bg-slate-800/50 border ${
                 errors.location
                   ? "border-red-500"
@@ -330,7 +333,7 @@ export default function BecomeSellerPage() {
                     onChange={(e) =>
                       handleArrayChange(index, e.target.value, "skills")
                     }
-                    placeholder="UI/UX Design"
+                    placeholder="เช่น การออกแบบกราฟิก, การพัฒนาเว็บ"
                     className="flex-1 px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-[var(--primary)] text-white placeholder:text-slate-400 focus:outline-none transition-colors"
                   />
                   {formData.skills.length > 1 && (
@@ -355,48 +358,6 @@ export default function BecomeSellerPage() {
             </div>
             {errors.skills && (
               <p className="text-red-500 text-xs mt-1">{errors.skills}</p>
-            )}
-          </div>
-
-          {/* Tools */}
-          <div>
-            <label className="block text-white text-sm mb-2">
-              เครื่องมือที่ใช้ <span className="text-red-500">*</span>
-            </label>
-            <div className="space-y-2">
-              {formData.tools.map((tool, index) => (
-                <div key={index} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={tool}
-                    onChange={(e) =>
-                      handleArrayChange(index, e.target.value, "tools")
-                    }
-                    placeholder="Figma"
-                    className="flex-1 px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-[var(--primary)] text-white placeholder:text-slate-400 focus:outline-none transition-colors"
-                  />
-                  {formData.tools.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem(index, "tools")}
-                      className="px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
-                    >
-                      ลบ
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => addArrayItem("tools")}
-                disabled={formData.tools.length >= MAX_TOOLS}
-                className="w-full px-4 py-2 bg-slate-800/50 hover:bg-slate-800 text-slate-400 rounded-lg border border-dashed border-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                + เพิ่มเครื่องมือ ({formData.tools.length}/{MAX_TOOLS})
-              </button>
-            </div>
-            {errors.tools && (
-              <p className="text-red-500 text-xs mt-1">{errors.tools}</p>
             )}
           </div>
 
@@ -475,11 +436,11 @@ export default function BecomeSellerPage() {
                       onClick={() =>
                         setFormData((prev) => ({
                           ...prev,
-                          bankName: bank.name,
+                          bankCode: bank.code,
                         }))
                       }
                       className={`p-4 rounded-lg border-2 transition-all hover:scale-105 ${
-                        formData.bankName === bank.name
+                        formData.bankCode === bank.code
                           ? "border-[var(--primary)] bg-[var(--primary)]/10"
                           : "border-slate-700 bg-slate-800/50 hover:border-slate-600"
                       }`}
@@ -501,8 +462,8 @@ export default function BecomeSellerPage() {
                     </button>
                   ))}
                 </div>
-                {errors.bankName && (
-                  <p className="text-red-500 text-xs mt-1">{errors.bankName}</p>
+                {errors.bankCode && (
+                  <p className="text-red-500 text-xs mt-1">{errors.bankCode}</p>
                 )}
               </div>
 
@@ -538,7 +499,7 @@ export default function BecomeSellerPage() {
                   name="bankAccountName"
                   value={formData.bankAccountName}
                   onChange={handleChange}
-                  placeholder="John Doe"
+                  placeholder="Jane Doe"
                   className={`w-full px-4 py-3 rounded-lg bg-slate-800/50 border ${
                     errors.bankAccountName
                       ? "border-red-500"

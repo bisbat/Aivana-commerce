@@ -23,6 +23,9 @@ export class ResponseUserDto {
   role: string;
 
   @Expose()
+  sellerId?: string;
+
+  @Expose()
   createdAt: Date;
 
   @Expose()

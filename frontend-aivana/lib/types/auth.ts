@@ -31,11 +31,8 @@ export interface RegisterResponse {
 
 export interface TokenPayload {
   sub: string;
-  username: string;
-  role: string;
   iat?: number;
   exp?: number;
-  sellerId?: string;
 }
 
 // Helper function to decode JWT token
@@ -49,6 +46,8 @@ export function decodeJWT(token: string): TokenPayload {
         .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
         .join("")
     );
+
+    console.log("Decoded JWT Payload:", jsonPayload);
     return JSON.parse(jsonPayload);
   } catch (error) {
     throw new Error("Invalid token");

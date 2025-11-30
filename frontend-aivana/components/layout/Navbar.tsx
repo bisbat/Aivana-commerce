@@ -7,6 +7,7 @@ import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
 import { ProfileModal } from "./ProfileModal";
 import { CartModal } from "../cart/CartModal";
 import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
+import { getUserByUserId } from "@/lib/actions/user.actions";
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
@@ -24,11 +25,11 @@ export const Navbar: React.FC = () => {
 
   // Check authentication status on mount and when pathname changes
   useEffect(() => {
-    const checkAuth = () => {
-      const user = getCurrentUserFromToken();
+    const checkAuth = async () => {
+      const user = await getCurrentUserFromToken();
       setIsAuthenticated(!!user);
       setUserRole(user?.role || null);
-      setUserId(user?.sub || null);
+      setUserId(user?.id || null);
     };
 
     checkAuth();
@@ -125,14 +126,6 @@ export const Navbar: React.FC = () => {
                 </Link>
               )}
               {/* Show "Dashboard" button if user is seller */}
-              {userRole === "seller" && (
-                <Link
-                  href="/seller/dashboard"
-                  className="text-white hover:text-[var(--primary)] transition-colors text-sm"
-                >
-                  แดชบอร์ด
-                </Link>
-              )}
             </div>
           </div>
 
@@ -178,8 +171,8 @@ export const Navbar: React.FC = () => {
           {/* Right Side: Auth-based content */}
           {isAuthenticated ? (
             <div className="hidden md:flex items-center gap-4 shrink-0">
-              {/* Cart - Only show for customers */}
-              {userRole === "customer" && (
+              {/* Cart - Show for customers and sellers */}
+              {(userRole === "customer" || userRole === "seller") && (
                 <button
                   onClick={() => setIsCartOpen(true)}
                   className="text-white hover:text-[var(--primary)] transition-colors relative"
@@ -188,8 +181,6 @@ export const Navbar: React.FC = () => {
                   <ShoppingCart size={20} />
                 </button>
               )}
-
-              {/* Profile Icon with Modal */}
               <div ref={profileRef} className="relative">
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -272,7 +263,7 @@ export const Navbar: React.FC = () => {
 
             {isAuthenticated ? (
               <>
-                {userRole === "customer" && (
+                {(userRole === "customer" || userRole === "seller") && (
                   <>
                     <button
                       onClick={() => {
@@ -292,15 +283,7 @@ export const Navbar: React.FC = () => {
                     </Link>
                   </>
                 )}
-                {userRole === "seller" && (
-                  <Link
-                    href="/seller/dashboard"
-                    className="block text-white hover:text-[var(--primary)] transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    แดชบอร์ด
-                  </Link>
-                )}
+
                 <Link
                   href="/profile"
                   className="block text-white hover:text-[var(--primary)] transition-colors"
@@ -332,9 +315,10 @@ export const Navbar: React.FC = () => {
       )}
 
       {/* Cart Modal - Only for customers */}
-      {isAuthenticated && userRole === "customer" && (
-        <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-      )}
+      {isAuthenticated &&
+        (userRole === "customer" || userRole === "seller") && (
+          <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+        )}
     </nav>
   );
 };

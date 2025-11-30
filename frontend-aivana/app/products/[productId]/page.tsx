@@ -36,7 +36,7 @@ export default function ProductDetailPage() {
     try {
       setAddingToCart(true);
 
-      const user = getCurrentUserFromToken();
+      const user = await getCurrentUserFromToken();
       if (!user) {
         setToast({
           show: true,
@@ -51,7 +51,7 @@ export default function ProductDetailPage() {
       }
 
       await addToCart({
-        userId: user.sub,
+        userId: user.id,
         productId: parseInt(productId),
       });
 
@@ -66,7 +66,6 @@ export default function ProductDetailPage() {
         3000
       );
     } catch (err: unknown) {
-      // Check for specific error code instead of message string
       const errorMessage =
         err instanceof Error && err.message === "PRODUCT_ALREADY_IN_CART"
           ? "สินค้านี้มีอยู่ในตะกร้าแล้ว"
