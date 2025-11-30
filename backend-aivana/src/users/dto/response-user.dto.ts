@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 
 export class ResponseUserDto {
   @Expose()
@@ -23,6 +23,7 @@ export class ResponseUserDto {
   role: string;
 
   @Expose()
+  @Transform(({ obj }) => obj.sellerProfile?.id || null)
   sellerId?: string;
 
   @Expose()
