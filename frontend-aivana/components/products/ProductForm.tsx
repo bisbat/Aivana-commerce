@@ -17,12 +17,14 @@ import { getAuthData } from '@/lib/actions/auth.actions';
 // NEW: This component no longer submits to backend
 // It just collects data and passes to next step
 interface ProductFormProps {
+  sellerId: string;
   uploadData: UploadFileFormData ;
   onNext: (data: ProductInformationFormData) => void; // Changed from onBack
   onBack: () => void;
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({ 
+  sellerId,
   uploadData, 
   onNext, 
   onBack 
@@ -61,11 +63,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         setCategories(categoriesData);
         setTags(tagsData);
 
-        console.log('✅ Categories loaded:', categoriesData);
-        console.log('✅ Tags loaded:', tagsData);
 
       } catch (err) {
-        console.error('❌ Error loading categories/tags:', err);
         setError('Failed to load categories and tags. Please refresh the page.');
       } finally {
         setIsLoadingData(false);
@@ -95,12 +94,17 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       return;
     }
 
+    if (!sellerId) {
+      setError('Seller ID is missing. Please log in again.');
+      return;
+    }
+
     // Pass data to parent (page.tsx)
     const formData: ProductInformationFormData = {
       name,
       blurb,
       categoryId: Number(categoryId),
-      ownerId: 1,
+      sellerId: sellerId,
       description,
       features: features.filter(f => f.trim() !== ''),
       installationGuide,
@@ -111,6 +115,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       heroImageUrl: null,
       tagIds: selectedTagIds
     };
+    console.log("Product Information Form Data:", formData);
 
     onNext(formData);
   };
