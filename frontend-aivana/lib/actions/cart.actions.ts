@@ -5,6 +5,7 @@ export async function addToCart(
   data: AddToCartRequest,
   accessToken?: string
 ): Promise<AddToCartResponse> {
+  console.log("AccessToken:", accessToken);
   const response = await fetch("http://localhost:3001/cart/add", {
     method: "POST",
     headers: {
@@ -26,7 +27,10 @@ export async function addToCart(
   return response.json();
 }
 
-export async function getCart(userId: string, accessToken?: string): Promise<GetCartResponse> {
+export async function getCart(
+  userId: string,
+  accessToken?: string
+): Promise<GetCartResponse> {
   const response = await fetch(`http://localhost:3001/cart/user/${userId}`, {
     method: "GET",
     headers: {

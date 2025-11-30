@@ -28,7 +28,6 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
       }
       const accessToken = getAuthData()?.accessToken || "";
 
-
       const data = await getCart(user.id, accessToken);
       setCartData(data);
     } catch (error) {
@@ -68,11 +67,16 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
     };
   }, [isOpen]);
 
-  const total =
-    cartData?.items.reduce(
-      (sum, item) => sum + Number(item.product.price),
-      0
-    ) || 0;
+  const total = (() => {
+    if (!cartData?.items?.length) return "0.00";
+
+    const sum = cartData.items.reduce((acc, item) => {
+      const price = item.product.price || 0;
+      return acc + price;
+    }, 0);
+
+    return sum.toFixed(2);
+  })();
 
   if (!isOpen) return null;
 

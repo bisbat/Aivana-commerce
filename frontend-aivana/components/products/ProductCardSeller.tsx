@@ -1,6 +1,7 @@
 import React from "react";
 import { Edit2 } from "lucide-react";
-import Link from 'next/link';
+import Link from "next/link";
+import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { Product } from "@/lib/types/product/Product";
 
 interface ProductCardSellerProps {
@@ -8,7 +9,10 @@ interface ProductCardSellerProps {
   onEdit?: (productId: number) => void;
 }
 
-const ProductCardSeller: React.FC<ProductCardSellerProps> = ({ product, onEdit }) => {
+const ProductCardSeller: React.FC<ProductCardSellerProps> = ({
+  product,
+  onEdit,
+}) => {
   return (
     <Link href={`/stores/products/${product.id}`}>
       <div className="border rounded-lg p-0 shadow hover:shadow-xl transition-all duration-300 h-70 w-full overflow-hidden bg-[var(--linne-purple)]">
@@ -37,7 +41,7 @@ const ProductCardSeller: React.FC<ProductCardSellerProps> = ({ product, onEdit }
 
           <div className="flex items-center justify-between">
             <span className="text-xl font-bold">
-              {product.price}฿
+              {formatPriceWithCurrency(product.price)}
             </span>
 
             <button

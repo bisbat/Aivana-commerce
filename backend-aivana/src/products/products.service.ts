@@ -294,7 +294,7 @@ export class ProductsService {
     const detailImages =
       product.productImages?.map((image) => ({
         imageId: image.imageId.toString(),
-        url: this.minioService.getFileUrl(image.pathImage),
+        url: image.pathImage,
       })) || [];
 
     const tags =
@@ -408,7 +408,7 @@ export class ProductsService {
       const imageUrl = this.minioService.getFileUrl(fullPath);
 
       await this.productImageService.create({
-        pathImage: imageUrl, 
+        pathImage: imageUrl,
         productId: product.id,
       });
 

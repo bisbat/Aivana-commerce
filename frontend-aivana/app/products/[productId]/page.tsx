@@ -52,11 +52,13 @@ export default function ProductDetailPage() {
       }
       const accessToken = getAuthData()?.accessToken || "";
 
-      await addToCart({
-        userId: user.id,
-        productId: parseInt(productId),
-        accessToken: accessToken
-      });
+      await addToCart(
+        {
+          userId: user.id,
+          productId: parseInt(productId),
+        },
+        accessToken
+      );
 
       setToast({
         show: true,

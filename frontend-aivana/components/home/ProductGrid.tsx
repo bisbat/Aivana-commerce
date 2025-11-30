@@ -12,10 +12,10 @@ interface ProductGridProps {
   title?: string;
 }
 
-export const ProductGrid: React.FC<ProductGridProps> = ({ 
-  products: externalProducts, 
-  showHeader = true, 
-  title = "เลือกซื้อ" 
+export const ProductGrid: React.FC<ProductGridProps> = ({
+  products: externalProducts,
+  showHeader = true,
+  title = "เลือกซื้อ",
 }) => {
   const [products, setProducts] = useState<Product[]>(externalProducts || []);
   const [isLoading, setIsLoading] = useState(!externalProducts);
@@ -53,7 +53,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   // Sort products
   const sortedProducts = [...products].sort((a, b) => {
     if (sortBy === "price") {
-      return parseFloat(a.price) - parseFloat(b.price);
+      return a.price - b.price;
     }
     // Sort by created_at (latest first)
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();

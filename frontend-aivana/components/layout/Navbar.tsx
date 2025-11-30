@@ -91,8 +91,8 @@ export const Navbar: React.FC = () => {
 
   return (
     <nav className="bg-[var(--background)] border-b border-slate-800 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-3">
+        <div className="flex items-center h-16 gap-4">
           {/* Left Side: Logo + Menu Items */}
           <div className="flex items-center gap-8 shrink-0">
             {/* Logo */}
@@ -103,16 +103,16 @@ export const Navbar: React.FC = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-6">
+            <div className="flex items-center gap-3 shrink-0 ml-auto">
               <Link
                 href="/categories"
-                className="text-white hover:text-[var(--primary)] transition-colors text-sm"
+                className="px-4 py-2 font-medium text-white hover:text-[var(--primary)] transition-colors text-sm"
               >
                 หมวดหมู่
               </Link>
               <Link
                 href="/about"
-                className="text-white hover:text-[var(--primary)] transition-colors text-sm"
+                className="px-4 py-2 font-medium text-white hover:text-[var(--primary)] transition-colors text-sm"
               >
                 เกี่ยวกับ
               </Link>
@@ -125,16 +125,12 @@ export const Navbar: React.FC = () => {
                   สมัครเป็นผู้ขาย
                 </Link>
               )}
-              {/* Show "Dashboard" button if user is seller */}
             </div>
           </div>
 
-          {/* Middle: Animated Search Bar */}
+          {/* Middle: Animated Search Bar - ใช้ flex-1 เพื่อให้ยืดเต็ม */}
           {showSearchBar && (
-            <div
-              ref={searchRef}
-              className="hidden md:flex items-center flex-1 max-w-2xl"
-            >
+            <div ref={searchRef} className="hidden md:flex items-center flex-1">
               <form
                 onSubmit={handleSearch}
                 className={`flex items-center transition-all duration-300 ease-in-out w-full ${
@@ -170,7 +166,7 @@ export const Navbar: React.FC = () => {
 
           {/* Right Side: Auth-based content */}
           {isAuthenticated ? (
-            <div className="hidden md:flex items-center gap-4 shrink-0">
+            <div className="flex items-center gap-4 shrink-0 ml-auto">
               {/* Cart - Show for customers and sellers */}
               {(userRole === "customer" || userRole === "seller") && (
                 <button
@@ -198,7 +194,7 @@ export const Navbar: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="hidden md:flex items-center gap-3 shrink-0">
+            <div className="flex items-center gap-3 shrink-0 ml-auto">
               <Link
                 href="/login"
                 className="px-4 py-2 text-white hover:text-[var(--primary)] transition-colors text-sm font-medium"
@@ -218,7 +214,7 @@ export const Navbar: React.FC = () => {
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-white"
+            className="md:hidden text-white ml-auto"
             aria-label="Toggle mobile menu"
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
