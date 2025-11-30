@@ -1,10 +1,14 @@
+'use server';
 import { UserProfile } from "@/lib/types/user.ts/user";
-import { getAuthData } from "./auth.actions";
 
 export async function getUserByUserId(
-  userId: string
+  userId: string | null,
+  accessToken: string | null
 ): Promise<UserProfile | null> {
-  const accessToken = getAuthData().accessToken;
+
+  if (!userId) return null;
+  if (!accessToken) return null;
+
   try {
     const response = await fetch(`http://localhost:3001/users/${userId}`, {
       method: "GET",
@@ -13,10 +17,11 @@ export async function getUserByUserId(
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    const user = await response.json();
-    return user;
+
+    return await response.json();
   } catch (error) {
     console.error("Error fetching user:", error);
     return null;
   }
 }
+

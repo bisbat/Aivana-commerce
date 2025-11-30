@@ -47,10 +47,6 @@ export class UpdateSellerDto {
 
     @IsOptional()
     @IsString()
-    storeName?: string;
-
-    @IsOptional()
-    @IsString()
     bio?: string;
 
     @IsOptional()
