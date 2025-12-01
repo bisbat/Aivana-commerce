@@ -1,3 +1,5 @@
+'use client';
+
 import { LoginRequest, TokenResponse, decodeJWT } from "@/lib/types/auth";
 import { UserProfile } from "@/lib/types/user.ts/user";
 import { getUserByUserId } from "./user.actions";
@@ -55,6 +57,7 @@ export async function register(data: FormData): Promise<TokenResponse> {
 export function getAuthData(): {
   accessToken: string | null;
 } {
+  console.log("Running on:", typeof window);
   const accessToken = localStorage.getItem("accessToken");
 
   return {

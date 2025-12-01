@@ -75,7 +75,7 @@ export default function EditProductPage() {
   const [deletedImageIds, setDeletedImageIds] = useState<number[]>([]);
   const [detailImages, setDetailImages] = useState<ProductImages[]>([]);
 
-  const token = getAuthData()?.accessToken || "";
+  const [token, setToken] = useState<string>("");
 
   useEffect(() => {
     async function fetchFormData() {
@@ -83,6 +83,7 @@ export default function EditProductPage() {
       setProductData(product);
 
       const accessToken = getAuthData()?.accessToken || "";
+      setToken(accessToken);
       const tags: Tag[] = await getAllTagsAction(accessToken);
       setTags(tags);
 
@@ -134,8 +135,7 @@ export default function EditProductPage() {
   // Handler for removing existing image
   const handleDeleteImage = async (imageId: number) => {
     try {
-      const accessToken = getAuthData().accessToken || "";
-      await deleteProductImageAction(imageId, accessToken);
+      await deleteProductImageAction(imageId, token);
 
       setDetailImages(prev => prev.filter(img => img.imageId !== imageId));
       setDeletedImageIds(prev => [...prev, imageId]);
