@@ -15,7 +15,7 @@ const ProductCardSeller: React.FC<ProductCardSellerProps> = ({
 }) => {
   return (
     <Link href={`/stores/products/${product.id}`}>
-      <div className="border rounded-lg p-0 shadow hover:shadow-xl transition-all duration-300 h-70 w-full overflow-hidden bg-[var(--linne-purple)]">
+      <div className="rounded-lg p-0 shadow hover:shadow-xl transition-all duration-300 h-70 w-full overflow-hidden bg-[var(--linne-purple)]">
         {/* Image Section */}
         <div className="relative h-48 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 overflow-hidden">
           {product.heroImageUrl ? (

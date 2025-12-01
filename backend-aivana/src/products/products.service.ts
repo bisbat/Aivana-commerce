@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductEntity } from './entities/product.entity';
 import { In, Not, Repository } from 'typeorm';
@@ -30,11 +34,11 @@ export class ProductsService {
     private categoryRepository: Repository<CategoryEntity>,
     @InjectRepository(ProductImage)
     private productImageRepository: Repository<ProductImage>,
-  ) { }
+  ) {}
 
   async getAllProducts(): Promise<ResponseProductDto[]> {
     const products = await this.productsRepository.find({
-      relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'], // ← เพิ่ม 'seller.user'
+      relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
     });
 
     return products.map((product) => {
@@ -55,25 +59,26 @@ export class ProductsService {
       // Transform category to ResponseCategoryDto format
       const category = product.category
         ? {
-          id: product.category.id,
-          name: product.category.name,
-        }
+            id: product.category.id,
+            name: product.category.name,
+          }
         : null;
 
       // Transform seller to MinimalSellerDto format with user data
       const seller = product.seller
         ? {
-          id: product.seller.id,
-          firstName: product.seller.user?.firstName,
-          lastName: product.seller.user?.lastName,
-        }
+            id: product.seller.id,
+            firstName: product.seller.user?.firstName,
+            lastName: product.seller.user?.lastName,
+            username: product.seller.user?.username,
+          }
         : null;
 
       // Prepare data for transformation
       const productData = {
         ...product,
         id: product.id.toString(),
-        seller, // ← ใช้ seller object ที่ transform แล้ว
+        seller,
         category,
         tags,
         detailImages,
@@ -112,18 +117,19 @@ export class ProductsService {
     // Transform category to ResponseCategoryDto format
     const category = product.category
       ? {
-        id: product.category.id,
-        name: product.category.name,
-      }
+          id: product.category.id,
+          name: product.category.name,
+        }
       : null;
 
     // Transform seller to MinimalSellerDto format with user data
     const seller = product.seller
       ? {
-        id: product.seller.id,
-        firstName: product.seller.user?.firstName,
-        lastName: product.seller.user?.lastName,
-      }
+          id: product.seller.id,
+          firstName: product.seller.user?.firstName,
+          lastName: product.seller.user?.lastName,
+          username: product.seller.user?.username,
+        }
       : null;
 
     // Prepare data for transformation
@@ -253,7 +259,9 @@ export class ProductsService {
       relations: ['category', 'seller', 'tags', 'productImages'],
     });
     if (!updatedProduct) {
-      throw new NotFoundException(`Product with ID ${id} not found after update`);
+      throw new NotFoundException(
+        `Product with ID ${id} not found after update`,
+      );
     }
     return updatedProduct;
   }
@@ -284,12 +292,11 @@ export class ProductsService {
   async getProductById(id: number): Promise<ResponseProductDto | null> {
     const product = await this.productsRepository.findOne({
       where: { id },
-      relations: ['category', 'seller', 'productImages', 'tags'],
+      relations: ['category', 'seller', 'productImages', 'tags', 'seller.user'],
     });
 
     if (!product) return null;
 
-    // แปลง productImages → detailImages (เติม URL จาก Minio)
     const detailImages =
       product.productImages?.map((image) => ({
         imageId: image.imageId.toString(),
@@ -302,12 +309,21 @@ export class ProductsService {
         name: tag.name,
       })) || [];
 
+    const seller = product.seller
+      ? {
+          id: product.seller.id,
+          firstName: product.seller.user?.firstName,
+          lastName: product.seller.user?.lastName,
+          username: product.seller.user?.username,
+        }
+      : null;
+
     // inject detailImages เข้าไปใน product object และแปลงข้อมูล
     const productWithDetailImages = {
       ...product,
       id: product.id.toString(),
       categoryId: product.category?.id,
-      sellerId: product.seller?.id,
+      seller,
       tags,
       detailImages,
     };
@@ -433,7 +449,6 @@ export class ProductsService {
       detailImages?: UploadedFileType[];
     },
   ): Promise<ResponseProductDto> {
-
     /* 1. Find seller by userId */
     const seller = await this.sellerRepository.findOne({
       where: { user: { id: userId } },
@@ -460,7 +475,9 @@ export class ProductsService {
       const heroFile = files.heroImage[0];
       const fileName = `hero-${Date.now()}-${heroFile.originalname}`;
 
-      await this.minioService.deleteFolder(MINIO_FOLDERS.PRODUCTS.HERO(productId));
+      await this.minioService.deleteFolder(
+        MINIO_FOLDERS.PRODUCTS.HERO(productId),
+      );
 
       const full = await this.minioService.uploadFile(
         heroFile,
@@ -539,5 +556,4 @@ export class ProductsService {
       excludeExtraneousValues: true,
     });
   }
-
 }

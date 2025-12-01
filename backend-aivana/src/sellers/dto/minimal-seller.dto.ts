@@ -9,4 +9,7 @@ export class MinimalSellerDto {
 
   @Expose()
   lastName: string;
+
+  @Expose()
+  username: string;
 }

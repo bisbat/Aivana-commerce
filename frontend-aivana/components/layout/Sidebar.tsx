@@ -1,9 +1,15 @@
-'use client';
+"use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation"; // ✅ import router
-import { Home, LayoutDashboard, Package, DollarSign, Store } from "lucide-react";
+import {
+  Home,
+  LayoutDashboard,
+  Package,
+  DollarSign,
+  Store,
+} from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -21,16 +27,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
   storeName = "Store name",
   currentPath = "/",
 }) => {
-  const router = useRouter(); // ✅ initialize router
+  const router = useRouter();
 
   const navItems: NavItem[] = [
     { label: "Market Place", icon: <Store size={20} />, href: "/" },
-    { label: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/dashboard" },
+    {
+      label: "Dashboard",
+      icon: <LayoutDashboard size={20} />,
+      href: "/dashboard",
+    },
     { label: "Product", icon: <Package size={20} />, href: "/stores" },
     { label: "Earning", icon: <DollarSign size={20} />, href: "/earning" },
   ];
-
-  // ✅ Function to handle navigation to /stores/products/new
   const handleAddProduct = () => {
     router.push("/stores/products/new");
   };
@@ -48,7 +56,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           />
         ))}
 
-        {/* ✅ Add Product Button */}
         <button
           onClick={handleAddProduct}
           className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] cursor-pointer text-white py-3 px-4 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"

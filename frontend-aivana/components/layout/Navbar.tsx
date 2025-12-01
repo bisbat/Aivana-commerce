@@ -106,13 +106,13 @@ export const Navbar: React.FC = () => {
             <div className="flex items-center gap-3 shrink-0 ml-auto">
               <Link
                 href="/categories"
-                className="px-4 py-2 font-medium text-white hover:text-[var(--primary)] transition-colors text-sm"
+                className="px-2 py-2 font-medium text-white hover:text-[var(--primary)] transition-colors text-sm"
               >
                 หมวดหมู่
               </Link>
               <Link
                 href="/about"
-                className="px-4 py-2 font-medium text-white hover:text-[var(--primary)] transition-colors text-sm"
+                className="px-2 py-2 font-medium text-white hover:text-[var(--primary)] transition-colors text-sm"
               >
                 เกี่ยวกับ
               </Link>
@@ -166,12 +166,12 @@ export const Navbar: React.FC = () => {
 
           {/* Right Side: Auth-based content */}
           {isAuthenticated ? (
-            <div className="flex items-center gap-4 shrink-0 ml-auto">
+            <div className="flex items-center gap-3 shrink-0 ml-auto">
               {/* Cart - Show for customers and sellers */}
               {(userRole === "customer" || userRole === "seller") && (
                 <button
                   onClick={() => setIsCartOpen(true)}
-                  className="text-white hover:text-[var(--primary)] transition-colors relative"
+                  className="px-2  text-white hover:text-[var(--primary)] transition-colors relative"
                   aria-label="Shopping cart"
                 >
                   <ShoppingCart size={20} />
@@ -180,7 +180,7 @@ export const Navbar: React.FC = () => {
               <div ref={profileRef} className="relative">
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="text-white hover:text-[var(--primary)] transition-colors"
+                  className="px-2  text-white hover:text-[var(--primary)] transition-colors"
                   aria-label="User profile"
                 >
                   <User size={20} />

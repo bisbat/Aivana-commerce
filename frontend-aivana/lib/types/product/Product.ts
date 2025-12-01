@@ -2,7 +2,6 @@ import { Category } from "../category";
 import { Tag } from "../tag";
 import { ProductImages } from "./product_images";
 
-//product retrieve interface form back-end
 export interface Product {
   id: string;
   name: string;
@@ -19,6 +18,7 @@ export interface Product {
     id: string;
     firstName: string;
     lastName: string;
+    username: string;
   } | null;
   category: Category;
   createdAt: string;

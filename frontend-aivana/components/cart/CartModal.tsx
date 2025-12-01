@@ -67,16 +67,16 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
     };
   }, [isOpen]);
 
-  const total = (() => {
-    if (!cartData?.items?.length) return "0.00";
+ const total = (() => {
+   if (!cartData?.items?.length) return "0.00";
 
-    const sum = cartData.items.reduce((acc, item) => {
-      const price = item.product.price || 0;
-      return acc + price;
-    }, 0);
+   const sum = cartData.items.reduce((acc, item) => {
+     const price = Number(item.product.price) || 0;
+     return acc + price;
+   }, 0);
 
-    return sum.toFixed(2);
-  })();
+   return Number(sum).toFixed(2);
+ })();
 
   if (!isOpen) return null;
 
