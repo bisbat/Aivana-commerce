@@ -13,7 +13,8 @@ import { UserProfile } from "@/lib/types/user.ts/user";
 export default function StorePage() {
   const router = useRouter();
   const [sellerId, setSellerId] = useState<string | null>(null);
-  const token = getAuthData()?.accessToken || "";
+
+  const [token, setToken] = useState<string>("");
 
   // State for products
   const [products, setProducts] = useState<Product[]>([]);
@@ -26,6 +27,9 @@ export default function StorePage() {
       const user = await getCurrentUserFromToken();
       setUserData(user);
       setSellerId(user?.sellerId ?? null);
+
+      const auth = getAuthData();   // <-- รันแค่บน client
+      setToken(auth?.accessToken || "");
     }
     fetchCurrentUser();
   }, []);
