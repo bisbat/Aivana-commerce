@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import React, { useState, useRef } from 'react';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
-import { UploadImageFormData } from '@/lib/types/formCreateProduct/UploadImageFormData';
+import React, { useState, useRef } from "react";
+import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { UploadImageFormData } from "@/lib/types/formCreateProduct/UploadImageFormData";
 
 interface UploadImageFormProps {
   onPublish: (data: UploadImageFormData) => void;
   onBack: () => void;
 }
 
-export const UploadImageForm: React.FC<UploadImageFormProps> = ({ 
-  onPublish, 
-  onBack 
+export const UploadImageForm: React.FC<UploadImageFormProps> = ({
+  onPublish,
+  onBack,
 }) => {
   // State
   const [heroImage, setHeroImage] = useState<File | null>(null);
@@ -29,14 +29,14 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setError('Please upload an image file (JPG, PNG, JPEG)');
+      if (!file.type.startsWith("image/")) {
+        setError("Please upload an image file (JPG, PNG, JPEG)");
         return;
       }
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setError('Hero image must be less than 5MB');
+        setError("Hero image must be less than 5MB");
         return;
       }
 
@@ -55,23 +55,23 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
   // Handle detail images upload
   const handleDetailImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    
+
     if (files.length === 0) return;
 
     // Check total number of images (max 10)
     if (detailImages.length + files.length > 8) {
-      setError('You can upload maximum 8 detail images');
+      setError("You can upload maximum 8 detail images");
       return;
     }
 
     // Validate each file
     for (const file of files) {
-      if (!file.type.startsWith('image/')) {
-        setError('All files must be images (JPG, PNG, JPEG)');
+      if (!file.type.startsWith("image/")) {
+        setError("All files must be images (JPG, PNG, JPEG)");
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        setError('Each image must be less than 5MB');
+        setError("Each image must be less than 5MB");
         return;
       }
     }
@@ -79,13 +79,13 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
     setError(null);
 
     // Add to existing images
-    setDetailImages(prev => [...prev, ...files]);
+    setDetailImages((prev) => [...prev, ...files]);
 
     // Create preview URLs
-    files.forEach(file => {
+    files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setDetailImagePreviews(prev => [...prev, reader.result as string]);
+        setDetailImagePreviews((prev) => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
     });
@@ -93,8 +93,8 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
 
   // Remove detail image
   const removeDetailImage = (index: number) => {
-    setDetailImages(prev => prev.filter((_, i) => i !== index));
-    setDetailImagePreviews(prev => prev.filter((_, i) => i !== index));
+    setDetailImages((prev) => prev.filter((_, i) => i !== index));
+    setDetailImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   // Handle publish
@@ -110,16 +110,16 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
     // Pass data to parent
     onPublish({
       heroImage,
-      detailImages
+      detailImages,
     });
   };
 
   // ... rest of your component (JSX) stays exactly the same ...
-  
+
   return (
     <div className="space-y-8">
-            {/* Step Indicator */}
-            <div className="flex items-center gap-4 mb-8">
+      {/* Step Indicator */}
+      <div className="flex items-center gap-4 mb-8">
         <button
           onClick={onBack}
           className="text-purple-400 hover:text-purple-300 transition-colors"
@@ -130,21 +130,27 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
           <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-bold">
             ✓
           </div>
-          <span className="text-green-400 text-sm font-medium">Upload File</span>
-          
+          <span className="text-green-400 text-sm font-medium">
+            Upload File
+          </span>
+
           <div className="h-px w-12 bg-slate-700" />
-          
+
           <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-bold">
             ✓
           </div>
-          <span className="text-green-400 text-sm font-medium">Product Information</span>
-          
+          <span className="text-green-400 text-sm font-medium">
+            Product Information
+          </span>
+
           <div className="h-px w-12 bg-slate-700" />
-          
+
           <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-sm font-bold">
             3
           </div>
-          <span className="text-purple-400 text-sm font-medium">Product Images</span>
+          <span className="text-purple-400 text-sm font-medium">
+            Product Images
+          </span>
         </div>
       </div>
 
@@ -201,7 +207,10 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
             className="border-2 border-dashed border-slate-600 rounded-lg p-12 text-center cursor-pointer hover:border-purple-500 hover:bg-slate-800/50 transition-all"
           >
             <ImageIcon className="mx-auto text-purple-400 mb-4" size={48} />
-            <p className="text-white mb-2">Drop your image here, or <span className="text-purple-400">brown</span></p>
+            <p className="text-white mb-2">
+              Drop your image here, or{" "}
+              <span className="text-purple-400">browse</span>
+            </p>
             <p className="text-slate-400 text-sm">Supports: JPG, JPEG</p>
           </div>
         )}
@@ -209,10 +218,10 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
 
       {/* Detail Images Section */}
       <div className="space-y-3">
-        <label className="block text-white font-medium">
-          Detail images
-        </label>
-        <p className="text-slate-400 text-sm">Upload up to 10 images showing product details</p>
+        <label className="block text-white font-medium">Detail images</label>
+        <p className="text-slate-400 text-sm">
+          Upload up to 10 images showing product details
+        </p>
 
         {/* Hidden file input (multiple) */}
         <input
@@ -230,7 +239,10 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
           className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center cursor-pointer hover:border-purple-500 hover:bg-slate-800/50 transition-all"
         >
           <Upload className="mx-auto text-purple-400 mb-3" size={40} />
-          <p className="text-white mb-1">Drop your image here, or <span className="text-purple-400">brown</span></p>
+          <p className="text-white mb-1">
+            Drop your image here, or{" "}
+            <span className="text-purple-400">browse</span>
+          </p>
           <p className="text-slate-400 text-sm">Supports: JPG, JPEG</p>
         </div>
 
@@ -263,7 +275,7 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
             ))}
           </div>
         )}
-        
+
         {detailImages.length > 0 && (
           <p className="text-slate-400 text-sm mt-2">
             {detailImages.length} / 10 images uploaded
