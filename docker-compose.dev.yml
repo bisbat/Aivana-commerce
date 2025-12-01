@@ -1,6 +1,19 @@
-# version: '3.8'
-
 services:
+  backend:
+    build:
+      context: ./backend-aivana
+      dockerfile: Dockerfile
+    container_name: backend
+    env_file: ./backend-aivana/.env
+    ports:
+      - "3001:3001" # backend API
+    depends_on:
+      - postgres
+      - minio
+    restart: unless-stopped
+    networks:
+      - aivana-network
+
   postgres:
     image: postgres:latest
     container_name: postgres
@@ -13,6 +26,8 @@ services:
     ports:
       - "5432:5432"
     restart: unless-stopped
+    networks:
+      - aivana-network
 
   minio:
     image: minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1
@@ -26,6 +41,8 @@ services:
       - ./services/minio/data:/data
       - ./services/minio/config:/root/.minio
     restart: unless-stopped
+    networks:
+      - aivana-network
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -38,8 +55,12 @@ services:
     depends_on:
       - postgres
     restart: unless-stopped
+    networks:
+      - aivana-network
 
 volumes:
   postgres_data:
 
+networks:
+  aivana-network:
 
