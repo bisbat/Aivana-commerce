@@ -3,13 +3,13 @@ export interface ProductUpdatePayload {
     description?: string;
     price?: string;
     blurb?: string;
-    installation_guide?: string;
+    installationGuide?: string;
     features?: string[];
     compatibility?: string[];
     categoryId?: string;
-    tagIds?: string[];
+    tagIds?: number[];
     heroImage?: File;
     detailImages?: File[];
-    preview_url?: string;
+    previewUrl?: string;
     productFile?: File;
 }

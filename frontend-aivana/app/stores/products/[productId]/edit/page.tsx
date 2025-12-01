@@ -19,12 +19,31 @@ import { Category } from "@/lib/types/category";
 import { getAllCategories } from "@/lib/actions/category.actions";
 import { FeatureInput } from "@/components/ui/FeatureInput";
 import { CompatibilityInput } from "@/components/ui/CompatibilityInput";
-
 import EditProductImages from "./EditProductImages";
 import EditProductHeroImage from "./EditProductHeroImage";
 import EditProductFile from "./EditProductFile";
-import BackButton from "../BackButton";
+import BackButton from "./BackButton";
 import { getAuthData } from "@/lib/actions/auth.actions";
+import { ProductUpdatePayload } from "@/lib/types/product/UpdateProductPayload";
+
+
+export interface UpdatedProductData {
+  name: string;
+  blurb: string;
+  description: string;
+  categoryId: string;
+  features: string; // JSON string of string[]
+  installationGuide: string;
+  compatibility: string; // JSON string of string[]
+  tagIds: string; // JSON string of number[]
+  price: string;
+  previewUrl: string;
+  files?: {
+    heroImage?: File | null;
+    productFile?: File | null;
+    detailImages?: File[] | null;
+  };
+}
 
 export default function EditProductPage() {
   const params = useParams();
@@ -41,70 +60,71 @@ export default function EditProductPage() {
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [categoryId, setCategoryId] = useState("");
   const [features, setFeatures] = useState<string[]>([]);
-  const [installation_guide, setInstallation_guide] = useState("");
+  const [installationGuide, setInstallationGuide] = useState("");
   const [compatibility, setCompatibility] = useState<string[]>([]);
   const [price, setPrice] = useState("");
-  const [livePreview, setLivePreview] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [detailImages, setDetailImages] = useState<ProductImages[]>([]);
+  const [previewUrl, setpreviewUrl] = useState("");
 
-  // States for handling detail images
-  const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
-  const [deletedImageIds, setDeletedImageIds] = useState<string[]>([]);
-
-  // States for handling hero image
   const [currentHeroImage, setCurrentHeroImage] = useState<string | null>(null);
   const [newHeroImageFile, setNewHeroImageFile] = useState<File | null>(null);
 
-  // States for handling product file
-  const [currentProductFile, setCurrentProductFile] = useState<string | null>(
-    null
-  );
+  const [currentProductFile, setCurrentProductFile] = useState<string | null>(null);
   const [newProductFile, setNewProductFile] = useState<File | null>(null);
+
+  const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
+  const [deletedImageIds, setDeletedImageIds] = useState<number[]>([]);
+  const [detailImages, setDetailImages] = useState<ProductImages[]>([]);
+
+  const token = getAuthData()?.accessToken || "";
 
   useEffect(() => {
     async function fetchFormData() {
-      try {
-        const product: Product = await getProductByIdAction(productId);
-        setProductData(product);
+      const product: Product = await getProductByIdAction(productId);
+      setProductData(product);
 
-        const accessToken = getAuthData()?.accessToken || "";
-        const tags: Tag[] = await getAllTagsAction(accessToken);
-        setTags(tags);
+      const accessToken = getAuthData()?.accessToken || "";
+      const tags: Tag[] = await getAllTagsAction(accessToken);
+      setTags(tags);
 
-        const categories: Category[] = await getAllCategories();
-        setCategories(categories);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+      const categories: Category[] = await getAllCategories();
+      setCategories(categories);
+      setName(product.name);
+      setBlurb(product.blurb || "");
+      setDescription(product.description);
+      setCategoryId(product.category.id);
+      setFeatures(product.features || []);
+      setInstallationGuide(product.installationGuide);
+      setCompatibility(product.compatibility || []);
+      setSelectedTagIds(product.tags.map((tag) => parseInt(tag.id)));
+      setPrice(product.price.toString());
+      setpreviewUrl(product.previewUrl || "");
+      setCurrentHeroImage(product.heroImageUrl || null);
+      setCurrentProductFile(product.uploadedFilePath || null);
+      setDetailImages(product.detailImages || []);
     }
 
     fetchFormData();
   }, [productId]);
 
-  // แยก useEffect สำหรับ populate form เมื่อ productData เปลี่ยน
-  useEffect(() => {
-    console.log("Populating form with product data:", productData);
-    if (productData) {
-      setName(productData.name || "");
-      setBlurb(productData.blurb || "");
-      setDescription(productData.description || "");
-      setInstallation_guide(productData.installationGuide || "");
-      setCompatibility(productData.compatibility || []);
-      setPrice((productData.price ?? 0).toString());
-      setLivePreview(productData.previewUrl || "");
-      setFeatures(productData.features || []);
-      setCategoryId(productData.category?.id?.toString() || "");
-      setSelectedTagIds(productData.tags?.map((tag) => Number(tag.id)) || []);
-      setDetailImages(productData.detailImages || []);
-      setCurrentHeroImage(productData.heroImageUrl || null);
-      setCurrentProductFile(productData.uploadedFilePath || null);
-    }
-  }, [productData]);
+  if (!productData) return <div>Loading...</div>;
 
-  if (loading) return <div>Loading...</div>;
+  const handleHeroImageChange = (file: File | null) => {
+    setNewHeroImageFile(file);
+  };
+
+  const handleRemoveHeroImage = () => {
+    setCurrentHeroImage(null);
+    setNewHeroImageFile(null);
+  };
+
+  const handleProductFileChange = (file: File | null) => {
+    setNewProductFile(file);
+  };
+
+  const handleRemoveProductFile = () => {
+    setCurrentProductFile(null);
+    setNewProductFile(null);
+  };
 
   // Handler for adding new image files
   const handleAddImages = (files: File[]) => {
@@ -115,118 +135,46 @@ export default function EditProductPage() {
   const handleDeleteImage = async (imageId: number) => {
     try {
       const accessToken = getAuthData().accessToken || "";
-      // เรียก API เพื่อลบรูปจริงๆ
-      await deleteProductImageAction(imageId,accessToken);
+      await deleteProductImageAction(imageId, accessToken);
 
-      // อัปเดต UI
-      setDetailImages((prev) => prev.filter((img) => img.imageId !== imageId));
-
-      console.log(`Deleted image: ${imageId}`);
+      setDetailImages(prev => prev.filter(img => img.imageId !== imageId));
+      setDeletedImageIds(prev => [...prev, imageId]);
     } catch (error) {
-      console.error("Error deleting image:", error);
-      // ควรแสดง error message ให้ user
+      console.error(error);
     }
   };
-
   // Handler for removing new image file
   const handleRemoveNewImage = (index: number) => {
     setNewImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Handler for hero image change
-  const handleHeroImageChange = (file: File | null) => {
-    setNewHeroImageFile(file);
-  };
-
-  // Handler for removing hero image
-  const handleRemoveHeroImage = () => {
-    setCurrentHeroImage(null);
-    setNewHeroImageFile(null);
-  };
-
-  // Handler for product file change
-  const handleProductFileChange = (file: File | null) => {
-    setNewProductFile(file);
-  };
-
-  // Handler for removing product file
-  const handleRemoveProductFile = () => {
-    setCurrentProductFile(null);
-    setNewProductFile(null);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const updatedProductData: UpdatedProductData = {
+      name,
+      blurb,
+      description,
+      categoryId,
+      features: JSON.stringify(features),
+      installationGuide,
+      compatibility: JSON.stringify(compatibility),
+      tagIds: JSON.stringify(selectedTagIds),
+      price: price,
+      previewUrl,
+      files: {
+        heroImage: newHeroImageFile,
+        productFile: newProductFile,
+        detailImages: newImageFiles,
+      },
+    };
+    await updateProductAction(productId, updatedProductData, token)
+    router.push(`/stores/products/${productId}`);
 
-    try {
-      setLoading(true);
-
-      // Create FormData for handling files
-      const formData = new FormData();
-
-      // Add text data
-      formData.append("name", name);
-      formData.append("blurb", blurb);
-      formData.append("description", description);
-      formData.append("installation_guide", installation_guide);
-      formData.append("price", price);
-      formData.append("preview_url", livePreview);
-      formData.append("categoryId", categoryId);
-
-      // Add arrays as JSON strings
-      formData.append("compatibility", JSON.stringify(compatibility));
-      formData.append("features", JSON.stringify(features));
-      formData.append("tagIds", JSON.stringify(selectedTagIds));
-      formData.append("deletedImageIds", JSON.stringify(deletedImageIds));
-
-      // Add new detail image files
-      newImageFiles.forEach((file, index) => {
-        formData.append("detailImages", file);
-      });
-
-      // Add hero image file if changed
-      if (newHeroImageFile) {
-        formData.append("heroImage", newHeroImageFile);
-      }
-
-      // Add product file if changed
-      if (newProductFile) {
-        formData.append("productFile", newProductFile);
-      }
-
-      console.log("Updated Product Data:", {
-        name,
-        blurb,
-        description,
-        installation_guide,
-        compatibility,
-        price,
-        livePreview,
-        features,
-        categoryId,
-        selectedTagIds,
-        newDetailImages: newImageFiles.length,
-        hasNewHeroImage: !!newHeroImageFile,
-        hasNewProductFile: !!newProductFile,
-      });
-
-      const accessToken = getAuthData()?.accessToken || "";
-
-      await updateProductAction(productId, formData,accessToken);
-
-      // Redirect to product detail or products list
-      // router.push(`/stores/products/${productId}`);
-    } catch (error) {
-      console.error("Error updating product:", error);
-      // ควรแสดง error message ให้ user
-    } finally {
-      setLoading(false);
-    }
-  };
+  }
 
   return (
     <div>
-      <BackButton />
+      <BackButton productId={productId} />
       <h1 className="text-3xl font-bold text-primary mb-4">Edit page</h1>
 
       <form onSubmit={handleSubmit}>
@@ -268,8 +216,8 @@ export default function EditProductPage() {
 
         <Textarea
           label="Installation Document"
-          value={installation_guide}
-          onChange={setInstallation_guide}
+          value={installationGuide}
+          onChange={setInstallationGuide}
           placeholder="Installation Document..."
           rows={4}
         />
@@ -296,8 +244,8 @@ export default function EditProductPage() {
         />
         <Input
           label="Live Preview"
-          value={livePreview}
-          onChange={setLivePreview}
+          value={previewUrl}
+          onChange={setpreviewUrl}
           placeholder="https://example.com"
           type="url"
         />

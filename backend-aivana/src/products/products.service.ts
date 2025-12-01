@@ -300,7 +300,7 @@ export class ProductsService {
     const detailImages =
       product.productImages?.map((image) => ({
         imageId: image.imageId.toString(),
-        url: image.pathImage,
+        url: image.pathImage, // pathImage is already a URL
       })) || [];
 
     const tags =
@@ -423,7 +423,7 @@ export class ProductsService {
       const imageUrl = this.minioService.getFileUrl(fullPath);
 
       await this.productImageService.create({
-        pathImage: imageUrl,
+        pathImage: imageUrl, // Save URL for frontend compatibility
         productId: product.id,
       });
 
@@ -486,6 +486,7 @@ export class ProductsService {
       );
 
       const url = this.minioService.getFileUrl(full);
+      
       await this.updateHeroImage(product.id, url);
     }
 
@@ -540,9 +541,11 @@ export class ProductsService {
           MINIO_FOLDERS.PRODUCTS.DETAILS(productId),
         );
 
+        const imageUrl = this.minioService.getFileUrl(fullPath);
+
         await this.productImageService.create({
           productId: product.id,
-          pathImage: fullPath,
+          pathImage: imageUrl, // Use URL instead of path for frontend compatibility
         });
 
         await new Promise((r) => setTimeout(r, 10)); // ensure unique timestamp
