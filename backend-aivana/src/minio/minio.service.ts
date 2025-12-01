@@ -119,6 +119,7 @@ export class MinioService implements OnModuleInit {
       // Public URL format: http://localhost:9000/bucket-name/file-path
       const publicUrl = `${protocol}://${endpoint}${portSuffix}/${this.bucketName}/${fileName}`;
 
+      
       return publicUrl;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';

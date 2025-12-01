@@ -13,7 +13,6 @@ export async function updateProductAction(
   updatedData: UpdatedProductData,
   accessToken?: string
 ) {
-  console.log(updatedData);
 
   const formData = new FormData();
 
@@ -100,7 +99,7 @@ export async function deleteProductAction(
   accessToken?: string
 ) {
   // ส่งคำขอไปยัง API เพื่อลบสินค้า
-  const res = await fetch(`http://localhost:3001/products/${productId}`, {
+  const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -115,12 +114,15 @@ export async function deleteProductAction(
 }
 
 export async function getAllProductsAction() {
-  const res = await fetch(`http://localhost:3001/products`, {
+  const res = await fetch(`${API_BASE_URL}/products`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-  });
+  });  
+
+  console.log(res);
+  
 
   if (res.ok) {
     const data = await res.json();
@@ -131,13 +133,13 @@ export async function getAllProductsAction() {
 }
 
 export async function getProductByIdAction(productId: string) {
-  const res = await fetch(`http://localhost:3001/products/${productId}`, {
+  const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
   });
-
+  
   if (res.ok) {
     const data = await res.json();
     return data;
@@ -190,7 +192,6 @@ export async function createCompleteProduct(
       });
     }
 
-    console.log("📤 Sending complete product to backend...");
 
     // ✨ Single API call with everything
     const response = await fetch(`${API_BASE_URL}/products`, {
@@ -207,14 +208,12 @@ export async function createCompleteProduct(
     }
 
     const createdProduct = await response.json();
-    console.log("✅ Product created successfully:", createdProduct);
 
     // Revalidate cache
     revalidatePath("/stores");
 
     return createdProduct;
   } catch (error) {
-    console.error("❌ Error creating complete product:", error);
     throw error;
   }
 }

@@ -4,8 +4,10 @@ import { LoginRequest, TokenResponse, decodeJWT } from "@/lib/types/auth";
 import { UserProfile } from "@/lib/types/user.ts/user";
 import { getUserByUserId } from "./user.actions";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
 export async function login(data: LoginRequest): Promise<TokenResponse> {
-  const response = await fetch("http://localhost:3001/auth/login", {
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -33,7 +35,7 @@ export function clearAuthData(): void {
 }
 
 export async function register(data: FormData): Promise<TokenResponse> {
-  const response = await fetch("http://localhost:3001/auth/register", {
+  const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: "POST",
     headers:
       data instanceof FormData

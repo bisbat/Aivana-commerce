@@ -4,6 +4,9 @@ WORKDIR /app
 # Copy package.json เข้าไปใน Container เพื่อติดตั้ง Package ต่างๆ
 COPY package.json ./
 
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # ติดตั้ง Package ต่างๆที่ต้องใช้
 RUN npm install
 

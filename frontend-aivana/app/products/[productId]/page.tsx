@@ -9,6 +9,8 @@ import { Footer } from "@/components/layout/Footer";
 import { addToCart } from "@/lib/actions/cart.actions";
 import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
 import { getAuthData } from "@/lib/actions/auth.actions";
+import { getProductByIdAction } from "@/lib/actions/product.actions";
+import { getAllProductsAction } from "@/lib/actions/product.actions";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -85,14 +87,7 @@ export default function ProductDetailPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3001/products/${productId}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch product");
-
-        const data: Product = await response.json();
-
-        console.log("Product data:", data);
+        const data = await getProductByIdAction(productId);
         setProduct(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
@@ -103,10 +98,7 @@ export default function ProductDetailPage() {
 
     const fetchAllProducts = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/products`);
-        if (!response.ok) throw new Error("Failed to fetch products");
-        const data: Product[] = await response.json();
-        console.log("All products:", data);
+        const data = await getAllProductsAction();
         setAllProducts(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");

@@ -3,13 +3,15 @@ import { SellerProfile } from "../types/user.ts/sellerProfile";
 import { CreateSellerProfileDto } from "../types/user.ts/sellerCreate";
 import { Product } from "../types/product/Product";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
 export async function becomeSeller(
   data: CreateSellerProfileDto,
   userId: string,
   accessToken?: string
 ): Promise<SellerProfile> {
   const response = await fetch(
-    `http://localhost:3001/seller/upgrade/${userId}`,
+    `${API_BASE_URL}/seller/upgrade/${userId}`,
     {
       method: "POST",
       headers: {
@@ -33,7 +35,7 @@ export async function getProductsBySellerId(
   token: string
 ): Promise<Product[]> {
   const response = await fetch(
-    `http://localhost:3001/seller/${sellerId}/products`,
+    `${API_BASE_URL}/seller/${sellerId}/products`,
     {
       method: "GET",
       headers: {
@@ -56,7 +58,7 @@ export async function getSellerById(
   token: string 
 ): Promise<SellerProfile> {
 
-  const response = await fetch(`http://localhost:3001/seller/${sellerId}`, {
+  const response = await fetch(`${API_BASE_URL}/seller/${sellerId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -77,7 +79,7 @@ export async function updateSellerProfile(
   data: Partial<SellerProfile>,
   token: string
 ): Promise<SellerProfile> {
-  const response = await fetch(`http://localhost:3001/seller/${sellerId}`, {
+  const response = await fetch(`${API_BASE_URL}/seller/${sellerId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

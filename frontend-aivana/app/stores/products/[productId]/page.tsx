@@ -5,20 +5,11 @@ import BackButton from "./BackButton";
 import ProductImages from "./ProductImages";
 import DeleteButton from "./DeleteButton";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
+import { getProductByIdAction } from "@/lib/actions/product.actions";
 
 async function getProductData(productId: string): Promise<Product | null> {
-  const API_URL = process.env.BACKEND_API_URL || "http://localhost:3001";
-
-  const res = await fetch(`${API_URL}/products/${productId}`, {
-    // 'no-store' เหมาะสำหรับข้อมูลที่ไม่ควร Cache (เช่น ข้อมูลที่กำลังจะแก้ไข)
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    notFound();
-  }
-
-  return res.json();
+  const productData = await getProductByIdAction(productId);
+  return productData || null;
 }
 
 export default async function ProductStoreDetailPage({

@@ -1,12 +1,14 @@
 import { AddToCartResponse, AddToCartRequest } from "@/lib/types/cart/AddCart";
 import { GetCartResponse } from "@/lib/types/cart/GetCart";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
 export async function addToCart(
   data: AddToCartRequest,
   accessToken?: string
 ): Promise<AddToCartResponse> {
   console.log("AccessToken:", accessToken);
-  const response = await fetch("http://localhost:3001/cart/add", {
+  const response = await fetch(`${API_BASE_URL}/cart/add`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -31,7 +33,7 @@ export async function getCart(
   userId: string,
   accessToken?: string
 ): Promise<GetCartResponse> {
-  const response = await fetch(`http://localhost:3001/cart/user/${userId}`, {
+  const response = await fetch(`${API_BASE_URL}/cart/user/${userId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -52,7 +54,7 @@ export async function removeFromCart(
   accessToken?: string
 ): Promise<{ message: string }> {
   const response = await fetch(
-    `http://localhost:3001/cart/user/${userId}/product/${productId}`,
+    `${API_BASE_URL}/cart/user/${userId}/product/${productId}`,
     {
       method: "DELETE",
       headers: {
