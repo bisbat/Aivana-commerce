@@ -32,21 +32,11 @@ export class ProductsController {
 
   @Post()
   @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'heroImage', maxCount: 1 },
-        { name: 'productFile', maxCount: 1 },
-        { name: 'detailImages', maxCount: 8 },
-      ],
-      {
-        limits: {
-          fileSize: 100 * 1024 * 1024, // 100MB per file
-          files: 10, // total files
-          fieldSize: 100 * 1024 * 1024, // field size
-          parts: 1000, // total parts
-        },
-      },
-    ),
+    FileFieldsInterceptor([
+      { name: 'heroImage', maxCount: 1 },
+      { name: 'productFile', maxCount: 1 },
+      { name: 'detailImages', maxCount: 8 },
+    ]),
   )
   async createProductWithFiles(
     @Body() body: Record<string, string>,
@@ -97,7 +87,7 @@ export class ProductsController {
       heroImage?: UploadedFileType[];
       productFile?: UploadedFileType[];
       detailImages?: UploadedFileType[];
-    }
+    },
   ) {
     const userId = req.user.userId;
     const updateProductDto = plainToInstance(UpdateProductDto, body);

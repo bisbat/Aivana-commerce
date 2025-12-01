@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useEffect } from "react";
+import Reacts from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation"; // ✅ import router
-import {
-  Home,
-  LayoutDashboard,
-  Package,
-  DollarSign,
-  Store,
-} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { LayoutDashboard, Package, DollarSign, Store } from "lucide-react";
+import { getAuthData } from "@/lib/actions/auth.actions";
+import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
+import { SellerProfile } from "@/lib/types/user.ts/sellerProfile";
+import { getSellerById } from "@/lib/actions/seller.actions";
+import { Product } from "@/lib/types/product/Product";
+import { useState, useEffect } from "react";
 
 interface NavItem {
   label: string;
@@ -19,15 +19,32 @@ interface NavItem {
 }
 
 interface SidebarProps {
-  storeName?: string;
   currentPath?: string;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({
-  storeName = "Store name",
-  currentPath = "/",
-}) => {
+export const Sidebar: React.FC<SidebarProps> = ({ currentPath = "/" }) => {
   const router = useRouter();
+  const [sellerId, setSellerId] = useState<string | null>(null);
+
+  useEffect(() => {
+    getCurrentUserFromToken().then((user) =>
+      setSellerId(user?.sellerId ?? null)
+    );
+  }, []);
+
+  const [seller, setSeller] = useState<SellerProfile | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      if (!sellerId) return;
+      const token = getAuthData()?.accessToken;
+      if (!token) return;
+
+      const profileData = await getSellerById(sellerId, token);
+      setSeller(profileData);
+    }
+    fetchData();
+  }, [sellerId]);
 
   const navItems: NavItem[] = [
     { label: "Market Place", icon: <Store size={20} />, href: "/" },
@@ -45,7 +62,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside className="w-64 min-h-screen bg-[var(--linne-purple)] text-white p-6 flex flex-col">
-      <h1 className="text-2xl font-bold mb-8">{storeName}</h1>
+      <h1 className="text-2xl font-bold mb-5 text-center text-white">
+        {seller?.storeName}
+      </h1>
 
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => (
