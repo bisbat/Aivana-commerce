@@ -14,7 +14,6 @@ export class CartController {
 
   @Get('user/:userId')
   getCartByUserId(@Param('userId') userId: string): Promise<CartResponseDto> {
-    // ← เปลี่ยนจาก CartItemDto[]
     return this.cartService.getCartByUserId(userId);
   }
 

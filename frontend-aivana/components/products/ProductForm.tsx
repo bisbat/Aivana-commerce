@@ -1,51 +1,53 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { UploadFileFormData } from '@/lib/types/formCreateProduct/UploadFileFormData';
-import { ProductInformationFormData } from '@/lib/types/formCreateProduct/ProductInformationFormData';
-import { getAllCategories } from '@/lib/actions/category.actions'
-import { getAllTagsAction } from '@/lib/actions/tag.actions'
-import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
-import { Select } from '@/components/ui/Dropdown';
-import { CompatibilityInput } from '../ui/CompatibilityInput';
-import { FeatureInput } from '@/components/ui/FeatureInput';
-import { MultiSelectTag } from '@/components/ui/MultiSelectTag';
-import { Loader } from 'lucide-react';
-import { getAuthData } from '@/lib/actions/auth.actions';
+import React, { useState, useEffect } from "react";
+import { UploadFileFormData } from "@/lib/types/formCreateProduct/UploadFileFormData";
+import { ProductInformationFormData } from "@/lib/types/formCreateProduct/ProductInformationFormData";
+import { getAllCategories } from "@/lib/actions/category.actions";
+import { getAllTagsAction } from "@/lib/actions/tag.actions";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
+import { Select } from "@/components/ui/Dropdown";
+import { CompatibilityInput } from "../ui/CompatibilityInput";
+import { FeatureInput } from "@/components/ui/FeatureInput";
+import { MultiSelectTag } from "@/components/ui/MultiSelectTag";
+import { Loader } from "lucide-react";
+import { getAuthData } from "@/lib/actions/auth.actions";
 
 // NEW: This component no longer submits to backend
 // It just collects data and passes to next step
 interface ProductFormProps {
   sellerId: string;
-  uploadData: UploadFileFormData ;
+  uploadData: UploadFileFormData;
   onNext: (data: ProductInformationFormData) => void; // Changed from onBack
   onBack: () => void;
 }
 
-export const ProductForm: React.FC<ProductFormProps> = ({ 
+export const ProductForm: React.FC<ProductFormProps> = ({
   sellerId,
-  uploadData, 
-  onNext, 
-  onBack 
+  uploadData,
+  onNext,
+  onBack,
 }) => {
   // Form state
-  const [name, setName] = useState('');
-  const [blurb, setBlurb] = useState('');
-  const [category, setCategory] = useState('');
-  const [description, setDescription] = useState('');
+  const [name, setName] = useState("");
+  const [blurb, setBlurb] = useState("");
+  const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("");
   const [features, setFeatures] = useState<string[]>([]);
-  const [installationGuide, setInstallationGuide] = useState('');
-  const [price, setPrice] = useState('');
-  const [livePreview, setLivePreview] = useState('');
+  const [installationGuide, setInstallationGuide] = useState("");
+  const [price, setPrice] = useState("");
+  const [livePreview, setLivePreview] = useState("");
   const [compatibility, setCompatibility] = useState<string[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
-  const [categoryId, setCategoryId] = useState('');
+  const [categoryId, setCategoryId] = useState("");
 
-  const [categories, setCategories] = useState<Array<{ id: string; name: string; description: string | null }>>([]);
+  const [categories, setCategories] = useState<
+    Array<{ id: string; name: string; description: string | null }>
+  >([]);
   const [tags, setTags] = useState<Array<{ id: string; name: string }>>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
-  
+
   // const [tags, setTags] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,19 +55,18 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     const fetchData = async () => {
       setIsLoadingData(true);
       try {
-
         const accessToken = getAuthData()?.accessToken || "";
         const [categoriesData, tagsData] = await Promise.all([
           getAllCategories(),
-          getAllTagsAction(accessToken)
+          getAllTagsAction(accessToken),
         ]);
 
         setCategories(categoriesData);
         setTags(tagsData);
-
-
       } catch (err) {
-        setError('Failed to load categories and tags. Please refresh the page.');
+        setError(
+          "Failed to load categories and tags. Please refresh the page."
+        );
       } finally {
         setIsLoadingData(false);
       }
@@ -79,23 +80,23 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     setError(null);
 
     // Validate required fields
-    if ( !name ) {
-      setError('Please fill in all required fields');
+    if (!name) {
+      setError("Please fill in all required fields");
       return;
     }
-    
+
     if (!categoryId) {
-      setError('Please select a category');
+      setError("Please select a category");
       return;
     }
 
     if (!price || Number(price) <= 0) {
-      setError('Please enter a valid price');
+      setError("Please enter a valid price");
       return;
     }
 
     if (!sellerId) {
-      setError('Seller ID is missing. Please log in again.');
+      setError("Seller ID is missing. Please log in again.");
       return;
     }
 
@@ -106,14 +107,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       categoryId: Number(categoryId),
       sellerId: sellerId,
       description,
-      features: features.filter(f => f.trim() !== ''),
+      features: features.filter((f) => f.trim() !== ""),
       installationGuide,
       price: Number(price),
       previewUrl: livePreview || null,
-      compatibility: compatibility.filter(f => f.trim() !== ''),
+      compatibility: compatibility.filter((f) => f.trim() !== ""),
       uploadedFilePath: null,
       heroImageUrl: null,
-      tagIds: selectedTagIds
+      tagIds: selectedTagIds,
     };
     console.log("Product Information Form Data:", formData);
 
@@ -124,7 +125,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <Loader className="animate-spin text-purple-400 mx-auto mb-4" size={48} />
+          <Loader
+            className="animate-spin text-purple-400 mx-auto mb-4"
+            size={48}
+          />
           <p className="text-white">Loading categories and tags...</p>
         </div>
       </div>
@@ -145,21 +149,27 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-bold">
             ✓
           </div>
-          <span className="text-green-400 text-sm font-medium">Upload File</span>
-          
+          <span className="text-green-400 text-sm font-medium">
+            Upload File
+          </span>
+
           <div className="h-px w-12 bg-slate-700" />
-          
+
           <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-sm font-bold">
             2
           </div>
-          <span className="text-purple-400 text-sm font-medium">Product Information</span>
-          
+          <span className="text-purple-400 text-sm font-medium">
+            Product Information
+          </span>
+
           <div className="h-px w-12 bg-slate-700" />
-          
+
           <div className="w-8 h-8 rounded-full bg-slate-700 text-slate-400 flex items-center justify-center text-sm font-bold">
             3
           </div>
-          <span className="text-slate-400 text-sm font-medium">Product Images</span>
+          <span className="text-slate-400 text-sm font-medium">
+            Product Images
+          </span>
         </div>
       </div>
 
@@ -167,7 +177,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
         <p className="text-slate-400 text-sm mb-2">Uploaded file:</p>
         <p className="text-white font-medium">{uploadData.file?.name}</p>
-        <p className="text-slate-400 text-sm mt-1">Type: {uploadData.productType}</p>
+        <p className="text-slate-400 text-sm mt-1">
+          Type: {uploadData.productType}
+        </p>
       </div>
 
       {/* Error Message */}
@@ -197,9 +209,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           label="Category"
           value={categoryId}
           onChange={setCategoryId}
-          options={categories.map(cat => ({
+          options={categories.map((cat) => ({
             value: cat.id,
-            label: cat.name
+            label: cat.name,
           }))}
           placeholder="Select a category"
           required
@@ -224,7 +236,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         rows={4}
       />
 
-      <CompatibilityInput compatibility={compatibility} onChange={setCompatibility} />
+      <CompatibilityInput
+        compatibility={compatibility}
+        onChange={setCompatibility}
+      />
 
       <MultiSelectTag
         label="Tags"

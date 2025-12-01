@@ -10,20 +10,12 @@ import { addToCart } from "@/lib/actions/cart.actions";
 import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
 import { getAuthData } from "@/lib/actions/auth.actions";
 
-interface DetailImage {
-  imageId: string;
-  url: string;
-}
-
-interface ProductWithImages extends Omit<Product, "detailImages"> {
-  detailImages: DetailImage[];
-}
-
 export default function ProductDetailPage() {
   const params = useParams();
   const productId = params.productId as string;
 
-  const [product, setProduct] = useState<ProductWithImages | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [addingToCart, setAddingToCart] = useState(false);
@@ -98,7 +90,9 @@ export default function ProductDetailPage() {
         );
         if (!response.ok) throw new Error("Failed to fetch product");
 
-        const data: ProductWithImages = await response.json();
+        const data: Product = await response.json();
+
+        console.log("Product data:", data);
         setProduct(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
@@ -107,7 +101,20 @@ export default function ProductDetailPage() {
       }
     };
 
+    const fetchAllProducts = async () => {
+      try {
+        const response = await fetch(`http://localhost:3001/products`);
+        if (!response.ok) throw new Error("Failed to fetch products");
+        const data: Product[] = await response.json();
+        console.log("All products:", data);
+        setAllProducts(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      }
+    };
+
     fetchProduct();
+    fetchAllProducts();
   }, [productId]);
 
   if (loading) {
@@ -119,6 +126,45 @@ export default function ProductDetailPage() {
       </div>
     );
   }
+
+  const getRelatedProducts = (
+    currentProduct: Product,
+    allProducts: Product[]
+  ) => {
+    if (!currentProduct) return [];
+
+    const scoredProducts = allProducts
+      .filter((p) => p.id !== currentProduct.id)
+      .map((product) => {
+        let score = 0;
+
+        if (product.category === currentProduct.category) score += 3;
+
+        const commonTags =
+          product.tags?.filter((tag) => currentProduct.tags?.includes(tag))
+            .length || 0;
+        score += commonTags;
+
+        if (product.seller?.id === currentProduct.seller?.id) score += 2;
+
+        const priceDiff = Math.abs(product.price - currentProduct.price);
+        if (priceDiff < currentProduct.price * 0.3) score += 1;
+
+        return { product, score };
+      })
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 4)
+      .map((item) => item.product);
+
+    return scoredProducts;
+  };
+
+  const handlePreview = (previewUrl: string) => {
+    if (previewUrl) {
+      window.open(previewUrl, "_blank");
+    }
+  };
 
   if (error || !product) {
     return (
@@ -187,7 +233,12 @@ export default function ProductDetailPage() {
           <div className="bg-linear-to-r from-(--linne-purple) to-[#141332] p-3 rounded-lg flex flex-col md:flex-row md:items-center md:justify-between">
             <p className="text-white text-lg font-light">{product.blurb}</p>
             <div className="flex gap-3 mt-4 items-center md:mt-0">
-              <button className="px-4 py-2 border-2 border-white text-white rounded-lg hover:bg-white/10 transition-colors font-medium text-sm cursor-pointer">
+              <button
+                onClick={() => {
+                  handlePreview(product.previewUrl ?? "");
+                }}
+                className="px-4 py-2 border-2 border-white text-white rounded-lg hover:bg-white/10 transition-colors font-medium text-sm cursor-pointer"
+              >
                 คลิกเพื่อดูตัวอย่าง
               </button>
               <button
@@ -232,7 +283,7 @@ export default function ProductDetailPage() {
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={img.url}
+                      src={Array.isArray(img.url) ? img.url[0] : img.url}
                       alt={`Detail ${img.imageId}`}
                       className="w-full h-full object-cover"
                     />
@@ -303,6 +354,39 @@ export default function ProductDetailPage() {
           {/* Right Side - Product Details */}
           <div className="lg:col-span-3 space-y-6">
             {/* Product Details */}
+            {/* <div className="bg-(--linne-purple) rounded-lg p-5 flex flex-col items-center space-y-3 shadow-lg">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white shadow-lg mb-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-user"
+                >
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+              <h3 className="text-white font-bold text-lg">
+                {product.seller?.firstName} {product.seller?.lastName}
+              </h3>
+
+          
+              <button
+                className="text-sm w-full bg-(--primary) hover:bg-(--primary-hover) text-white font-semibold py-2 rounded-lg transition-colors"
+                onClick={() =>
+                  (window.location.href = `/seller/${product.seller?.username}`)
+                }
+              >
+                เข้าดูโปรไฟล์
+              </button>
+            </div> */}
+
             <div className="bg-(--linne-purple) rounded-lg p-5 space-y-3">
               <h3 className="text-lg font-bold text-white">คุณสมบัติ</h3>
 
@@ -313,14 +397,6 @@ export default function ProductDetailPage() {
                     {product.category.name}
                   </span>
                 </div>
-
-                {/* <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">รูปแบบไฟล์:</span>
-                  <span className="text-white font-medium">
-                   
-                  </span>
-                </div> */}
-
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-400">ประเภทไฟล์:</span>
                   <span className="text-white font-medium">ZIP file</span>
@@ -532,46 +608,37 @@ export default function ProductDetailPage() {
           <h2 className="text-2xl font-bold text-white mb-8">แนะนำสำหรับคุณ</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Product Card 1 */}
-            <div className="bg-(--linne-purple) rounded-xl overflow-hidden  cursor-pointer group">
-              <div className="aspect-[4/3] bg-slate-800 overflow-hidden">
-                <img
-                  src="https://picsum.photos/400/300?random=1"
-                  alt="Recommended Product 1"
-                  className="w-full h-full object-cover"
-                />
+            {getRelatedProducts(product, allProducts).map((relatedProduct) => (
+              <div
+                key={relatedProduct.id}
+                className="bg-(--linne-purple) rounded-xl overflow-hidden cursor-pointer group"
+                onClick={() =>
+                  (window.location.href = `/products/${relatedProduct.id}`)
+                }
+              >
+                <div className="aspect-[4/3] bg-slate-800 overflow-hidden">
+                  <img
+                    src={
+                      relatedProduct.heroImageUrl ||
+                      "https://via.placeholder.com/400x300?text=No+Image"
+                    }
+                    alt={relatedProduct.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-white font-bold text-base mb-1 truncate">
+                    {relatedProduct.name}
+                  </h3>
+                  <p className="text-slate-300 text-xs mb-4 truncate">
+                    {relatedProduct.blurb}
+                  </p>
+                  <span className="text-white font-semibold text-base">
+                    {formatPriceWithCurrency(relatedProduct.price)}
+                  </span>
+                </div>
               </div>
-            </div>
-
-            <div className="bg-(--linne-purple) rounded-xl overflow-hidden  cursor-pointer group">
-              <div className="aspect-[4/3] bg-slate-800 overflow-hidden">
-                <img
-                  src="https://picsum.photos/400/300?random=1"
-                  alt="Recommended Product 1"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-
-            <div className="bg-(--linne-purple) rounded-xl overflow-hidden  cursor-pointer group">
-              <div className="aspect-[4/3] bg-slate-800 overflow-hidden">
-                <img
-                  src="https://picsum.photos/400/300?random=1"
-                  alt="Recommended Product 1"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-
-            <div className="bg-(--linne-purple) rounded-xl overflow-hidden  cursor-pointer group">
-              <div className="aspect-[4/3] bg-slate-800 overflow-hidden">
-                <img
-                  src="https://picsum.photos/400/300?random=1"
-                  alt="Recommended Product 1"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

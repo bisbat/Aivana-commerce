@@ -58,7 +58,7 @@ export class ProductEntity {
   @ManyToOne(() => SellerEntity, (seller) => seller.products, {
     nullable: false,
   })
-  @JoinColumn({ name: 'sellerId'})
+  @JoinColumn({ name: 'sellerId' })
   seller: SellerEntity;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

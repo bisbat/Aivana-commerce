@@ -52,18 +52,31 @@ export default function SellerProfilePage() {
         <div className="flex items-center gap-4">
           {/* Back Button */}
           <button
-            onClick={()=> router.push('/')}
+            onClick={() => router.push("/")}
             className="px-3 py-1 border rounded-md text-sm text-gray-300 hover:bg-neutral-800 transition"
           >
             ← Back
           </button>
 
-          {/* Avatar */}
-          <img
-            src={seller.user.avatarUrl || "/default-avatar.png"}
-            className="w-16 h-16 rounded-full object-cover bg-neutral-800"
-            alt="seller avatar"
-          />
+          <div className="w-16 h-16 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden">
+            {seller.user.avatarUrl ? (
+              <img
+                src={seller.user.avatarUrl}
+                alt="Seller Avatar"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-white text-2xl font-bold">
+                {seller.user.username
+                  ? seller.user.username
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase()
+                  : "?"}
+              </span>
+            )}
+          </div>
 
           {/* Seller Info */}
           <div>
