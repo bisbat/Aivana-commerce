@@ -8,10 +8,11 @@ import { TagEntity } from 'src/tags/entities/tag.entity';
 import { ProductImageModule } from '../product-image/product-image.module';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
 import { CategoryEntity } from 'src/categories/entities/category.entity';
+import { ProductImage } from 'src/product-image/entities/product-image.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ProductEntity, TagEntity, SellerEntity, CategoryEntity]),
+    TypeOrmModule.forFeature([ProductEntity, TagEntity, SellerEntity, CategoryEntity, ProductImage]),
     MinioModule,
     forwardRef(() => ProductImageModule),
   ],

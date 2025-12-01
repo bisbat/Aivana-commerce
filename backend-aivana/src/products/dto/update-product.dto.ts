@@ -21,7 +21,7 @@ export class UpdateProductDto {
 
   @IsOptional()
   @IsString()
-  installation_guide?: string;
+  installationGuide?: string;
 
   @IsOptional()
   @Transform(({ value }) => JSON.parse(value as string) as string[])
@@ -50,5 +50,5 @@ export class UpdateProductDto {
 
   @IsOptional()
   @IsString()
-  preview_url?: string;
+  previewUrl?: string;
 }
