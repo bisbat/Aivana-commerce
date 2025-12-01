@@ -26,7 +26,6 @@ import BackButton from "./BackButton";
 import { getAuthData } from "@/lib/actions/auth.actions";
 import { ProductUpdatePayload } from "@/lib/types/product/UpdateProductPayload";
 
-
 export interface UpdatedProductData {
   name: string;
   blurb: string;
@@ -68,7 +67,9 @@ export default function EditProductPage() {
   const [currentHeroImage, setCurrentHeroImage] = useState<string | null>(null);
   const [newHeroImageFile, setNewHeroImageFile] = useState<File | null>(null);
 
-  const [currentProductFile, setCurrentProductFile] = useState<string | null>(null);
+  const [currentProductFile, setCurrentProductFile] = useState<string | null>(
+    null
+  );
   const [newProductFile, setNewProductFile] = useState<File | null>(null);
 
   const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
@@ -84,7 +85,7 @@ export default function EditProductPage() {
 
       const accessToken = getAuthData()?.accessToken || "";
       setToken(accessToken);
-      const tags: Tag[] = await getAllTagsAction(accessToken);
+      const tags: Tag[] = await getAllTagsAction();
       setTags(tags);
 
       const categories: Category[] = await getAllCategories();
@@ -137,8 +138,8 @@ export default function EditProductPage() {
     try {
       await deleteProductImageAction(imageId, token);
 
-      setDetailImages(prev => prev.filter(img => img.imageId !== imageId));
-      setDeletedImageIds(prev => [...prev, imageId]);
+      setDetailImages((prev) => prev.filter((img) => img.imageId !== imageId));
+      setDeletedImageIds((prev) => [...prev, imageId]);
     } catch (error) {
       console.error(error);
     }
@@ -167,10 +168,9 @@ export default function EditProductPage() {
         detailImages: newImageFiles,
       },
     };
-    await updateProductAction(productId, updatedProductData, token)
+    await updateProductAction(productId, updatedProductData, token);
     router.push(`/stores/products/${productId}`);
-
-  }
+  };
 
   return (
     <div>

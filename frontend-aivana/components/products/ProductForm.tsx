@@ -55,10 +55,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     const fetchData = async () => {
       setIsLoadingData(true);
       try {
-        const accessToken = getAuthData()?.accessToken || "";
         const [categoriesData, tagsData] = await Promise.all([
           getAllCategories(),
-          getAllTagsAction(accessToken),
+          getAllTagsAction(),
         ]);
 
         setCategories(categoriesData);
