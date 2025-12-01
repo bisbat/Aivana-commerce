@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductEntity } from './entities/product.entity';
-import { In, Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { MinioService } from '../minio/minio.service';
@@ -13,6 +13,7 @@ import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
 import { plainToInstance } from 'class-transformer';
 import { ResponseProductDto } from './dto/response-product.dto';
+import { ProductImage } from 'src/product-image/entities/product-image.entity';
 
 @Injectable()
 export class ProductsService {
@@ -27,7 +28,9 @@ export class ProductsService {
     private sellerRepository: Repository<SellerEntity>,
     @InjectRepository(CategoryEntity)
     private categoryRepository: Repository<CategoryEntity>,
-  ) {}
+    @InjectRepository(ProductImage)
+    private productImageRepository: Repository<ProductImage>,
+  ) { }
 
   async getAllProducts(): Promise<ResponseProductDto[]> {
     const products = await this.productsRepository.find({
@@ -52,18 +55,18 @@ export class ProductsService {
       // Transform category to ResponseCategoryDto format
       const category = product.category
         ? {
-            id: product.category.id,
-            name: product.category.name,
-          }
+          id: product.category.id,
+          name: product.category.name,
+        }
         : null;
 
       // Transform seller to MinimalSellerDto format with user data
       const seller = product.seller
         ? {
-            id: product.seller.id,
-            firstName: product.seller.user?.firstName,
-            lastName: product.seller.user?.lastName,
-          }
+          id: product.seller.id,
+          firstName: product.seller.user?.firstName,
+          lastName: product.seller.user?.lastName,
+        }
         : null;
 
       // Prepare data for transformation
@@ -109,18 +112,18 @@ export class ProductsService {
     // Transform category to ResponseCategoryDto format
     const category = product.category
       ? {
-          id: product.category.id,
-          name: product.category.name,
-        }
+        id: product.category.id,
+        name: product.category.name,
+      }
       : null;
 
     // Transform seller to MinimalSellerDto format with user data
     const seller = product.seller
       ? {
-          id: product.seller.id,
-          firstName: product.seller.user?.firstName,
-          lastName: product.seller.user?.lastName,
-        }
+        id: product.seller.id,
+        firstName: product.seller.user?.firstName,
+        lastName: product.seller.user?.lastName,
+      }
       : null;
 
     // Prepare data for transformation
@@ -220,11 +223,12 @@ export class ProductsService {
     updateProductDto: UpdateProductDto,
   ): Promise<ProductEntity> {
     const product = await this.productsRepository.findOneBy({ id });
+
     if (!product) {
-      throw new Error('Product not found');
+      throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    const { tagIds, categoryId, sellerId, ...productData } = updateProductDto;
+    const { tagIds, categoryId, ...productData } = updateProductDto;
 
     // Update tags if provided
     if (tagIds) {
@@ -240,11 +244,6 @@ export class ProductsService {
       product.category = { id: categoryId } as CategoryEntity;
     }
 
-    // Update seller if provided
-    if (sellerId) {
-      product.seller = { id: sellerId } as any; // Partial entity for relation
-    }
-
     // Update other fields
     Object.assign(product, productData);
 
@@ -254,7 +253,7 @@ export class ProductsService {
       relations: ['category', 'seller', 'tags', 'productImages'],
     });
     if (!updatedProduct) {
-      throw new Error('Product not found after update');
+      throw new NotFoundException(`Product with ID ${id} not found after update`);
     }
     return updatedProduct;
   }
@@ -426,130 +425,119 @@ export class ProductsService {
 
   async updateProductWithFiles(
     id: number,
+    userId: string,
     updateProductDto: UpdateProductDto,
     files?: {
       heroImage?: UploadedFileType[];
       productFile?: UploadedFileType[];
       detailImages?: UploadedFileType[];
     },
-  ): Promise<{ product: ResponseProductDto | null }> {
-    /* ------------------------------------------------------
-     * 1. Update basic product fields first
-     * ------------------------------------------------------ */
-    const product = await this.updateProduct(id, updateProductDto);
-    const productId = product.id.toString();
+  ): Promise<ResponseProductDto> {
 
-    /* ------------------------------------------------------
-     * 2. Update hero image if new file provided
-     * ------------------------------------------------------ */
-    if (files?.heroImage?.length) {
-      const heroFile = files.heroImage[0];
-      const heroTimestamp = Date.now();
-      const heroFileName = `hero-${heroTimestamp}-${heroFile.originalname}`;
+    /* 1. Find seller by userId */
+    const seller = await this.sellerRepository.findOne({
+      where: { user: { id: userId } },
+    });
 
-      // Clean old hero folder
-      await this.minioService.deleteFolder(
-        MINIO_FOLDERS.PRODUCTS.HERO(productId),
-      );
+    if (!seller) throw new NotFoundException(`Seller not found`);
 
-      const heroFullPath = await this.minioService.uploadFile(
-        heroFile,
-        heroFileName,
-        MINIO_FOLDERS.PRODUCTS.HERO(productId),
-      );
+    /* 2. Find product & check owner */
+    const product = await this.productsRepository.findOne({
+      where: { id },
+      relations: ['seller', 'productImages'],
+    });
 
-      const heroFileUrl = this.minioService.getFileUrl(heroFullPath);
-      await this.updateHeroImage(product.id, heroFileUrl);
+    if (!product) throw new NotFoundException(`Product not found`);
+
+    if (product.seller.id !== seller.id) {
+      throw new ForbiddenException(`You cannot update this product`);
     }
 
-    /* ------------------------------------------------------
-     * 3. Update uploaded .zip file
-     * ------------------------------------------------------ */
+    const productId = product.id.toString();
+
+    /* 3. Update hero image */
+    if (files?.heroImage?.length) {
+      const heroFile = files.heroImage[0];
+      const fileName = `hero-${Date.now()}-${heroFile.originalname}`;
+
+      await this.minioService.deleteFolder(MINIO_FOLDERS.PRODUCTS.HERO(productId));
+
+      const full = await this.minioService.uploadFile(
+        heroFile,
+        fileName,
+        MINIO_FOLDERS.PRODUCTS.HERO(productId),
+      );
+
+      const url = this.minioService.getFileUrl(full);
+      await this.updateHeroImage(product.id, url);
+    }
+
+    /* 4. Update product file (.zip) */
     if (files?.productFile?.length) {
-      const productFile = files.productFile[0];
-      const fileExtension = productFile.originalname
-        .split('.')
-        .pop()
-        ?.toLowerCase();
+      const pf = files.productFile[0];
+      const ext = pf.originalname.split('.').pop()?.toLowerCase();
 
-      if (fileExtension !== 'zip') {
-        throw new Error(
-          `Invalid file type. Only .zip allowed. Received .${fileExtension}`,
-        );
-      }
+      if (ext !== 'zip') throw new Error(`Only .zip allowed`);
 
-      const timestamp = Date.now();
-      const fileName = `uploaded-${timestamp}-${productFile.originalname}`;
+      const fileName = `uploaded-${Date.now()}-${pf.originalname}`;
 
-      // Clean old uploaded folder
       await this.minioService.deleteFolder(
         MINIO_FOLDERS.PRODUCTS.UPLOAD(productId),
       );
 
-      const fullPath = await this.minioService.uploadFile(
-        productFile,
+      const full = await this.minioService.uploadFile(
+        pf,
         fileName,
         MINIO_FOLDERS.PRODUCTS.UPLOAD(productId),
       );
 
-      const fileUrl = this.minioService.getFileUrl(fullPath);
-      await this.updateUploadedFilePath(product.id, fileUrl);
+      const url = this.minioService.getFileUrl(full);
+      await this.updateUploadedFilePath(product.id, url);
     }
 
-    /* ------------------------------------------------------
-     * 4. Add new detail images (validate min/max count)
-     * ------------------------------------------------------ */
+    /* 5. Update detail images */
     if (files?.detailImages?.length) {
-      const detailFiles = files.detailImages;
+      const newFiles = files.detailImages;
 
-      const existing = await this.productsRepository.findOne({
-        where: { id },
-        relations: ['productImages'],
-      });
+      if (newFiles.length < 2)
+        throw new Error(`At least 2 images are required`);
 
-      const existingCount = existing?.productImages?.length || 0;
-      const totalCount = existingCount + detailFiles.length;
+      if (newFiles.length > 8)
+        throw new Error(`Maximum 8 detail images allowed`);
 
-      if (totalCount < 2) {
-        throw new Error(`Product must have at least 2 detail images.`);
-      }
-      if (totalCount > 8) {
-        throw new Error(
-          `Too many images. Already ${existingCount}. Adding ${detailFiles.length} causes total ${totalCount}, max is 8.`,
-        );
-      }
+      // Delete old images in Minio
+      await this.minioService.deleteFolder(
+        MINIO_FOLDERS.PRODUCTS.DETAILS(productId),
+      );
 
-      // Upload new images
-      for (const file of detailFiles) {
-        const ts = Date.now();
-        const detailFileName = `detail-${ts}-${file.originalname}`;
+      // Delete old DB data
+      await this.productImageRepository.delete({ product: { id } });
+
+      // Upload new ones
+      for (const file of newFiles) {
+        const fileName = `detail-${Date.now()}-${file.originalname}`;
 
         const fullPath = await this.minioService.uploadFile(
           file,
-          detailFileName,
+          fileName,
           MINIO_FOLDERS.PRODUCTS.DETAILS(productId),
         );
 
         await this.productImageService.create({
-          pathImage: fullPath,
           productId: product.id,
+          pathImage: fullPath,
         });
 
-        await new Promise((r) => setTimeout(r, 10)); // ensure unique timestamps
+        await new Promise((r) => setTimeout(r, 10)); // ensure unique timestamp
       }
     }
 
-    /* ------------------------------------------------------
-     * 5. Load updated product + convert to Response DTO
-     * ------------------------------------------------------ */
-    const updatedProduct = await this.getProductById(product.id);
+    /* 6. Update product fields */
+    const updatedProduct = await this.updateProduct(id, updateProductDto);
 
-    return {
-      product: updatedProduct
-        ? plainToInstance(ResponseProductDto, updatedProduct, {
-            excludeExtraneousValues: true,
-          })
-        : null,
-    };
+    return plainToInstance(ResponseProductDto, updatedProduct, {
+      excludeExtraneousValues: true,
+    });
   }
+
 }

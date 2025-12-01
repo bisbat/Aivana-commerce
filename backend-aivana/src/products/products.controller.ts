@@ -8,6 +8,7 @@ import {
   Param,
   Put,
   Delete,
+  Req,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ProductsService } from './products.service';
@@ -90,17 +91,20 @@ export class ProductsController {
   async updateProductWithFiles(
     @Param('id') id: number,
     @Body() body: Record<string, string>,
+    @Req() req: any,
     @UploadedFiles()
     files?: {
       heroImage?: UploadedFileType[];
       productFile?: UploadedFileType[];
       detailImages?: UploadedFileType[];
-    },
+    }
   ) {
+    const userId = req.user.userId;
     const updateProductDto = plainToInstance(UpdateProductDto, body);
 
     const result = await this.productsService.updateProductWithFiles(
       id,
+      userId,
       updateProductDto,
       files,
     );
