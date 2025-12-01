@@ -78,7 +78,7 @@ export default function EditProductFile({
             <div className="flex items-center space-x-3">
               <span className="text-2xl">{fileIcon}</span>
               <div>
-                <p className="font-medium text-gray-900">{fileName}</p>
+                <p className="font-medium">{fileName}</p>
                 {newFile && (
                   <p className="text-sm text-green-600">
                     ✓ New file selected (will replace current file when saved)

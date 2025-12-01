@@ -3,38 +3,76 @@ import { revalidatePath } from "next/cache";
 import { ProductInformationFormData } from "../types/formCreateProduct/ProductInformationFormData";
 import { UploadFileFormData } from "../types/formCreateProduct/UploadFileFormData";
 import { UploadImageFormData } from "../types/formCreateProduct/UploadImageFormData";
+import { ProductUpdatePayload } from "../types/product/UpdateProductPayload";
+import { UpdatedProductData } from "@/app/stores/products/[productId]/edit/page";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export async function updateProductAction(
   productId: string,
-  updatedData: any,
+  updatedData: UpdatedProductData,
   accessToken?: string
 ) {
-  // ส่งคำขอไปยัง API เพื่ออัปเดตข้อมูลสินค้า
-  const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
-    method: "PUT",
-    headers:
-      updatedData instanceof FormData
-        ? {}
-        : {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-    body:
-      updatedData instanceof FormData
-        ? updatedData
-        : JSON.stringify(updatedData),
-  });
+  console.log(updatedData);
 
-  if (res.ok) {
-    // 2. ✅ อัปเดตข้อมูลใน Cache
-    revalidatePath(`/stores/products/${productId}`);
-    return await res.json();
+  const formData = new FormData();
+
+  for (const key in updatedData) {
+    const value = updatedData[key as keyof UpdatedProductData];
+
+    if (value === undefined || value === null) continue;
+
+    // Handle nested files object
+    if (key === 'files' && typeof value === 'object') {
+      for (const fileKey in value) {
+        const fileOrFiles = value[fileKey as keyof typeof value];
+
+        if (!fileOrFiles) continue;
+
+        // Single file
+        if (fileOrFiles instanceof File) {
+          formData.append(fileKey, fileOrFiles);
+        }
+        // Array of files (e.g., detailImages)
+        else if (Array.isArray(fileOrFiles)) {
+          fileOrFiles.forEach((f) => formData.append(fileKey, f));
+        }
+      }
+    }
+
+    // Handle arrays by stringifying them
+    else if (Array.isArray(value)) {
+      formData.append(key, JSON.stringify(value));
+    }
+    // Handle primitive values
+    else {
+      formData.append(key, String(value));
+    }
   }
 
-  throw new Error("Failed to update product");
+  console.log(formData);
+
+
+  const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to update product");
+  }
+
+  // Revalidate cache
+  revalidatePath(`/stores/products/${productId}`);
+
+  return await res.json();
 }
+
+
+
 
 // ฟังก์ชันสำหรับลบ detail image
 export async function deleteProductImageAction(

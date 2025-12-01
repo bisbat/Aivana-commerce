@@ -1,7 +1,10 @@
 'use client';
-export default function BackButton() {
+import { useRouter } from "next/navigation";
+export default function BackButton({ productId }: { productId: string }) {
+    const router = useRouter();
+
     const handleBack = () => {
-        window.history.back();
+        router.push(`/stores/products/${productId}`);
     };
 
     return (

@@ -1,7 +1,10 @@
 'use client';
+import { useRouter } from "next/navigation";
 export default function BackButton() {
+    const router = useRouter();
+
     const handleBack = () => {
-        window.history.back();
+        router.push('/stores');
     };
 
     return (
