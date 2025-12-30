@@ -6,11 +6,13 @@ import { deleteProductAction } from '@/lib/actions/product.actions';
 import toast from 'react-hot-toast';
 import { getAuthData } from '@/lib/actions/auth.actions';
 import { useEffect,useState } from 'react';
+import { useRouter } from "next/navigation";
 
 
 
 
 export default function DeleteButton({ productId }: { productId: string }) {
+        const router = useRouter()
 
     const [token, setToken] = useState<string>("");
 
@@ -29,7 +31,7 @@ export default function DeleteButton({ productId }: { productId: string }) {
         await deleteProductAction(productId, token);
 
         toast.success("Product deleted successfully.");
-        window.location.href = '/stores';
+        router.push(`/stores`);
     };
 
     return (

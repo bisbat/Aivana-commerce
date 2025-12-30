@@ -3,7 +3,7 @@ import { SellerProfile } from "../types/user.ts/sellerProfile";
 import { CreateSellerProfileDto } from "../types/user.ts/sellerCreate";
 import { Product } from "../types/product/Product";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3001';
 
 export async function becomeSeller(
   data: CreateSellerProfileDto,

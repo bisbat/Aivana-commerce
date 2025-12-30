@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams,useRouter } from "next/navigation";
 import { Product } from "@/lib/types/product/Product";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { Loader } from "lucide-react";
@@ -13,6 +13,7 @@ import { getProductByIdAction } from "@/lib/actions/product.actions";
 import { getAllProductsAction } from "@/lib/actions/product.actions";
 
 export default function ProductDetailPage() {
+  const router = useRouter();
   const params = useParams();
   const productId = params.productId as string;
 
@@ -605,7 +606,7 @@ export default function ProductDetailPage() {
                 key={relatedProduct.id}
                 className="bg-(--linne-purple) rounded-xl overflow-hidden cursor-pointer group"
                 onClick={() =>
-                  (window.location.href = `/products/${relatedProduct.id}`)
+                  router.push(`/products/${relatedProduct.id}`)
                 }
               >
                 <div className="aspect-[4/3] bg-slate-800 overflow-hidden">

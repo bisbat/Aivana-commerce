@@ -107,7 +107,8 @@ export class MinioService implements OnModuleInit {
   getFileUrl(fileName: string): string {
     try {
       // Return permanent public URL for e-commerce
-      const endpoint = this.configService.get<string>('MINIO_ENDPOINT');
+      // const endpoint = this.configService.get<string>('MINIO_ENDPOINT');
+      const endpoint = "bscit.sit.kmutt.ac.th/capstone25/cp25ssi3/files";
       const port = this.configService.get<string>('MINIO_PORT');
       const useSSL =
         (this.configService.get<string>('MINIO_USE_SSL') ?? 'false') === 'true';
@@ -117,7 +118,11 @@ export class MinioService implements OnModuleInit {
         port && port !== '80' && port !== '443' ? `:${port}` : '';
 
       // Public URL format: http://localhost:9000/bucket-name/file-path
-      const publicUrl = `${protocol}://${endpoint}${portSuffix}/${this.bucketName}/${fileName}`;
+      // const publicUrl = `${protocol}://${endpoint}${portSuffix}/${this.bucketName}/${fileName}`;
+      const publicUrl = `${protocol}://${endpoint}/${this.bucketName}/${fileName}`;
+      console.log(`Generated public URL: ${publicUrl}`);
+      console.log(`File Name: ${fileName}, Endpoint: ${endpoint}`);
+      console.log(`Port: ${port}, Use SSL: ${useSSL}`);
 
       
       return publicUrl;

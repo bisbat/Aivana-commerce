@@ -1,7 +1,11 @@
 'use client';
+import { useRouter } from "next/navigation";
+
 export default function EditButton({ username }: { username: string}) {
+    const router = useRouter();
     const handleEdit = () => {
-        window.location.href = `/seller/${username}/edit`;
+        // window.location.href = `/seller/${username}/edit`;
+         router.push(`/seller/${username}/edit`);
     };
 
     return (

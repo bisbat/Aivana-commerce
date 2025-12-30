@@ -6,7 +6,7 @@ import { UploadImageFormData } from "../types/formCreateProduct/UploadImageFormD
 import { ProductUpdatePayload } from "../types/product/UpdateProductPayload";
 import { UpdatedProductData } from "@/app/stores/products/[productId]/edit/page";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3001";
 
 export async function updateProductAction(
   productId: string,
@@ -198,6 +198,7 @@ export async function createCompleteProduct(
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "multipart/form-data",
       },
       body: formData,
     });
