@@ -2,14 +2,18 @@
 
 import React, { useState } from "react";
 import { Search } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export const HeroSection: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Searching for:", searchQuery);
-    // TODO: Implement search functionality
+
+    if (!searchQuery.trim()) return;
+
+    router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
   };
 
   return (
