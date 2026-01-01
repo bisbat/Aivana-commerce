@@ -21,6 +21,7 @@ interface ProductFormProps {
   uploadData: UploadFileFormData;
   onNext: (data: ProductInformationFormData) => void; // Changed from onBack
   onBack: () => void;
+  initialData?: ProductInformationFormData;
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
@@ -28,6 +29,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   uploadData,
   onNext,
   onBack,
+  initialData
 }) => {
   // Form state
   const [name, setName] = useState("");
@@ -73,6 +75,22 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (!initialData) return;
+
+    setName(initialData.name);
+    setBlurb(initialData.blurb ?? "");
+    setCategoryId(String(initialData.categoryId));
+    setDescription(initialData.description ?? "");
+    setFeatures(initialData.features ?? []);
+    setInstallationGuide(initialData.installationGuide ?? "");
+    setPrice(String(initialData.price));
+    setLivePreview(initialData.previewUrl ?? "");
+    setCompatibility(initialData.compatibility ?? []);
+    setSelectedTagIds(initialData.tagIds ?? []);
+  }, [initialData]);
+
 
   // Handle continue to next step
   const handleContinue = () => {
