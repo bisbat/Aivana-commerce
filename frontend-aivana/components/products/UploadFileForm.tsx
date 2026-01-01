@@ -1,14 +1,18 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Upload } from 'lucide-react';
 import { UploadFileFormData } from '@/lib/types/formCreateProduct/UploadFileFormData';
 
 interface UploadFileFormProps {
   onNext: (data: UploadFileFormData) => void;
+  initialData?: {
+    productType: 'UI Kit' | 'Coded Template';
+    keywords: string;
+  };
 }
 
-export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext }) => {
+export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialData }) => {
   // State for form fields
   const [productType, setProductType] = useState<'UI Kit' | 'Coded Template' | ''>('');
   const [file, setFile] = useState<File | null>(null);
@@ -17,6 +21,13 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext }) => {
 
   // Reference to file input for triggering click
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!initialData) return;
+
+    setProductType(initialData.productType);
+    setKeywords(initialData.keywords);
+  }, [initialData]);
 
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,22 +96,20 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext }) => {
           <button
             type="button"
             onClick={() => setProductType('UI Kit')}
-            className={`px-6 py-4 rounded-lg font-medium transition-all ${
-              productType === 'UI Kit'
+            className={`px-6 py-4 rounded-lg font-medium transition-all ${productType === 'UI Kit'
                 ? 'bg-purple-600 text-white'
                 : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-            }`}
+              }`}
           >
             UI kits
           </button>
           <button
             type="button"
             onClick={() => setProductType('Coded Template')}
-            className={`px-6 py-4 rounded-lg font-medium transition-all ${
-              productType === 'Coded Template'
+            className={`px-6 py-4 rounded-lg font-medium transition-all ${productType === 'Coded Template'
                 ? 'bg-purple-600 text-white'
                 : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-            }`}
+              }`}
           >
             Coded Template
           </button>
@@ -112,7 +121,7 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext }) => {
         <label className="block text-white font-medium">
           อัปโหลดไฟล์สินค้าของคุณ
         </label>
-        
+
         {/* Hidden file input */}
         <input
           ref={fileInputRef}
