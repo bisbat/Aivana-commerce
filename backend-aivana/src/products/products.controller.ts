@@ -139,4 +139,12 @@ export class ProductsController {
       detailImages: files.detailImages,
     };
   }
+
+  @Public()
+  @Get('search/:query')
+  async searchProducts(
+    @Param('query') query: string,
+  ): Promise<ResponseProductDto[]> {
+    return this.productsService.searchProducts(query);
+  }
 }

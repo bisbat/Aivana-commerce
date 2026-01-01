@@ -486,7 +486,7 @@ export class ProductsService {
       );
 
       const url = this.minioService.getFileUrl(full);
-      
+
       await this.updateHeroImage(product.id, url);
     }
 
@@ -556,6 +556,19 @@ export class ProductsService {
     const updatedProduct = await this.updateProduct(id, updateProductDto);
 
     return plainToInstance(ResponseProductDto, updatedProduct, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  async searchProducts(query: string): Promise<ResponseProductDto[]> {
+    const products = await this.productsRepository.find({
+      where: {
+        name: In([`%${query}%`]),
+      },
+      relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
+    });
+
+    return plainToInstance(ResponseProductDto, products, {
       excludeExtraneousValues: true,
     });
   }
