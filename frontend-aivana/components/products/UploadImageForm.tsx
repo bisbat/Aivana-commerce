@@ -266,7 +266,7 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
                   <X size={16} />
                 </button>
                 {/* Lock icon overlay */}
-                <div className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                   <div className="bg-slate-800/90 p-2 rounded-full">
                     <ImageIcon size={20} className="text-white" />
                   </div>
