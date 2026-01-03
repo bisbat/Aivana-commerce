@@ -19,6 +19,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ResponseProductDto } from './dto/response-product.dto';
 import { Public } from 'src/common/decorators/public.decorator';
+import { Query } from '@nestjs/common/decorators';
 
 @Controller('products')
 export class ProductsController {
@@ -60,6 +61,11 @@ export class ProductsController {
       message: 'Product created successfully with all files',
       ...result,
     };
+  }
+  @Public()
+  @Get('search')
+  search(@Query('q') q: string) {
+    return this.productsService.searchProducts(q);
   }
 
   @Public()
@@ -138,13 +144,5 @@ export class ProductsController {
       productFile: files.productFile,
       detailImages: files.detailImages,
     };
-  }
-
-  @Public()
-  @Get('search/:query')
-  async searchProducts(
-    @Param('query') query: string,
-  ): Promise<ResponseProductDto[]> {
-    return this.productsService.searchProducts(query);
   }
 }

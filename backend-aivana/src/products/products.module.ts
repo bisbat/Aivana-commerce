@@ -9,15 +9,22 @@ import { ProductImageModule } from '../product-image/product-image.module';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
 import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { ProductImage } from 'src/product-image/entities/product-image.entity';
+import { ProductMapper } from './products.mapper';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ProductEntity, TagEntity, SellerEntity, CategoryEntity, ProductImage]),
+    TypeOrmModule.forFeature([
+      ProductEntity,
+      TagEntity,
+      SellerEntity,
+      CategoryEntity,
+      ProductImage,
+    ]),
     MinioModule,
     forwardRef(() => ProductImageModule),
   ],
   controllers: [ProductsController],
-  providers: [ProductsService],
+  providers: [ProductsService, ProductMapper],
   exports: [ProductsService],
 })
 export class ProductsModule {}

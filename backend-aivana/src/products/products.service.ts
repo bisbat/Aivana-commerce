@@ -18,6 +18,7 @@ import { SellerEntity } from 'src/sellers/entities/seller.entity';
 import { plainToInstance } from 'class-transformer';
 import { ResponseProductDto } from './dto/response-product.dto';
 import { ProductImage } from 'src/product-image/entities/product-image.entity';
+import { ProductMapper } from './products.mapper';
 
 @Injectable()
 export class ProductsService {
@@ -34,6 +35,7 @@ export class ProductsService {
     private categoryRepository: Repository<CategoryEntity>,
     @InjectRepository(ProductImage)
     private productImageRepository: Repository<ProductImage>,
+    private productMapper: ProductMapper,
   ) {}
 
   async getAllProducts(): Promise<ResponseProductDto[]> {
@@ -41,110 +43,17 @@ export class ProductsService {
       relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
     });
 
-    return products.map((product) => {
-      // Transform productImages to detailImages with URLs
-      const detailImages =
-        product.productImages?.map((image) => ({
-          imageId: image.imageId.toString(),
-          url: this.minioService.getFileUrl(image.pathImage),
-        })) || [];
-
-      // Transform tags to ResponseTagDto format
-      const tags =
-        product.tags?.map((tag) => ({
-          id: tag.id,
-          name: tag.name,
-        })) || [];
-
-      // Transform category to ResponseCategoryDto format
-      const category = product.category
-        ? {
-            id: product.category.id,
-            name: product.category.name,
-          }
-        : null;
-
-      // Transform seller to MinimalSellerDto format with user data
-      const seller = product.seller
-        ? {
-            id: product.seller.id,
-            firstName: product.seller.user?.firstName,
-            lastName: product.seller.user?.lastName,
-            username: product.seller.user?.username,
-          }
-        : null;
-
-      // Prepare data for transformation
-      const productData = {
-        ...product,
-        id: product.id.toString(),
-        seller,
-        category,
-        tags,
-        detailImages,
-      };
-
-      return plainToInstance(ResponseProductDto, productData, {
-        excludeExtraneousValues: true,
-      });
-    });
+    return this.productMapper.toResponseList(products);
   }
-
   async findOne(productId: number): Promise<ResponseProductDto | null> {
     const product = await this.productsRepository.findOne({
       where: { id: productId },
-      relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'], // ← มีอยู่แล้ว
+      relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
     });
 
-    if (!product) {
-      return null;
-    }
+    if (!product) return null;
 
-    // Transform productImages to detailImages with URLs
-    const detailImages =
-      product.productImages?.map((image) => ({
-        imageId: image.imageId.toString(),
-        url: this.minioService.getFileUrl(image.pathImage),
-      })) || [];
-
-    // Transform tags to ResponseTagDto format
-    const tags =
-      product.tags?.map((tag) => ({
-        id: tag.id,
-        name: tag.name,
-      })) || [];
-
-    // Transform category to ResponseCategoryDto format
-    const category = product.category
-      ? {
-          id: product.category.id,
-          name: product.category.name,
-        }
-      : null;
-
-    // Transform seller to MinimalSellerDto format with user data
-    const seller = product.seller
-      ? {
-          id: product.seller.id,
-          firstName: product.seller.user?.firstName,
-          lastName: product.seller.user?.lastName,
-          username: product.seller.user?.username,
-        }
-      : null;
-
-    // Prepare data for transformation
-    const productData = {
-      ...product,
-      id: product.id.toString(),
-      seller, // ← ใช้ seller object ที่ transform แล้ว
-      category,
-      tags,
-      detailImages,
-    };
-
-    return plainToInstance(ResponseProductDto, productData, {
-      excludeExtraneousValues: true,
-    });
+    return this.productMapper.toResponse(product);
   }
 
   async createProduct(
@@ -288,49 +197,15 @@ export class ProductsService {
 
     return product;
   }
-
   async getProductById(id: number): Promise<ResponseProductDto | null> {
     const product = await this.productsRepository.findOne({
       where: { id },
-      relations: ['category', 'seller', 'productImages', 'tags', 'seller.user'],
+      relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
     });
 
     if (!product) return null;
 
-    const detailImages =
-      product.productImages?.map((image) => ({
-        imageId: image.imageId.toString(),
-        url: image.pathImage, // pathImage is already a URL
-      })) || [];
-
-    const tags =
-      product.tags?.map((tag) => ({
-        id: tag.id,
-        name: tag.name,
-      })) || [];
-
-    const seller = product.seller
-      ? {
-          id: product.seller.id,
-          firstName: product.seller.user?.firstName,
-          lastName: product.seller.user?.lastName,
-          username: product.seller.user?.username,
-        }
-      : null;
-
-    // inject detailImages เข้าไปใน product object และแปลงข้อมูล
-    const productWithDetailImages = {
-      ...product,
-      id: product.id.toString(),
-      categoryId: product.category?.id,
-      seller,
-      tags,
-      detailImages,
-    };
-
-    return plainToInstance(ResponseProductDto, productWithDetailImages, {
-      excludeExtraneousValues: true,
-    });
+    return this.productMapper.toResponse(product);
   }
 
   async createProductWithFiles(
@@ -561,15 +436,43 @@ export class ProductsService {
   }
 
   async searchProducts(query: string): Promise<ResponseProductDto[]> {
-    const products = await this.productsRepository.find({
-      where: {
-        name: In([`%${query}%`]),
-      },
-      relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
-    });
+    if (!query || query.trim() === '') {
+      return [];
+    }
 
-    return plainToInstance(ResponseProductDto, products, {
-      excludeExtraneousValues: true,
-    });
+    const keyword = query.trim().toLowerCase();
+    const isShortKeyword = keyword.length <= 2;
+    const q = `%${keyword}%`;
+
+    const qb = this.productsRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('product.productImages', 'images')
+      .leftJoinAndSelect('product.seller', 'seller')
+      .leftJoinAndSelect('seller.user', 'user')
+      .leftJoinAndSelect('product.tags', 'tag');
+
+    // ✅ name ต้อง search เสมอ
+    qb.where('product.name ILIKE :q', { q });
+
+    // ✅ cate / compatibility ช่วยกรอง
+    qb.orWhere('category.name ILIKE :q', { q }).orWhere(
+      ':q ILIKE ANY(product.compatibility)',
+      { q },
+    );
+
+    // ✅ คำยาว ค่อยเปิด field กว้าง
+    if (!isShortKeyword) {
+      qb.orWhere('product.blurb ILIKE :q', { q })
+        .orWhere('product.description ILIKE :q', { q })
+        .orWhere(':q ILIKE ANY(product.features)', { q });
+    }
+
+    const products = await qb
+      .orderBy('product.createdAt', 'DESC')
+      .limit(30)
+      .getMany();
+
+    return this.productMapper.toResponseList(products);
   }
 }
