@@ -12,6 +12,7 @@ import { CompatibilityInput } from "../ui/CompatibilityInput";
 import { FeatureInput } from "@/components/ui/FeatureInput";
 import { MultiSelectTag } from "@/components/ui/MultiSelectTag";
 import { Loader } from "lucide-react";
+import { saveFormStep } from "@/lib/utils/formStorage";
 import { getAuthData } from "@/lib/actions/auth.actions";
 
 // NEW: This component no longer submits to backend
@@ -19,7 +20,7 @@ import { getAuthData } from "@/lib/actions/auth.actions";
 interface ProductFormProps {
   sellerId: string;
   uploadData: UploadFileFormData;
-  onNext: (data: ProductInformationFormData) => void; // Changed from onBack
+  onNext: (data: ProductInformationFormData) => void;
   onBack: () => void;
   initialData?: ProductInformationFormData;
 }
@@ -90,6 +91,39 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     setCompatibility(initialData.compatibility ?? []);
     setSelectedTagIds(initialData.tagIds ?? []);
   }, [initialData]);
+
+  useEffect(() => {
+    const data: ProductInformationFormData = {
+      name,
+      blurb,
+      categoryId: categoryId ? Number(categoryId) : 0,
+      sellerId,
+      description,
+      features,
+      installationGuide,
+      price: price ? Number(price) : 0,
+      previewUrl: livePreview || null,
+      compatibility,
+      uploadedFilePath: null,
+      heroImageUrl: null,
+      tagIds: selectedTagIds,
+    };
+
+    saveFormStep(2, data);
+  }, [
+    name,
+    blurb,
+    categoryId,
+    description,
+    features,
+    installationGuide,
+    price,
+    livePreview,
+    compatibility,
+    selectedTagIds,
+    sellerId,
+  ]);
+
 
 
   // Handle continue to next step

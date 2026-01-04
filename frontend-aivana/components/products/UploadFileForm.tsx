@@ -3,6 +3,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Upload } from 'lucide-react';
 import { UploadFileFormData } from '@/lib/types/formCreateProduct/UploadFileFormData';
+import { saveFormStep } from "@/lib/utils/formStorage";
+
 
 interface UploadFileFormProps {
   onNext: (data: UploadFileFormData) => void;
@@ -28,6 +30,17 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialD
     setProductType(initialData.productType);
     setKeywords(initialData.keywords);
   }, [initialData]);
+
+  useEffect(() => {
+  if (!productType && !file && !keywords) return;
+
+  saveFormStep(1, {
+    productType,
+    file,
+    keywords,
+  });
+}, [productType, file, keywords]);
+
 
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
