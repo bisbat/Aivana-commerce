@@ -13,6 +13,7 @@ import { FeatureInput } from "@/components/ui/FeatureInput";
 import { MultiSelectTag } from "@/components/ui/MultiSelectTag";
 import { Loader } from "lucide-react";
 import { saveFormStep } from "@/lib/utils/formStorage";
+import { PRODUCT_FORM_STEP } from "@/lib/constants/productFormSteps";
 import { getAuthData } from "@/lib/actions/auth.actions";
 
 // NEW: This component no longer submits to backend
@@ -32,10 +33,16 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   onBack,
   initialData
 }) => {
+
+  const isFormMeaningful = () =>
+    name.trim() !== "" ||
+    blurb.trim() !== "" ||
+    description.trim() !== "" ||
+    price !== "";
+
   // Form state
   const [name, setName] = useState("");
   const [blurb, setBlurb] = useState("");
-  const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [features, setFeatures] = useState<string[]>([]);
   const [installationGuide, setInstallationGuide] = useState("");
@@ -93,6 +100,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   }, [initialData]);
 
   useEffect(() => {
+    if (!isFormMeaningful()) return;
+
     const data: ProductInformationFormData = {
       name,
       blurb,
@@ -109,7 +118,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       tagIds: selectedTagIds,
     };
 
-    saveFormStep(2, data);
+    saveFormStep(PRODUCT_FORM_STEP.PRODUCT_INFO, data);
   }, [
     name,
     blurb,
@@ -227,11 +236,21 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       {/* Show uploaded file info */}
       <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
         <p className="text-slate-400 text-sm mb-2">Uploaded file:</p>
-        <p className="text-white font-medium">{uploadData.file?.name}</p>
-        <p className="text-slate-400 text-sm mt-1">
-          Type: {uploadData.productType}
-        </p>
+
+        {uploadData.file ? (
+          <>
+            <p className="text-white font-medium">{uploadData.file.name}</p>
+            <p className="text-slate-400 text-sm mt-1">
+              Type: {uploadData.productType}
+            </p>
+          </>
+        ) : (
+          <p className="text-yellow-400 text-sm">
+            File information lost after refresh. Please go back and re-upload.
+          </p>
+        )}
       </div>
+
 
       {/* Error Message */}
       {error && (
