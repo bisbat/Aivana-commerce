@@ -13,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
 import { SellersModule } from './sellers/sellers.module';
 import { APP_GUARD } from '@nestjs/core';
 import { PassportJwtAuthGuard } from './common/guards/passport-jwt.guard';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { PassportJwtAuthGuard } from './common/guards/passport-jwt.guard';
     SellersModule,
     AuthModule,
     UsersModule,
+    DashboardModule,
   ],
   controllers: [],
   providers: [{
