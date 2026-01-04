@@ -8,13 +8,12 @@ import { getAllTagsAction } from "@/lib/actions/tag.actions";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Dropdown";
-import { CompatibilityInput } from "../ui/CompatibilityInput";
-import { FeatureInput } from "@/components/ui/FeatureInput";
 import { MultiSelectTag } from "@/components/ui/MultiSelectTag";
 import { Loader } from "lucide-react";
 import { saveFormStep } from "@/lib/utils/formStorage";
 import { PRODUCT_FORM_STEP } from "@/lib/constants/productFormSteps";
 import { getAuthData } from "@/lib/actions/auth.actions";
+import { DynamicTextListInput } from "../ui/DynamicTextListInput";
 
 // NEW: This component no longer submits to backend
 // It just collects data and passes to next step
@@ -296,7 +295,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         rows={5}
       />
 
-      <FeatureInput features={features} onChange={setFeatures} />
+      <DynamicTextListInput
+        label="Features"
+        value={features}
+        onChange={setFeatures}
+        placeholder="Feature เช่น AI Chat, Image Generator"
+        maxItems={6}
+        required
+      />
 
       <Textarea
         label="Installation Document"
@@ -306,9 +312,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         rows={4}
       />
 
-      <CompatibilityInput
-        compatibility={compatibility}
+      <DynamicTextListInput
+        label="Compatibility"
+        value={compatibility}
         onChange={setCompatibility}
+        placeholder="เช่น Windows, macOS, Chrome"
+        maxItems={6}
       />
 
       <MultiSelectTag
