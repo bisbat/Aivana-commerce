@@ -32,9 +32,6 @@ export class SellerEntity {
   location: string;
 
   @Column({ type: 'int', default: 0 })
-  totalProducts: number;
-
-  @Column({ type: 'int', default: 0 })
   totalSales: number;
 
   @Column({ type: 'float', default: 0 })

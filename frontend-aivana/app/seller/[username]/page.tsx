@@ -9,6 +9,7 @@ import {
 } from "@/lib/actions/auth.actions";
 import { ProductGrid } from "@/components/home/ProductGrid";
 import { getProductsBySellerId } from "@/lib/actions/seller.actions";
+import { getDashboardStats } from "@/lib/actions/dashboard.actions";
 import { Product } from "@/lib/types/product/Product";
 import BackgroundAivana from "@/components/common/BackgroundAivana";
 import { useRouter } from "next/navigation";
@@ -25,6 +26,7 @@ export default function SellerProfilePage() {
 
   const [seller, setSeller] = useState<SellerProfile | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [productsTotal, setProductsTotal] = useState<number>(0);
 
   useEffect(() => {
     async function fetchData() {
@@ -37,6 +39,9 @@ export default function SellerProfilePage() {
 
       const productsData = await getProductsBySellerId(sellerId, token);
       setProducts(productsData);
+
+      const productsTotal = await getDashboardStats(sellerId, token);
+      setProductsTotal(productsTotal.productCount || 0);
     }
     fetchData();
   }, [sellerId]);
@@ -103,7 +108,7 @@ export default function SellerProfilePage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="p-4 rounded-xl bg-neutral-900/40">
-          <p className="text-lg font-semibold">{seller.totalProducts}</p>
+          <p className="text-lg font-semibold">{productsTotal}</p>
           <p className="text-gray-400 text-sm">Products</p>
         </div>
         <div className="p-4 rounded-xl bg-neutral-900/40">
