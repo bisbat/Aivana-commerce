@@ -20,12 +20,9 @@ export class DashboardService {
   }
 
    async getDashboardData(sellerId: string) {
-    // return total products, total sales, etc. of sellerId
-    // product total count example
     const productCount = await this.productRepository.count({ where: { seller: { id: sellerId } } });
     return {
-      productCount,
-      // add other dashboard data here
+      productCount
     };
   }
 }

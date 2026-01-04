@@ -41,6 +41,7 @@ export default function SellerProfilePage() {
       setProducts(productsData);
 
       const productsTotal = await getDashboardStats(sellerId, token);
+      console.log('Products Total:', productsTotal);
       setProductsTotal(productsTotal.productCount || 0);
     }
     fetchData();
