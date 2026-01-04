@@ -17,8 +17,7 @@ import { MultiSelectTag } from "@/components/ui/MultiSelectTag";
 import { Tag } from "@/lib/types/tag";
 import { Category } from "@/lib/types/category";
 import { getAllCategories } from "@/lib/actions/category.actions";
-import { FeatureInput } from "@/components/ui/FeatureInput";
-import { CompatibilityInput } from "@/components/ui/CompatibilityInput";
+import { DynamicTextListInput } from "@/components/ui/DynamicTextListInput";
 import EditProductImages from "./EditProductImages";
 import EditProductHeroImage from "./EditProductHeroImage";
 import EditProductFile from "./EditProductFile";
@@ -212,7 +211,14 @@ export default function EditProductPage() {
           rows={5}
         />
 
-        <FeatureInput features={features} onChange={setFeatures} />
+        <DynamicTextListInput
+          label="Features"
+          value={features}
+          onChange={setFeatures}
+          placeholder="Feature เช่น AI Chat, Image Generator"
+          maxItems={6}
+          required
+        />
 
         <Textarea
           label="Installation Document"
@@ -222,10 +228,14 @@ export default function EditProductPage() {
           rows={4}
         />
 
-        <CompatibilityInput
-          compatibility={compatibility}
+        <DynamicTextListInput
+          label="Compatibility"
+          value={compatibility}
           onChange={setCompatibility}
+          placeholder="เช่น Windows, macOS, Chrome"
+          maxItems={6}
         />
+
 
         <MultiSelectTag
           label="Tags"
