@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ProductGrid } from "@/components/home/ProductGrid";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
@@ -29,22 +30,7 @@ export default function SearchPage() {
 
       {loading && <p className="text-slate-400">กำลังค้นหา...</p>}
 
-      {!loading && results.length === 0 && (
-        <p className="text-slate-400">ไม่พบผลลัพธ์</p>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {results.map((item) => (
-          <div
-            key={item.id}
-            className="bg-[#0f1729] border border-slate-700 rounded-xl p-4"
-          >
-            <h2 className="text-white font-medium">{item.name}</h2>
-            <p className="text-slate-400 text-sm mt-1">{item.blurb}</p>
-            <p className="text-purple-400 mt-3 font-semibold">฿{item.price}</p>
-          </div>
-        ))}
-      </div>
+      <ProductGrid products={results} showHeader={false} />
     </div>
   );
 }
