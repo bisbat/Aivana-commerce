@@ -1,7 +1,7 @@
 import { AddToCartResponse, AddToCartRequest } from "@/lib/types/cart/AddCart";
 import { GetCartResponse } from "@/lib/types/cart/GetCart";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.API_URL || 'http://localhost:3001';
 
 export async function addToCart(
   data: AddToCartRequest,
