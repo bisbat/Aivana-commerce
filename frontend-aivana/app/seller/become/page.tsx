@@ -234,7 +234,7 @@ export default function BecomeSellerPage() {
       }
 
       // Call backend API to become seller
-      await becomeSeller(submitData, user.id, accessToken || "");
+      await becomeSeller(submitData, user.id);
 
       router.push("/");
     } catch (error) {

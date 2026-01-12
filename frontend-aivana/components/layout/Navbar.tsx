@@ -7,7 +7,8 @@ import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
 import { ProfileModal } from "./ProfileModal";
 import { CartModal } from "../cart/CartModal";
 import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
-import { getUserByUserId } from "@/lib/actions/user.actions";
+import { getCurrentUser } from "@/lib/auth";
+import { UserProfile } from "@/lib/types/user.ts/user";
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
@@ -19,6 +20,7 @@ export const Navbar: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -26,7 +28,8 @@ export const Navbar: React.FC = () => {
   // Check authentication status on mount and when pathname changes
   useEffect(() => {
     const checkAuth = async () => {
-      const user = await getCurrentUserFromToken();
+      const user = await getCurrentUser();
+      setUser(user);
       setIsAuthenticated(!!user);
       setUserRole(user?.role || null);
       setUserId(user?.id || null);
@@ -188,6 +191,7 @@ export const Navbar: React.FC = () => {
 
                 {/* Profile Modal */}
                 <ProfileModal
+                  user={user}
                   isOpen={isProfileOpen}
                   onClose={() => setIsProfileOpen(false)}
                 />

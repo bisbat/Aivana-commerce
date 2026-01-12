@@ -40,7 +40,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = "/" }) => {
       const token = getAuthData()?.accessToken;
       if (!token) return;
 
-      const profileData = await getSellerById(sellerId, token);
+      const profileData = await getSellerById(sellerId);
       setSeller(profileData);
     }
     fetchData();

@@ -1,12 +1,17 @@
 "use server";
+import { getAccessToken } from "../auth";
 
 const API_BASE_URL =
   process.env.API_URL || "http://localhost:3001";
 
 export async function getDashboardStats(
   sellerId: string,
-  token: string
 ) {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
   const response = await fetch(`${API_BASE_URL}/dashboard/${sellerId}`, {
     method: "GET",
     headers: {

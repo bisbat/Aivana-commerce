@@ -45,7 +45,7 @@ export default function StorePage() {
 
     try {
       if (!sellerId) return;
-      const data = await getProductsBySellerId(sellerId, token);
+      const data = await getProductsBySellerId(sellerId);
       setProducts(data);
     } catch (err) {
       const errorMessage =

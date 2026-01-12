@@ -44,7 +44,7 @@ export default function EditSellerSellerInfo() {
         setLoading(false);
         return;
       }
-      const seller = await getSellerById(user.sellerId, token);
+      const seller = await getSellerById(user.sellerId);
       if (!seller) {
         setLoading(false);
         return;
@@ -103,7 +103,7 @@ export default function EditSellerSellerInfo() {
     try {
       setSaving(true);
       // call update API: (sellerId, payload, token)
-      const updated = await updateSellerProfile(sellerData.id, payload, token);
+      const updated = await updateSellerProfile(sellerData.id, payload);
 
       // update local state with returned data (best if API returns updated seller)
       if (updated) {

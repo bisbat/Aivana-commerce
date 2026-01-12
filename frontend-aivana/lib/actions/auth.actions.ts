@@ -34,6 +34,7 @@ export function clearAuthData(): void {
   window.dispatchEvent(new Event("authStateChanged"));
 }
 
+// สมัครสมาชิกใหม่
 export async function register(data: FormData): Promise<TokenResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: "POST",
@@ -56,10 +57,10 @@ export async function register(data: FormData): Promise<TokenResponse> {
   return result;
 }
 
+// อ่าน token จาก localStorage
 export function getAuthData(): {
   accessToken: string | null;
 } {
-  console.log("Running on:", typeof window);
   const accessToken = localStorage.getItem("accessToken");
 
   return {
@@ -67,6 +68,7 @@ export function getAuthData(): {
   };
 }
 
+// เอา accessToken → decode → ดึง user profile
 export async function getCurrentUserFromToken(): Promise<UserProfile | null> {
   const accessToken = localStorage.getItem("accessToken");
 
