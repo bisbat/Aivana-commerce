@@ -4,11 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { becomeSeller } from "@/lib/actions/seller.actions";
-import {
-  getAuthData,
-  getCurrentUserFromToken,
-} from "@/lib/actions/auth.actions";
 import { CreateSellerProfileDto } from "@/lib/types/user.ts/sellerCreate";
+import { getCurrentUser } from "@/lib/auth";
 
 const SOCIAL_PLATFORMS = [
   { value: "github", label: "GitHub" },
@@ -227,8 +224,7 @@ export default function BecomeSellerPage() {
         },
       };
 
-      const user = await getCurrentUserFromToken();
-      const accessToken = getAuthData()?.accessToken || "";
+      const user = await getCurrentUser();
       if (!user) {
         throw new Error("Not authenticated");
       }

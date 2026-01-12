@@ -12,7 +12,6 @@ import { CompatibilityInput } from "../ui/CompatibilityInput";
 import { FeatureInput } from "@/components/ui/FeatureInput";
 import { MultiSelectTag } from "@/components/ui/MultiSelectTag";
 import { Loader } from "lucide-react";
-import { getAuthData } from "@/lib/actions/auth.actions";
 
 // NEW: This component no longer submits to backend
 // It just collects data and passes to next step

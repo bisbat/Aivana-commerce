@@ -1,18 +1,24 @@
+"use server";
 import { AddToCartResponse, AddToCartRequest } from "@/lib/types/cart/AddCart";
 import { GetCartResponse } from "@/lib/types/cart/GetCart";
+import { getAccessToken } from "../auth";
 
 const API_BASE_URL = process.env.API_URL || 'http://localhost:3001';
 
 export async function addToCart(
-  data: AddToCartRequest,
-  accessToken?: string
+  data: AddToCartRequest
 ): Promise<AddToCartResponse> {
-  console.log("AccessToken:", accessToken);
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
   const response = await fetch(`${API_BASE_URL}/cart/add`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });
@@ -30,14 +36,18 @@ export async function addToCart(
 }
 
 export async function getCart(
-  userId: string,
-  accessToken?: string
+  userId: string
 ): Promise<GetCartResponse> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
   const response = await fetch(`${API_BASE_URL}/cart/user/${userId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -50,16 +60,20 @@ export async function getCart(
 
 export async function removeFromCart(
   userId: string,
-  productId: number,
-  accessToken?: string
+  productId: number
 ): Promise<{ message: string }> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
   const response = await fetch(
     `${API_BASE_URL}/cart/user/${userId}/product/${productId}`,
     {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${token}`,
       },
     }
   );

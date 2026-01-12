@@ -8,7 +8,6 @@ import { Loader } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
 import { addToCart } from "@/lib/actions/cart.actions";
 import { getCurrentUser } from "@/lib/auth";
-import { getAuthData } from "@/lib/actions/auth.actions";
 import { getProductByIdAction } from "@/lib/actions/product.actions";
 import { getAllProductsAction } from "@/lib/actions/product.actions";
 
@@ -44,14 +43,11 @@ export default function ProductDetailPage() {
         );
         return;
       }
-      const accessToken = getAuthData()?.accessToken || "";
-
       await addToCart(
         {
           userId: user.id,
           productId: parseInt(productId),
-        },
-        accessToken
+        }
       );
 
       setToast({

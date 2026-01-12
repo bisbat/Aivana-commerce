@@ -5,15 +5,19 @@ import { UploadFileFormData } from "../types/formCreateProduct/UploadFileFormDat
 import { UploadImageFormData } from "../types/formCreateProduct/UploadImageFormData";
 import { ProductUpdatePayload } from "../types/product/UpdateProductPayload";
 import { UpdatedProductData } from "@/app/stores/products/[productId]/edit/page";
+import { getAccessToken } from "../auth";
 
 const API_BASE_URL = process.env.API_URL || "http://localhost:3001";
 
 export async function updateProductAction(
   productId: string,
-  updatedData: UpdatedProductData,
-  accessToken?: string
+  updatedData: UpdatedProductData
 ) {
+  const token = await getAccessToken();
 
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
   const formData = new FormData();
 
   for (const key in updatedData) {
@@ -55,7 +59,7 @@ export async function updateProductAction(
   const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
     method: "PUT",
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${token}`,
     },
     body: formData,
   });
@@ -75,14 +79,19 @@ export async function updateProductAction(
 
 // ฟังก์ชันสำหรับลบ detail image
 export async function deleteProductImageAction(
-  imageId: number,
-  accessToken?: string
+  imageId: number
 ) {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
   const res = await fetch(`${API_BASE_URL}/product-images/${imageId}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -95,15 +104,19 @@ export async function deleteProductImageAction(
 }
 
 export async function deleteProductAction(
-  productId: string,
-  accessToken?: string
+  productId: string
 ) {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
   // ส่งคำขอไปยัง API เพื่อลบสินค้า
   const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -119,10 +132,10 @@ export async function getAllProductsAction() {
     headers: {
       "Content-Type": "application/json",
     },
-  });  
+  });
 
   console.log(res);
-  
+
 
   if (res.ok) {
     const data = await res.json();
@@ -139,7 +152,7 @@ export async function getProductByIdAction(productId: string) {
       "Content-Type": "application/json",
     },
   });
-  
+
   if (res.ok) {
     const data = await res.json();
     return data;
@@ -150,9 +163,13 @@ export async function getProductByIdAction(productId: string) {
 export async function createCompleteProduct(
   uploadFileData: UploadFileFormData, // Step 1 data
   productInfoData: ProductInformationFormData, // Step 2 data
-  imageData: UploadImageFormData,
-  accessToken?: string | undefined // Step 3 data
+  imageData: UploadImageFormData
 ) {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
   try {
     // Create FormData with ALL information
     const formData = new FormData();
@@ -197,7 +214,7 @@ export async function createCompleteProduct(
     const response = await fetch(`${API_BASE_URL}/products`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${token}`,
       },
       body: formData,
     });

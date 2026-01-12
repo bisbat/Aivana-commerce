@@ -4,29 +4,14 @@ import ConfirmModal from '@/components/common/ConfirmModal';
 import { useConfirmModal } from '@/hooks/useConfirmModal';
 import { deleteProductAction } from '@/lib/actions/product.actions';
 import toast from 'react-hot-toast';
-import { getAuthData } from '@/lib/actions/auth.actions';
-import { useEffect,useState } from 'react';
-
-
-
 
 export default function DeleteButton({ productId }: { productId: string }) {
-
-    const [token, setToken] = useState<string>("");
-
-    useEffect(() => {
-        function fetchCurrentUser() {
-            const auth = getAuthData();   // <-- รันแค่บน client
-            setToken(auth?.accessToken || "");
-        }
-        fetchCurrentUser();
-    }, []);
 
 
     const { isOpen, open, close, callback } = useConfirmModal();
 
     const handleDelete = async () => {
-        await deleteProductAction(productId, token);
+        await deleteProductAction(productId);
 
         toast.success("Product deleted successfully.");
         window.location.href = '/stores';

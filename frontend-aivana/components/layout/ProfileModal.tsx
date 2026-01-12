@@ -4,10 +4,6 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { User, Store, LogOut } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth.server";
-import {
-  clearAuthData,
-  getCurrentUserFromToken,
-} from "@/lib/actions/auth.actions";
 import { useRouter } from "next/navigation";
 import { UserProfile } from "@/lib/types/user.ts/user";
 

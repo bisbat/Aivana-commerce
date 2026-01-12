@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { register, saveAuthData } from "@/lib/actions/auth.actions";
 import { registerAction } from "@/lib/actions/auth.server";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

@@ -6,7 +6,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
 import { ProfileModal } from "./ProfileModal";
 import { CartModal } from "../cart/CartModal";
-import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
 import { getCurrentUser } from "@/lib/auth";
 import { UserProfile } from "@/lib/types/user.ts/user";
 
