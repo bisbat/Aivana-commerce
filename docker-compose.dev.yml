@@ -19,7 +19,8 @@ services:
       context: ./frontend-aivana
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://backend:3001
+        # NEXT_PUBLIC_API_URL: http://backend:3001
+        NEXT_PUBLIC_API_URL: http://localhost:3001
     container_name: frontend
     env_file: ./frontend-aivana/.env
     ports:

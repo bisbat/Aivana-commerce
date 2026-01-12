@@ -12,7 +12,6 @@ import { MultiSelectTag } from "@/components/ui/MultiSelectTag";
 import { Loader } from "lucide-react";
 import { saveFormStep } from "@/lib/utils/formStorage";
 import { PRODUCT_FORM_STEP } from "@/lib/constants/productFormSteps";
-import { getAuthData } from "@/lib/actions/auth.actions";
 import { DynamicTextListInput } from "../ui/DynamicTextListInput";
 
 // NEW: This component no longer submits to backend

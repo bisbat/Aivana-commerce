@@ -2,13 +2,10 @@
 
 import { useEffect, useState } from "react";
 import {
-  getCurrentUserFromToken,
-  getAuthData,
-} from "@/lib/actions/auth.actions";
-import {
   getSellerById,
   updateSellerProfile,
 } from "@/lib/actions/seller.actions";
+import { getCurrentUser } from "@/lib/auth";
 import { SellerProfile } from "@/lib/types/user.ts/sellerProfile";
 import { SocialLink } from "@/lib/types/user.ts/sellerProfile";
 import { Skills } from "./SkillsProps";
@@ -38,13 +35,12 @@ export default function EditSellerSellerInfo() {
   useEffect(() => {
     async function load() {
       setLoading(true);
-      const token = getAuthData()?.accessToken;
-      const user = await getCurrentUserFromToken();
-      if (!user || !token || !user.sellerId) {
+      const user = await getCurrentUser();
+      if (!user || !user.sellerId) {
         setLoading(false);
         return;
       }
-      const seller = await getSellerById(user.sellerId, token);
+      const seller = await getSellerById(user.sellerId);
       if (!seller) {
         setLoading(false);
         return;
@@ -95,15 +91,15 @@ export default function EditSellerSellerInfo() {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (!sellerData) return;
-    const token = getAuthData()?.accessToken;
-    if (!token) return alert("Not authenticated");
+    const user = await getCurrentUser();
+    if (!user) return alert("Not authenticated");
 
     const payload = buildUpdatePayload();
 
     try {
       setSaving(true);
       // call update API: (sellerId, payload, token)
-      const updated = await updateSellerProfile(sellerData.id, payload, token);
+      const updated = await updateSellerProfile(sellerData.id, payload);
 
       // update local state with returned data (best if API returns updated seller)
       if (updated) {

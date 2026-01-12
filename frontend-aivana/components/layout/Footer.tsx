@@ -2,14 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
+import { getCurrentUser } from "@/lib/auth";
 
 export const Footer: React.FC = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
-      const user = await getCurrentUserFromToken();
+      const user = await getCurrentUser();
       setUserRole(user?.role || null);
     };
 

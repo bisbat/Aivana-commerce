@@ -10,8 +10,7 @@ import { UploadFileFormData } from "@/lib/types/formCreateProduct/UploadFileForm
 import { ProductInformationFormData } from "@/lib/types/formCreateProduct/ProductInformationFormData";
 import { createCompleteProduct } from "@/lib/actions/product.actions";
 import { Loader, CheckCircle, AlertCircle } from "lucide-react";
-import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
-import { getAuthData } from "@/lib/actions/auth.actions";
+import { getCurrentUser } from "@/lib/auth";
 
 // Import storage helpers
 import {
@@ -46,7 +45,7 @@ export default function AddProductPage() {
         setIsLoadingData(true);
 
         // Fetch user data
-        const user = await getCurrentUserFromToken();
+        const user = await getCurrentUser();
         setSellerId(user?.sellerId || null);
 
         // Load saved form data
@@ -134,14 +133,11 @@ export default function AddProductPage() {
     try {
       console.log("📤 Submitting complete product...");
 
-      const accessToken = getAuthData()?.accessToken || "";
-
       // Submit to backend
       const createdProduct = await createCompleteProduct(
         uploadData,
         productData,
-        imageData,
-        accessToken
+        imageData
       );
 
       console.log("✅ Product created:", createdProduct);

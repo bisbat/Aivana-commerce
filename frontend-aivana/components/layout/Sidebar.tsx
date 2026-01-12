@@ -4,12 +4,11 @@ import Reacts from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LayoutDashboard, Package, DollarSign, Store } from "lucide-react";
-import { getAuthData } from "@/lib/actions/auth.actions";
-import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
 import { SellerProfile } from "@/lib/types/user.ts/sellerProfile";
 import { getSellerById } from "@/lib/actions/seller.actions";
 import { Product } from "@/lib/types/product/Product";
 import { useState, useEffect } from "react";
+import { getCurrentUser } from "@/lib/auth";
 
 interface NavItem {
   label: string;
@@ -27,7 +26,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = "/" }) => {
   const [sellerId, setSellerId] = useState<string | null>(null);
 
   useEffect(() => {
-    getCurrentUserFromToken().then((user) =>
+    getCurrentUser().then((user) =>
       setSellerId(user?.sellerId ?? null)
     );
   }, []);
@@ -37,10 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = "/" }) => {
   useEffect(() => {
     async function fetchData() {
       if (!sellerId) return;
-      const token = getAuthData()?.accessToken;
-      if (!token) return;
-
-      const profileData = await getSellerById(sellerId, token);
+      const profileData = await getSellerById(sellerId);
       setSeller(profileData);
     }
     fetchData();

@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { getCart, removeFromCart } from "@/lib/actions/cart.actions";
 import { GetCartResponse } from "@/lib/types/cart/GetCart";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
-import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
-import { getAuthData } from "@/lib/actions/auth.actions";
+import { getCurrentUser } from "@/lib/auth";
 interface CartModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -21,14 +20,15 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
   const fetchCart = async () => {
     try {
       setLoading(true);
-      const user = await getCurrentUserFromToken();
+      const user = await getCurrentUser();
       if (!user) {
         setCartData(null);
         return;
       }
-      const accessToken = getAuthData()?.accessToken || "";
 
-      const data = await getCart(user.id, accessToken);
+      const data = await getCart(user.id);
+      console.log("Hi there");
+      console.log("Fetched cart data:", data);
       setCartData(data);
     } catch (error) {
       console.error("Failed to fetch cart:", error);
@@ -40,12 +40,11 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
   const handleRemoveItem = async (productId: number) => {
     try {
       setRemovingItemId(productId);
-      const user = await getCurrentUserFromToken();
+      const user = await getCurrentUser();
       if (!user) return;
 
-      const accessToken = getAuthData()?.accessToken || "";
 
-      await removeFromCart(user.id, productId, accessToken);
+      await removeFromCart(user.id, productId);
       await fetchCart();
     } catch (error) {
       console.error("Failed to remove item:", error);

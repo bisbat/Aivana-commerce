@@ -3,45 +3,31 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { User, Store, LogOut } from "lucide-react";
-import {
-  clearAuthData,
-  getCurrentUserFromToken,
-} from "@/lib/actions/auth.actions";
+import { logoutAction } from "@/lib/actions/auth.server";
 import { useRouter } from "next/navigation";
 import { UserProfile } from "@/lib/types/user.ts/user";
 
 interface ProfileModalProps {
+  user: UserProfile | null;
   isOpen: boolean;
   onClose: () => void;
 }
 
 export const ProfileModal: React.FC<ProfileModalProps> = ({
+  user,
   isOpen,
   onClose,
 }) => {
   const router = useRouter();
   const [userData, setUserData] = useState<UserProfile | null>(null);
   useEffect(() => {
-    const fetchUser = async () => {
-      const userProfile = await getCurrentUserFromToken();
-      if (!userProfile) {
-        clearAuthData();
-        onClose();
-        router.push("/login");
-        return;
-      }
-      setUserData(userProfile);
-    };
-
-    if (isOpen) {
-      fetchUser();
-    }
+    setUserData(user);
   }, [isOpen, router, onClose]);
 
-  const handleLogout = () => {
-    clearAuthData();
-    onClose();
+  const handleLogout = async () => {
+    await logoutAction();
     router.push("/login");
+    router.refresh();
   };
 
   if (!isOpen) return null;

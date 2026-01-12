@@ -7,8 +7,7 @@ import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { Loader } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
 import { addToCart } from "@/lib/actions/cart.actions";
-import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
-import { getAuthData } from "@/lib/actions/auth.actions";
+import { getCurrentUser } from "@/lib/auth";
 import { getProductByIdAction } from "@/lib/actions/product.actions";
 import { getAllProductsAction } from "@/lib/actions/product.actions";
 
@@ -31,7 +30,7 @@ export default function ProductDetailPage() {
     try {
       setAddingToCart(true);
 
-      const user = await getCurrentUserFromToken();
+      const user = await getCurrentUser();
       if (!user) {
         setToast({
           show: true,
@@ -44,14 +43,11 @@ export default function ProductDetailPage() {
         );
         return;
       }
-      const accessToken = getAuthData()?.accessToken || "";
-
       await addToCart(
         {
           userId: user.id,
           productId: parseInt(productId),
-        },
-        accessToken
+        }
       );
 
       setToast({

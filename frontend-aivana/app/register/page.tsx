@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { register, saveAuthData } from "@/lib/actions/auth.actions";
+import { registerAction } from "@/lib/actions/auth.server";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -150,13 +150,10 @@ export default function RegisterPage() {
         formPayload.append("avatar", fileInputRef.current.files[0]);
       }
 
-      const tokenResponse = await register(formPayload);
-
-      saveAuthData(tokenResponse.accessToken);
-
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await registerAction(formPayload);
 
       router.push("/");
+      router.refresh();
     } catch (error: any) {
       console.error("Register error:", error);
 

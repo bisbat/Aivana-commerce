@@ -5,5 +5,6 @@ export interface Owner {
     first_name: string;
     last_name: string;
     promptpay_id: string;
+    productsTotal: number;
     role: 'customer' | 'seller' | 'admin';
 }
