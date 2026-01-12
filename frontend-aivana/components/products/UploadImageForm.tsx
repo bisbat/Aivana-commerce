@@ -1,18 +1,23 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
 import { UploadImageFormData } from "@/lib/types/formCreateProduct/UploadImageFormData";
+import { saveFormStep } from "@/lib/utils/formStorage";
+
 
 interface UploadImageFormProps {
   onPublish: (data: UploadImageFormData) => void;
   onBack: () => void;
 }
 
+
 export const UploadImageForm: React.FC<UploadImageFormProps> = ({
   onPublish,
   onBack,
 }) => {
+
+
   // State
   const [heroImage, setHeroImage] = useState<File | null>(null);
   const [heroImagePreview, setHeroImagePreview] = useState<string | null>(null);
@@ -24,8 +29,17 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
   const heroInputRef = useRef<HTMLInputElement>(null);
   const detailInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    saveFormStep(3, {
+      heroImage,
+      detailImages,
+    });
+  }, [heroImage, detailImages]);
+
+
   // Handle hero image upload
   const handleHeroImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
     const file = e.target.files?.[0];
     if (file) {
       // Validate file type

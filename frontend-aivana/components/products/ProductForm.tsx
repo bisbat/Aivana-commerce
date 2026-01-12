@@ -8,17 +8,18 @@ import { getAllTagsAction } from "@/lib/actions/tag.actions";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Dropdown";
-import { CompatibilityInput } from "../ui/CompatibilityInput";
-import { FeatureInput } from "@/components/ui/FeatureInput";
 import { MultiSelectTag } from "@/components/ui/MultiSelectTag";
 import { Loader } from "lucide-react";
+import { saveFormStep } from "@/lib/utils/formStorage";
+import { PRODUCT_FORM_STEP } from "@/lib/constants/productFormSteps";
+import { DynamicTextListInput } from "../ui/DynamicTextListInput";
 
 // NEW: This component no longer submits to backend
 // It just collects data and passes to next step
 interface ProductFormProps {
   sellerId: string;
   uploadData: UploadFileFormData;
-  onNext: (data: ProductInformationFormData) => void; // Changed from onBack
+  onNext: (data: ProductInformationFormData) => void;
   onBack: () => void;
   initialData?: ProductInformationFormData;
 }
@@ -30,10 +31,16 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   onBack,
   initialData
 }) => {
+
+  const isFormMeaningful = () =>
+    name.trim() !== "" ||
+    blurb.trim() !== "" ||
+    description.trim() !== "" ||
+    price !== "";
+
   // Form state
   const [name, setName] = useState("");
   const [blurb, setBlurb] = useState("");
-  const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [features, setFeatures] = useState<string[]>([]);
   const [installationGuide, setInstallationGuide] = useState("");
@@ -89,6 +96,41 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     setCompatibility(initialData.compatibility ?? []);
     setSelectedTagIds(initialData.tagIds ?? []);
   }, [initialData]);
+
+  useEffect(() => {
+    if (!isFormMeaningful()) return;
+
+    const data: ProductInformationFormData = {
+      name,
+      blurb,
+      categoryId: categoryId ? Number(categoryId) : 0,
+      sellerId,
+      description,
+      features,
+      installationGuide,
+      price: price ? Number(price) : 0,
+      previewUrl: livePreview || null,
+      compatibility,
+      uploadedFilePath: null,
+      heroImageUrl: null,
+      tagIds: selectedTagIds,
+    };
+
+    saveFormStep(PRODUCT_FORM_STEP.PRODUCT_INFO, data);
+  }, [
+    name,
+    blurb,
+    categoryId,
+    description,
+    features,
+    installationGuide,
+    price,
+    livePreview,
+    compatibility,
+    selectedTagIds,
+    sellerId,
+  ]);
+
 
 
   // Handle continue to next step
@@ -192,11 +234,21 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       {/* Show uploaded file info */}
       <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
         <p className="text-slate-400 text-sm mb-2">Uploaded file:</p>
-        <p className="text-white font-medium">{uploadData.file?.name}</p>
-        <p className="text-slate-400 text-sm mt-1">
-          Type: {uploadData.productType}
-        </p>
+
+        {uploadData.file ? (
+          <>
+            <p className="text-white font-medium">{uploadData.file.name}</p>
+            <p className="text-slate-400 text-sm mt-1">
+              Type: {uploadData.productType}
+            </p>
+          </>
+        ) : (
+          <p className="text-yellow-400 text-sm">
+            File information lost after refresh. Please go back and re-upload.
+          </p>
+        )}
       </div>
+
 
       {/* Error Message */}
       {error && (
@@ -242,7 +294,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         rows={5}
       />
 
-      <FeatureInput features={features} onChange={setFeatures} />
+      <DynamicTextListInput
+        label="Features"
+        value={features}
+        onChange={setFeatures}
+        placeholder="Feature เช่น AI Chat, Image Generator"
+        maxItems={6}
+        required
+      />
 
       <Textarea
         label="Installation Document"
@@ -252,9 +311,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         rows={4}
       />
 
-      <CompatibilityInput
-        compatibility={compatibility}
+      <DynamicTextListInput
+        label="Compatibility"
+        value={compatibility}
         onChange={setCompatibility}
+        placeholder="เช่น Windows, macOS, Chrome"
+        maxItems={6}
       />
 
       <MultiSelectTag
