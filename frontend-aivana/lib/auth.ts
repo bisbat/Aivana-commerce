@@ -10,6 +10,8 @@ export async function getCurrentUser() {
   const decoded = decodeJWT(token);
   if (!decoded.exp || decoded.exp * 1000 < Date.now()) return null;
 
+  console.log('Decoded JWT:', decoded);
+
   return getUserByUserId(decoded.sub, token);
 }
 
