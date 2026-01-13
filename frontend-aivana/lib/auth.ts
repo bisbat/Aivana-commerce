@@ -1,18 +1,18 @@
 "use server";
 import { cookies } from 'next/headers';
-import { decodeJWT } from './types/auth';
+import { decodeJWT } from './utils/jwt';
 import { getUserByUserId } from '@/lib/actions/user.actions';
+import { isTokenExpired } from './utils/jwt';
 
 export async function getCurrentUser() {
   const token = (await cookies()).get('accessToken')?.value;
   if (!token) return null;
 
+  if (isTokenExpired(token)) return null;
+
   const decoded = decodeJWT(token);
-  if (!decoded.exp || decoded.exp * 1000 < Date.now()) return null;
 
-  console.log('Decoded JWT:', decoded);
-
-  return getUserByUserId(decoded.sub, token);
+  return getUserByUserId(decoded?.sub ?? '', token);
 }
 
 export async function getAccessToken(): Promise<string | null> {
