@@ -118,11 +118,12 @@ export class AuthService {
   }
 
   async signIn(user: SignInData): Promise<{ accessToken: string }> {
-    const tokenPayload = {
+    const JwtPayload = {
       sub: user.userId,
+      role: user.role,
     };
 
-    const accessToken = await this.jwtService.signAsync(tokenPayload);
+    const accessToken = await this.jwtService.signAsync(JwtPayload);
 
     return { accessToken };
   }

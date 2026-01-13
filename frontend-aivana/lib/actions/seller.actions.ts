@@ -4,7 +4,7 @@ import { CreateSellerProfileDto } from "../types/user.ts/sellerCreate";
 import { Product } from "../types/product/Product";
 import { getAccessToken } from "../auth";
 
-const API_BASE_URL = process.env.API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export async function becomeSeller(
   data: CreateSellerProfileDto,
