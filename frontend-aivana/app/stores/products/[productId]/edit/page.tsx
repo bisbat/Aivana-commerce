@@ -22,6 +22,7 @@ import EditProductImages from "./EditProductImages";
 import EditProductHeroImage from "./EditProductHeroImage";
 import EditProductFile from "./EditProductFile";
 import BackButton from "./BackButton";
+import { InstallationGuideInput } from "@/components/ui/InstallationGuideInput";
 import { ProductUpdatePayload } from "@/lib/types/product/UpdateProductPayload";
 
 export interface UpdatedProductData {
@@ -215,12 +216,9 @@ export default function EditProductPage() {
           required
         />
 
-        <Textarea
-          label="Installation Document"
+        <InstallationGuideInput
           value={installationGuide}
           onChange={setInstallationGuide}
-          placeholder="Installation Document..."
-          rows={4}
         />
 
         <DynamicTextListInput
