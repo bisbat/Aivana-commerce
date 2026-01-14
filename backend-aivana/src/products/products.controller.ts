@@ -27,6 +27,16 @@ export class ProductsController {
 
   @Public()
   @Get()
+  async getProducts(@Query('tag') tag?: string) {
+    if (tag) {
+      return this.productsService.getProductsByTag(tag);
+    }
+
+    return this.productsService.getAllProducts();
+  }
+
+  @Public()
+  @Get()
   async getAllProducts(): Promise<ResponseProductDto[]> {
     return this.productsService.getAllProducts();
   }
@@ -62,6 +72,7 @@ export class ProductsController {
       ...result,
     };
   }
+
   @Public()
   @Get('search')
   search(@Query('q') q: string) {

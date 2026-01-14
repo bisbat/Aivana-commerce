@@ -25,6 +25,6 @@ import { ProductMapper } from './products.mapper';
   ],
   controllers: [ProductsController],
   providers: [ProductsService, ProductMapper],
-  exports: [ProductsService],
+  exports: [ProductsService, ProductMapper],
 })
 export class ProductsModule {}

@@ -45,6 +45,7 @@ export class ProductsService {
 
     return this.productMapper.toResponseList(products);
   }
+
   async findOne(productId: number): Promise<ResponseProductDto | null> {
     const product = await this.productsRepository.findOne({
       where: { id: productId },
@@ -472,6 +473,21 @@ export class ProductsService {
       .orderBy('product.createdAt', 'DESC')
       .limit(30)
       .getMany();
+
+    return this.productMapper.toResponseList(products);
+  }
+
+  async getProductsByTag(tag?: string) {
+    if (!tag || !tag.trim()) return [];
+
+    const normalized = tag.trim();
+
+    const products = await this.productsRepository.find({
+      where: {
+        tags: { name: normalized },
+      },
+      relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
+    });
 
     return this.productMapper.toResponseList(products);
   }

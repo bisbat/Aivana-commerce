@@ -21,6 +21,12 @@ export class TagsController {
     return this.tagsService.getAllTags();
   }
 
+  @Public()
+  @Get('/navbar')
+  async getNavbarTags() {
+    return this.tagsService.getNavbarTags();
+  }
+
   @Post()
   async createTag(@Body() createTagDto: CreateTagDto) {
     return this.tagsService.createTag(createTagDto);

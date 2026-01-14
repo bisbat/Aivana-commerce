@@ -21,11 +21,22 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [toast, setToast] = useState<{
     show: boolean;
     message: string;
     type: "success" | "error";
   }>({ show: false, message: "", type: "success" });
+
+  const allImages = product
+    ? [
+        product.heroImageUrl,
+        ...(product.detailImages?.map((img) =>
+          Array.isArray(img.url) ? img.url[0] : img.url
+        ) || []),
+      ].filter(Boolean)
+    : [];
 
   const handleAddToCart = async () => {
     try {
@@ -106,6 +117,18 @@ export default function ProductDetailPage() {
     fetchAllProducts();
   }, [productId]);
 
+  useEffect(() => {
+    if (isPreviewOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isPreviewOpen]);
+
   if (loading) {
     return (
       /* Loading State */
@@ -148,7 +171,22 @@ export default function ProductDetailPage() {
 
     return scoredProducts;
   };
+  // ฟังก์ชันเปิด lightbox
+  const openPreview = (index: number) => {
+    setCurrentImageIndex(index);
+    setIsPreviewOpen(true);
+  };
 
+  // ฟังก์ชันเปลี่ยนรูป
+  const goToNext = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const goToPrev = () => {
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + allImages.length) % allImages.length
+    );
+  };
   const handlePreview = (previewUrl: string) => {
     if (previewUrl) {
       window.open(previewUrl, "_blank");
@@ -212,7 +250,7 @@ export default function ProductDetailPage() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-3 py-10">
         {/* Header Product Name */}
         <div className="space-y-4">
           <h1 className="text-2xl md:text-3xl font-bold text-white">
@@ -245,97 +283,195 @@ export default function ProductDetailPage() {
         {/* Main Product */}
         <div className="grid grid-cols-1 lg:grid-cols-8 gap-8 mt-10">
           {/* Left Side - Hero Image */}
-          <div className="lg:col-span-5 space-y-4">
-            <div className="aspect-[17/11] rounded-xl overflow-hidden bg-slate-800">
-              {product.heroImageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={product.heroImageUrl}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-slate-500">
-                  No Image
-                </div>
-              )}
-            </div>
-
-            {/* Thumbnails */}
-            {product.detailImages && product.detailImages.length > 0 && (
-              <div className="grid grid-cols-6 gap-2">
-                {product.detailImages.slice(0, 6).map((img) => (
-                  <div
-                    key={img.imageId}
-                    className="aspect-square rounded-lg overflow-hidden bg-slate-800 border-2 border-slate-700 hover:border-purple-500 transition-colors cursor-pointer"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={Array.isArray(img.url) ? img.url[0] : img.url}
-                      alt={`Detail ${img.imageId}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Main Product Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10">
-              {/* Left Side - Description */}
-              <div className="lg:col-span-3">
-                <div className="space-y-8">
-                  <div>
-                    <h2 className="text-xl font-bold text-white mb-4">
-                      รายละเอียด
-                    </h2>
-                    <div className="text-slate-300 leading-relaxed whitespace-pre-line">
-                      {product.description}
-                    </div>
-                  </div>
-
-                  {product.installationGuide && (
-                    <div>
-                      <h2 className="text-xl font-bold text-white mb-4">
-                        วิธีใช้
-                      </h2>
-                      <MarkdownRenderer
-                        content={product.installationGuide}
-                      />
-                    </div>
-                  )}
-
-                  {product.compatibility &&
-                    product.compatibility.length > 0 && (
-                      <div>
-                        <h2 className="text-xl font-bold text-white mb-4">
-                          ความเข้ากันได้กับ
-                        </h2>
-                        <ul className="list-disc list-inside space-y-2 text-slate-300 marker:text-purple-400">
-                          {product.compatibility.map((item, index) => (
-                            <li key={index}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                </div>
-              </div>
-
-              {/* Right Side - Compatibility */}
-              <div className="lg:col-span-2">
-                {product.features && product.features.length > 0 && (
-                  <div>
-                    <h2 className="text-xl font-bold text-white mb-4">
-                      คุณสมบัติ
-                    </h2>
-                    <ul className="list-disc list-inside space-y-2 text-slate-300 marker:text-purple-400">
-                      {product.features.map((feature, index) => (
-                        <li key={index}>{feature}</li>
-                      ))}
-                    </ul>
+          <div className="lg:col-span-5">
+            <div className="space-y-6">
+              {/* Hero Image - คลิกเพื่อดูรูปที่ 0 */}
+              <div
+                className="aspect-[17/11] rounded-xl overflow-hidden bg-slate-800 cursor-pointer hover:opacity-95 transition-opacity"
+                onClick={() => openPreview(0)}
+              >
+                {product.heroImageUrl ? (
+                  <img
+                    src={product.heroImageUrl}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-slate-500">
+                    No Image
                   </div>
                 )}
               </div>
+
+              {/* Thumbnails - คลิกเพื่อดูรูปตาม index */}
+              {product.detailImages && product.detailImages.length > 0 && (
+                <div className="grid grid-cols-2 gap-2">
+                  {product.detailImages.slice(0, 6).map((img, index) => (
+                    <div
+                      key={img.imageId}
+                      className="h-72 rounded-lg overflow-hidden bg-slate-800 border-2 border-slate-700 hover:border-purple-500 transition-colors cursor-pointer"
+                      onClick={() => openPreview(index + 1)} // +1 เพราะ hero image อยู่ index 0
+                    >
+                      <img
+                        src={Array.isArray(img.url) ? img.url[0] : img.url}
+                        alt={`Detail ${img.imageId}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Left Side - Description */}
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mt-10">
+                {/* Left Side - Description */}
+                <div className="lg:col-span-3">
+                  <div className="space-y-8">
+                    <div>
+                      <h2 className="text-xl font-bold text-white mb-4">
+                        รายละเอียด
+                      </h2>
+                      <div className="text-slate-300 leading-relaxed whitespace-pre-line">
+                        {product.description}
+                      </div>
+                    </div>
+
+                    {product.installationGuide && (
+                      <div>
+                        <h2 className="text-xl font-bold text-white mb-4">
+                          วิธีใช้
+                        </h2>
+                        <div className="text-slate-300 leading-relaxed whitespace-pre-line">
+                          {product.installationGuide}
+                        </div>
+                      </div>
+                    )}
+
+                    {product.compatibility &&
+                      product.compatibility.length > 0 && (
+                        <div>
+                          <h2 className="text-xl font-bold text-white mb-4">
+                            ความเข้ากันได้กับ
+                          </h2>
+                          <ul className="list-disc list-inside space-y-2 text-slate-300 marker:text-purple-400">
+                            {product.compatibility.map((item, index) => (
+                              <li key={index}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                  </div>
+                </div>
+
+                {/* Right Side - Compatibility */}
+                <div className="lg:col-span-2">
+                  {product.features && product.features.length > 0 && (
+                    <div>
+                      <h2 className="text-xl font-bold text-white mb-4">
+                        คุณสมบัติ
+                      </h2>
+                      <ul className="list-disc list-inside space-y-2 text-slate-300 marker:text-purple-400">
+                        {product.features.map((feature, index) => (
+                          <li key={index}>{feature}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Lightbox with Navigation */}
+              {isPreviewOpen && (
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-0"
+                  onClick={() => setIsPreviewOpen(false)}
+                >
+                  {/* Close Button */}
+                  <button
+                    className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors z-10"
+                    onClick={() => setIsPreviewOpen(false)}
+                  >
+                    <svg
+                      className="w-8 h-8"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+
+                  {/* Previous Button */}
+                  {allImages.length > 1 && (
+                    <button
+                      className="absolute left-4 text-white/80 hover:text-white transition-colors z-10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        goToPrev();
+                      }}
+                    >
+                      <svg
+                        className="w-10 h-10"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 19l-7-7 7-7"
+                        />
+                      </svg>
+                    </button>
+                  )}
+
+                  {/* Image - ลบ padding ออก */}
+                  <div className="w-full h-full flex items-center justify-center">
+                    <img
+                      src={allImages[currentImageIndex] || ""}
+                      alt={`Preview ${currentImageIndex}`}
+                      className="w-full h-full object-contain"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+
+                    {/* Image Counter */}
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/60 text-white px-4 py-2 rounded-full text-sm">
+                      {currentImageIndex + 1} / {allImages.length}
+                    </div>
+                  </div>
+
+                  {/* Next Button */}
+                  {allImages.length > 1 && (
+                    <button
+                      className="absolute right-4 text-white/80 hover:text-white transition-colors z-10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        goToNext();
+                      }}
+                    >
+                      <svg
+                        className="w-10 h-10"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 

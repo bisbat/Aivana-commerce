@@ -66,16 +66,16 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
     };
   }, [isOpen]);
 
- const total = (() => {
-   if (!cartData?.items?.length) return "0.00";
+  const total = (() => {
+    if (!cartData?.items?.length) return "0.00";
 
-   const sum = cartData.items.reduce((acc, item) => {
-     const price = Number(item.product.price) || 0;
-     return acc + price;
-   }, 0);
+    const sum = cartData.items.reduce((acc, item) => {
+      const price = Number(item.product.price) || 0;
+      return acc + price;
+    }, 0);
 
-   return Number(sum).toFixed(2);
- })();
+    return Number(sum).toFixed(2);
+  })();
 
   if (!isOpen) return null;
 
@@ -93,7 +93,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
         className="fixed inset-0 z-50 pointer-events-none overflow-hidden"
         style={{ top: "15px" }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-start justify-end relative">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-start justify-end relative">
           <div
             className="bg-[#fafafa] rounded-2xl w-full max-w-md h-auto max-h-[calc(100vh-2rem)] mt-16 overflow-hidden shadow-2xl pointer-events-auto flex flex-col fixed"
             onClick={(e) => e.stopPropagation()}

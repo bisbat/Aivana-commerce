@@ -20,4 +20,12 @@ export class TagsService {
   async getAllTags(): Promise<TagEntity[]> {
     return await this.tagRepository.find();
   }
+
+  async getNavbarTags() {
+    return this.tagRepository.find({
+      select: ['id', 'name'],
+      order: { name: 'ASC' },
+      take: 8,
+    });
+  }
 }

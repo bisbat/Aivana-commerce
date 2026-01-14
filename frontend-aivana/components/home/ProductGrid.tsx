@@ -61,7 +61,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
 
   return (
     <section className="py-12 px-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-[1400px] mx-auto">
         {/* Header */}
         {showHeader && (
           <div className="flex items-center justify-between mb-8">

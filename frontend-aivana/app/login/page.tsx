@@ -58,7 +58,6 @@ export default function LoginPage() {
 
       router.push("/");
       router.refresh();
-
     } catch (error) {
       console.error("Login error:", error);
       setErrors({ submit: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });

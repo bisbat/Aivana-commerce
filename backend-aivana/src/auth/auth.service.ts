@@ -33,7 +33,7 @@ export class AuthService {
       registerDto.email,
     );
     if (existingUserByEmail) {
-      throw new ConflictException('Email already exists');
+      throw new ConflictException('Email  already exists');
     }
 
     // 2. ตรวจสอบว่า username ซ้ำหรือไม่

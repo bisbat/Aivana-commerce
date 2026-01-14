@@ -8,6 +8,8 @@ import { UserRoles } from 'src/constants/user-roles.enum';
 import { plainToInstance } from 'class-transformer';
 import { ResponseSellerDto } from './dto/response-seller.dto';
 import { UpdateSellerDto } from './dto/update-seller.dto';
+import { ResponseProductDto } from 'src/products/dto/response-product.dto';
+import { ProductMapper } from 'src/products/products.mapper';
 
 @Injectable()
 export class SellersService {
@@ -16,6 +18,7 @@ export class SellersService {
     private readonly sellerRepository: Repository<SellerEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private readonly productMapper: ProductMapper,
   ) {}
 
   async upgradeToSeller(
@@ -107,7 +110,7 @@ export class SellersService {
     });
   }
 
-  async getProductsBySellerId(sellerId: string) {
+  async getProductsBySellerId(sellerId: string): Promise<ResponseProductDto[]> {
     const seller = await this.sellerRepository.findOne({
       where: { id: sellerId },
       relations: [
@@ -115,8 +118,13 @@ export class SellersService {
         'products.category',
         'products.productImages',
         'products.tags',
+        'products.seller',
+        'products.seller.user',
       ],
     });
-    return seller ? seller.products : [];
+
+    if (!seller) return [];
+
+    return this.productMapper.toResponseList(seller.products);
   }
 }

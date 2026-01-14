@@ -26,7 +26,7 @@ export async function updateProductAction(
     if (value === undefined || value === null) continue;
 
     // Handle nested files object
-    if (key === 'files' && typeof value === 'object') {
+    if (key === "files" && typeof value === "object") {
       for (const fileKey in value) {
         const fileOrFiles = value[fileKey as keyof typeof value];
 
@@ -55,7 +55,6 @@ export async function updateProductAction(
 
   console.log(formData);
 
-
   const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
     method: "PUT",
     headers: {
@@ -74,13 +73,8 @@ export async function updateProductAction(
   return await res.json();
 }
 
-
-
-
 // ฟังก์ชันสำหรับลบ detail image
-export async function deleteProductImageAction(
-  imageId: number
-) {
+export async function deleteProductImageAction(imageId: number) {
   const token = await getAccessToken();
 
   if (!token) {
@@ -103,9 +97,7 @@ export async function deleteProductImageAction(
   throw new Error("Failed to delete image");
 }
 
-export async function deleteProductAction(
-  productId: string
-) {
+export async function deleteProductAction(productId: string) {
   const token = await getAccessToken();
 
   if (!token) {
@@ -135,7 +127,6 @@ export async function getAllProductsAction() {
   });
 
   console.log(res);
-
 
   if (res.ok) {
     const data = await res.json();
@@ -209,7 +200,6 @@ export async function createCompleteProduct(
       });
     }
 
-
     // ✨ Single API call with everything
     const response = await fetch(`${API_BASE_URL}/products`, {
       method: "POST",
@@ -233,4 +223,38 @@ export async function createCompleteProduct(
   } catch (error) {
     throw error;
   }
+}
+
+export async function getProductsByTag(tag: string) {
+  const res = await fetch(
+    `${API_BASE_URL}/products?tag=${encodeURIComponent(tag)}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (res.ok) {
+    const data = await res.json();
+    return data;
+  }
+  throw new Error("Failed to fetch products by tag");
+}
+
+export async function getProductsBySearchQuery(query: string) {
+  const res = await fetch(
+    `${API_BASE_URL}/products/search?q=${encodeURIComponent(query)}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (res.ok) {
+    const data = await res.json();
+    return data;
+  }
+  throw new Error("Failed to fetch products by search query");
 }

@@ -24,15 +24,8 @@
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #141332;
-    --foreground: #ededed;
-  }
+  --background: #141332;
+  --foreground: #eaeaea;
 }
 
 body {
