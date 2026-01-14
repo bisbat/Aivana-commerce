@@ -22,7 +22,7 @@ import EditProductImages from "./EditProductImages";
 import EditProductHeroImage from "./EditProductHeroImage";
 import EditProductFile from "./EditProductFile";
 import BackButton from "./BackButton";
-import { getAuthData } from "@/lib/actions/auth.actions";
+import { InstallationGuideInput } from "@/components/ui/InstallationGuideInput";
 import { ProductUpdatePayload } from "@/lib/types/product/UpdateProductPayload";
 
 export interface UpdatedProductData {
@@ -75,15 +75,11 @@ export default function EditProductPage() {
   const [deletedImageIds, setDeletedImageIds] = useState<number[]>([]);
   const [detailImages, setDetailImages] = useState<ProductImages[]>([]);
 
-  const [token, setToken] = useState<string>("");
-
   useEffect(() => {
     async function fetchFormData() {
       const product: Product = await getProductByIdAction(productId);
       setProductData(product);
 
-      const accessToken = getAuthData()?.accessToken || "";
-      setToken(accessToken);
       const tags: Tag[] = await getAllTagsAction();
       setTags(tags);
 
@@ -135,7 +131,7 @@ export default function EditProductPage() {
   // Handler for removing existing image
   const handleDeleteImage = async (imageId: number) => {
     try {
-      await deleteProductImageAction(imageId, token);
+      await deleteProductImageAction(imageId);
 
       setDetailImages((prev) => prev.filter((img) => img.imageId !== imageId));
       setDeletedImageIds((prev) => [...prev, imageId]);
@@ -167,7 +163,7 @@ export default function EditProductPage() {
         detailImages: newImageFiles,
       },
     };
-    await updateProductAction(productId, updatedProductData, token);
+    await updateProductAction(productId, updatedProductData);
     router.push(`/stores/products/${productId}`);
   };
 
@@ -220,12 +216,9 @@ export default function EditProductPage() {
           required
         />
 
-        <Textarea
-          label="Installation Document"
+        <InstallationGuideInput
           value={installationGuide}
           onChange={setInstallationGuide}
-          placeholder="Installation Document..."
-          rows={4}
         />
 
         <DynamicTextListInput

@@ -6,6 +6,7 @@ import ProductImages from "./ProductImages";
 import DeleteButton from "./DeleteButton";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { getProductByIdAction } from "@/lib/actions/product.actions";
+import MarkdownRenderer from "@/components/common/MarkdownRenderer";
 
 async function getProductData(productId: string): Promise<Product | null> {
   const productData = await getProductByIdAction(productId);
@@ -51,7 +52,16 @@ export default async function ProductStoreDetailPage({
             </span>
           </p>
           <p>Blurb: {initialProductData.blurb}</p>
-          <p>Installation Guide: {initialProductData.installationGuide}</p>
+          {initialProductData.installationGuide && (
+            <div>
+              <h3 className="font-semibold text-lg mb-2">
+                Installation Guide
+              </h3>
+              <MarkdownRenderer
+                content={initialProductData.installationGuide}
+              />
+            </div>
+          )}
 
           <div>
             <h3 className="font-semibold text-lg">Features</h3>

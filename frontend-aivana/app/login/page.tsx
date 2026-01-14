@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { login, saveAuthData } from "@/lib/actions/auth.actions";
+import { loginAction } from "@/lib/actions/auth.server";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -51,14 +51,14 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const tokenResponse = await login({
+      await loginAction({
         username: formData.username,
         password: formData.password,
       });
 
-      saveAuthData(tokenResponse.accessToken);
-
       router.push("/");
+      router.refresh();
+
     } catch (error) {
       console.error("Login error:", error);
       setErrors({ submit: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });

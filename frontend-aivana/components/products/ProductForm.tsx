@@ -12,8 +12,8 @@ import { MultiSelectTag } from "@/components/ui/MultiSelectTag";
 import { Loader } from "lucide-react";
 import { saveFormStep } from "@/lib/utils/formStorage";
 import { PRODUCT_FORM_STEP } from "@/lib/constants/productFormSteps";
-import { getAuthData } from "@/lib/actions/auth.actions";
 import { DynamicTextListInput } from "../ui/DynamicTextListInput";
+import { InstallationGuideInput } from "../ui/InstallationGuideInput";
 
 // NEW: This component no longer submits to backend
 // It just collects data and passes to next step
@@ -304,13 +304,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         required
       />
 
-      <Textarea
-        label="Installation Document"
+      <InstallationGuideInput
         value={installationGuide}
         onChange={setInstallationGuide}
-        placeholder="Installation Document..."
-        rows={4}
       />
+
 
       <DynamicTextListInput
         label="Compatibility"

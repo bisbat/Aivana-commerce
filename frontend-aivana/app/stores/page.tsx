@@ -6,15 +6,12 @@ import { ProductCardSeller } from "@/components/products/ProductCardSeller";
 import { Product } from "@/lib/types/product/Product";
 import { Loader, AlertCircle, Package } from "lucide-react";
 import { getProductsBySellerId } from "@/lib/actions/seller.actions";
-import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
-import { getAuthData } from "@/lib/actions/auth.actions";
 import { UserProfile } from "@/lib/types/user.ts/user";
+import { getCurrentUser } from "@/lib/auth";
 
 export default function StorePage() {
   const router = useRouter();
   const [sellerId, setSellerId] = useState<string | null>(null);
-
-  const [token, setToken] = useState<string>("");
 
   // State for products
   const [products, setProducts] = useState<Product[]>([]);
@@ -24,12 +21,9 @@ export default function StorePage() {
 
   useEffect(() => {
     async function fetchCurrentUser() {
-      const user = await getCurrentUserFromToken();
+      const user = await getCurrentUser();
       setUserData(user);
       setSellerId(user?.sellerId ?? null);
-
-      const auth = getAuthData();   // <-- รันแค่บน client
-      setToken(auth?.accessToken || "");
     }
     fetchCurrentUser();
   }, []);
@@ -45,7 +39,7 @@ export default function StorePage() {
 
     try {
       if (!sellerId) return;
-      const data = await getProductsBySellerId(sellerId, token);
+      const data = await getProductsBySellerId(sellerId);
       setProducts(data);
     } catch (err) {
       const errorMessage =

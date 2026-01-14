@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '50mb', // Example: Increase limit to 2MB
     },
   },
+  // basePath: '/capstone25/cp25ssi3',
+  // assetPrefix: '/capstone25/cp25ssi3',
 };
 
 export default nextConfig;
