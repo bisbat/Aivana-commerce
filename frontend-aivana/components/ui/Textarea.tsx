@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface TextareaProps {
-  label: string;
+  label?: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;

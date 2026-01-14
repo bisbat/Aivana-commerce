@@ -10,6 +10,7 @@ import { addToCart } from "@/lib/actions/cart.actions";
 import { getCurrentUser } from "@/lib/auth";
 import { getProductByIdAction } from "@/lib/actions/product.actions";
 import { getAllProductsAction } from "@/lib/actions/product.actions";
+import MarkdownRenderer from "@/components/common/MarkdownRenderer";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -170,11 +171,10 @@ export default function ProductDetailPage() {
       {toast.show && (
         <div className="fixed top-20 right-4 z-50 animate-in slide-in-from-top-5 duration-300">
           <div
-            className={`rounded-lg px-6 py-4 shadow-lg ${
-              toast.type === "success"
+            className={`rounded-lg px-6 py-4 shadow-lg ${toast.type === "success"
                 ? "bg-green-500 text-white"
                 : "bg-red-500 text-white"
-            }`}
+              }`}
           >
             <div className="flex items-center gap-3">
               {toast.type === "success" ? (
@@ -281,7 +281,7 @@ export default function ProductDetailPage() {
             )}
 
             {/* Main Product Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mt-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10">
               {/* Left Side - Description */}
               <div className="lg:col-span-3">
                 <div className="space-y-8">
@@ -299,9 +299,9 @@ export default function ProductDetailPage() {
                       <h2 className="text-xl font-bold text-white mb-4">
                         วิธีใช้
                       </h2>
-                      <div className="text-slate-300 leading-relaxed whitespace-pre-line">
-                        {product.installationGuide}
-                      </div>
+                      <MarkdownRenderer
+                        content={product.installationGuide}
+                      />
                     </div>
                   )}
 
