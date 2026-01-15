@@ -6,12 +6,15 @@ import { getCart, removeFromCart } from "@/lib/actions/cart.actions";
 import { GetCartResponse } from "@/lib/types/cart/GetCart";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { getCurrentUser } from "@/lib/auth";
+import { RefObject } from "react";
+
 interface CartModalProps {
   isOpen: boolean;
   onClose: () => void;
+  cartRef: RefObject<HTMLDivElement | null>;
 }
 
-export function CartModal({ isOpen, onClose }: CartModalProps) {
+export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
   const router = useRouter();
   const [cartData, setCartData] = useState<GetCartResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -42,7 +45,6 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
       setRemovingItemId(productId);
       const user = await getCurrentUser();
       if (!user) return;
-
 
       await removeFromCart(user.id, productId);
       await fetchCart();
@@ -82,11 +84,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
   return (
     <>
       {/* Backdrop - below navbar */}
-      <div
-        className="fixed inset-0 bg-black/60 z-40 transition-opacity"
-        style={{ top: "64px" }}
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/60 z-40 transition-opacity" />
 
       {/* Modal Container with max-width constraint */}
       <div
@@ -95,121 +93,118 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
       >
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-start justify-end relative">
           <div
-            className="bg-[#fafafa] rounded-2xl w-full max-w-md h-auto max-h-[calc(100vh-2rem)] mt-16 overflow-hidden shadow-2xl pointer-events-auto flex flex-col fixed"
-            onClick={(e) => e.stopPropagation()}
+            ref={cartRef}
+            className="bg-[#1e1b3d] rounded-xl w-3/12 h-auto max-h-[calc(100vh-2rem)] mt-16 overflow-hidden shadow-xl pointer-events-auto flex flex-col fixed border border-[#262549]"
           >
             {/* Header */}
-            <div className="p-4 pb-3 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-800">
-                  Shopping Cart
-                </h2>
-              </div>
+            <div className="p-4 border-b border-[#262549]">
+              <p className="text-white font-medium text-base">Shopping Cart</p>
+              <p className="text-slate-400 text-sm mt-0.5">
+                {cartData?.items.length || 0} items
+              </p>
             </div>
 
             {/* Content - Scrollable */}
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto py-2">
               {loading ? (
                 <div className="flex justify-center items-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800"></div>
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <>
                   {/* Cart Items */}
                   {cartData?.items.map((item) => (
                     <div
                       key={item.cartItemId}
-                      className="bg-white rounded-lg p-3 flex items-center gap-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                      className="block px-4 py-3 text-sm text-white hover:bg-[#262549] transition-colors cursor-pointer"
                       onClick={() => {
                         router.push(`/products/${item.product.id}`);
                         onClose();
                       }}
                     >
-                      {/* Product Image */}
-                      <div className="w-20 h-16 bg-gray-200 rounded-md overflow-hidden shrink-0">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={
-                            item.product.heroImageUrl ||
-                            "https://via.placeholder.com/200x150"
-                          }
-                          alt={item.product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
+                      <div className="flex items-start gap-3">
+                        {/* Product Image */}
+                        <div className="w-16 h-14 bg-[#1a1733] rounded overflow-hidden shrink-0">
+                          <img
+                            src={
+                              item.product.heroImageUrl ||
+                              "https://via.placeholder.com/200x150"
+                            }
+                            alt={item.product.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
 
-                      {/* Product Info */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-gray-800 mb-0.5 truncate">
-                          {item.product.name}
-                        </h3>
-                        <p className="text-gray-500 text-xs">
-                          by {item.product.seller?.firstName || "Unknown"}{" "}
-                          {item.product.seller?.lastName || ""}
-                        </p>
-                      </div>
+                        {/* Product Info */}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-white font-medium truncate">
+                            {item.product.name}
+                          </p>
+                          <p className="text-slate-400 text-xs truncate mt-1">
+                            {item.product.seller?.firstName || "Unknown"}
+                          </p>
+                          <p className="text-white text-sm font-semibold mt-1">
+                            {formatPriceWithCurrency(item.product.price)}
+                          </p>
+                        </div>
 
-                      {/* Price */}
-                      <div className="text-base font-bold text-gray-800 shrink-0">
-                        {formatPriceWithCurrency(item.product.price)}
+                        {/* Remove Button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveItem(item.product.id);
+                          }}
+                          disabled={removingItemId === item.product.id}
+                          className="p-1.5 hover:bg-[#1e1b3d] rounded transition-colors shrink-0 disabled:opacity-50"
+                          aria-label="Remove item"
+                        >
+                          {removingItemId === item.product.id ? (
+                            <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-slate-400"></div>
+                          ) : (
+                            <svg
+                              className="w-3.5 h-3.5 text-slate-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          )}
+                        </button>
                       </div>
-
-                      {/* Remove Button */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRemoveItem(item.product.id);
-                        }}
-                        disabled={removingItemId === item.product.id}
-                        className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                        aria-label="Remove item"
-                      >
-                        {removingItemId === item.product.id ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
-                        ) : (
-                          <svg
-                            className="w-4 h-4 text-gray-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
-                            />
-                          </svg>
-                        )}
-                      </button>
                     </div>
                   ))}
 
                   {/* Empty Cart Message */}
                   {!loading &&
                     (!cartData?.items || cartData.items.length === 0) && (
-                      <div className="text-center py-12">
-                        <p className="text-base text-gray-400">
+                      <div className="text-center py-12 px-4">
+                        <p className="text-sm text-slate-400">
                           Your cart is empty
                         </p>
                       </div>
                     )}
-                </div>
+                </>
               )}
             </div>
 
             {/* Footer - Total and Checkout */}
-            {!loading && cartData && (
-              <div className="p-4 pt-3 border-t border-gray-200">
-                <div className="bg-white rounded-lg p-3 flex items-center justify-between gap-4 shadow-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">Total</span>
-                    <span className="text-lg font-bold text-gray-800">
+            {!loading && cartData && cartData.items.length > 0 && (
+              <div className="py-3 border-t border-[#262549]">
+                <div className="px-4 py-2">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm text-slate-400">Total</span>
+                    <span className="text-base font-semibold text-white">
                       {formatPriceWithCurrency(total)}
                     </span>
                   </div>
                   <button
-                    className="px-6 py-2 bg-black text-white text-sm font-semibold rounded-full hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-2.5 bg-white text-[#1e1b3d] text-sm font-medium rounded hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={cartData.items.length === 0}
                   >
                     Checkout
