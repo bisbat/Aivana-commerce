@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { SellerEntity } from './entities/seller.entity';
 import { Repository } from 'typeorm';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { UserRoles } from 'src/constants/user-roles.enum';
+import { Role } from 'src/auth/enum/role.enum';
 import { plainToInstance } from 'class-transformer';
 import { ResponseSellerDto } from './dto/response-seller.dto';
 import { UpdateSellerDto } from './dto/update-seller.dto';
@@ -46,7 +46,7 @@ export class SellersService {
     const savedSeller = await this.sellerRepository.save(seller);
 
     // อัพเดท user role และ link seller profile
-    user.role = UserRoles.SELLER;
+    user.role = Role.SELLER;
     user.sellerProfile = savedSeller;
     await this.userRepository.save(user);
 

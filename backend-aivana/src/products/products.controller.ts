@@ -18,8 +18,10 @@ import { plainToInstance } from 'class-transformer';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ResponseProductDto } from './dto/response-product.dto';
-import { Public } from 'src/common/decorators/public.decorator';
+import { Public } from 'src/auth/decorators/public.decorator';
 import { Query } from '@nestjs/common/decorators';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/enum/role.enum';
 
 @Controller('products')
 export class ProductsController {
@@ -32,6 +34,7 @@ export class ProductsController {
   }
 
   @Post()
+  @Roles(Role.SELLER)
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'heroImage', maxCount: 1 },
@@ -77,6 +80,7 @@ export class ProductsController {
   }
 
   @Put(':id')
+  @Roles(Role.SELLER)
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'heroImage', maxCount: 1 },
@@ -112,6 +116,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @Roles(Role.SELLER,Role.ADMIN)
   async deleteProduct(@Param('id') id: number) {
     await this.productsService.deleteProduct(id);
     return { message: 'Product deleted successfully' };

@@ -4,12 +4,15 @@ import { ResponseUserDto } from './dto/response-user.dto';
 import { plainToInstance } from 'class-transformer';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Role } from 'src/auth/enum/role.enum';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Get()
+  @Roles(Role.ADMIN)
   getAllUsers() {
     const user = this.usersService.getAllUsers();
     return plainToInstance(ResponseUserDto, user, {
@@ -18,6 +21,7 @@ export class UsersController {
   }
 
   @Get('/:userId')
+  @Roles(Role.ADMIN, Role.SELLER, Role.CUSTOMER)
   async getUserById(@Request() req): Promise<ResponseUserDto> {
     const { userId } = req.params;
     const user = await this.usersService.findUserById(userId);
@@ -27,6 +31,7 @@ export class UsersController {
   }
 
   @Put('/:userId')
+  @Roles(Role.SELLER, Role.CUSTOMER)
   async updateUser(
     @Param('userId') userId: string,
     @Body() updateUserDto: UpdateUserDto,
