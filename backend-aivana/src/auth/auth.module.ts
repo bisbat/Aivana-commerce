@@ -4,8 +4,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { JWT_SECRET } from '../common/config/jwt-secret';
 import { PassportModule } from '@nestjs/passport';
 import { PassportAuthController } from './passport-auth.controller';
-import { LocalStrategy } from 'src/auth/strategies/local.strategy';
-import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
+import { LocalStrategy } from 'src/common/strategies/local.strategy';
+import { JwtStrategy } from 'src/common/strategies/jwt.strategy';
 import { UsersModule } from 'src/users/users.module';
 import { MinioModule } from 'src/minio/minio.module';
 

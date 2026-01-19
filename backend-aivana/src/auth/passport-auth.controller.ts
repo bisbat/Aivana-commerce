@@ -9,9 +9,9 @@ import {
   Body,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { PassportLocalGuard } from './guards/passport-local.guard';
-import { PassportJwtAuthGuard } from './guards/passport-jwt.guard';
-import { Public } from 'src/auth/decorators/public.decorator';
+import { PassportLocalGuard } from '../common/guards/passport-local.guard';
+import { PassportJwtAuthGuard } from '../common/guards/passport-jwt.guard';
+import { Public } from 'src/common/decorators/public.decorator';
 import { UseInterceptors, UploadedFile } from '@nestjs/common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BadRequestException } from '@nestjs/common/exceptions';

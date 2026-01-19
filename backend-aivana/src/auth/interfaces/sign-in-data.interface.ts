@@ -1,4 +1,4 @@
-import { Role } from "../enum/role.enum";
+import { UserRoles } from 'src/constants/user-roles.enum';
 
 export interface SignInData {
   userId: string;
@@ -6,7 +6,7 @@ export interface SignInData {
   username: string;
   firstName: string;
   lastName: string;
-  role: Role;
+  role: UserRoles;
   avatarUrl?: string | null;
   sellerId?: string | null;
 }

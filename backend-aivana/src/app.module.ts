@@ -12,9 +12,8 @@ import { TagsModule } from './tags/tags.module';
 import { AuthModule } from './auth/auth.module';
 import { SellersModule } from './sellers/sellers.module';
 import { APP_GUARD } from '@nestjs/core';
-import { PassportJwtAuthGuard } from './auth/guards/passport-jwt.guard';
+import { PassportJwtAuthGuard } from './common/guards/passport-jwt.guard';
 import { DashboardModule } from './dashboard/dashboard.module';
-import { RolesGuard } from './auth/guards/roles.guard';
 
 @Module({
   imports: [
@@ -35,15 +34,9 @@ import { RolesGuard } from './auth/guards/roles.guard';
     DashboardModule,
   ],
   controllers: [],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: PassportJwtAuthGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
-  ],
+  providers: [{
+    provide: APP_GUARD,
+    useClass: PassportJwtAuthGuard,
+  }],
 })
-export class AppModule { }
+export class AppModule {}

@@ -7,13 +7,13 @@ import {
 } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { UserRoles } from 'src/constants/user-roles.enum';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { AuthInput, SignInData } from './interfaces';
 import { MinioService } from 'src/minio/minio.service';
 import { MINIO_FOLDERS } from 'src/constants/minio-folders.constant';
 import { UploadedFileType } from 'src/products/interfaces/uploaded-file.interface';
-import { Role } from './enum/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -51,7 +51,7 @@ export class AuthService {
     const user = await this.userService.create({
       ...registerDto,
       password: hashedPassword,
-      role: Role.CUSTOMER,
+      role: UserRoles.CUSTOMER,
       avatarUrl: null,
     });
 
