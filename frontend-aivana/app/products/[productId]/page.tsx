@@ -8,15 +8,15 @@ import { Loader } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
 import { addToCart } from "@/lib/actions/cart.actions";
 import { getCurrentUser } from "@/lib/auth";
-import { getCurrentUser } from "@/lib/auth";
 import { getProductByIdAction } from "@/lib/actions/product.actions";
 import { getAllProductsAction } from "@/lib/actions/product.actions";
-import MarkdownRenderer from "@/components/common/MarkdownRenderer";
+import { useRouter } from "next/navigation";
 import MarkdownRenderer from "@/components/common/MarkdownRenderer";
 
 export default function ProductDetailPage() {
   const params = useParams();
   const productId = params.productId as string;
+  const router = useRouter();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
@@ -61,6 +61,10 @@ export default function ProductDetailPage() {
         userId: user.id,
         productId: parseInt(productId),
       });
+      await addToCart({
+        userId: user.id,
+        productId: parseInt(productId),
+      });
 
       setToast({
         show: true,
@@ -96,6 +100,7 @@ export default function ProductDetailPage() {
     const fetchProduct = async () => {
       try {
         const data = await getProductByIdAction(productId);
+
         setProduct(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
@@ -171,13 +176,12 @@ export default function ProductDetailPage() {
 
     return scoredProducts;
   };
-  // ฟังก์ชันเปิด lightbox
+
   const openPreview = (index: number) => {
     setCurrentImageIndex(index);
     setIsPreviewOpen(true);
   };
 
-  // ฟังก์ชันเปลี่ยนรูป
   const goToNext = () => {
     setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
   };
@@ -187,9 +191,22 @@ export default function ProductDetailPage() {
       (prev) => (prev - 1 + allImages.length) % allImages.length
     );
   };
+
   const handlePreview = (previewUrl: string) => {
     if (previewUrl) {
       window.open(previewUrl, "_blank");
+    }
+  };
+
+  const handleTagClick = (tagName?: string) => {
+    if (tagName) {
+      router.push(`/products?tag=${encodeURIComponent(tagName)}`);
+    }
+  };
+
+  const handleSellerClick = () => {
+    if (product && product.seller?.username) {
+      router.push(`/seller/${product.seller.username}`);
     }
   };
 
@@ -254,31 +271,9 @@ export default function ProductDetailPage() {
       <div className="max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-3 py-10">
         {/* Header Product Name */}
         <div className="space-y-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-white">
+          {/* <h1 className="text-2xl md:text-3xl font-bold text-white">
             {product.name}
-          </h1>
-          <div className="bg-linear-to-r from-(--linne-purple) to-[#141332] p-3 rounded-lg flex flex-col md:flex-row md:items-center md:justify-between">
-            <p className="text-white text-lg font-light">{product.blurb}</p>
-            <div className="flex gap-3 mt-4 items-center md:mt-0">
-              <button
-                onClick={() => {
-                  handlePreview(product.previewUrl ?? "");
-                }}
-                className="px-4 py-2 border-2 border-white text-white rounded-lg hover:bg-white/10 transition-colors font-medium text-sm cursor-pointer"
-              >
-                คลิกเพื่อดูตัวอย่าง
-              </button>
-              <button
-                onClick={handleAddToCart}
-                disabled={addingToCart}
-                className="px-4 py-2 bg-(--primary) text-white rounded-lg hover:bg-(--primary-hover) transition-colors font-medium text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {addingToCart
-                  ? "กำลังเพิ่ม..."
-                  : `เพิ่มลงตะกร้า ${formatPriceWithCurrency(product.price)}`}
-              </button>
-            </div>
-          </div>
+          </h1> */}
         </div>
 
         {/* Main Product */}
@@ -323,47 +318,29 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              {/* Main Product Content */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10">
+              {/* Left Side - Description */}
+              <div className=" mt-10">
                 {/* Left Side - Description */}
-                <div className="lg:col-span-3">
-                  <div className="space-y-8">
+
+                <div className="space-y-8">
+                  <div>
+                    <h2 className="text-xl font-bold text-white mb-4">
+                      รายละเอียด
+                    </h2>
+                    <div className="text-slate-300 leading-relaxed whitespace-pre-line">
+                      {product.description}
+                    </div>
+                  </div>
+
+                  {product.installationGuide && (
                     <div>
                       <h2 className="text-xl font-bold text-white mb-4">
-                        รายละเอียด
+                        วิธีใช้
                       </h2>
-                      <div className="text-slate-300 leading-relaxed whitespace-pre-line">
-                        {product.description}
-                      </div>
+                      <MarkdownRenderer content={product.installationGuide} />
                     </div>
+                  )}
 
-                    {product.installationGuide && (
-                      <div>
-                        <h2 className="text-xl font-bold text-white mb-4">
-                          วิธีใช้
-                        </h2>
-                        <MarkdownRenderer content={product.installationGuide} />
-                      </div>
-                    )}
-
-                    {product.compatibility &&
-                      product.compatibility.length > 0 && (
-                        <div>
-                          <h2 className="text-xl font-bold text-white mb-4">
-                            ความเข้ากันได้กับ
-                          </h2>
-                          <ul className="list-disc list-inside space-y-2 text-slate-300 marker:text-purple-400">
-                            {product.compatibility.map((item, index) => (
-                              <li key={index}>{item}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                  </div>
-                </div>
-
-                {/* Right Side - Compatibility */}
-                <div className="lg:col-span-2">
                   {product.features && product.features.length > 0 && (
                     <div>
                       <h2 className="text-xl font-bold text-white mb-4">
@@ -377,6 +354,8 @@ export default function ProductDetailPage() {
                     </div>
                   )}
                 </div>
+
+                {/* Right Side - Compatibility */}
               </div>
 
               {/* Lightbox with Navigation */}
@@ -477,62 +456,103 @@ export default function ProductDetailPage() {
           {/* Right Side - Product Details */}
           <div className="lg:col-span-3 space-y-6">
             {/* Product Details */}
-            {/* <div className="bg-(--linne-purple) rounded-lg p-5 flex flex-col items-center space-y-3 shadow-lg">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white shadow-lg mb-2">
+            <div className="bg-purple-900/5 backdrop-blur-sm rounded-lg p-6 space-y-4 border border-purple-500/5">
+              <div className="bg-gradient-to-r from-purple-700/60 via-purple-900/50 to-[#141332]/60 rounded-xl p-5 shadow-lg flex flex-col gap-4 overflow-hidden">
+                {/* Product Name */}
+                <div className="pb-3 border-b border-white/10 flex flex-col gap-2">
+                  <h2 className="text-2xl font-bold text-white leading-tight">
+                    {product.name}
+                  </h2>
+                  <div className="flex items-center gap-2 pb-2 text-xs">
+                    <span className="text-purple-100/50">ขายโดย</span>
+                    {product.seller ? (
+                      <a
+                        href={`/seller/${product.seller.username}`}
+                        className="text-purple-200 font-medium hover:underline transition-colors"
+                      >
+                        {`${product.seller.firstName} ${product.seller.lastName}`}
+                      </a>
+                    ) : (
+                      <span className="text-white/80 font-medium">
+                        Unknown Seller
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Product Blurb */}
+                <div className="flex items-center gap-3">
+                  <p className="text-white text-base font-light drop-shadow-sm leading-relaxed">
+                    {product.blurb}
+                  </p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={() => handlePreview(product.previewUrl ?? "")}
+                    className="px-4 py-2 border-2 border-white/50 text-white/90 rounded-lg hover:bg-white/10 transition-colors font-medium text-sm cursor-pointer shadow-sm"
+                  >
+                    คลิกเพื่อดูตัวอย่าง
+                  </button>
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={addingToCart}
+                    className="px-4 py-2 bg-gradient-to-r from-purple-500/90 to-pink-500/90 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-colors font-medium text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow"
+                  >
+                    {addingToCart
+                      ? "กำลังเพิ่ม..."
+                      : `เพิ่มลงตะกร้า ${formatPriceWithCurrency(
+                          product.price
+                        )}`}
+                  </button>
+                </div>
+              </div>
+
+              {/* Compatibility Section */}
+              <h3 className="text-lg font-semibold text-white/90 flex items-center gap-2">
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
+                  className="w-5 h-5 text-purple-400/70"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-user"
+                  viewBox="0 0 24 24"
                 >
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
-              </div>
-              <h3 className="text-white font-bold text-lg">
-                {product.seller?.firstName} {product.seller?.lastName}
+                รองรับการใช้งาน
               </h3>
 
-          
-              <button
-                className="text-sm w-full bg-(--primary) hover:bg-(--primary-hover) text-white font-semibold py-2 rounded-lg transition-colors"
-                onClick={() =>
-                  (window.location.href = `/seller/${product.seller?.username}`)
-                }
-              >
-                เข้าดูโปรไฟล์
-              </button>
-            </div> */}
-
-            <div className="bg-(--linne-purple) rounded-lg p-5 space-y-3">
-              <h3 className="text-lg font-bold text-white">คุณสมบัติ</h3>
-
-              <div className="space-y-2.5">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">หมวดหมู่:</span>
-                  <span className="text-white font-medium">
-                    {product.category.name}
-                  </span>
+              {product.compatibility && product.compatibility.length > 0 && (
+                <div className="space-y-2">
+                  {product.compatibility.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-3 p-3 bg-white/5 rounded-lg "
+                    >
+                      <div className="shrink-0">
+                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                      </div>
+                      <span className="text-white/90 font-medium text-sm leading-relaxed">
+                        {item}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">ประเภทไฟล์:</span>
-                  <span className="text-white font-medium">ZIP file</span>
-                </div>
-              </div>
+              )}
 
               {/* Tags */}
               {product.tags && product.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-700">
+                <div className="flex flex-wrap gap-2 ">
                   {product.tags.map((tag) => (
                     <span
                       key={tag.id}
-                      className="px-3 py-1 bg-purple-600/20 border border-purple-500/30 text-purple-300 rounded-full text-sm "
+                      className="px-3 py-1 bg-purple-600/20 border border-purple-500/30 text-purple-300 rounded-full text-sm hover:bg-purple-600/30 hover:border-purple-400/50 hover:text-white transition-colors cursor-pointer"
+                      onClick={() => handleTagClick(tag.name)}
                     >
                       {tag.name}
                     </span>
@@ -719,7 +739,7 @@ export default function ProductDetailPage() {
                 rows={4}
               ></textarea>
               <div className="flex justify-end mt-3">
-                <button className="px-6 py-2.5 bg-(--primary) text-white rounded-lg hover:bg-(--primary-hover) transition-colors font-medium cursor-pointer shadow-lg shadow-purple-500/20">
+                <button className="px-6 py-2.5 bg-(--primary) text-white rounded-lg hover:bg-(--primary-hover) transition-colors font-medium cursor-pointer ">
                   โพสต์ความคิดเห็น
                 </button>
               </div>

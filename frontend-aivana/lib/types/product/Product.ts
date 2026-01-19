@@ -19,6 +19,7 @@ export interface Product {
     firstName: string;
     lastName: string;
     username: string;
+    avatarUrl?: string;
   } | null;
   category: Category;
   createdAt: string;

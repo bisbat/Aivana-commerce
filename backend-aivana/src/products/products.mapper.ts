@@ -35,6 +35,7 @@ export class ProductMapper {
           firstName: product.seller.user?.firstName,
           lastName: product.seller.user?.lastName,
           username: product.seller.user?.username,
+          avatarUrl: product.seller.user?.avatarUrl,
         }
       : null;
 

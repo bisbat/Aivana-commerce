@@ -12,4 +12,7 @@ export class MinimalSellerDto {
 
   @Expose()
   username: string;
+
+  @Expose()
+  avatarUrl?: string;
 }
