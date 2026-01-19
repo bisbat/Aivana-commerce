@@ -74,7 +74,9 @@ export async function updateProductAction(
 }
 
 // ฟังก์ชันสำหรับลบ detail image
-export async function deleteProductImageAction(imageId: number) {
+export async function deleteProductImageAction(
+  imageId: number
+) {
   const token = await getAccessToken();
 
   if (!token) {
@@ -97,7 +99,9 @@ export async function deleteProductImageAction(imageId: number) {
   throw new Error("Failed to delete image");
 }
 
-export async function deleteProductAction(productId: string) {
+export async function deleteProductAction(
+  productId: string
+) {
   const token = await getAccessToken();
 
   if (!token) {

@@ -23,7 +23,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 }) => {
   const router = useRouter();
   const [userData, setUserData] = useState<UserProfile | null>(null);
-
   useEffect(() => {
     setUserData(user);
   }, [isOpen, router, onClose]);

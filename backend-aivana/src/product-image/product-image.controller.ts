@@ -15,6 +15,8 @@ import { MinioService } from '../minio/minio.service';
 import { MINIO_FOLDERS } from '../constants/minio-folders.constant';
 import { ProductsService } from '../products/products.service';
 import { UploadedFileType } from 'src/products/interfaces/uploaded-file.interface';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/enum/role.enum';
 
 @Controller('product-images')
 export class ProductImageController {
@@ -25,6 +27,7 @@ export class ProductImageController {
   ) {}
 
   @Post('upload')
+  @Roles(Role.SELLER)
   @UseInterceptors(FilesInterceptor('images', 8)) // Max 8 images per upload
   async uploadProductImages(
     @UploadedFiles() files: UploadedFileType[],
@@ -93,6 +96,7 @@ export class ProductImageController {
   }
 
   @Delete(':imageId')
+  @Roles(Role.SELLER,Role.ADMIN)
   async deleteProductImage(@Param('imageId') imageId: string) {
     const image = await this.productImageService.findOne(parseInt(imageId));
 
@@ -117,6 +121,7 @@ export class ProductImageController {
   }
 
   @Post('hero')
+  @Roles(Role.SELLER)
   @UseInterceptors(FileInterceptor('image'))
   async uploadHeroImage(
     @UploadedFile() file: UploadedFileType[],

@@ -8,7 +8,7 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import { UserRoles } from 'src/constants/user-roles.enum';
+import { Role } from 'src/auth/enum/role.enum';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
 
 @Entity('users')
@@ -34,8 +34,8 @@ export class UserEntity {
   @Column({ type: 'text', nullable: true })
   avatarUrl: string | null;
   
-  @Column({ type: 'enum', enum: UserRoles, default: UserRoles.CUSTOMER })
-  role: UserRoles;
+  @Column({ type: 'enum', enum: Role, default: Role.CUSTOMER })
+  role: Role;
 
   @OneToOne(() => SellerEntity, (seller) => seller.user)
   sellerProfile: SellerEntity;
