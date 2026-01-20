@@ -5,12 +5,11 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
-  Unique,
 } from 'typeorm';
 import { ProductEntity } from 'src/products/entities/product.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
 
-@Entity('reviews')
+@Entity('review')
 export class ReviewEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;

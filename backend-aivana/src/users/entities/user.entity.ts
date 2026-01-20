@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { UserRoles } from 'src/constants/user-roles.enum';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
+import { OrderEntity } from 'src/orders/entities/order.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -33,7 +34,7 @@ export class UserEntity {
 
   @Column({ type: 'text', nullable: true })
   avatarUrl: string | null;
-  
+
   @Column({ type: 'enum', enum: UserRoles, default: UserRoles.CUSTOMER })
   role: UserRoles;
 
@@ -45,4 +46,7 @@ export class UserEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => OrderEntity, (order) => order.user)
+  orders: OrderEntity[];
 }

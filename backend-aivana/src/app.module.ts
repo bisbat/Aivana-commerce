@@ -15,6 +15,9 @@ import { APP_GUARD } from '@nestjs/core';
 import { PassportJwtAuthGuard } from './common/guards/passport-jwt.guard';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { OrdersModule } from './orders/orders.module';
+import { OrderItemsModule } from './order-items/order-items.module';
+import { UserCollectionModule } from './user-collection/user-collection.module';
 
 @Module({
   imports: [
@@ -34,6 +37,9 @@ import { ReviewsModule } from './reviews/reviews.module';
     UsersModule,
     DashboardModule,
     ReviewsModule,
+    OrdersModule,
+    OrderItemsModule,
+    UserCollectionModule,
   ],
   controllers: [],
   providers: [{
