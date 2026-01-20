@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { UserRoles } from 'src/constants/user-roles.enum';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
-import { OrderEntity } from 'src/orders/entities/order.entity';
+import { OrderEntity } from 'src/order/entities/order.entity';
 
 @Entity('users')
 export class UserEntity {

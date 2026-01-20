@@ -6,7 +6,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { OrderEntity } from '../../orders/entities/order.entity';
+import { OrderEntity } from '../../order/entities/order.entity';
 import { ProductEntity } from 'src/products/entities/product.entity';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
 

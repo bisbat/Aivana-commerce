@@ -14,8 +14,8 @@ import { SellersModule } from './sellers/sellers.module';
 import { APP_GUARD } from '@nestjs/core';
 import { PassportJwtAuthGuard } from './common/guards/passport-jwt.guard';
 import { DashboardModule } from './dashboard/dashboard.module';
-import { ReviewsModule } from './reviews/reviews.module';
-import { OrdersModule } from './orders/orders.module';
+import { ReviewsModule } from './review/review.module';
+import { OrdersModule } from './order/order.module';
 import { OrderItemsModule } from './order-items/order-items.module';
 import { UserCollectionModule } from './user-collection/user-collection.module';
 
@@ -42,9 +42,11 @@ import { UserCollectionModule } from './user-collection/user-collection.module';
     UserCollectionModule,
   ],
   controllers: [],
-  providers: [{
-    provide: APP_GUARD,
-    useClass: PassportJwtAuthGuard,
-  }],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: PassportJwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

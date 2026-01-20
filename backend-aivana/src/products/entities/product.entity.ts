@@ -12,7 +12,7 @@ import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { ProductImage } from 'src/product-image/entities/product-image.entity';
 import { TagEntity } from 'src/tags/entities/tag.entity';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
-import { ReviewEntity } from 'src/reviews/entities/review.entity';
+import { ReviewEntity } from 'src/review/entities/review.entity';
 
 @Entity('product')
 export class ProductEntity {
