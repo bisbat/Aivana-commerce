@@ -15,10 +15,12 @@ import { APP_GUARD } from '@nestjs/core';
 import { PassportJwtAuthGuard } from './common/guards/passport-jwt.guard';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { OrdersModule } from './order/order.module';
-import { OrderItemsModule } from './order-items/order-items.module';
+import { OrderItemsModule } from './order-item/order-items.module';
 import { UserCollectionModule } from './user-collection/user-collection.module';
 import { ReviewModule } from './review/review.module';
 import { PayoutsModule } from './payouts/payouts.module';
+import { PayoutItemModule } from './payout-item/payout-item.module';
+import { ReportModule } from './report/report.module';
 
 
 @Module({
@@ -43,6 +45,8 @@ import { PayoutsModule } from './payouts/payouts.module';
     OrderItemsModule,
     UserCollectionModule,
     PayoutsModule,
+    PayoutItemModule,
+    ReportModule,
   ],
   controllers: [],
   providers: [

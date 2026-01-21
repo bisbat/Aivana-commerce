@@ -14,4 +14,4 @@ import { UserEntity } from 'src/users/entities/user.entity';
   controllers: [ReviewController],
   providers: [ReviewService],
 })
-export class ReviewsModule {}
+export class ReviewModule {}

@@ -10,7 +10,8 @@ import {
 } from 'typeorm';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { ProductEntity } from 'src/products/entities/product.entity';
-import { OrderItemEntity } from 'src/order-items/entities/order-item.entity';
+import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
+import { PayoutEntity } from 'src/payouts/entities/payout.entity';
 
 @Entity('sellers')
 export class SellerEntity {
@@ -71,4 +72,7 @@ export class SellerEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => PayoutEntity, (payout) => payout.seller)
+  payouts: PayoutEntity[];
 }

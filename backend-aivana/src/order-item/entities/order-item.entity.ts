@@ -5,10 +5,12 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import { OrderEntity } from '../../order/entities/order.entity';
 import { ProductEntity } from 'src/products/entities/product.entity';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
+import { PayoutItemEntity } from 'src/payout-item/entities/payout-item.entity';
 
 @Entity('order_item')
 export class OrderItemEntity {
@@ -50,4 +52,7 @@ export class OrderItemEntity {
   @ManyToOne(() => SellerEntity, (seller) => seller.orderItems)
   @JoinColumn({ name: 'sellerId' })
   seller: SellerEntity;
+
+  @OneToOne(() => PayoutItemEntity, (payoutItem) => payoutItem.orderItem)
+  payoutItem: PayoutItemEntity[];
 }

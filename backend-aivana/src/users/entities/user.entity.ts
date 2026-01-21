@@ -11,6 +11,7 @@ import {
 import { UserRoles } from 'src/constants/user-roles.enum';
 import { SellerEntity } from 'src/sellers/entities/seller.entity';
 import { OrderEntity } from 'src/order/entities/order.entity';
+import { ReportEntity } from 'src/report/entities/report.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -49,4 +50,7 @@ export class UserEntity {
 
   @OneToMany(() => OrderEntity, (order) => order.user)
   orders: OrderEntity[];
+
+  @OneToOne(() => ReportEntity, report => report.reportedBy)
+  reports: ReportEntity;
 }
