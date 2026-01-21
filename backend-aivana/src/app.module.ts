@@ -14,10 +14,12 @@ import { SellersModule } from './sellers/sellers.module';
 import { APP_GUARD } from '@nestjs/core';
 import { PassportJwtAuthGuard } from './common/guards/passport-jwt.guard';
 import { DashboardModule } from './dashboard/dashboard.module';
-import { ReviewsModule } from './review/review.module';
 import { OrdersModule } from './order/order.module';
 import { OrderItemsModule } from './order-items/order-items.module';
 import { UserCollectionModule } from './user-collection/user-collection.module';
+import { ReviewModule } from './review/review.module';
+import { PayoutsModule } from './payouts/payouts.module';
+
 
 @Module({
   imports: [
@@ -36,10 +38,11 @@ import { UserCollectionModule } from './user-collection/user-collection.module';
     AuthModule,
     UsersModule,
     DashboardModule,
-    ReviewsModule,
+    ReviewModule,
     OrdersModule,
     OrderItemsModule,
     UserCollectionModule,
+    PayoutsModule,
   ],
   controllers: [],
   providers: [
