@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { ProductEntity } from 'src/products/entities/product.entity';
-import { OrderItemEntity } from 'src/order-items/entities/order-item.entity';
+import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
 @Entity('user_collection')
 export class UserCollectionEntity {
   @PrimaryGeneratedColumn()

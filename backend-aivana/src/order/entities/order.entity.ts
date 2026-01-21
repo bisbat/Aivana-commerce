@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { OrderItemEntity } from '../../order-items/entities/order-item.entity';
+import { OrderItemEntity } from '../../order-item/entities/order-item.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { ManyToOne, JoinColumn } from 'typeorm';
 
