@@ -6,8 +6,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ProductEntity } from 'src/products/entities/product.entity';
-import { UserEntity } from 'src/users/entities/user.entity';
+import { ProductEntity } from 'src/product/entities/product.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
 
 @Entity('review')
 export class ReviewEntity {

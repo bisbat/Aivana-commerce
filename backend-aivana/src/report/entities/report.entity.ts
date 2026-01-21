@@ -1,6 +1,6 @@
-import { ReportStatus } from "src/constants/report-status.enum";
-import { OrderItemEntity } from "src/order-item/entities/order-item.entity";
-import { UserEntity } from "src/users/entities/user.entity";
+import { ReportStatus } from 'src/constants/report-status.enum';
+import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -9,30 +9,29 @@ import {
   OneToOne,
   CreateDateColumn,
   JoinColumn,
+} from 'typeorm';
 
-} from "typeorm";
-
-@Entity("reports")
+@Entity('report')
 export class ReportEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    status: ReportStatus;
+  status: ReportStatus;
 
-    @OneToOne(() => UserEntity, user => user.reports, {
-        nullable: false,
-    })
-    @JoinColumn({ name: "reportedById" })
-    reportedBy: UserEntity;
-    
-    @OneToOne(() => OrderItemEntity, {
-        nullable: false,
-    })
-    @JoinColumn({ name: "orderItemId" })
-    orderItem: OrderItemEntity;    
+  @OneToOne(() => UserEntity, (user) => user.reports, {
+    nullable: false,
+  })
+  @JoinColumn({ name: 'reportedById' })
+  reportedBy: UserEntity;
 
-    reason: string;
+  @OneToOne(() => OrderItemEntity, {
+    nullable: false,
+  })
+  @JoinColumn({ name: 'orderItemId' })
+  orderItem: OrderItemEntity;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  reason: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }

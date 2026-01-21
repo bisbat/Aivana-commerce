@@ -6,7 +6,7 @@ import { PassportModule } from '@nestjs/passport';
 import { PassportAuthController } from './passport-auth.controller';
 import { LocalStrategy } from 'src/common/strategies/local.strategy';
 import { JwtStrategy } from 'src/common/strategies/jwt.strategy';
-import { UsersModule } from 'src/users/users.module';
+import { UserModule } from 'src/user/user.module';
 import { MinioModule } from 'src/minio/minio.module';
 
 @Module({
@@ -17,7 +17,7 @@ import { MinioModule } from 'src/minio/minio.module';
       signOptions: { expiresIn: '1d' },
     }),
     PassportModule,
-    forwardRef(() => UsersModule),
+    forwardRef(() => UserModule),
     MinioModule,
   ],
   controllers: [PassportAuthController],

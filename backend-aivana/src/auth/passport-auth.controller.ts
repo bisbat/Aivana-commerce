@@ -15,7 +15,7 @@ import { Public } from 'src/common/decorators/public.decorator';
 import { UseInterceptors, UploadedFile } from '@nestjs/common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BadRequestException } from '@nestjs/common/exceptions';
-import type { UploadedFileType } from 'src/products/interfaces/uploaded-file.interface';
+import type { UploadedFileType } from 'src/product/interfaces/uploaded-file.interface';
 import { RegisterDto } from './dto/register.dto';
 
 @Controller('auth')

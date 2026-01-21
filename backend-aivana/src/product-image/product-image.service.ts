@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductImage } from './entities/product-image.entity';
-import { ProductEntity } from '../products/entities/product.entity';
+import { ProductEntity } from '../product/entities/product.entity';
 
 @Injectable()
 export class ProductImageService {

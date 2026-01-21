@@ -1,27 +1,26 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersModule } from './users/users.module';
+import { UserModule } from './user/user.module';
 import { dataSourceOptions } from 'db/data-source';
-import { CategoriesModule } from './categories/categories.module';
-import { ProductsModule } from './products/products.module';
+import { CategoryModule } from './category/category.module';
+import { ProductModule } from './product/product.module';
 import { MinioModule } from './minio/minio.module';
 import { ProductImageModule } from './product-image/product-image.module';
 import { CartModule } from './cart/cart.module';
-import { TagsModule } from './tags/tags.module';
+import { TagModule } from './tag/tag.module';
 import { AuthModule } from './auth/auth.module';
-import { SellersModule } from './sellers/sellers.module';
+import { SellerModule } from './seller/seller.module';
 import { APP_GUARD } from '@nestjs/core';
 import { PassportJwtAuthGuard } from './common/guards/passport-jwt.guard';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { OrdersModule } from './order/order.module';
-import { OrderItemsModule } from './order-item/order-items.module';
+import { OrderItemModule } from './order-item/order-item.module';
 import { UserCollectionModule } from './user-collection/user-collection.module';
 import { ReviewModule } from './review/review.module';
-import { PayoutsModule } from './payouts/payouts.module';
+import { PayoutModule } from './payout/payout.module';
 import { PayoutItemModule } from './payout-item/payout-item.module';
 import { ReportModule } from './report/report.module';
-
 
 @Module({
   imports: [
@@ -30,21 +29,21 @@ import { ReportModule } from './report/report.module';
       isGlobal: true,
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
-    CategoriesModule,
-    ProductsModule,
+    CategoryModule,
+    ProductModule,
     MinioModule,
     ProductImageModule,
     CartModule,
-    TagsModule,
-    SellersModule,
+    TagModule,
+    SellerModule,
     AuthModule,
-    UsersModule,
+    UserModule,
     DashboardModule,
     ReviewModule,
     OrdersModule,
-    OrderItemsModule,
+    OrderItemModule,
     UserCollectionModule,
-    PayoutsModule,
+    PayoutModule,
     PayoutItemModule,
     ReportModule,
   ],

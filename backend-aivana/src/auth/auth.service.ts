@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
   ConflictException,
 } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
+import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserRoles } from 'src/constants/user-roles.enum';
 import { RegisterDto } from './dto/register.dto';
@@ -13,13 +13,13 @@ import * as bcrypt from 'bcrypt';
 import { AuthInput, SignInData } from './interfaces';
 import { MinioService } from 'src/minio/minio.service';
 import { MINIO_FOLDERS } from 'src/constants/minio-folders.constant';
-import { UploadedFileType } from 'src/products/interfaces/uploaded-file.interface';
+import { UploadedFileType } from 'src/product/interfaces/uploaded-file.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject(forwardRef(() => UsersService))
-    private userService: UsersService,
+    @Inject(forwardRef(() => UserService))
+    private userService: UserService,
     private jwtService: JwtService,
     private minioService: MinioService,
   ) {}

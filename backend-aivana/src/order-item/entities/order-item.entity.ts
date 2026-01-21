@@ -8,8 +8,8 @@ import {
   OneToOne,
 } from 'typeorm';
 import { OrderEntity } from '../../order/entities/order.entity';
-import { ProductEntity } from 'src/products/entities/product.entity';
-import { SellerEntity } from 'src/sellers/entities/seller.entity';
+import { ProductEntity } from 'src/product/entities/product.entity';
+import { SellerEntity } from 'src/seller/entities/seller.entity';
 import { PayoutItemEntity } from 'src/payout-item/entities/payout-item.entity';
 
 @Entity('order_item')
