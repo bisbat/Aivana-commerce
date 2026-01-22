@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
-import { JWT_SECRET } from '../common/config/jwt-secret';
+import { JWT_SECRET } from './config/jwt-secret';
 import { PassportModule } from '@nestjs/passport';
 import { PassportAuthController } from './passport-auth.controller';
 import { LocalStrategy } from 'src/common/strategies/local.strategy';

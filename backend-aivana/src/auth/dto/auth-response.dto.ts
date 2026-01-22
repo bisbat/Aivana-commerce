@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { UserRoles } from 'src/constants/user-roles.enum';
+import { Role } from '../enum/role.enum';
 
 export class AuthUserDto {
   @Expose()
@@ -18,7 +18,7 @@ export class AuthUserDto {
   lastName: string;
 
   @Expose()
-  role: UserRoles;
+  role: Role;
 
   @Expose()
   avatarUrl?: string;

@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { UserRoles } from 'src/constants/user-roles.enum';
+import { Role } from './enum/role.enum';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { AuthInput, SignInData } from './interfaces';
@@ -51,7 +51,7 @@ export class AuthService {
     const user = await this.userService.create({
       ...registerDto,
       password: hashedPassword,
-      role: UserRoles.CUSTOMER,
+      role: Role.CUSTOMER,
       avatarUrl: null,
     });
 

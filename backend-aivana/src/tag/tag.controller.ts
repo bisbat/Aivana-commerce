@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { TagService } from './tag.service';
 import { CreateTagDto } from './dto/create-tag.dto';
-import { Public } from 'src/common/decorators/public.decorator';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('tags')
 export class TagController {

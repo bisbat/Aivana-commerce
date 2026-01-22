@@ -12,7 +12,7 @@ import { TagModule } from './tag/tag.module';
 import { AuthModule } from './auth/auth.module';
 import { SellerModule } from './seller/seller.module';
 import { APP_GUARD } from '@nestjs/core';
-import { PassportJwtAuthGuard } from './common/guards/passport-jwt.guard';
+import { PassportJwtAuthGuard } from './auth/guards/passport-jwt.guard';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { OrdersModule } from './order/order.module';
 import { OrderItemModule } from './order-item/order-item.module';
@@ -21,6 +21,7 @@ import { ReviewModule } from './review/review.module';
 import { PayoutModule } from './payout/payout.module';
 import { PayoutItemModule } from './payout-item/payout-item.module';
 import { ReportModule } from './report/report.module';
+import { RolesGuard } from './auth/guards/roles.guard';
 
 @Module({
   imports: [
@@ -52,6 +53,10 @@ import { ReportModule } from './report/report.module';
     {
       provide: APP_GUARD,
       useClass: PassportJwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })
