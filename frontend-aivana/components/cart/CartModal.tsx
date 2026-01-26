@@ -81,6 +81,12 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
 
   if (!isOpen) return null;
 
+  const handleCheckout = () => {
+    return cartData;
+    // router.push("/checkout");
+    // onClose();
+  };
+
   return (
     <>
       {/* Backdrop - below navbar */}
@@ -206,6 +212,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                   <button
                     className="w-full px-4 py-2.5 bg-white text-[#1e1b3d] text-sm font-medium rounded hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={cartData.items.length === 0}
+                    onClick={handleCheckout}
                   >
                     Checkout
                   </button>
