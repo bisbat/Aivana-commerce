@@ -3,8 +3,8 @@ import { CreateCheckoutDto } from './dto/create-checkout.dto';
 import { UpdateCheckoutDto } from './dto/update-checkout.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from 'src/product/entities/product.entity';
-import { Repository } from 'typeorm/browser/repository/Repository.js';
-import { In } from 'typeorm/browser/find-options/operator/In.js';
+import { Repository } from 'typeorm';
+import { In } from 'typeorm';
 
 @Injectable()
 export class CheckoutService {
