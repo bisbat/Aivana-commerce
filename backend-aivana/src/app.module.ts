@@ -22,7 +22,6 @@ import { PayoutModule } from './payout/payout.module';
 import { PayoutItemModule } from './payout-item/payout-item.module';
 import { ReportModule } from './report/report.module';
 import { RolesGuard } from './auth/guards/roles.guard';
-import { CheckoutModule } from './checkout/checkout.module';
 
 @Module({
   imports: [
@@ -48,7 +47,6 @@ import { CheckoutModule } from './checkout/checkout.module';
     PayoutModule,
     PayoutItemModule,
     ReportModule,
-    CheckoutModule,
   ],
   controllers: [],
   providers: [

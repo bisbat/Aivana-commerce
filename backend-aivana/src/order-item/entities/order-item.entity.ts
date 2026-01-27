@@ -24,7 +24,7 @@ export class OrderItemEntity {
   productId: number;
 
   @Column()
-  sellerId: number;
+  sellerId: string;
 
   @Column('decimal')
   price: number;
