@@ -24,8 +24,8 @@ export class TagService {
   async getNavbarTags() {
     return this.tagRepository.find({
       select: ['id', 'name'],
-      order: { name: 'ASC' },
-      take: 8,
+      take: 10,
+      order: { id: 'ASC' },
     });
   }
 }

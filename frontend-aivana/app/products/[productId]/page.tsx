@@ -35,7 +35,7 @@ export default function ProductDetailPage() {
     ? [
         product.heroImageUrl,
         ...(product.detailImages?.map((img) =>
-          Array.isArray(img.url) ? img.url[0] : img.url
+          Array.isArray(img.url) ? img.url[0] : img.url,
         ) || []),
       ].filter(Boolean)
     : [];
@@ -53,7 +53,7 @@ export default function ProductDetailPage() {
         });
         setTimeout(
           () => setToast({ show: false, message: "", type: "error" }),
-          3000
+          3000,
         );
         return;
       }
@@ -74,7 +74,7 @@ export default function ProductDetailPage() {
 
       setTimeout(
         () => setToast({ show: false, message: "", type: "success" }),
-        3000
+        3000,
       );
     } catch (err: unknown) {
       const errorMessage =
@@ -89,7 +89,7 @@ export default function ProductDetailPage() {
       });
       setTimeout(
         () => setToast({ show: false, message: "", type: "error" }),
-        3000
+        3000,
       );
     } finally {
       setAddingToCart(false);
@@ -146,7 +146,7 @@ export default function ProductDetailPage() {
 
   const getRelatedProducts = (
     currentProduct: Product,
-    allProducts: Product[]
+    allProducts: Product[],
   ) => {
     if (!currentProduct) return [];
 
@@ -188,7 +188,7 @@ export default function ProductDetailPage() {
 
   const goToPrev = () => {
     setCurrentImageIndex(
-      (prev) => (prev - 1 + allImages.length) % allImages.length
+      (prev) => (prev - 1 + allImages.length) % allImages.length,
     );
   };
 
@@ -503,7 +503,7 @@ export default function ProductDetailPage() {
                     {addingToCart
                       ? "กำลังเพิ่ม..."
                       : `เพิ่มลงตะกร้า ${formatPriceWithCurrency(
-                          product.price
+                          product.price,
                         )}`}
                   </button>
                 </div>

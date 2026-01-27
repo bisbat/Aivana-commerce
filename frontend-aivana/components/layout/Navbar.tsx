@@ -257,7 +257,7 @@ export const Navbar: React.FC = () => {
           </button>
 
           {/* TAGS */}
-          {tagNavbar.slice(0, 8).map((tag) => (
+          {tagNavbar.slice(0, 10).map((tag) => (
             <button
               key={tag.id}
               className={`px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${

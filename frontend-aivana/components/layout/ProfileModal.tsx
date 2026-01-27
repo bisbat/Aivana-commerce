@@ -66,10 +66,21 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         <div className="py-2">
           <Link
             className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
-            href={`/seller/${userData?.username ?? ""}`}
+            href={
+              userData?.role === "seller"
+                ? `/seller/${userData?.username ?? ""}`
+                : `/${userData?.username ?? ""}`
+            }
             onClick={onClose}
           >
             โปรไฟล์
+          </Link>
+          <Link
+            className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
+            href="/collections"
+            onClick={onClose}
+          >
+            คอลเลกชันของฉัน
           </Link>
           {userData?.role === "seller" && (
             <Link
@@ -80,13 +91,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               ร้านค้าของฉัน
             </Link>
           )}
-          {/* <Link
-        href="/orders"
-        className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
-        onClick={() => setIsProfileOpen(false)}
-      >
-        คำสั่งซื้อของฉัน
-      </Link> */}
         </div>
         <div className="py-2 border-t border-[#262549]">
           <button
