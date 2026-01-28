@@ -127,7 +127,7 @@ export class ProductController {
   }
 
   @Delete(':id')
-  @Roles(Role.SELLER,Role.ADMIN)
+  @Roles(Role.SELLER, Role.ADMIN)
   async deleteProduct(@Param('id') id: number) {
     await this.ProductService.deleteProduct(id);
     return { message: 'Product deleted successfully' };

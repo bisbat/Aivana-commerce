@@ -5,7 +5,7 @@ import Link from "next/link";
 import { User, Store, LogOut } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth.server";
 import { useRouter } from "next/navigation";
-import { UserProfile } from "@/lib/types/user.ts/user";
+import { UserProfile } from "@/lib/types/user/user";
 import { RefObject } from "react";
 
 interface ProfileModalProps {
@@ -80,7 +80,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             href="/collections"
             onClick={onClose}
           >
-            คอลเลกชันของฉัน
+            คอลเลกชัน
           </Link>
           {userData?.role === "seller" && (
             <Link

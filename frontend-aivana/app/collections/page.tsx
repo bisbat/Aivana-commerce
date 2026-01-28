@@ -1,90 +1,124 @@
 "use client";
 
-import { Download, Star, Flag, Package, Search } from "lucide-react";
-import { useState } from "react";
+import { getUserCollections } from "@/lib/actions/user-collection.actions";
+import { UserCollection } from "@/lib/types/userCollection";
+import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
+import { Download, Star, Flag, Package, Search, Loader2 } from "lucide-react";
+import ReviewModal from "@/components/ReviewModal";
+import { getCurrentUser } from "@/lib/auth";
+
+import { useEffect, useState } from "react";
 
 export default function MyCollectionPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [collections, setCollections] = useState<UserCollection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
-  // Mock data - คุณจะเปลี่ยนเป็นข้อมูลจริงจาก API
-  const mockCollections = [
-    {
-      id: 1,
-      productName: "Dashboard Template Pro",
-      thumbnail:
-        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop",
-      purchaseDate: "15 ม.ค. 2567",
-      category: "Dashboard",
-      price: 1500,
-      hasReviewed: false,
-    },
-    {
-      id: 2,
-      productName: "E-commerce UI Kit",
-      thumbnail:
-        "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&h=300&fit=crop",
-      purchaseDate: "10 ม.ค. 2567",
-      category: "E-commerce",
-      price: 2500,
-      hasReviewed: true,
-    },
-    {
-      id: 3,
-      productName: "Landing Page Collection",
-      thumbnail:
-        "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=400&h=300&fit=crop",
-      purchaseDate: "5 ม.ค. 2567",
-      category: "Landing Page",
-      price: 1200,
-      hasReviewed: false,
-    },
-    {
-      id: 4,
-      productName: "Admin Panel Dark Mode",
-      thumbnail:
-        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop",
-      purchaseDate: "1 ม.ค. 2567",
-      category: "Admin Panel",
-      price: 1800,
-      hasReviewed: false,
-    },
-    {
-      id: 5,
-      productName: "Social Media Management Dashboard UI Kit",
-      thumbnail:
-        "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&h=300&fit=crop",
-      purchaseDate: "20 ธ.ค. 2566",
-      category: "Dashboard",
-      price: 3200,
-      hasReviewed: false,
-    },
-    {
-      id: 6,
-      productName: "Minimal Portfolio Template",
-      thumbnail:
-        "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=400&h=300&fit=crop",
-      purchaseDate: "18 ธ.ค. 2566",
-      category: "Landing Page",
-      price: 900,
-      hasReviewed: true,
-    },
-  ];
+  // Modal states
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
-  const filteredCollections = mockCollections.filter((item) =>
-    item.productName.toLowerCase().includes(searchQuery.toLowerCase()),
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        // Fetch user and collections
+        const user = await getCurrentUser();
+        console.log("Current User:", user);
+        setCurrentUser(user);
+
+        const data = await getUserCollections();
+        setCollections(data);
+      } catch (err) {
+        console.error("Error fetching collections:", err);
+        setError("ไม่สามารถโหลดข้อมูลได้");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const filteredCollections = collections.filter((item) =>
+    item.product.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const handleDownload = (id: number, name: string) => {
-    alert(`กำลังดาวน์โหลด: ${name}`);
+  const handleDownload = (id: string, name: string, filePath: string) => {
+    window.open(filePath, "_blank");
   };
 
-  const handleReview = (id: number, name: string) => {
-    alert(`เปิดหน้ารีวิว: ${name}`);
+  const handleReview = (productId: string, name: string) => {
+    setSelectedProduct({ id: productId, name });
+    setIsReviewModalOpen(true);
   };
 
-  const handleReport = (id: number, name: string) => {
-    alert(`เปิดหน้ารีพอร์ต: ${name}`);
+  const handleReviewSubmit = async (rating: number, message: string) => {
+    // TODO: ส่งข้อมูล review ไปยัง API
+    console.log("Review submitted:", {
+      productId: selectedProduct?.id,
+      rating,
+      message,
+    });
+
+    // คุณสามารถเรียก API ที่นี่
+    // await submitReview(selectedProduct?.id, rating, message);
+
+    // อัพเดทสถานะ hasReviewed ใน collections
+    setCollections((prev) =>
+      prev.map((item) =>
+        item.product.id === selectedProduct?.id
+          ? { ...item, product: { ...item.product, hasReviewed: true } }
+          : item,
+      ),
+    );
   };
+
+  const handleReport = (productId: string, name: string) => {
+    // Navigate ไปหน้ารีพอร์ต
+    window.location.href = `/products/${productId}/report`;
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("th-TH", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  // Loading State
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2
+            className="animate-spin mx-auto mb-4 text-purple-400"
+            size={48}
+          />
+          <p className="text-slate-400">กำลังโหลดคอลเลคชัน...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error State
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Package className="mx-auto mb-4 text-red-400" size={64} />
+          <p className="text-red-400 text-lg">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="">
@@ -93,9 +127,11 @@ export default function MyCollectionPage() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
             <Package className="text-purple-400" size={32} />
-            <h1 className="text-3xl font-bold">คอลเลคชันของฉัน</h1>
+            <h1 className="text-3xl font-bold">คอลเลคชัน</h1>
           </div>
-          <p className="text-slate-400">สินค้าทั้งหมดที่คุณซื้อไว้</p>
+          <p className="text-slate-400">
+            สินค้าทั้งหมดที่คุณซื้อไว้ ({collections.length} รายการ)
+          </p>
         </div>
 
         {/* Search Bar */}
@@ -126,11 +162,15 @@ export default function MyCollectionPage() {
                 {/* Thumbnail */}
                 <div className="relative h-48 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 overflow-hidden">
                   <img
-                    src={item.thumbnail}
-                    alt={item.productName}
+                    src={
+                      item.product.heroImageUrl ||
+                      "https://via.placeholder.com/200x150"
+                    }
+                    alt={item.product.name}
                     className="w-full h-full object-cover"
                   />
-                  {item.hasReviewed && (
+
+                  {item.product.hasReviewed && (
                     <div className="absolute top-2 right-2 bg-green-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium">
                       <Star size={10} fill="white" />
                       <span>รีวิวแล้ว</span>
@@ -142,14 +182,14 @@ export default function MyCollectionPage() {
                 <div className="p-3 flex flex-col gap-3">
                   <h3
                     className="text-base font-semibold line-clamp-2 mb-1 truncate"
-                    title={item.productName}
+                    title={item.product.name}
                   >
-                    {item.productName}
+                    {item.product.name}
                   </h3>
 
                   <div className="flex items-center justify-between">
                     <span className="text-xl font-bold">
-                      {item.price.toFixed(2)}฿
+                      {formatPriceWithCurrency(item.product.price)}
                     </span>
                   </div>
 
@@ -157,7 +197,13 @@ export default function MyCollectionPage() {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => handleDownload(item.id, item.productName)}
+                      onClick={() =>
+                        handleDownload(
+                          item.product.id,
+                          item.product.name,
+                          item.product.uploadedFilePath,
+                        )
+                      }
                       aria-label="Download"
                       title="ดาวน์โหลด"
                       className="flex-1 h-9 flex items-center justify-center gap-1.5 rounded-lg transition-all duration-150 bg-[#8a57fb] hover:bg-[#7a47eb] cursor-pointer text-sm font-medium"
@@ -168,11 +214,13 @@ export default function MyCollectionPage() {
 
                     <button
                       type="button"
-                      onClick={() => handleReview(item.id, item.productName)}
+                      onClick={() =>
+                        handleReview(item.product.id, item.product.name)
+                      }
                       aria-label="Review"
                       title="รีวิว"
                       className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 cursor-pointer ${
-                        item.hasReviewed
+                        item.product.hasReviewed
                           ? "bg-slate-700 hover:bg-slate-600"
                           : "bg-blue-600 hover:bg-blue-700"
                       }`}
@@ -182,7 +230,9 @@ export default function MyCollectionPage() {
 
                     <button
                       type="button"
-                      onClick={() => handleReport(item.id, item.productName)}
+                      onClick={() =>
+                        handleReport(item.product.id, item.product.name)
+                      }
                       aria-label="Report"
                       title="รีพอร์ต"
                       className="w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 bg-slate-700 hover:bg-red-600 cursor-pointer"
@@ -201,6 +251,21 @@ export default function MyCollectionPage() {
           </div>
         )}
       </div>
+
+      {/* Review Modal */}
+      {currentUser && (
+        <ReviewModal
+          isOpen={isReviewModalOpen}
+          onClose={() => {
+            setIsReviewModalOpen(false);
+            setSelectedProduct(null);
+          }}
+          productId={selectedProduct?.id || ""}
+          productName={selectedProduct?.name || ""}
+          onSubmit={handleReviewSubmit}
+          currentUser={currentUser}
+        />
+      )}
     </div>
   );
 }

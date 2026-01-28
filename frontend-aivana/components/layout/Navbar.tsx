@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect, use } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Search, ShoppingCart, User, Menu, X, ChevronDown } from "lucide-react";
-import { UserProfile } from "@/lib/types/user.ts/user";
+import { UserProfile } from "@/lib/types/user/user";
 import { ProfileModal } from "./ProfileModal";
 import { CartModal } from "../cart/CartModal";
 import { getCurrentUser } from "@/lib/auth";

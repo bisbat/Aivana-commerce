@@ -6,7 +6,7 @@ import { ProductCardSeller } from "@/components/products/ProductCardSeller";
 import { Product } from "@/lib/types/product/Product";
 import { Loader, AlertCircle, Package } from "lucide-react";
 import { getProductsBySellerId } from "@/lib/actions/seller.actions";
-import { UserProfile } from "@/lib/types/user.ts/user";
+import { UserProfile } from "@/lib/types/user/user";
 import { getCurrentUser } from "@/lib/auth";
 
 export default function StorePage() {

@@ -15,7 +15,7 @@ export class UserCollectionEntity {
   id: number;
 
   @Column()
-  userId: number;
+  userId: string;
 
   @Column()
   productId: number;

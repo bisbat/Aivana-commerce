@@ -25,4 +25,5 @@ export interface Product {
   createdAt: string;
   detailImages: ProductImages[];
   tags: Tag[];
+  hasReviewed?: boolean;
 }

@@ -2,7 +2,7 @@
 import { Controller, Get, Req } from '@nestjs/common';
 import { UserCollectionService } from './user-collection.service';
 
-@Controller('user-collection')
+@Controller('user-collections')
 export class UserCollectionController {
   constructor(private userCollectionService: UserCollectionService) {}
 

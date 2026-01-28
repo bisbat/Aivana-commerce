@@ -6,12 +6,12 @@ import {
   updateSellerProfile,
 } from "@/lib/actions/seller.actions";
 import { getCurrentUser } from "@/lib/auth";
-import { SellerProfile } from "@/lib/types/user.ts/sellerProfile";
-import { SocialLink } from "@/lib/types/user.ts/sellerProfile";
+import { SellerProfile } from "@/lib/types/user/sellerProfile";
+import { SocialLink } from "@/lib/types/user/sellerProfile";
 import { Skills } from "./SkillsProps";
 import { SocialLinks } from "./SocialLinks";
 import BankInfoSection from "./BankInfoSection";
-import { BankInfo } from "@/lib/types/user.ts/sellerProfile";
+import { BankInfo } from "@/lib/types/user/sellerProfile";
 import { useRouter } from "next/navigation";
 
 export default function EditSellerSellerInfo() {

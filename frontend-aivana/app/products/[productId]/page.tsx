@@ -601,7 +601,7 @@ export default function ProductDetailPage() {
                       TewwyLoveP
                     </h3>
                     <div className="flex items-center gap-3">
-                      <button className="flex items-center gap-1.5 text-slate-400 hover:text-(--primary) transition-colors cursor-pointer text-sm">
+                      {/* <button className="flex items-center gap-1.5 text-slate-400 hover:text-(--primary) transition-colors cursor-pointer text-sm">
                         <svg
                           className="w-4 h-4"
                           fill="none"
@@ -616,7 +616,7 @@ export default function ProductDetailPage() {
                           />
                         </svg>
                         <span className="font-medium">Reply</span>
-                      </button>
+                      </button> */}
                       <button className="flex items-center gap-1.5 text-slate-400 hover:text-pink-500 transition-colors cursor-pointer text-sm">
                         <svg
                           className="w-4 h-4"
@@ -633,115 +633,6 @@ export default function ProductDetailPage() {
                     ปั้นและผมชื่อแล้วใช้ได้จริงครับ :D
                   </p>
                 </div>
-              </div>
-            </div>
-
-            {/* Comment Item 2 - Reply */}
-            <div className="ml-12 bg-(--linne-purple)/50 rounded-xl p-6  border-(--primary) hover:border-purple-500/80 transition-all relative">
-              <div className="flex items-start gap-4">
-                {/* Avatar */}
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-700 flex items-center justify-center text-white shrink-0 shadow-lg ring-2 ring-purple-500/20">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-user"
-                  >
-                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                  </svg>
-                </div>
-
-                {/* Reply Content */}
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-(--primary) font-bold text-base">
-                        Apisara C.
-                      </h3>
-                      <span className="text-xs bg-purple-600/50 text-purple-200 px-3 py-1 rounded-full font-semibold border border-purple-400/30 shadow-sm">
-                        เจ้าของร้าน
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <button className="flex items-center gap-1.5 text-slate-400 hover:text-(--primary) transition-colors cursor-pointer text-sm">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                          />
-                        </svg>
-                        <span className="font-medium">Reply</span>
-                      </button>
-                      <button className="flex items-center gap-1.5 text-slate-400 hover:text-pink-500 transition-colors cursor-pointer text-sm">
-                        <svg
-                          className="w-4 h-4"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                        <span className="font-medium">1</span>
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-slate-300 leading-relaxed text-[15px]">
-                    <span className="text-purple-400 font-semibold">
-                      @TewwyLoveP
-                    </span>{" "}
-                    ขอบคุณมากครับ
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="mt-8 bg-(--linne-purple) rounded-xl p-6">
-          <div className="flex gap-4">
-            {/* User Avatar */}
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white shrink-0 shadow-lg">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-user"
-                aria-hidden="true"
-              >
-                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-            </div>
-
-            {/* Comment Input */}
-            <div className="flex-1">
-              <textarea
-                placeholder="เขียนความคิดเห็นของคุณ..."
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-lg p-4 text-slate-300 placeholder:text-slate-500 focus:outline-none focus:border-(--primary) focus:ring-2 focus:ring-purple-500/20 transition-all resize-none"
-                rows={4}
-              ></textarea>
-              <div className="flex justify-end mt-3">
-                <button className="px-6 py-2.5 bg-(--primary) text-white rounded-lg hover:bg-(--primary-hover) transition-colors font-medium cursor-pointer ">
-                  โพสต์ความคิดเห็น
-                </button>
               </div>
             </div>
           </div>
