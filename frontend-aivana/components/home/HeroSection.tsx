@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
 
 export const HeroSection: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
-
+  const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.play().catch((error) => {
@@ -25,18 +25,17 @@ export const HeroSection: React.FC = () => {
         preload="auto"
         className="absolute inset-0 w-full h-full object-cover scale-110 opacity-40 -z-10"
         onLoadedData={(e) => {
-          e.currentTarget.play().catch(() => {});
+          e.currentTarget.play().catch(() => { });
         }}
       >
         <source
-          src="/Purple_Gradient_Grain_Hero_Section.mp4"
+          src={`${BASE_PATH}/Purple_Gradient_Grain_Hero_Section.mp4`}
           type="video/mp4"
         />
       </video>
-
       {/* Fallback Background - แสดงเมื่อวิดีโอโหลดไม่ได้ */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 opacity-50 -z-20" />
-
+      
       {/* Content */}
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center py-24 md:py-28">
         {/* Main Title */}

@@ -20,7 +20,7 @@ export async function loginAction(data: LoginRequest) {
   (await cookies()).set('accessToken', accessToken, {
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    // secure: process.env.NODE_ENV === 'production',
     maxAge: 60 * 60 * 24 * 7,
     path: process.env.NODE_ENV === 'production' ? '/capstone25/cp25ssi3' : '/',
   });
@@ -51,7 +51,7 @@ export async function registerAction(data: FormData) {
   (await cookies()).set('accessToken', accessToken, {
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    // secure: process.env.NODE_ENV === 'production',
     path: process.env.NODE_ENV === 'production' ? '/capstone25/cp25ssi3' : '/',
   });
 
@@ -63,8 +63,8 @@ export async function logoutAction() {
     httpOnly: true,
     maxAge: 0, // ลบทันที
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    path: '/capstone25/cp25ssi3',
+    // secure: process.env.NODE_ENV === 'production',
+    path: process.env.NODE_ENV === 'production' ? '/capstone25/cp25ssi3' : '/',
   });
 
   return { success: true };

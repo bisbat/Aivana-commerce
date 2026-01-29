@@ -1,14 +1,10 @@
-import type { NextConfig } from "next";
+/** @type {import('next').NextConfig} */
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
-const nextConfig: NextConfig = {
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '50mb', // Example: Increase limit to 2MB
-    },
-  },
-  // basePath: '/capstone25/cp25ssi3',
-  // assetPrefix: '/capstone25/cp25ssi3/',
-  // trailingSlash: true,
+const nextConfig = {
+  basePath,
+  assetPrefix: basePath ? `${basePath}/` : '',
+  trailingSlash: true,
 };
 
 export default nextConfig;
