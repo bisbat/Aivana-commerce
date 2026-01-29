@@ -19,6 +19,8 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
   const [cartData, setCartData] = useState<GetCartResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [removingItemId, setRemovingItemId] = useState<number | null>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'promptpay' | 'credit-card'>('promptpay');
+
 
   const fetchCart = async () => {
     try {
@@ -30,8 +32,6 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
       }
 
       const data = await getCart(user.id);
-      console.log("Hi there");
-      console.log("Fetched cart data:", data);
       setCartData(data);
     } catch (error) {
       console.error("Failed to fetch cart:", error);
@@ -39,6 +39,10 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
       setLoading(false);
     }
   };
+
+  const handlePaymentMethod = (method: 'promptpay' | 'credit-card') => {
+    setSelectedPaymentMethod(method);
+  }
 
   const handleRemoveItem = async (productId: number) => {
     try {
@@ -100,15 +104,33 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-start justify-end relative">
           <div
             ref={cartRef}
-            className="bg-[#1e1b3d] rounded-xl w-3/12 h-auto max-h-[calc(100vh-2rem)] mt-16 overflow-hidden shadow-xl pointer-events-auto flex flex-col fixed border border-[#262549]"
+            className="bg-[#1e1b3d] rounded-xl w-4/12 h-auto max-h-[calc(100vh-2rem)] mt-16 overflow-hidden shadow-xl pointer-events-auto flex flex-col fixed border border-[#262549]"
           >
             {/* Header */}
-            <div className="p-4 border-b border-[#262549]">
-              <p className="text-white font-medium text-base">รถเข็น</p>
-              <p className="text-slate-400 text-sm mt-0.5">
-                {cartData?.items.length || 0} สินค้า
-              </p>
+            <div className="px-4 border-b border-[#262549] flex items-center justify-between">
+              <div className="flex flex-col">
+                <p className="text-white font-medium text-2xl">รถเข็น</p>
+                {/* <p className="text-slate-400 text-md mt-0.5">
+                  {cartData?.items.length || 0} สินค้า
+                </p> */}
+              </div>
+              {/* Footer - Total and Checkout */}
+              {!loading && cartData && cartData.items.length > 0 && (
+                <div className="py-2 border-t border-[#262549]">
+                  <div className="px-4 py-2">
+                    <div className="flex items-center justify-between flex-col">
+                      <span className="text-md text-slate-400">
+                        ราคารวม
+                      </span>
+                      <span className="text-xl font-semibold text-white">
+                        {formatPriceWithCurrency(total)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
+
 
             {/* Content - Scrollable */}
             <div className="flex-1 overflow-y-auto py-2">
@@ -122,7 +144,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                   {cartData?.items.map((item) => (
                     <div
                       key={item.cartItemId}
-                      className="block px-4 py-3 text-sm text-white hover:bg-[#262549] transition-colors cursor-pointer"
+                      className="block px-4 py-3 text-md text-white hover:bg-[#262549] transition-colors cursor-pointer"
                       onClick={() => {
                         router.push(`/products/${item.product.id}`);
                         onClose();
@@ -130,7 +152,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                     >
                       <div className="flex items-start gap-3">
                         {/* Product Image */}
-                        <div className="w-16 h-14 bg-[#1a1733] rounded overflow-hidden shrink-0">
+                        <div className="w-28 h-26 bg-[#1a1733] rounded overflow-hidden shrink-0">
                           <img
                             src={
                               item.product.heroImageUrl ||
@@ -143,13 +165,13 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
 
                         {/* Product Info */}
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-white font-medium truncate">
+                          <p className="text-md text-white font-medium truncate">
                             {item.product.name}
                           </p>
                           <p className="text-slate-400 text-xs truncate mt-1">
                             {item.product.seller?.firstName || "Unknown"}
                           </p>
-                          <p className="text-white text-sm font-semibold mt-1">
+                          <p className="text-white text-md font-semibold mt-1">
                             {formatPriceWithCurrency(item.product.price)}
                           </p>
                         </div>
@@ -190,7 +212,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                   {!loading &&
                     (!cartData?.items || cartData.items.length === 0) && (
                       <div className="text-center py-12 px-4">
-                        <p className="text-sm text-slate-400">
+                        <p className="text-md text-slate-400">
                           ไม่มีสินค้าในรถเข็น
                         </p>
                       </div>
@@ -198,26 +220,94 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                 </>
               )}
             </div>
-
-            {/* Footer - Total and Checkout */}
+            {/* Payment method */}
             {!loading && cartData && cartData.items.length > 0 && (
-              <div className="py-3 border-t border-[#262549]">
-                <div className="px-4 py-2">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm text-slate-400">
-                      ราคารวม
-                    </span>
-                    <span className="text-base font-semibold text-white">
-                      {formatPriceWithCurrency(total)}
-                    </span>
+              <div>
+                {/* Payment Method Section */}
+                <div className="border-t border-[#262549] bg-[#1a1733]">
+                  {/* Payment Options */}
+                  <div className="p-4 space-y-3">
+                    <p className="text-white font-medium text-md mb-3">วิธีการชำระเงิน</p>
+                    <div className="flex gap-3">
+                      {/* Credit Card Option */}
+                      <button
+                        onClick={() => handlePaymentMethod('credit-card')}
+                        className={`w-full p-3 cursor-pointer rounded-xl transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-purple-500 group
+    ${selectedPaymentMethod === 'credit-card'
+                            ? 'bg-[#2d2a52] border-2 border-purple-500'  // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
+                            : 'bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30'}
+  `}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors
+      ${selectedPaymentMethod === 'credit-card'
+                              ? 'bg-purple-500/20'  // เมื่อถูกเลือก
+                              : 'bg-[#1e1b3d] group-hover:bg-[#262549]'}
+    `}>
+                            <svg className="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            </svg>
+                          </div>
+                          <span className="text-white font-medium text-md">Credit card</span>
+
+                          {selectedPaymentMethod === 'credit-card' && (
+                            <svg className="w-5 h-5 text-purple-500 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                      </button>
+
+                      {/* PromptPay Option */}
+                      <button
+                        onClick={() => handlePaymentMethod('promptpay')}
+                        className={`w-full p-3 cursor-pointer rounded-xl transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-purple-500 group
+    ${selectedPaymentMethod === 'promptpay'
+                            ? 'bg-[#2d2a52] border-2 border-purple-500'  // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
+                            : 'bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30'}
+  `}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors
+      ${selectedPaymentMethod === 'promptpay'
+                              ? 'bg-purple-500/20'  // เมื่อถูกเลือก
+                              : 'bg-[#1e1b3d] group-hover:bg-[#262549]'}
+    `}>
+                            <img src="/icon/promptpay.svg" alt="promptpay-icon" className="w-6" />
+                          </div>
+                          <span className="text-white font-medium text-md">PromptPay</span>
+
+                          {selectedPaymentMethod === 'promptpay' && (
+                            <svg className="w-5 h-5 text-purple-500 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                      </button>
+
+                    </div>
+
+                    {/* Security Badge */}
+                    <div className="flex items-center justify-center gap-2 pt-2">
+                      <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <p className="text-slate-400 text-xs">Payment secured by Omise</p>
+                    </div>
                   </div>
-                  <button
-                    className="w-full px-4 py-2.5 bg-white text-[#1e1b3d] text-sm font-medium rounded hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={cartData.items.length === 0}
-                    onClick={handleCheckout}
-                  >
-                    ชำระเงิน
-                  </button>
+
+                  {!loading && cartData && cartData.items.length > 0 && (
+                    <div>
+                      <div className="p-4 pt-0">
+                        <button
+                          className="w-full py-3.5 text-md bg-[#8a57fb] hover:bg-[#7a47eb] text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={!cartData?.items || cartData.items.length === 0}
+                        >
+                          ชำระเงิน
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
