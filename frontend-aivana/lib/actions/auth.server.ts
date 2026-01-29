@@ -22,7 +22,7 @@ export async function loginAction(data: LoginRequest) {
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
     maxAge: 60 * 60 * 24 * 7,
-    path: '/capstone25/cp25ssi3',
+    path: process.env.NODE_ENV === 'production' ? '/capstone25/cp25ssi3' : '/',
   });
 
   return { success: true };
@@ -52,7 +52,7 @@ export async function registerAction(data: FormData) {
     httpOnly: true,
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
-    path: '/capstone25/cp25ssi3',
+    path: process.env.NODE_ENV === 'production' ? '/capstone25/cp25ssi3' : '/',
   });
 
   return { success: true };

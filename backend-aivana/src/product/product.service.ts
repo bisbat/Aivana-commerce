@@ -19,6 +19,7 @@ import { plainToInstance } from 'class-transformer';
 import { ResponseProductDto } from './dto/response-product.dto';
 import { ProductImage } from 'src/product-image/entities/product-image.entity';
 import { ProductMapper } from './product.mapper';
+import { ReviewService } from 'src/review/review.service';
 
 @Injectable()
 export class ProductService {
@@ -36,6 +37,7 @@ export class ProductService {
     @InjectRepository(ProductImage)
     private productImageRepository: Repository<ProductImage>,
     private productMapper: ProductMapper,
+    private reviewService: ReviewService,
   ) {}
 
   async getAllProducts(): Promise<ResponseProductDto[]> {
@@ -43,6 +45,7 @@ export class ProductService {
       relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
     });
 
+ 
     return this.productMapper.toResponseList(products);
   }
 

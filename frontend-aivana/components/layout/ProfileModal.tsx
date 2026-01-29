@@ -5,7 +5,7 @@ import Link from "next/link";
 import { User, Store, LogOut } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth.server";
 import { useRouter } from "next/navigation";
-import { UserProfile } from "@/lib/types/user.ts/user";
+import { UserProfile } from "@/lib/types/user/user";
 import { RefObject } from "react";
 
 interface ProfileModalProps {
@@ -66,10 +66,21 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         <div className="py-2">
           <Link
             className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
-            href={`/seller/${userData?.username ?? ""}`}
+            href={
+              userData?.role === "seller"
+                ? `/seller/${userData?.username ?? ""}`
+                : `/${userData?.username ?? ""}`
+            }
             onClick={onClose}
           >
             โปรไฟล์
+          </Link>
+          <Link
+            className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
+            href="/collections"
+            onClick={onClose}
+          >
+            คอลเลกชัน
           </Link>
           {userData?.role === "seller" && (
             <Link
@@ -80,13 +91,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               ร้านค้าของฉัน
             </Link>
           )}
-          {/* <Link
-        href="/orders"
-        className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
-        onClick={() => setIsProfileOpen(false)}
-      >
-        คำสั่งซื้อของฉัน
-      </Link> */}
         </div>
         <div className="py-2 border-t border-[#262549]">
           <button

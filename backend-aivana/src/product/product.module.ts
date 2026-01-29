@@ -10,6 +10,8 @@ import { SellerEntity } from 'src/seller/entities/seller.entity';
 import { CategoryEntity } from 'src/category/entities/category.entity';
 import { ProductImage } from 'src/product-image/entities/product-image.entity';
 import { ProductMapper } from './product.mapper';
+import { ReviewService } from 'src/review/review.service';
+import { ReviewModule } from 'src/review/review.module';
 
 @Module({
   imports: [
@@ -20,11 +22,12 @@ import { ProductMapper } from './product.mapper';
       CategoryEntity,
       ProductImage,
     ]),
+    ReviewModule,
     MinioModule,
     forwardRef(() => ProductImageModule),
   ],
   controllers: [ProductController],
-  providers: [ProductService, ProductMapper],
+  providers: [ProductService, ProductMapper], 
   exports: [ProductService, ProductMapper],
 })
 export class ProductModule {}

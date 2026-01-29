@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { becomeSeller } from "@/lib/actions/seller.actions";
-import { CreateSellerProfileDto } from "@/lib/types/user.ts/sellerCreate";
+import { CreateSellerProfileDto } from "@/lib/types/user/sellerCreate";
 import { getCurrentUser } from "@/lib/auth";
 
 const SOCIAL_PLATFORMS = [
@@ -71,12 +71,12 @@ export default function BecomeSellerPage() {
     return SOCIAL_PLATFORMS.filter(
       (platform) =>
         !selectedPlatforms.includes(platform.value) ||
-        platform.value === currentPlatform
+        platform.value === currentPlatform,
     );
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -103,7 +103,7 @@ export default function BecomeSellerPage() {
   const handleSocialLinkChange = (
     index: number,
     field: "platform" | "url",
-    value: string
+    value: string,
   ) => {
     const newLinks = [...formData.socialLinks];
     newLinks[index] = { ...newLinks[index], [field]: value };
@@ -211,10 +211,13 @@ export default function BecomeSellerPage() {
 
         socials: formData.socialLinks
           .filter((link) => link.platform.trim() && link.url.trim())
-          .reduce((acc, link) => {
-            acc[link.platform.toLowerCase()] = link.url;
-            return acc;
-          }, {} as Record<string, string>),
+          .reduce(
+            (acc, link) => {
+              acc[link.platform.toLowerCase()] = link.url;
+              return acc;
+            },
+            {} as Record<string, string>,
+          ),
 
         bankInfo: {
           bankName: BANKS.find((b) => b.code === formData.bankCode)?.name || "",

@@ -3,9 +3,10 @@ import { UserCollectionService } from './user-collection.service';
 import { UserCollectionController } from './user-collection.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserCollectionEntity } from './entities/user-collection.entity';
+import { ReviewModule } from 'src/review/review.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserCollectionEntity])],
+  imports: [TypeOrmModule.forFeature([UserCollectionEntity]), ReviewModule],
   controllers: [UserCollectionController],
   providers: [UserCollectionService],
   exports: [UserCollectionService],

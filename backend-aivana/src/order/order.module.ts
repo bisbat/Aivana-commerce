@@ -12,5 +12,6 @@ import { OrderItemModule } from 'src/order-item/order-item.module';
   imports: [TypeOrmModule.forFeature([OrderEntity, Cart, OrderItemEntity]), OrderItemModule],
   controllers: [OrderController],
   providers: [OrderService],
+  exports: [OrderService], 
 })
-export class OrdersModule {}
+export class OrderModule {}

@@ -104,9 +104,9 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
           >
             {/* Header */}
             <div className="p-4 border-b border-[#262549]">
-              <p className="text-white font-medium text-base">Shopping Cart</p>
+              <p className="text-white font-medium text-base">รถเข็น</p>
               <p className="text-slate-400 text-sm mt-0.5">
-                {cartData?.items.length || 0} items
+                {cartData?.items.length || 0} สินค้า
               </p>
             </div>
 
@@ -191,7 +191,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                     (!cartData?.items || cartData.items.length === 0) && (
                       <div className="text-center py-12 px-4">
                         <p className="text-sm text-slate-400">
-                          Your cart is empty
+                          ไม่มีสินค้าในรถเข็น
                         </p>
                       </div>
                     )}
@@ -204,7 +204,9 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
               <div className="py-3 border-t border-[#262549]">
                 <div className="px-4 py-2">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm text-slate-400">Total</span>
+                    <span className="text-sm text-slate-400">
+                      ราคารวม
+                    </span>
                     <span className="text-base font-semibold text-white">
                       {formatPriceWithCurrency(total)}
                     </span>
@@ -214,7 +216,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                     disabled={cartData.items.length === 0}
                     onClick={handleCheckout}
                   >
-                    Checkout
+                    ชำระเงิน
                   </button>
                 </div>
               </div>

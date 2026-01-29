@@ -1,10 +1,10 @@
 "use server";
-import { SellerProfile } from "../types/user.ts/sellerProfile";
-import { CreateSellerProfileDto } from "../types/user.ts/sellerCreate";
+import { SellerProfile } from "../types/user/sellerProfile";
+import { CreateSellerProfileDto } from "../types/user/sellerCreate";
 import { Product } from "../types/product/Product";
 import { getAccessToken } from "../auth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export async function becomeSeller(
   data: CreateSellerProfileDto,
@@ -15,17 +15,14 @@ export async function becomeSeller(
   if (!token) {
     throw new Error("Unauthorized");
   }
-  const response = await fetch(
-    `${API_BASE_URL}/seller/upgrade/${userId}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(data),
-    }
-  );
+  const response = await fetch(`${API_BASE_URL}/seller/upgrade/${userId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
 
   if (!response.ok) {
     const error = await response.json();
@@ -44,16 +41,13 @@ export async function getProductsBySellerId(
     throw new Error("Unauthorized");
   }
 
-  const response = await fetch(
-    `${API_BASE_URL}/seller/${sellerId}/products`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  const response = await fetch(`${API_BASE_URL}/seller/${sellerId}/products`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!response.ok) {
     const error = await response.json();
@@ -63,9 +57,7 @@ export async function getProductsBySellerId(
   return await response.json();
 }
 
-export async function getSellerById(
-  sellerId: string,
-): Promise<SellerProfile> {
+export async function getSellerById(sellerId: string): Promise<SellerProfile> {
   const token = await getAccessToken();
 
   if (!token) {
@@ -76,7 +68,7 @@ export async function getSellerById(
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -101,7 +93,7 @@ export async function updateSellerProfile(
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });

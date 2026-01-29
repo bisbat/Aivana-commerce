@@ -14,7 +14,7 @@ import { SellerModule } from './seller/seller.module';
 import { APP_GUARD } from '@nestjs/core';
 import { PassportJwtAuthGuard } from './auth/guards/passport-jwt.guard';
 import { DashboardModule } from './dashboard/dashboard.module';
-import { OrdersModule } from './order/order.module';
+import { OrderModule } from './order/order.module';
 import { OrderItemModule } from './order-item/order-item.module';
 import { UserCollectionModule } from './user-collection/user-collection.module';
 import { ReviewModule } from './review/review.module';
@@ -41,7 +41,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
     UserModule,
     DashboardModule,
     ReviewModule,
-    OrdersModule,
+    OrderModule,
     OrderItemModule,
     UserCollectionModule,
     PayoutModule,

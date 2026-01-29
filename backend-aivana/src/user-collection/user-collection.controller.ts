@@ -1,4 +1,14 @@
-import { Controller } from '@nestjs/common';
+// user-collection.controller.ts
+import { Controller, Get, Req } from '@nestjs/common';
+import { UserCollectionService } from './user-collection.service';
 
-@Controller('user-collection')
-export class UserCollectionController {}
+@Controller('user-collections')
+export class UserCollectionController {
+  constructor(private userCollectionService: UserCollectionService) {}
+
+  @Get()
+  async getUserCollection(@Req() req) {
+    const userId = req.user.userId;
+    return this.userCollectionService.findByUserId(userId);
+  }
+}

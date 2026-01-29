@@ -51,4 +51,5 @@ export class OrderEntity {
   @ManyToOne(() => UserEntity, (user) => user.orders)
   @JoinColumn({ name: 'userId' })
   user: UserEntity;
+    static status: any;
 }

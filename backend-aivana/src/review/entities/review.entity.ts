@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -14,13 +15,24 @@ export class ReviewEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
+  // ✅ เพิ่ม productId column
+  @Column({ type: 'bigint' })
+  productId: number;
+
+  // ✅ เพิ่ม buyerId column
+  @Column({ type: 'varchar' })
+  buyerId: string;
+
   @ManyToOne(() => ProductEntity, (product) => product.reviews, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'productId' })
   product: ProductEntity;
+
   @ManyToOne(() => UserEntity, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'buyerId' })
   buyer: UserEntity;
 
   @Column({ type: 'int' })

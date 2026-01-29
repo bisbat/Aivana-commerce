@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { SocialLink } from '@/lib/types/user.ts/sellerProfile';
+import { useState } from "react";
+import { SocialLink } from "@/lib/types/user/sellerProfile";
 
 const SOCIAL_PLATFORMS = [
-  { value: 'github', label: 'GitHub' },
-  { value: 'linkedin', label: 'LinkedIn' },
-  { value: 'facebook', label: 'Facebook' },
-  { value: 'instagram', label: 'Instagram' },
-  { value: 'tiktok', label: 'TikTok' },
+  { value: "github", label: "GitHub" },
+  { value: "linkedin", label: "LinkedIn" },
+  { value: "facebook", label: "Facebook" },
+  { value: "instagram", label: "Instagram" },
+  { value: "tiktok", label: "TikTok" },
 ] as const;
 
 const MAX_SOCIAL_LINKS = 5;
 
-type PlatformValue = typeof SOCIAL_PLATFORMS[number]['value'];
+type PlatformValue = (typeof SOCIAL_PLATFORMS)[number]["value"];
 
 interface SocialLinksProps {
   socials: SocialLink;
@@ -23,11 +23,11 @@ interface SocialLinksProps {
 export function SocialLinks({ socials, onChange }: SocialLinksProps) {
   // derive used platforms (only those with a non-empty string)
   const usedPlatforms = (Object.keys(socials) as PlatformValue[]).filter(
-    (k) => socials[k] && socials[k]!.trim() !== ''
+    (k) => socials[k] && socials[k]!.trim() !== "",
   );
 
   const availablePlatforms = SOCIAL_PLATFORMS.filter(
-    (p) => !usedPlatforms.includes(p.value as PlatformValue)
+    (p) => !usedPlatforms.includes(p.value as PlatformValue),
   );
 
   function handleRemove(platform: PlatformValue) {
@@ -60,7 +60,7 @@ export function SocialLinks({ socials, onChange }: SocialLinksProps) {
             <input
               type="url"
               className="border rounded px-3 py-2 flex-1"
-              value={socials[platform] ?? ''}
+              value={socials[platform] ?? ""}
               onChange={(e) => handleUpdateField(platform, e.target.value)}
             />
 
@@ -101,8 +101,8 @@ function AddSocialForm({
   platforms: { value: string; label: string }[];
   onAdd: (platform: string, url: string) => void;
 }) {
-  const [selectedPlatform, setSelectedPlatform] = useState<string>('');
-  const [urlValue, setUrlValue] = useState<string>('');
+  const [selectedPlatform, setSelectedPlatform] = useState<string>("");
+  const [urlValue, setUrlValue] = useState<string>("");
 
   return (
     <div className="flex gap-2">
@@ -133,16 +133,16 @@ function AddSocialForm({
         type="button"
         onClick={() => {
           if (!selectedPlatform) {
-            alert('Select a platform first');
+            alert("Select a platform first");
             return;
           }
           if (!urlValue.trim()) {
-            alert('Enter a URL');
+            alert("Enter a URL");
             return;
           }
           onAdd(selectedPlatform, urlValue.trim());
-          setSelectedPlatform('');
-          setUrlValue('');
+          setSelectedPlatform("");
+          setUrlValue("");
         }}
         className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
       >

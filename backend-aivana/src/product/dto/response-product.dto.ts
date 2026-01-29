@@ -43,4 +43,6 @@ export class ResponseProductDto {
   createdAt: Date;
   @Expose()
   updatedAt: Date;
+  @Expose()
+  hasReviewed: boolean;
 }

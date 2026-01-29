@@ -4,7 +4,7 @@ import Reacts from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LayoutDashboard, Package, DollarSign, Store } from "lucide-react";
-import { SellerProfile } from "@/lib/types/user.ts/sellerProfile";
+import { SellerProfile } from "@/lib/types/user/sellerProfile";
 import { getSellerById } from "@/lib/actions/seller.actions";
 import { Product } from "@/lib/types/product/Product";
 import { useState, useEffect } from "react";
@@ -26,9 +26,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = "/" }) => {
   const [sellerId, setSellerId] = useState<string | null>(null);
 
   useEffect(() => {
-    getCurrentUser().then((user) =>
-      setSellerId(user?.sellerId ?? null)
-    );
+    getCurrentUser().then((user) => setSellerId(user?.sellerId ?? null));
   }, []);
 
   const [seller, setSeller] = useState<SellerProfile | null>(null);

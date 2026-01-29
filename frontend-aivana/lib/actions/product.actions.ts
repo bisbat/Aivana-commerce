@@ -11,7 +11,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export async function updateProductAction(
   productId: string,
-  updatedData: UpdatedProductData
+  updatedData: UpdatedProductData,
 ) {
   const token = await getAccessToken();
 
@@ -74,9 +74,7 @@ export async function updateProductAction(
 }
 
 // ฟังก์ชันสำหรับลบ detail image
-export async function deleteProductImageAction(
-  imageId: number
-) {
+export async function deleteProductImageAction(imageId: number) {
   const token = await getAccessToken();
 
   if (!token) {
@@ -99,9 +97,7 @@ export async function deleteProductImageAction(
   throw new Error("Failed to delete image");
 }
 
-export async function deleteProductAction(
-  productId: string
-) {
+export async function deleteProductAction(productId: string) {
   const token = await getAccessToken();
 
   if (!token) {
@@ -158,7 +154,7 @@ export async function getProductByIdAction(productId: string) {
 export async function createCompleteProduct(
   uploadFileData: UploadFileFormData, // Step 1 data
   productInfoData: ProductInformationFormData, // Step 2 data
-  imageData: UploadImageFormData
+  imageData: UploadImageFormData,
 ) {
   const token = await getAccessToken();
 
@@ -183,7 +179,7 @@ export async function createCompleteProduct(
     formData.append("features", JSON.stringify(productInfoData.features));
     formData.append(
       "compatibility",
-      JSON.stringify(productInfoData.compatibility)
+      JSON.stringify(productInfoData.compatibility),
     );
     formData.append("tagIds", JSON.stringify(productInfoData.tagIds));
 
@@ -237,7 +233,7 @@ export async function getProductsByTag(tag: string) {
       headers: {
         "Content-Type": "application/json",
       },
-    }
+    },
   );
   if (res.ok) {
     const data = await res.json();
@@ -254,7 +250,7 @@ export async function getProductsBySearchQuery(query: string) {
       headers: {
         "Content-Type": "application/json",
       },
-    }
+    },
   );
   if (res.ok) {
     const data = await res.json();
