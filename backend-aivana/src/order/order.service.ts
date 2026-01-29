@@ -53,4 +53,17 @@ export class OrderService {
             relations: ['items'],
         });
     }
+
+    async hasUserPurchasedProduct(
+        userId: string,
+        productId: number,
+    ): Promise<boolean> {
+        return this.orderRepository
+            .createQueryBuilder('order')
+            .innerJoin('order.items', 'orderItem')
+            .where('order.userId = :userId', { userId })
+            .andWhere('orderItem.productId = :productId', { productId })
+            .andWhere('order.status = :status', { status: 'PAID' })
+            .getExists();
+    }
 }
