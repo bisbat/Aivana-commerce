@@ -5,13 +5,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SellerEntity } from './entities/seller.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { ProductModule } from '../product/product.module';
+import { JwtModule } from '@nestjs/jwt';
+import { JWT_SECRET } from 'src/auth/config/jwt-secret';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([SellerEntity, UserEntity]),
     ProductModule,
+    JwtModule.register({
+      global: true,
+      secret: JWT_SECRET,
+      signOptions: { expiresIn: '1d' },
+    }),
   ],
   controllers: [SellerController],
   providers: [SellerService],
 })
-export class SellerModule {}
+export class SellerModule { }

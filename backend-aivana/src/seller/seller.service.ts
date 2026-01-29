@@ -10,6 +10,7 @@ import { ResponseSellerDto } from './dto/response-seller.dto';
 import { UpdateSellerDto } from './dto/update-seller.dto';
 import { ResponseProductDto } from 'src/product/dto/response-product.dto';
 import { ProductMapper } from 'src/product/product.mapper';
+import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 
 @Injectable()
 export class SellerService {
@@ -19,12 +20,13 @@ export class SellerService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly productMapper: ProductMapper,
+    private readonly jwtService: JwtService,
   ) {}
 
   async upgradeToSeller(
     userId: string,
     sellerData: CreateSellerDto,
-  ): Promise<ResponseSellerDto> {
+  ): Promise<{ accessToken: string }> {
     // ตรวจสอบว่า user มีอยู่จริง
     const user = await this.userRepository.findOne({
       where: { id: userId },
@@ -32,7 +34,7 @@ export class SellerService {
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     // ตรวจสอบว่ายังไม่เป็น seller อยู่แล้ว
@@ -53,15 +55,13 @@ export class SellerService {
     user.sellerProfile = savedSeller;
     await this.userRepository.save(user);
 
-    // Reload seller with user relationship
-    const reloadedSeller = await this.sellerRepository.findOne({
-      where: { id: savedSeller.id },
-      relations: ['user'],
-    });
+    const JwtPayload = {
+      sub: userId,
+      role: user.role,
+    };
 
-    return plainToInstance(ResponseSellerDto, reloadedSeller, {
-      excludeExtraneousValues: true,
-    });
+    const accessToken = await this.jwtService.signAsync(JwtPayload);
+    return {accessToken};
   }
 
   async getAllSellers(): Promise<ResponseSellerDto[]> {
