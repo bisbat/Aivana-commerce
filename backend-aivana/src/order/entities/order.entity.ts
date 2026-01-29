@@ -9,6 +9,8 @@ import {
 import { OrderItemEntity } from '../../order-item/entities/order-item.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { ManyToOne, JoinColumn } from 'typeorm';
+import { PaymentStatusEnum } from '../enum/order-status.enum';
+import { PaymentMethodEnum } from '../enum/payment.enum';
 
 @Entity('order')
 export class OrderEntity {
@@ -16,19 +18,23 @@ export class OrderEntity {
   id: number;
 
   @Column()
-  userId: number;
+  userId: string;
 
   @Column('decimal')
   totalAmount: number;
 
   @Column({
     type: 'enum',
-    enum: ['PENDING', 'PAID', 'FAILED', 'REFUNDED'],
+    enum: PaymentStatusEnum,
+    default: PaymentStatusEnum.PENDING,
   })
-  status: string;
+  status: PaymentStatusEnum;
 
-  @Column()
-  paymentMethod: string;
+  @Column({
+    type: 'enum',
+    enum: PaymentMethodEnum,
+  })
+  paymentMethod: PaymentMethodEnum;
 
   @Column({ nullable: true })
   omiseChargeId: string;
