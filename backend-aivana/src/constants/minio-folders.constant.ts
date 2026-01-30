@@ -2,7 +2,8 @@
  * MinIO folder structure constants
  * Centralized location for bucket folder paths
  */
-export const MINIO_FOLDERS = {
+export const 
+MINIO_FOLDERS = {
   PRODUCTS: {
     /**
      * Get hero image folder for a specific product
@@ -40,4 +41,11 @@ export const MINIO_FOLDERS = {
      */
     AVATARS: (userId: number | string) => `users/${userId}/avatars`,
   },
+  PAYOUT: {
+  /**
+   * Folder สำหรับเก็บสลิปของ payout
+   * path: payouts/{payoutId}/slip
+   */
+  SLIP: (payoutId: number | string) => `payouts/${payoutId}/slip`,
+}
 } as const;

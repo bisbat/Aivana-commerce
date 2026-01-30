@@ -22,6 +22,7 @@ import { PayoutModule } from './payout/payout.module';
 import { PayoutItemModule } from './payout-item/payout-item.module';
 import { ReportModule } from './report/report.module';
 import { RolesGuard } from './auth/guards/roles.guard';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
     PayoutModule,
     PayoutItemModule,
     ReportModule,
+    ScheduleModule.forRoot()
   ],
   controllers: [],
   providers: [
