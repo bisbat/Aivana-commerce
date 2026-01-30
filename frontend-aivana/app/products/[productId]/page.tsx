@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { Product } from "@/lib/types/product/Product";
+import { Product } from "@/lib/types/product/product";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { Loader } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
@@ -12,6 +12,7 @@ import { getProductByIdAction } from "@/lib/actions/product.actions";
 import { getAllProductsAction } from "@/lib/actions/product.actions";
 import { useRouter } from "next/navigation";
 import MarkdownRenderer from "@/components/common/MarkdownRenderer";
+import { showSuccessToast, showErrorToast } from "@/lib/toast";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -25,11 +26,6 @@ export default function ProductDetailPage() {
   const [addingToCart, setAddingToCart] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [toast, setToast] = useState<{
-    show: boolean;
-    message: string;
-    type: "success" | "error";
-  }>({ show: false, message: "", type: "success" });
 
   const allImages = product
     ? [
@@ -46,51 +42,23 @@ export default function ProductDetailPage() {
 
       const user = await getCurrentUser();
       if (!user) {
-        setToast({
-          show: true,
-          message: "กรุณาเข้าสู่ระบบก่อนเพิ่มสินค้าลงตะกร้า",
-          type: "error",
-        });
-        setTimeout(
-          () => setToast({ show: false, message: "", type: "error" }),
-          3000,
-        );
+        showErrorToast("กรุณาเข้าสู่ระบบก่อนเพิ่มสินค้าลงตะกร้า");
         return;
       }
-      await addToCart({
-        userId: user.id,
-        productId: parseInt(productId),
-      });
+
       await addToCart({
         userId: user.id,
         productId: parseInt(productId),
       });
 
-      setToast({
-        show: true,
-        message: "เพิ่มสินค้าเข้าตะกร้าสำเร็จ!",
-        type: "success",
-      });
-
-      setTimeout(
-        () => setToast({ show: false, message: "", type: "success" }),
-        3000,
-      );
+      showSuccessToast("เพิ่มสินค้าเข้าตะกร้าสำเร็จ!");
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error && err.message === "PRODUCT_ALREADY_IN_CART"
           ? "สินค้านี้มีอยู่ในตะกร้าแล้ว"
           : "ไม่สามารถเพิ่มสินค้าเข้าตะกร้าได้ กรุณาลองใหม่อีกครั้ง";
 
-      setToast({
-        show: true,
-        message: errorMessage,
-        type: "error",
-      });
-      setTimeout(
-        () => setToast({ show: false, message: "", type: "error" }),
-        3000,
-      );
+      showErrorToast(errorMessage);
     } finally {
       setAddingToCart(false);
     }
@@ -204,12 +172,6 @@ export default function ProductDetailPage() {
     }
   };
 
-  const handleSellerClick = () => {
-    if (product && product.seller?.username) {
-      router.push(`/seller/${product.seller.username}`);
-    }
-  };
-
   if (error || !product) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -222,52 +184,6 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Toast Notification */}
-      {toast.show && (
-        <div className="fixed top-20 right-4 z-50 animate-in slide-in-from-top-5 duration-300">
-          <div
-            className={`rounded-lg px-6 py-4 shadow-lg ${
-              toast.type === "success"
-                ? "bg-green-500 text-white"
-                : "bg-red-500 text-white"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              {toast.type === "success" ? (
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              )}
-              <p className="font-medium">{toast.message}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-3 py-10">
         {/* Header Product Name */}
         <div className="space-y-4">
@@ -564,77 +480,66 @@ export default function ProductDetailPage() {
         </div>
 
         {/* FIXME: ทำ component ของ comment ด้วย */}
+        {/* FIXME: ทำ likeCounted */}
         {/* Comments Section */}
         <div className="mt-16">
           <h2 className="text-2xl font-bold text-white mb-8">
-            ความคิดเห็น (2)
+            ความคิดเห็น ({product.reviews.length})
           </h2>
 
           {/* Comment List */}
           <div className="space-y-6">
-            {/* Comment Item 1 */}
-            <div className="bg-(--linne-purple)/50 rounded-xl p-6 transition-all">
-              <div className="flex items-start gap-4">
-                {/* Avatar */}
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white shrink-0 shadow-lg ring-2 ring-purple-500/20">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-user"
-                  >
-                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                  </svg>
-                </div>
-
-                {/* Comment Content */}
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="text-(--primary) font-bold text-base">
-                      TewwyLoveP
-                    </h3>
-                    <div className="flex items-center gap-3">
-                      {/* <button className="flex items-center gap-1.5 text-slate-400 hover:text-(--primary) transition-colors cursor-pointer text-sm">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                          />
-                        </svg>
-                        <span className="font-medium">Reply</span>
-                      </button> */}
-                      <button className="flex items-center gap-1.5 text-slate-400 hover:text-pink-500 transition-colors cursor-pointer text-sm">
-                        <svg
-                          className="w-4 h-4"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                        <span className="font-medium">1</span>
-                      </button>
-                    </div>
+            {product.reviews?.map((review) => (
+              <div
+                key={review.id}
+                className="bg-(--linne-purple)/50 rounded-xl p-6 transition-all"
+              >
+                <div className="flex items-start gap-4">
+                  {/* Avatar */}
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white shrink-0 shadow-lg ring-2 ring-purple-500/20">
+                    {review.user?.avatarUrl ? (
+                      <img
+                        src={review.user.avatarUrl}
+                        alt={`${review.user.firstName}`}
+                        className="w-full h-full rounded-full object-cover"
+                      />
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                      </svg>
+                    )}
                   </div>
-                  <p className="text-slate-300 leading-relaxed text-[15px]">
-                    ปั้นและผมชื่อแล้วใช้ได้จริงครับ :D
-                  </p>
+
+                  {/* Content */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-3">
+                      <h3 className="text-(--primary) font-bold text-base">
+                        {review.user?.firstName} {review.user?.lastName}
+                      </h3>
+
+                      <div className="flex items-center text-xs text-slate-400 bg-black/20 px-2 py-0.5 rounded-full">
+                        <span>⭐ {review.rating}</span>
+                      </div>
+                    </div>
+
+                    <p className="text-slate-300 leading-relaxed text-[15px]">
+                      {review.comment || "ไม่มีความคิดเห็นเพิ่มเติม"}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
 
@@ -650,18 +555,19 @@ export default function ProductDetailPage() {
                   (window.location.href = `/products/${relatedProduct.id}`)
                 }
               >
-                <div className="aspect-[4/3] bg-slate-800 overflow-hidden">
+                <div className="relative aspect-[4/3] bg-slate-800 overflow-hidden">
                   <img
                     src={
                       relatedProduct.heroImageUrl ||
                       "https://via.placeholder.com/400x300?text=No+Image"
                     }
                     alt={relatedProduct.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
                 <div className="p-4">
-                  <h3 className="text-white font-bold text-base mb-1 truncate">
+                  <h3 className="text-white font-bold text-base mb-1 truncate group-hover:text-purple-400 transition-colors">
                     {relatedProduct.name}
                   </h3>
                   <p className="text-slate-300 text-xs mb-4 truncate">

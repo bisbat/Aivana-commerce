@@ -1,7 +1,7 @@
 "use server";
 import { SellerProfile } from "../types/user/sellerProfile";
 import { CreateSellerProfileDto } from "../types/user/sellerCreate";
-import { Product } from "../types/product/Product";
+import { Product } from "../types/product/product";
 import { getAccessToken } from "../auth";
 import { cookies } from 'next/headers';
 

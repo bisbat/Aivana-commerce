@@ -2,7 +2,7 @@ import React from "react";
 import { Edit2 } from "lucide-react";
 import Link from "next/link";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
-import { Product } from "@/lib/types/product/Product";
+import { Product } from "@/lib/types/product/product";
 
 interface ProductCardSellerProps {
   product: Product;

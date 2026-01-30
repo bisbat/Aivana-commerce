@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { LayoutDashboard, Package, DollarSign, Store } from "lucide-react";
 import { SellerProfile } from "@/lib/types/user/sellerProfile";
 import { getSellerById } from "@/lib/actions/seller.actions";
-import { Product } from "@/lib/types/product/Product";
+import { Product } from "@/lib/types/product/product";
 import { useState, useEffect } from "react";
 import { getCurrentUser } from "@/lib/auth";
 

@@ -20,6 +20,7 @@ import { ResponseProductDto } from './dto/response-product.dto';
 import { ProductImage } from 'src/product-image/entities/product-image.entity';
 import { ProductMapper } from './product.mapper';
 import { ReviewService } from 'src/review/review.service';
+import { ReviewEntity } from 'src/review/entities/review.entity';
 
 @Injectable()
 export class ProductService {
@@ -37,7 +38,8 @@ export class ProductService {
     @InjectRepository(ProductImage)
     private productImageRepository: Repository<ProductImage>,
     private productMapper: ProductMapper,
-    private reviewService: ReviewService,
+    @InjectRepository(ReviewEntity)
+    private reviewRepository: Repository<ReviewEntity>,
   ) {}
 
   async getAllProducts(): Promise<ResponseProductDto[]> {
@@ -45,7 +47,6 @@ export class ProductService {
       relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
     });
 
- 
     return this.productMapper.toResponseList(products);
   }
 
@@ -201,10 +202,25 @@ export class ProductService {
 
     return product;
   }
-  async getProductById(id: number): Promise<ResponseProductDto | null> {
+
+  // product.service.ts
+  async getProductById(id: number) {
     const product = await this.productsRepository.findOne({
       where: { id },
-      relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
+      relations: [
+        'category',
+        'seller',
+        'seller.user',
+        'tags',
+        'productImages',
+        'reviews',
+        'reviews.buyer',
+      ],
+      order: {
+        reviews: {
+          createdAt: 'DESC',
+        },
+      },
     });
 
     if (!product) return null;
@@ -493,5 +509,37 @@ export class ProductService {
     });
 
     return this.productMapper.toResponseList(products);
+  }
+
+  async getProductReviews(
+    productId: number,
+    page: number = 1,
+    limit: number = 10,
+  ) {
+    const product = await this.productsRepository.findOne({
+      where: { id: productId },
+    });
+
+    if (!product) {
+      throw new NotFoundException(`Product with ID "${productId}" not found`);
+    }
+
+    const [reviews, total] = await this.reviewRepository.findAndCount({
+      where: { product: { id: productId } },
+      relations: ['user'],
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      reviews,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }

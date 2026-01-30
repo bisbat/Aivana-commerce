@@ -151,6 +151,8 @@ export async function getProductByIdAction(productId: string) {
 
   throw new Error("Failed to fetch product");
 }
+
+
 export async function createCompleteProduct(
   uploadFileData: UploadFileFormData, // Step 1 data
   productInfoData: ProductInformationFormData, // Step 2 data
@@ -257,4 +259,24 @@ export async function getProductsBySearchQuery(query: string) {
     return data;
   }
   throw new Error("Failed to fetch products by search query");
+}
+
+export async function getProductReviews(productId: number, page: number = 1) {
+  const accessToken = await getAccessToken();
+
+  const res = await fetch(
+    `${API_BASE_URL}/products/${productId}/reviews?page=${page}&limit=10`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch reviews");
+  }
+
+  return await res.json();
 }

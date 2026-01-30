@@ -6,6 +6,7 @@ import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { Download, Star, Flag, Package, Search, Loader2 } from "lucide-react";
 import ReviewModal from "@/components/ReviewModal";
 import { getCurrentUser } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
 
@@ -15,19 +16,17 @@ export default function MyCollectionPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
-
-  // Modal states
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<{
     id: string;
     name: string;
   } | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Fetch user and collections
         const user = await getCurrentUser();
         console.log("Current User:", user);
         setCurrentUser(user);
@@ -59,17 +58,11 @@ export default function MyCollectionPage() {
   };
 
   const handleReviewSubmit = async (rating: number, message: string) => {
-    // TODO: ส่งข้อมูล review ไปยัง API
     console.log("Review submitted:", {
       productId: selectedProduct?.id,
       rating,
       message,
     });
-
-    // คุณสามารถเรียก API ที่นี่
-    // await submitReview(selectedProduct?.id, rating, message);
-
-    // อัพเดทสถานะ hasReviewed ใน collections
     setCollections((prev) =>
       prev.map((item) =>
         item.product.id === selectedProduct?.id
@@ -84,16 +77,6 @@ export default function MyCollectionPage() {
     window.location.href = `/products/${productId}/report`;
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("th-TH", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  };
-
-  // Loading State
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -157,7 +140,8 @@ export default function MyCollectionPage() {
             {filteredCollections.map((item) => (
               <div
                 key={item.id}
-                className="rounded-lg p-0 shadow hover:shadow-xl transition-all duration-300 h-auto w-full overflow-hidden bg-slate-800/60"
+                onClick={() => router.push(`/products/${item.product.id}`)}
+                className="group cursor-pointer rounded-lg p-0 shadow hover:shadow-xl transition-all duration-300 h-auto w-full overflow-hidden bg-slate-800/60"
               >
                 {/* Thumbnail */}
                 <div className="relative h-48 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 overflow-hidden">
@@ -167,8 +151,9 @@ export default function MyCollectionPage() {
                       "https://via.placeholder.com/200x150"
                     }
                     alt={item.product.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                   {item.product.hasReviewed && (
                     <div className="absolute top-2 right-2 bg-green-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium">
@@ -181,7 +166,7 @@ export default function MyCollectionPage() {
                 {/* Content */}
                 <div className="p-3 flex flex-col gap-3">
                   <h3
-                    className="text-base font-semibold line-clamp-2 mb-1 truncate"
+                    className="text-base font-semibold line-clamp-2 mb-1 truncate group-hover:text-purple-400 transition-colors"
                     title={item.product.name}
                   >
                     {item.product.name}
@@ -214,16 +199,21 @@ export default function MyCollectionPage() {
 
                     <button
                       type="button"
+                      disabled={item.product.hasReviewed}
                       onClick={() =>
                         handleReview(item.product.id, item.product.name)
                       }
                       aria-label="Review"
                       title="รีวิว"
-                      className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 cursor-pointer ${
-                        item.product.hasReviewed
-                          ? "bg-slate-700 hover:bg-slate-600"
-                          : "bg-blue-600 hover:bg-blue-700"
-                      }`}
+                      className={`
+                        w-9 h-9 flex items-center justify-center rounded-lg
+                        transition-all duration-150
+                        ${
+                          item.product.hasReviewed
+                            ? "bg-slate-700 cursor-not-allowed opacity-60"
+                            : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                        }
+                      `}
                     >
                       <Star className="w-4 h-4" />
                     </button>

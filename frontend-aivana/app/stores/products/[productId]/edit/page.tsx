@@ -7,7 +7,7 @@ import {
   updateProductAction,
   deleteProductImageAction,
 } from "@/lib/actions/product.actions";
-import { Product } from "@/lib/types/product/Product";
+import { Product } from "@/lib/types/product/product";
 import { ProductImages } from "@/lib/types/product/product_images";
 import { getAllTagsAction } from "@/lib/actions/tag.actions";
 import { Input } from "@/components/ui/Input";
@@ -67,7 +67,7 @@ export default function EditProductPage() {
   const [newHeroImageFile, setNewHeroImageFile] = useState<File | null>(null);
 
   const [currentProductFile, setCurrentProductFile] = useState<string | null>(
-    null
+    null,
   );
   const [newProductFile, setNewProductFile] = useState<File | null>(null);
 
@@ -228,7 +228,6 @@ export default function EditProductPage() {
           placeholder="เช่น Windows, macOS, Chrome"
           maxItems={6}
         />
-
 
         <MultiSelectTag
           label="Tags"

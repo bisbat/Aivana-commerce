@@ -39,6 +39,27 @@ export class ProductMapper {
         }
       : null;
 
+    const reviews =
+      product.reviews?.map((review) => ({
+        id: review.id,
+        rating: review.rating,
+        comment: review.comment,
+        createdAt: review.createdAt,
+        user: {
+          firstName: review.buyer.firstName,
+          lastName: review.buyer.lastName,
+          username: review.buyer.username,
+          avatarUrl: review.buyer.avatarUrl,
+        },
+      })) || [];
+
+    const totalReviews = product.reviews?.length || 0;
+    const averageRating =
+      totalReviews > 0
+        ? product.reviews.reduce((sum, review) => sum + review.rating, 0) /
+          totalReviews
+        : 0;
+
     return plainToInstance(
       ResponseProductDto,
       {
@@ -48,11 +69,13 @@ export class ProductMapper {
         category,
         tags,
         detailImages,
+        reviews, // ✅ รีวิวทั้งหมด
+        averageRating: Math.round(averageRating * 10) / 10, // ✅ rating เฉลี่ย
+        totalReviews, // ✅ จำนวนรีวิว
       },
       { excludeExtraneousValues: true },
     );
   }
-
   toResponseList(products: ProductEntity[]): ResponseProductDto[] {
     return products.map((p) => this.toResponse(p));
   }

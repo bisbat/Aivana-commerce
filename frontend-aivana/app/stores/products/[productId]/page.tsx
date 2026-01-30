@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Product } from "@/lib/types/product/Product";
+import { Product } from "@/lib/types/product/product";
 import EditButton from "./EditButton";
 import BackButton from "./BackButton";
 import ProductImages from "./ProductImages";
@@ -54,9 +54,7 @@ export default async function ProductStoreDetailPage({
           <p>Blurb: {initialProductData.blurb}</p>
           {initialProductData.installationGuide && (
             <div>
-              <h3 className="font-semibold text-lg mb-2">
-                Installation Guide
-              </h3>
+              <h3 className="font-semibold text-lg mb-2">Installation Guide</h3>
               <MarkdownRenderer
                 content={initialProductData.installationGuide}
               />

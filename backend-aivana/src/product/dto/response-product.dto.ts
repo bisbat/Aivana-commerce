@@ -3,6 +3,7 @@ import { ResponseProductImageDto } from 'src/product-image/dto/response-product-
 import { ResponseCategoryDto } from 'src/category/dto/response-category.dto';
 import { ResponseTagDto } from 'src/tag/dto/response-tag.dto';
 import { MinimalSellerDto } from 'src/seller/dto/minimal-seller.dto';
+import { ReviewDto } from 'src/review/dto/review.dto';
 
 export class ResponseProductDto {
   @Expose()
@@ -45,4 +46,12 @@ export class ResponseProductDto {
   updatedAt: Date;
   @Expose()
   hasReviewed: boolean;
+
+  @Expose()
+  @Type(() => ReviewDto)
+  reviews: ReviewDto[];
+  @Expose()
+  averageRating: number;
+  @Expose()
+  totalReviews: number;
 }

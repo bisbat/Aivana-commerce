@@ -45,7 +45,7 @@ export class ReviewService {
     // 3. สร้าง review (ใช้ currentUserId เป็น buyerId)
     const review = this.reviewRepository.create({
       productId,
-      buyerId: currentUserId, 
+      buyerId: currentUserId,
       rating: createReviewDto.rating,
       comment: createReviewDto.comment,
       likeCounted: 0,
