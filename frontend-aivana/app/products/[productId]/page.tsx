@@ -551,9 +551,7 @@ export default function ProductDetailPage() {
               <div
                 key={relatedProduct.id}
                 className="bg-(--linne-purple) rounded-xl overflow-hidden cursor-pointer group"
-                onClick={() =>
-                  (window.location.href = `/products/${relatedProduct.id}`)
-                }
+                onClick={() => router.push(`/products/${relatedProduct.id}`)}
               >
                 <div className="relative aspect-[4/3] bg-slate-800 overflow-hidden">
                   <img
