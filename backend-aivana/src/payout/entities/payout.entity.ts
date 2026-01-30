@@ -34,11 +34,17 @@ export class PayoutEntity {
   status: PayoutStatus;
 
   @Column({ type: 'timestamp', nullable: true })
-  paidAt: Date;
+  paidAt?: Date;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
+  @Column({ type: 'text', nullable: true })
+  slipUrl?: string;
+
   @OneToMany(() => PayoutItemEntity, (payoutItem) => payoutItem.payout)
   payoutItem: PayoutItemEntity[];
+
+  @Column({ type: 'text', nullable: true })
+  slipPath?: string;
 }
