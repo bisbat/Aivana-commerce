@@ -32,7 +32,7 @@ export default function RootLayout({
         <Toaster
           position="top-right"
           toastOptions={{
-            duration: 4000,
+            duration: 3000,
             style: {
               background: "rgba(30, 27, 75, 0.95)",
               backdropFilter: "blur(12px)",

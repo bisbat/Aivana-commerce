@@ -1,12 +1,15 @@
 "use client";
 
 import { getUserCollections } from "@/lib/actions/user-collection.actions";
+import { createOrUpdateReportAction } from "@/lib/actions/report.actions";
 import { UserCollection } from "@/lib/types/userCollection";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { Download, Star, Flag, Package, Search, Loader2 } from "lucide-react";
 import ReviewModal from "@/components/ReviewModal";
+import ReportModal from "@/components/ReportModal";
 import { getCurrentUser } from "@/lib/auth";
 import { useRouter } from "next/navigation";
+import { showSuccessToast, showErrorToast } from "@/lib/toast";
 
 import { useEffect, useState } from "react";
 
@@ -17,9 +20,11 @@ export default function MyCollectionPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<{
     id: string;
     name: string;
+    orderItemId?: number;
   } | null>(null);
   const router = useRouter();
 
@@ -72,9 +77,32 @@ export default function MyCollectionPage() {
     );
   };
 
-  const handleReport = (productId: string, name: string) => {
-    // Navigate ไปหน้ารีพอร์ต
-    window.location.href = `/products/${productId}/report`;
+  const handleReport = (
+    productId: string,
+    name: string,
+    orderItemId: number,
+  ) => {
+    setSelectedProduct({ id: productId, name, orderItemId });
+    setIsReportModalOpen(true);
+  };
+
+  const handleReportSubmit = async (reason: string, message: string) => {
+    if (!selectedProduct?.orderItemId) {
+      showErrorToast("ไม่พบข้อมูลการสั่งซื้อ");
+      return;
+    }
+
+    try {
+      await createOrUpdateReportAction({
+        orderItemId: selectedProduct.orderItemId,
+        reason,
+        message: message.trim() || null,
+      });
+      showSuccessToast("ส่งรายงานเรียบร้อยแล้ว");
+    } catch (error: any) {
+      console.error("Error submitting report:", error);
+      showErrorToast(error.message || "เกิดข้อผิดพลาดในการส่งรายงาน");
+    }
   };
 
   if (loading) {
@@ -182,13 +210,14 @@ export default function MyCollectionPage() {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() =>
+                      onClick={(e) => {
+                        e.stopPropagation();
                         handleDownload(
                           item.product.id,
                           item.product.name,
                           item.product.uploadedFilePath,
-                        )
-                      }
+                        );
+                      }}
                       aria-label="Download"
                       title="ดาวน์โหลด"
                       className="flex-1 h-9 flex items-center justify-center gap-1.5 rounded-lg transition-all duration-150 bg-[#8a57fb] hover:bg-[#7a47eb] cursor-pointer text-sm font-medium"
@@ -200,9 +229,10 @@ export default function MyCollectionPage() {
                     <button
                       type="button"
                       disabled={item.product.hasReviewed}
-                      onClick={() =>
-                        handleReview(item.product.id, item.product.name)
-                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleReview(item.product.id, item.product.name);
+                      }}
                       aria-label="Review"
                       title="รีวิว"
                       className={`
@@ -220,9 +250,14 @@ export default function MyCollectionPage() {
 
                     <button
                       type="button"
-                      onClick={() =>
-                        handleReport(item.product.id, item.product.name)
-                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleReport(
+                          item.product.id,
+                          item.product.name,
+                          item.orderItemId,
+                        );
+                      }}
                       aria-label="Report"
                       title="รีพอร์ต"
                       className="w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 bg-slate-700 hover:bg-red-600 cursor-pointer"
@@ -254,6 +289,20 @@ export default function MyCollectionPage() {
           productName={selectedProduct?.name || ""}
           onSubmit={handleReviewSubmit}
           currentUser={currentUser}
+        />
+      )}
+
+      {/* Report Modal */}
+      {currentUser && (
+        <ReportModal
+          isOpen={isReportModalOpen}
+          onClose={() => {
+            setIsReportModalOpen(false);
+            setSelectedProduct(null);
+          }}
+          productId={selectedProduct?.id || ""}
+          productName={selectedProduct?.name || ""}
+          onSubmit={handleReportSubmit}
         />
       )}
     </div>

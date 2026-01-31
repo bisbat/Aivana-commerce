@@ -41,7 +41,7 @@ export default function ReportModal({
     setIsSubmitting(true);
     try {
       if (onSubmit) {
-        await onSubmit(selectedReason, message);
+        await onSubmit(selectedReason, message.trim() || "");
       }
       // Reset form
       setSelectedReason("");
@@ -65,32 +65,32 @@ export default function ReportModal({
       className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg relative overflow-hidden">
+      <div className="bg-[#1e1b3d] border border-[#262549] rounded-3xl shadow-2xl w-full max-w-md relative overflow-hidden">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10"
+          className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors z-10"
         >
           <X size={24} />
         </button>
 
-        <div className="p-8">
+        <div className="p-6">
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle className="text-red-500" size={32} />
+          <div className="text-center mb-6">
+            <div className="w-14 h-14 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+              <AlertTriangle className="text-red-500" size={28} />
             </div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">
-              Report Product
+            <h2 className="text-2xl font-bold text-white mb-2">
+              รีพอร์ตสินค้า
             </h2>
-            <p className="text-gray-500 text-sm leading-relaxed">
+            <p className="text-slate-400 text-sm leading-relaxed">
               {productName}
             </p>
           </div>
 
           {/* Reason Selection */}
-          <div className="mb-6">
-            <label className="block text-gray-700 font-medium mb-3">
+          <div className="mb-5">
+            <label className="block text-white font-medium mb-3 text-sm">
               เลือกเหตุผลในการรีพอร์ต
             </label>
             <div className="space-y-2">
@@ -99,10 +99,10 @@ export default function ReportModal({
                   key={reason}
                   type="button"
                   onClick={() => setSelectedReason(reason)}
-                  className={`w-full p-3 rounded-xl text-left transition-all ${
+                  className={`w-full p-2.5 rounded-lg text-left text-sm transition-all ${
                     selectedReason === reason
-                      ? "bg-red-100 border-2 border-red-500 text-red-700 font-medium"
-                      : "bg-gray-100 border-2 border-transparent hover:bg-gray-200 text-gray-700"
+                      ? "bg-red-500/20 border-2 border-red-500 text-white font-medium"
+                      : "bg-[#262549] border-2 border-transparent hover:bg-[#2d2a52] text-slate-300"
                   }`}
                 >
                   {reason}
@@ -112,45 +112,26 @@ export default function ReportModal({
           </div>
 
           {/* Message Textarea */}
-          <div className="mb-6">
-            <label className="block text-gray-700 font-medium mb-2">
+          <div className="mb-5">
+            <label className="block text-white font-medium mb-2 text-sm">
               รายละเอียดเพิ่มเติม (ถ้ามี)
             </label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="อธิบายปัญหาที่พบ..."
-              className="w-full h-32 p-4 bg-gray-100 rounded-2xl text-gray-700 placeholder:text-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-red-400 transition-all"
+              className="w-full h-24 p-3 bg-[#262549] rounded-xl text-white text-sm placeholder:text-slate-500 resize-none border border-transparent focus:outline-none focus:border-red-500 transition"
             />
           </div>
 
-          {/* Footer with Avatar and Submit Button */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-gray-400"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-gray-700 font-medium">John Smith</span>
-              </div>
-            </div>
-
+          {/* Submit Button */}
+          <div className="flex justify-end">
             <button
               onClick={handleSubmit}
               disabled={isSubmitting || !selectedReason}
-              className="px-8 py-3 bg-red-500 hover:bg-red-600 text-white font-medium rounded-full transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-red-500"
+              className="px-8 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-full transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-red-500"
             >
-              {isSubmitting ? "กำลังส่ง..." : "Submit"}
+              {isSubmitting ? "กำลังส่ง..." : "ส่งรีพอร์ต"}
             </button>
           </div>
         </div>
