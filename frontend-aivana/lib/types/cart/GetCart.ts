@@ -15,6 +15,7 @@ export interface GetCartResponse {
         id: string;
         firstName: string;
         lastName: string;
+        username: string;
       } | null;
     };
   }>;

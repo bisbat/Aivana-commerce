@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { CreateDashboardDto } from './dto/create-dashboard.dto';
 import { UpdateDashboardDto } from './dto/update-dashboard.dto';
@@ -13,7 +21,7 @@ export class DashboardController {
   }
 
   @Get(':id')
-   async getDashboard(@Param('id') sellerId: string) {
+  async getDashboard(@Param('id') sellerId: string) {
     return this.dashboardService.getDashboardData(sellerId);
   }
 }

@@ -95,6 +95,7 @@ export class CartService {
             id: item.product.seller.id,
             firstName: item.product.seller.user.firstName,
             lastName: item.product.seller.user.lastName,
+            username: item.product.seller.user.username,
           },
         },
       })),

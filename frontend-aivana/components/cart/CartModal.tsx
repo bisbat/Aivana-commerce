@@ -33,7 +33,9 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
       }
 
       const data = await getCart(user.id);
+      console.log("Fetched cart data:", data);
       setCartData(data);
+
     } catch (error) {
       console.error("Failed to fetch cart:", error);
     } finally {
