@@ -56,3 +56,29 @@ export async function getMyReportsAction() {
 
   return await res.json();
 }
+
+export async function getReportByOrderItemAction(orderItemId: number) {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
+  const res = await fetch(`${API_BASE_URL}/reports/order-item/${orderItemId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    // Return null if report not found (404)
+    if (res.status === 404) {
+      return null;
+    }
+    const error = await res.json();
+    throw new Error(error.message || "Failed to fetch report");
+  }
+
+  return await res.json();
+}

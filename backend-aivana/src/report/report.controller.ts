@@ -16,6 +16,7 @@ import { Role } from 'src/auth/enum/role.enum';
 export class ReportController {
   constructor(private readonly reportService: ReportService) {}
 
+  @Roles(Role.SELLER, Role.CUSTOMER)
   @Post()
   async createOrUpdate(
     @Req() req: any,

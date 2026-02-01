@@ -11,7 +11,6 @@ interface ReviewModalProps {
   productId: string;
   productName: string;
   onSubmit?: (rating: number, message: string) => void;
-  currentUser: any;
 }
 
 export default function ReviewModal({
@@ -19,7 +18,6 @@ export default function ReviewModal({
   onClose,
   productId,
   productName,
-  currentUser,
   onSubmit,
 }: ReviewModalProps) {
   const [rating, setRating] = useState(0);
@@ -126,34 +124,7 @@ export default function ReviewModal({
           </div>
 
           {/* Footer with Avatar and Submit Button */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden">
-                {currentUser.avatarUrl ? (
-                  <img
-                    src={currentUser.avatarUrl}
-                    alt="User Avatar"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-white text-2xl font-bold">
-                    {currentUser.username
-                      ? currentUser.username
-                          .split(" ")
-                          .map((n: any[]) => n[0])
-                          .join("")
-                          .toUpperCase()
-                      : "?"}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-white font-medium">
-                  {currentUser.firstName} {currentUser.lastName}
-                </span>
-              </div>
-            </div>
-
+          <div className="flex justify-end">
             <button
               onClick={handleSubmit}
               disabled={isSubmitting || rating === 0}

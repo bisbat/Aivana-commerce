@@ -165,7 +165,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                             {item.product.name}
                           </p>
                           <p className="text-slate-400 text-xs truncate mt-1">
-                            {item.product.seller?.firstName || "Unknown"}
+                            @{item.product.seller?.username || "Unknown"}
                           </p>
                           <p className="text-white text-md font-semibold mt-1">
                             {formatPriceWithCurrency(item.product.price)}

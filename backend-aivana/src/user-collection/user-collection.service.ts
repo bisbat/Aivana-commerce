@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserCollectionEntity } from './entities/user-collection.entity';
 import { ReviewService } from 'src/review/review.service';
+import { ReportService } from 'src/report/report.service';
 
 // ===== user-collection.service.ts =====
 @Injectable()
@@ -12,6 +13,7 @@ export class UserCollectionService {
     @InjectRepository(UserCollectionEntity)
     private userCollectionRepository: Repository<UserCollectionEntity>,
     private reviewService: ReviewService,
+    private reportService: ReportService,
   ) {}
 
   async findByUserId(userId: string) {
@@ -27,11 +29,16 @@ export class UserCollectionService {
           collection.product.id,
         );
 
+        const hasReported = await this.reportService.findByOrderItem(
+          collection.orderItem.id,
+        );
+
         return {
           ...collection,
           product: {
             ...collection.product,
-            hasReviewed,
+            hasReviewed: !!hasReviewed,
+            hasReported: !!hasReported,
           },
         };
       }),

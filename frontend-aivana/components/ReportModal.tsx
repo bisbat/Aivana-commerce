@@ -1,13 +1,15 @@
 "use client";
 
 import { X, AlertTriangle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface ReportModalProps {
   isOpen: boolean;
   onClose: () => void;
   productId: string;
   productName: string;
+  existingReason?: string;
+  existingMessage?: string;
   onSubmit?: (reason: string, message: string) => void;
 }
 
@@ -24,13 +26,26 @@ export default function ReportModal({
   onClose,
   productId,
   productName,
+  existingReason,
+  existingMessage,
   onSubmit,
 }: ReportModalProps) {
   const [selectedReason, setSelectedReason] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedReason(existingReason || "");
+      setMessage(existingMessage || "");
+    }
+  }, [isOpen, existingReason, existingMessage]);
+
   if (!isOpen) return null;
+
+  const hasChanged =
+    selectedReason !== (existingReason || "") ||
+    message.trim() !== (existingMessage || "");
 
   const handleSubmit = async () => {
     if (!selectedReason) {
@@ -43,9 +58,6 @@ export default function ReportModal({
       if (onSubmit) {
         await onSubmit(selectedReason, message.trim() || "");
       }
-      // Reset form
-      setSelectedReason("");
-      setMessage("");
       onClose();
     } catch (error) {
       console.error("Error submitting report:", error);
@@ -128,7 +140,7 @@ export default function ReportModal({
           <div className="flex justify-end">
             <button
               onClick={handleSubmit}
-              disabled={isSubmitting || !selectedReason}
+              disabled={isSubmitting || !selectedReason || !hasChanged}
               className="px-8 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-full transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-red-500"
             >
               {isSubmitting ? "กำลังส่ง..." : "ส่งรีพอร์ต"}

@@ -62,4 +62,12 @@ export class ReviewService {
       where: { productId, buyerId },
     });
   }
+
+  async findByUser(buyerId: string): Promise<ReviewEntity[]> {
+    return await this.reviewRepository.find({
+      where: { buyerId },
+      relations: ['product'],
+      order: { createdAt: 'DESC' },
+    });
+  }
 }

@@ -381,13 +381,15 @@ export default function ProductDetailPage() {
                   </h2>
                   <div className="flex items-center gap-2 pb-2 text-xs">
                     <span className="text-purple-100/50">ขายโดย</span>
-                    {product.seller ? (
-                      <a
-                        href={`/seller/${product.seller.username}`}
-                        className="text-purple-200 font-medium hover:underline transition-colors"
+                    {product.seller?.username ? (
+                      <span
+                        className="text-purple-200 font-medium hover:underline transition-colors cursor-pointer"
+                        onClick={() =>
+                          router.push(`/seller/${product.seller!.username}`)
+                        }
                       >
-                        {`${product.seller.firstName} ${product.seller.lastName}`}
-                      </a>
+                        @{product.seller.username}
+                      </span>
                     ) : (
                       <span className="text-white/80 font-medium">
                         Unknown Seller
@@ -500,12 +502,12 @@ export default function ProductDetailPage() {
                     {review.user?.avatarUrl ? (
                       <img
                         src={review.user.avatarUrl}
-                        alt={`${review.user.firstName}`}
+                        alt={review.user.username}
                         className="w-full h-full rounded-full object-cover"
                       />
                     ) : (
                       <span className="text-lg font-bold">
-                        {review.user?.firstName?.charAt(0).toUpperCase() || (
+                        {review.user?.username?.charAt(0).toUpperCase() || (
                           <svg
                             className="w-6 h-6"
                             fill="none"
@@ -528,7 +530,7 @@ export default function ProductDetailPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-3">
                       <h3 className="text-(--primary) font-bold text-base">
-                        {review.user?.firstName} {review.user?.lastName}
+                        @{review.user?.username}
                       </h3>
 
                       <div className="flex items-center text-xs text-slate-400 bg-black/20 px-2 py-0.5 rounded-full">

@@ -1,7 +1,10 @@
 "use client";
 
 import { getUserCollections } from "@/lib/actions/user-collection.actions";
-import { createOrUpdateReportAction } from "@/lib/actions/report.actions";
+import {
+  createOrUpdateReportAction,
+  getReportByOrderItemAction,
+} from "@/lib/actions/report.actions";
 import { UserCollection } from "@/lib/types/userCollection";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { Download, Star, Flag, Package, Search, Loader2 } from "lucide-react";
@@ -26,6 +29,10 @@ export default function MyCollectionPage() {
     name: string;
     orderItemId?: number;
   } | null>(null);
+  const [existingReport, setExistingReport] = useState<{
+    reason: string;
+    message: string;
+  } | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -33,7 +40,6 @@ export default function MyCollectionPage() {
       try {
         setLoading(true);
         const user = await getCurrentUser();
-        console.log("Current User:", user);
         setCurrentUser(user);
 
         const data = await getUserCollections();
@@ -77,11 +83,25 @@ export default function MyCollectionPage() {
     );
   };
 
-  const handleReport = (
+  const handleReport = async (
     productId: string,
     name: string,
     orderItemId: number,
   ) => {
+    try {
+      const report = await getReportByOrderItemAction(orderItemId);
+      if (report) {
+        setExistingReport({
+          reason: report.reason,
+          message: report.message || "",
+        });
+      } else {
+        setExistingReport(null);
+      }
+    } catch (error) {
+      console.error("Error fetching existing report:", error);
+      setExistingReport(null);
+    }
     setSelectedProduct({ id: productId, name, orderItemId });
     setIsReportModalOpen(true);
   };
@@ -98,7 +118,20 @@ export default function MyCollectionPage() {
         reason,
         message: message.trim() || null,
       });
-      showSuccessToast("ส่งรายงานเรียบร้อยแล้ว");
+      // Update collections state to reflect hasReported
+      setCollections((prev) =>
+        prev.map((item) =>
+          item.orderItemId === selectedProduct.orderItemId
+            ? { ...item, product: { ...item.product, hasReported: true } }
+            : item,
+        ),
+      );
+
+      if (existingReport) {
+        showSuccessToast("อัปเดตรายงานเรียบร้อยแล้ว");
+      } else {
+        showSuccessToast("ส่งรายงานเรียบร้อยแล้ว");
+      }
     } catch (error: any) {
       console.error("Error submitting report:", error);
       showErrorToast(error.message || "เกิดข้อผิดพลาดในการส่งรายงาน");
@@ -183,12 +216,25 @@ export default function MyCollectionPage() {
                   />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                  {item.product.hasReviewed && (
-                    <div className="absolute top-2 right-2 bg-green-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium">
-                      <Star size={10} fill="white" />
-                      <span>รีวิวแล้ว</span>
-                    </div>
-                  )}
+                  <div className="absolute top-2 right-2 flex flex-col gap-1.5 items-end">
+                    {item.product.hasReviewed ? (
+                      <div className="bg-green-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit">
+                        <Star size={10} fill="white" />
+                        <span>รีวิวแล้ว</span>
+                      </div>
+                    ) : (
+                      <div className="bg-amber-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit animate-pulse">
+                        <Star size={10} fill="white" />
+                        <span>รอรีวิว</span>
+                      </div>
+                    )}
+                    {item.product.hasReported && (
+                      <div className="bg-red-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit">
+                        <Flag size={10} fill="white" />
+                        <span>รีพอร์ตแล้ว</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Content */}
@@ -234,14 +280,18 @@ export default function MyCollectionPage() {
                         handleReview(item.product.id, item.product.name);
                       }}
                       aria-label="Review"
-                      title="รีวิว"
+                      title={
+                        item.product.hasReviewed
+                          ? "รีวิวแล้ว"
+                          : "คลิกเพื่อรีวิว"
+                      }
                       className={`
                         w-9 h-9 flex items-center justify-center rounded-lg
-                        transition-all duration-150
+                        transition-all duration-150 
                         ${
                           item.product.hasReviewed
                             ? "bg-slate-700 cursor-not-allowed opacity-60"
-                            : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                            : "bg-amber-500 hover:bg-amber-600 cursor-pointer animate-pulse"
                         }
                       `}
                     >
@@ -259,8 +309,14 @@ export default function MyCollectionPage() {
                         );
                       }}
                       aria-label="Report"
-                      title="รีพอร์ต"
-                      className="w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 bg-slate-700 hover:bg-red-600 cursor-pointer"
+                      title={
+                        item.product.hasReported ? "แก้ไขรีพอร์ต" : "รีพอร์ต"
+                      }
+                      className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 cursor-pointer ${
+                        item.product.hasReported
+                          ? "bg-red-600 hover:bg-red-700"
+                          : "bg-slate-700 hover:bg-red-600"
+                      }`}
                     >
                       <Flag className="w-4 h-4" />
                     </button>
@@ -288,7 +344,6 @@ export default function MyCollectionPage() {
           productId={selectedProduct?.id || ""}
           productName={selectedProduct?.name || ""}
           onSubmit={handleReviewSubmit}
-          currentUser={currentUser}
         />
       )}
 
@@ -299,9 +354,12 @@ export default function MyCollectionPage() {
           onClose={() => {
             setIsReportModalOpen(false);
             setSelectedProduct(null);
+            setExistingReport(null);
           }}
           productId={selectedProduct?.id || ""}
           productName={selectedProduct?.name || ""}
+          existingReason={existingReport?.reason}
+          existingMessage={existingReport?.message}
           onSubmit={handleReportSubmit}
         />
       )}
