@@ -12,6 +12,7 @@ import { Role } from 'src/auth/enum/role.enum';
 import { SellerEntity } from 'src/seller/entities/seller.entity';
 import { OrderEntity } from 'src/order/entities/order.entity';
 import { ReportEntity } from 'src/report/entities/report.entity';
+import { ReviewEntity } from '../../review/entities/review.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -53,4 +54,7 @@ export class UserEntity {
 
   @OneToOne(() => ReportEntity, (report) => report.reportedBy)
   reports: ReportEntity;
+
+  @OneToMany(() => ReviewEntity, (review) => review.buyer)
+  reviews: ReviewEntity[];
 }

@@ -17,7 +17,7 @@ import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('seller')
 export class SellerController {
-  constructor(private readonly SellerService: SellerService) {}
+  constructor(private readonly sellerService: SellerService) {}
 
   @Post('upgrade/:userId')
   @Roles(Role.CUSTOMER)
@@ -25,25 +25,31 @@ export class SellerController {
     @Param('userId') userId: string,
     @Body() createSellerDto: CreateSellerDto,
   ) {
-    return this.SellerService.upgradeToSeller(userId, createSellerDto);
+    return this.sellerService.upgradeToSeller(userId, createSellerDto);
   }
 
   @Get()
   @Roles(Role.ADMIN)
   getAllSellers() {
-    return this.SellerService.getAllSellers();
+    return this.sellerService.getAllSellers();
   }
 
   @Get(':sellerId')
   @Roles(Role.SELLER, Role.ADMIN)
   getSellerById(@Param('sellerId') sellerId: string) {
-    return this.SellerService.getSellerById(sellerId);
+    return this.sellerService.getSellerById(sellerId);
   }
 
+  @Get('username/:username')
+  @Public()
+  getSellerByUsername(@Param('username') username: string) {
+    return this.sellerService.getSellerByUsername(username);
+  }
+
+  @Public()
   @Get(':sellerId/products')
-  @Roles(Role.SELLER, Role.ADMIN)
   getProductsBySellerId(@Param('sellerId') sellerId: string) {
-    return this.SellerService.getProductsBySellerId(sellerId);
+    return this.sellerService.getProductsBySellerId(sellerId);
   }
 
   @Put(':sellerId')
@@ -52,6 +58,6 @@ export class SellerController {
     @Param('sellerId') sellerId: string,
     @Body() updateSellerDto: UpdateSellerDto,
   ) {
-    return this.SellerService.updateSellerProfile(sellerId, updateSellerDto);
+    return this.sellerService.updateSellerProfile(sellerId, updateSellerDto);
   }
 }

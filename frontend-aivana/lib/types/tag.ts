@@ -1,8 +1,8 @@
 export interface Tag {
-    id: string;
-    name: string;
+  id: string;
+  name: string;
 }
 
 export interface CreateProductTagsDTO {
-    name: string;
+  name: string;
 }

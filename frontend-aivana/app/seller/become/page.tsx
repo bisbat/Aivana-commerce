@@ -6,6 +6,7 @@ import Image from "next/image";
 import { becomeSeller } from "@/lib/actions/seller.actions";
 import { CreateSellerProfileDto } from "@/lib/types/user/sellerCreate";
 import { getCurrentUser } from "@/lib/auth";
+import { showSuccessToast, showErrorToast } from "@/lib/toast";
 
 const SOCIAL_PLATFORMS = [
   { value: "github", label: "GitHub" },
@@ -198,9 +199,16 @@ export default function BecomeSellerPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    console.log("🚀 Form submitted");
+
+    if (!validate()) {
+      console.log("❌ Validation failed");
+      showErrorToast("กรุณากรอกข้อมูลให้ครบถ้วน");
+      return;
+    }
 
     setIsLoading(true);
+    console.log("⏳ Loading started...");
 
     try {
       const submitData: CreateSellerProfileDto = {
@@ -227,24 +235,37 @@ export default function BecomeSellerPage() {
         },
       };
 
+      console.log("📝 Submit data:", submitData);
+
       const user = await getCurrentUser();
+      console.log("👤 Current user:", user);
+
       if (!user) {
+        showErrorToast("กรุณาเข้าสู่ระบบก่อนสมัครเป็นผู้ขาย");
         throw new Error("Not authenticated");
       }
 
       // Call backend API to become seller
+      console.log("🔄 Calling becomeSeller API...");
       await becomeSeller(submitData, user.id);
+      console.log("✅ Become seller success!");
 
-      router.push("/");
+      showSuccessToast("สมัครเป็นผู้ขายสำเร็จ!");
+
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
     } catch (error) {
-      console.error("Become seller error:", error);
+      console.error("❌ Become seller error:", error);
       const errorMessage =
         error instanceof Error
           ? error.message
           : "เกิดข้อผิดพลาดในการสมัครเป็นผู้ขาย";
       setErrors({ submit: errorMessage });
+      showErrorToast(errorMessage);
     } finally {
       setIsLoading(false);
+      console.log("✅ Loading ended");
     }
   };
 

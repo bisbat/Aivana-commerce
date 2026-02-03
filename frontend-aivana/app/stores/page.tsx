@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { ProductCardSeller } from "@/components/products/ProductCardSeller";
-import { Product } from "@/lib/types/product/Product";
+import { Product } from "@/lib/types/product/product";
 import { Loader, AlertCircle, Package } from "lucide-react";
 import { getProductsBySellerId } from "@/lib/actions/seller.actions";
 import { UserProfile } from "@/lib/types/user/user";

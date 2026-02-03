@@ -161,4 +161,12 @@ export class ProductController {
       detailImages: files.detailImages,
     };
   }
+
+  @Public()
+  @Get(':id/reviews')
+  async getProductReviews(@Param('id') id: number) {
+
+    
+    return this.ProductService.getProductReviews(id);
+  }
 }

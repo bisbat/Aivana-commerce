@@ -54,5 +54,5 @@ export class OrderItemEntity {
   seller: SellerEntity;
 
   @OneToOne(() => PayoutItemEntity, (payoutItem) => payoutItem.orderItem)
-  payoutItem: PayoutItemEntity[];
+  payoutItem: PayoutItemEntity;
 }

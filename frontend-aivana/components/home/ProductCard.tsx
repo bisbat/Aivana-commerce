@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Product } from "@/lib/types/product/Product";
+import { Product } from "@/lib/types/product/product";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 
 interface ProductCardProps {
@@ -37,9 +37,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           {/* Creator & Category */}
           <div className="flex items-center gap-2 text-sm text-slate-400">
-            <span>
-              {product.seller?.firstName} {product.seller?.lastName}
-            </span>
+            <span>@{product.seller?.username}</span>
             {product.category && (
               <>
                 <span>•</span>

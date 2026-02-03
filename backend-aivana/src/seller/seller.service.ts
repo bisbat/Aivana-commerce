@@ -61,7 +61,7 @@ export class SellerService {
     };
 
     const accessToken = await this.jwtService.signAsync(JwtPayload);
-    return {accessToken};
+    return { accessToken };
   }
 
   async getAllSellers(): Promise<ResponseSellerDto[]> {
@@ -126,5 +126,19 @@ export class SellerService {
     if (!seller) return [];
 
     return this.productMapper.toResponseList(seller.products);
+  }
+
+  async getSellerByUsername(username: string): Promise<ResponseSellerDto> {
+    const seller = await this.sellerRepository
+      .createQueryBuilder('seller')
+      .leftJoinAndSelect('seller.user', 'user')
+      .where('user.username = :username', { username })
+      .getOne();
+    if (!seller) {
+      throw new NotFoundException('Seller not found');
+    }
+    return plainToInstance(ResponseSellerDto, seller, {
+      excludeExtraneousValues: true,
+    });
   }
 }

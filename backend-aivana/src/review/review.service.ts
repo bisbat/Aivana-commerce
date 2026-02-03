@@ -45,7 +45,7 @@ export class ReviewService {
     // 3. สร้าง review (ใช้ currentUserId เป็น buyerId)
     const review = this.reviewRepository.create({
       productId,
-      buyerId: currentUserId, 
+      buyerId: currentUserId,
       rating: createReviewDto.rating,
       comment: createReviewDto.comment,
       likeCounted: 0,
@@ -60,6 +60,14 @@ export class ReviewService {
   ): Promise<boolean> {
     return await this.reviewRepository.exists({
       where: { productId, buyerId },
+    });
+  }
+
+  async findByUser(buyerId: string): Promise<ReviewEntity[]> {
+    return await this.reviewRepository.find({
+      where: { buyerId },
+      relations: ['product'],
+      order: { createdAt: 'DESC' },
     });
   }
 }

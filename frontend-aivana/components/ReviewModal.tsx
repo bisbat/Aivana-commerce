@@ -2,6 +2,8 @@
 
 import { X, Star } from "lucide-react";
 import { useState } from "react";
+import { createReviewAction } from "../lib/actions/review.actions";
+import { showSuccessToast, showErrorToast } from "@/lib/toast";
 
 interface ReviewModalProps {
   isOpen: boolean;
@@ -9,7 +11,6 @@ interface ReviewModalProps {
   productId: string;
   productName: string;
   onSubmit?: (rating: number, message: string) => void;
-  currentUser: any;
 }
 
 export default function ReviewModal({
@@ -18,11 +19,10 @@ export default function ReviewModal({
   productId,
   productName,
   onSubmit,
-  currentUser,
 }: ReviewModalProps) {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
-  const [message, setMessage] = useState("");
+  const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
@@ -35,15 +35,23 @@ export default function ReviewModal({
 
     setIsSubmitting(true);
     try {
+      await createReviewAction(productId, {
+        rating,
+        comment: comment.trim() || undefined,
+      });
+
       if (onSubmit) {
-        await onSubmit(rating, message);
+        await onSubmit(rating, comment);
       }
 
+      showSuccessToast("ส่งรีวิวเรียบร้อยแล้ว!");
+
       setRating(0);
-      setMessage("");
+      setComment("");
       onClose();
     } catch (error) {
       console.error("Error submitting review:", error);
+      showErrorToast("เกิดข้อผิดพลาดในการส่งรีวิว กรุณาลองใหม่อีกครั้ง");
     } finally {
       setIsSubmitting(false);
     }
@@ -51,6 +59,8 @@ export default function ReviewModal({
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
+      setRating(0);
+      setComment("");
       onClose();
     }
   };
@@ -106,46 +116,19 @@ export default function ReviewModal({
           {/* Message Textarea */}
           <div className="mb-6">
             <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
               placeholder="ข้อความของคุณ..."
-              className="w-full h-32 p-4 bg-[#262549] rounded-2xl text-white placeholder:text-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all border border-transparent"
+              className="w-full h-32 p-4 bg-[#262549] rounded-2xl text-white resize-none border border-transparent placeholder:text-slate-500 focus:outline-none focus:border-purple-500 transition"
             />
           </div>
 
           {/* Footer with Avatar and Submit Button */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden">
-                {currentUser.avatarUrl ? (
-                  <img
-                    src={currentUser.avatarUrl}
-                    alt="User Avatar"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-white text-2xl font-bold">
-                    {currentUser.username
-                      ? currentUser.username
-                          .split(" ")
-                          .map((n: any[]) => n[0])
-                          .join("")
-                          .toUpperCase()
-                      : "?"}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-white font-medium">
-                  {currentUser.firstName} {currentUser.lastName}
-                </span>
-              </div>
-            </div>
-
+          <div className="flex justify-end">
             <button
               onClick={handleSubmit}
               disabled={isSubmitting || rating === 0}
-              className="px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-full transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500"
+              className="px-8 py-3 bg-[#8a57fb] hover:bg-[#7a47eb] cursor-pointer text-white font-medium rounded-full transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#7a47eb]"
             >
               {isSubmitting ? "กำลังส่ง..." : "ส่งรีวิว"}
             </button>

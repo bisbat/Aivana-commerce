@@ -29,16 +29,14 @@ export class ReviewEntity {
   @JoinColumn({ name: 'productId' })
   product: ProductEntity;
 
-  @ManyToOne(() => UserEntity, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => UserEntity, (user) => user.reviews)
   @JoinColumn({ name: 'buyerId' })
   buyer: UserEntity;
 
   @Column({ type: 'int' })
   rating: number;
 
-  @Column({ type: 'varchar', length: 1000 })
+  @Column({ nullable: true })
   comment: string;
 
   @Column({ type: 'int', default: 0 })

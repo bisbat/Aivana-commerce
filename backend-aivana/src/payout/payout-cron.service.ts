@@ -1,0 +1,19 @@
+import { Injectable } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
+import { PayoutService } from './payout.service';
+import { getHalfMonthRange } from './helpers/payout-date.helper';
+
+@Injectable()
+export class PayoutCronService {
+    constructor(private readonly payoutService: PayoutService) { }
+
+    @Cron('0 5 0 1,16 * *', { timeZone: 'Asia/Bangkok' })
+    async handleHalfMonthPayout() {
+        const { start, end } = getHalfMonthRange(new Date());
+
+        await this.payoutService.generatePayout(
+            start.toISOString(),
+            end.toISOString(),
+        );
+    }
+}

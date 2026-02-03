@@ -1,6 +1,6 @@
 "use client";
 
-import { Product } from "@/lib/types/product/Product";
+import { Product } from "@/lib/types/product/product";
 import { SellerProfile } from "@/lib/types/user/sellerProfile";
 import BackgroundAivana from "@/components/common/BackgroundAivana";
 import EditButton from "./EditButton";
