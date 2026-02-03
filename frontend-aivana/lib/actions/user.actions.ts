@@ -66,3 +66,26 @@ export async function getUserStats() {
     };
   }
 }
+
+export async function getUserByUsername(
+  username: string,
+): Promise<UserProfile | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/username/${username}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching user by username:", error);
+    return null;
+  }
+}
