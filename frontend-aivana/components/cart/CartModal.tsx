@@ -106,26 +106,40 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
 
   if (!isOpen) return null;
 
-  const createSource = (amount: number, orderId: number) => {
-    (window as any).Omise.createSource(
-      'promptpay',
-      {
-        amount: amount * 100, // สตางค์
-        currency: 'THB',
-        type: 'promptpay'
-      },
-      (statusCode: number, response: any) => {
-        if (statusCode !== 200) {
-          console.error('Create source failed', response);
-          return;
+  const createPromptpaySource = (amount: number): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      (window as any).Omise.createSource(
+        'promptpay',
+        {
+          amount: amount * 100,
+          currency: 'THB',
+          type: 'promptpay',
+        },
+        (statusCode: number, response: any) => {
+          if (statusCode !== 200) {
+            reject(response);
+          } else {
+            resolve(response);
+          }
         }
-        console.log('source:', response);
-        
-        const charge = createPayment(response.id, orderId)
-        router.push('/payment')
-      }
-    );
+      );
+    });
   };
+
+
+  const createSource = async (amount: number, orderId: number) => {
+    try {
+      const source = await createPromptpaySource(amount);
+      console.log('source:', source);
+
+      await createPayment(source.id, orderId);
+
+      router.push(`/payment/${orderId}`);
+    } catch (err) {
+      console.error('Create source failed', err);
+    }
+  };
+
 
   const handleCheckout = async () => {
     if (selectedPaymentMethod == 'promptpay') {
@@ -281,21 +295,19 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                       <button
                         onClick={() => handlePaymentMethod("credit-card")}
                         className={`w-full p-3 cursor-pointer rounded-xl transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-purple-500 group
-    ${
-      selectedPaymentMethod === "credit-card"
-        ? "bg-[#2d2a52] border-2 border-purple-500" // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
-        : "bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30"
-    }
+    ${selectedPaymentMethod === "credit-card"
+                            ? "bg-[#2d2a52] border-2 border-purple-500" // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
+                            : "bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30"
+                          }
   `}
                       >
                         <div className="flex items-center gap-3">
                           <div
                             className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors
-      ${
-        selectedPaymentMethod === "credit-card"
-          ? "bg-purple-500/20" // เมื่อถูกเลือก
-          : "bg-[#1e1b3d] group-hover:bg-[#262549]"
-      }
+      ${selectedPaymentMethod === "credit-card"
+                                ? "bg-purple-500/20" // เมื่อถูกเลือก
+                                : "bg-[#1e1b3d] group-hover:bg-[#262549]"
+                              }
     `}
                           >
                             <svg
@@ -336,21 +348,19 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                       <button
                         onClick={() => handlePaymentMethod("promptpay")}
                         className={`w-full p-3 cursor-pointer rounded-xl transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-purple-500 group
-    ${
-      selectedPaymentMethod === "promptpay"
-        ? "bg-[#2d2a52] border-2 border-purple-500" // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
-        : "bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30"
-    }
+    ${selectedPaymentMethod === "promptpay"
+                            ? "bg-[#2d2a52] border-2 border-purple-500" // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
+                            : "bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30"
+                          }
   `}
                       >
                         <div className="flex items-center gap-3">
                           <div
                             className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors
-      ${
-        selectedPaymentMethod === "promptpay"
-          ? "bg-purple-500/20" // เมื่อถูกเลือก
-          : "bg-[#1e1b3d] group-hover:bg-[#262549]"
-      }
+      ${selectedPaymentMethod === "promptpay"
+                                ? "bg-purple-500/20" // เมื่อถูกเลือก
+                                : "bg-[#1e1b3d] group-hover:bg-[#262549]"
+                              }
     `}
                           >
                             <img
