@@ -76,9 +76,26 @@ export async function getReportByOrderItemAction(orderItemId: number) {
     if (res.status === 404) {
       return null;
     }
-    const error = await res.json();
-    throw new Error(error.message || "Failed to fetch report");
+
+    // Handle other errors
+    try {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to fetch report");
+    } catch (e) {
+      throw new Error("Failed to fetch report");
+    }
   }
 
-  return await res.json();
+  // Check for empty response
+  const text = await res.text();
+  if (!text || text.trim() === "" || text === "null") {
+    return null;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    console.error("Failed to parse report response:", text);
+    return null;
+  }
 }

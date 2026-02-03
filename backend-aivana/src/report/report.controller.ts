@@ -11,6 +11,7 @@ import { ReportService } from './report.service';
 import { CreateReportDto } from './dto/create-report.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enum/role.enum';
+import { NotFoundException } from '@nestjs/common';
 
 @Controller('reports')
 export class ReportController {
@@ -37,7 +38,11 @@ export class ReportController {
   // ดู report ตาม orderItemId
   @Get('order-item/:orderItemId')
   async getByOrderItem(@Param('orderItemId') orderItemId: string) {
-    return await this.reportService.findByOrderItem(+orderItemId);
+    const report = await this.reportService.findByOrderItem(+orderItemId);
+    if (!report) {
+      throw new NotFoundException('ไม่พบรายงานสำหรับรายการสั่งซื้อนี้');
+    }
+    return report;
   }
 
   // ดู report ทั้งหมด (สำหรับ admin)
