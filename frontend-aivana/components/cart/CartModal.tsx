@@ -122,7 +122,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
         console.log('source:', response);
         
         const charge = createPayment(response.id, orderId)
-        return charge;
+        router.push('/payment')
       }
     );
   };
