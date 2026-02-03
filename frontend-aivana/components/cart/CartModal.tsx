@@ -7,6 +7,9 @@ import { GetCartResponse } from "@/lib/types/cart/GetCart";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { getCurrentUser } from "@/lib/auth";
 import { RefObject } from "react";
+import { createPayment } from "@/lib/actions/payment.actions";
+import { createOrder } from "@/lib/actions/order.actions";
+import { PaymentMethod } from "@/lib/actions/order.actions";
 
 interface CartModalProps {
   isOpen: boolean;
@@ -20,7 +23,13 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
   const [loading, setLoading] = useState(false);
   const [removingItemId, setRemovingItemId] = useState<number | null>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'promptpay' | 'credit-card'>('promptpay');
+  const omisePublicKey = process.env.NEXT_PUBLIC_OMISE_PUBLIC_KEY
 
+  useEffect(() => {
+    (window as any).Omise.setPublicKey(
+      process.env.NEXT_PUBLIC_OMISE_PUBLIC_KEY
+    );
+  }, []);
 
   const fetchCart = async () => {
     try {
@@ -72,7 +81,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
     };
   }, [isOpen]);
 
-  const total = (() => {
+  const displayTotal = (() => {
     if (!cartData?.items?.length) return "0.00";
 
     const sum = cartData.items.reduce((acc, item) => {
@@ -83,13 +92,49 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
     return Number(sum).toFixed(2);
   })();
 
+  const numericTotal = (() => {
+    if (!cartData?.items?.length) return 0;
+
+    return cartData.items.reduce((acc, item) => {
+      const price = Number(item.product.price) || 0;
+      return acc + price;
+    }, 0);
+  })();
+
+
   if (!isOpen) return null;
 
-  const handleCheckout = () => {
-    return cartData;
-    // router.push("/checkout");
-    // onClose();
+  const createSource = (amount: number, orderId: number) => {
+    (window as any).Omise.createSource(
+      'promptpay',
+      {
+        amount: amount * 100, // สตางค์
+        currency: 'THB',
+        type: 'promptpay'
+      },
+      (statusCode: number, response: any) => {
+        if (statusCode !== 200) {
+          console.error('Create source failed', response);
+          return;
+        }
+        console.log('source:', response);
+        
+        const charge = createPayment(response.id, orderId)
+        return charge;
+      }
+    );
   };
+
+  const handleCheckout = async () => {
+    if (selectedPaymentMethod == 'promptpay') {
+      const order = await createOrder(PaymentMethod.PROMPTPAY);
+      createSource(numericTotal, order.id);
+    } else {
+      const order = await createOrder(PaymentMethod.CREDIT_CARD);
+      createSource(numericTotal, order.id);
+    }
+  };
+
 
   return (
     <>
@@ -123,7 +168,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                         ราคารวม
                       </span>
                       <span className="text-xl font-semibold text-white">
-                        {formatPriceWithCurrency(total)}
+                        {formatPriceWithCurrency(displayTotal)}
                       </span>
                     </div>
                   </div>
@@ -300,6 +345,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                     <div>
                       <div className="p-4 pt-0">
                         <button
+                          onClick={handleCheckout}
                           className="w-full py-3.5 text-md bg-[#8a57fb] hover:bg-[#7a47eb] text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={!cartData?.items || cartData.items.length === 0}
                         >

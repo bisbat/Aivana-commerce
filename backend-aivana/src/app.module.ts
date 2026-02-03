@@ -22,6 +22,8 @@ import { PayoutModule } from './payout/payout.module';
 import { PayoutItemModule } from './payout-item/payout-item.module';
 import { ReportModule } from './report/report.module';
 import { RolesGuard } from './auth/guards/roles.guard';
+import { OmiseModule } from './omise/omise.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -47,6 +49,8 @@ import { RolesGuard } from './auth/guards/roles.guard';
     PayoutModule,
     PayoutItemModule,
     ReportModule,
+    OmiseModule,
+    PaymentModule,
   ],
   controllers: [],
   providers: [

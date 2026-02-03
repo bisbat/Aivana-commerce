@@ -54,6 +54,23 @@ export class OrderService {
         });
     }
 
+    async getOrderById(orderId: number){
+        console.log('order id : '+ orderId)
+        const order = await this.orderRepository.findOne({
+            where:{id: orderId},
+            relations: ['items', 'items.product']
+        })
+        if(!order){
+            throw new NotFoundException('Not found order!')
+        }
+
+        // if (order.status !== 'pending') {
+        // throw new BadRequestException('Order is not payable');
+        // }
+
+        return order
+    }
+
     async hasUserPurchasedProduct(
         userId: string,
         productId: number,
