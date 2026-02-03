@@ -40,6 +40,13 @@ export default function MyCollectionPage() {
       try {
         setLoading(true);
         const user = await getCurrentUser();
+
+        // ตรวจสอบ authentication
+        if (!user) {
+          router.push("/");
+          return;
+        }
+
         setCurrentUser(user);
 
         const data = await getUserCollections();
@@ -165,127 +172,124 @@ export default function MyCollectionPage() {
   }
 
   return (
-    <div className="">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-10">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <Package className="text-purple-400" size={32} />
-            <h1 className="text-3xl font-bold">คอลเลคชัน</h1>
-          </div>
-          <p className="text-slate-400">
-            สินค้าทั้งหมดที่คุณซื้อไว้ ({collections.length} รายการ)
-          </p>
+    <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-10">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <Package className="text-purple-400" size={32} />
+          <h1 className="text-3xl font-bold">คอลเลคชัน</h1>
         </div>
+        <p className="text-slate-400">
+          สินค้าทั้งหมดที่คุณซื้อไว้ ({collections.length} รายการ)
+        </p>
+      </div>
 
-        {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative max-w-md">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              size={20}
-            />
-            <input
-              type="text"
-              placeholder="ค้นหาสินค้าในคอลเลคชันของคุณ..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500 transition"
-            />
-          </div>
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            size={20}
+          />
+          <input
+            type="text"
+            placeholder="ค้นหาสินค้าในคอลเลคชันของคุณ..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500 transition"
+          />
         </div>
+      </div>
 
-        {/* Collection Grid */}
-        {filteredCollections.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredCollections.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => router.push(`/products/${item.product.id}`)}
-                className="group cursor-pointer rounded-lg p-0 shadow hover:shadow-xl transition-all duration-300 h-auto w-full overflow-hidden bg-slate-800/60"
-              >
-                {/* Thumbnail */}
-                <div className="relative h-48 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 overflow-hidden">
-                  <img
-                    src={
-                      item.product.heroImageUrl ||
-                      "https://via.placeholder.com/200x150"
-                    }
-                    alt={item.product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      {/* Collection Grid */}
+      {filteredCollections.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {filteredCollections.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => router.push(`/products/${item.product.id}`)}
+              className="group cursor-pointer rounded-lg p-0 shadow hover:shadow-xl transition-all duration-300 h-auto w-full overflow-hidden bg-slate-800/60"
+            >
+              {/* Thumbnail */}
+              <div className="relative h-48 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 overflow-hidden">
+                <img
+                  src={
+                    item.product.heroImageUrl ||
+                    "https://via.placeholder.com/200x150"
+                  }
+                  alt={item.product.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                  <div className="absolute top-2 right-2 flex flex-col gap-1.5 items-end">
-                    {item.product.hasReviewed ? (
-                      <div className="bg-green-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit">
-                        <Star size={10} fill="white" />
-                        <span>รีวิวแล้ว</span>
-                      </div>
-                    ) : (
-                      <div className="bg-amber-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit animate-pulse">
-                        <Star size={10} fill="white" />
-                        <span>รอรีวิว</span>
-                      </div>
-                    )}
-                    {item.product.hasReported && (
-                      <div className="bg-red-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit">
-                        <Flag size={10} fill="white" />
-                        <span>รีพอร์ตแล้ว</span>
-                      </div>
-                    )}
-                  </div>
+                <div className="absolute top-2 right-2 flex flex-col gap-1.5 items-end">
+                  {item.product.hasReviewed ? (
+                    <div className="bg-green-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit">
+                      <Star size={10} fill="white" />
+                      <span>รีวิวแล้ว</span>
+                    </div>
+                  ) : (
+                    <div className="bg-amber-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit animate-pulse">
+                      <Star size={10} fill="white" />
+                      <span>รอรีวิว</span>
+                    </div>
+                  )}
+                  {item.product.hasReported && (
+                    <div className="bg-red-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit">
+                      <Flag size={10} fill="white" />
+                      <span>รีพอร์ตแล้ว</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-3 flex flex-col gap-3">
+                <h3
+                  className="text-base font-semibold line-clamp-2 mb-1 truncate group-hover:text-purple-400 transition-colors"
+                  title={item.product.name}
+                >
+                  {item.product.name}
+                </h3>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-xl font-bold">
+                    {formatPriceWithCurrency(item.product.price)}
+                  </span>
                 </div>
 
-                {/* Content */}
-                <div className="p-3 flex flex-col gap-3">
-                  <h3
-                    className="text-base font-semibold line-clamp-2 mb-1 truncate group-hover:text-purple-400 transition-colors"
-                    title={item.product.name}
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDownload(
+                        item.product.id,
+                        item.product.name,
+                        item.product.uploadedFilePath,
+                      );
+                    }}
+                    aria-label="Download"
+                    title="ดาวน์โหลด"
+                    className="flex-1 h-9 flex items-center justify-center gap-1.5 rounded-lg transition-all duration-150 bg-[#8a57fb] hover:bg-[#7a47eb] cursor-pointer text-sm font-medium"
                   >
-                    {item.product.name}
-                  </h3>
+                    <Download className="w-4 h-4" />
+                    <span>ดาวน์โหลด</span>
+                  </button>
 
-                  <div className="flex items-center justify-between">
-                    <span className="text-xl font-bold">
-                      {formatPriceWithCurrency(item.product.price)}
-                    </span>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDownload(
-                          item.product.id,
-                          item.product.name,
-                          item.product.uploadedFilePath,
-                        );
-                      }}
-                      aria-label="Download"
-                      title="ดาวน์โหลด"
-                      className="flex-1 h-9 flex items-center justify-center gap-1.5 rounded-lg transition-all duration-150 bg-[#8a57fb] hover:bg-[#7a47eb] cursor-pointer text-sm font-medium"
-                    >
-                      <Download className="w-4 h-4" />
-                      <span>ดาวน์โหลด</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      disabled={item.product.hasReviewed}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleReview(item.product.id, item.product.name);
-                      }}
-                      aria-label="Review"
-                      title={
-                        item.product.hasReviewed
-                          ? "รีวิวแล้ว"
-                          : "คลิกเพื่อรีวิว"
-                      }
-                      className={`
+                  <button
+                    type="button"
+                    disabled={item.product.hasReviewed}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleReview(item.product.id, item.product.name);
+                    }}
+                    aria-label="Review"
+                    title={
+                      item.product.hasReviewed ? "รีวิวแล้ว" : "คลิกเพื่อรีวิว"
+                    }
+                    className={`
                         w-9 h-9 flex items-center justify-center rounded-lg
                         transition-all duration-150 
                         ${
@@ -294,44 +298,43 @@ export default function MyCollectionPage() {
                             : "bg-amber-500 hover:bg-amber-600 cursor-pointer animate-pulse"
                         }
                       `}
-                    >
-                      <Star className="w-4 h-4" />
-                    </button>
+                  >
+                    <Star className="w-4 h-4" />
+                  </button>
 
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleReport(
-                          item.product.id,
-                          item.product.name,
-                          item.orderItemId,
-                        );
-                      }}
-                      aria-label="Report"
-                      title={
-                        item.product.hasReported ? "แก้ไขรีพอร์ต" : "รีพอร์ต"
-                      }
-                      className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 cursor-pointer ${
-                        item.product.hasReported
-                          ? "bg-red-600 hover:bg-red-700"
-                          : "bg-slate-700 hover:bg-red-600"
-                      }`}
-                    >
-                      <Flag className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleReport(
+                        item.product.id,
+                        item.product.name,
+                        item.orderItemId,
+                      );
+                    }}
+                    aria-label="Report"
+                    title={
+                      item.product.hasReported ? "แก้ไขรีพอร์ต" : "รีพอร์ต"
+                    }
+                    className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 cursor-pointer ${
+                      item.product.hasReported
+                        ? "bg-red-600 hover:bg-red-700"
+                        : "bg-slate-700 hover:bg-red-600"
+                    }`}
+                  >
+                    <Flag className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <Package className="mx-auto text-slate-600 mb-4" size={64} />
-            <p className="text-slate-400 text-lg">ไม่พบสินค้าที่ค้นหา</p>
-          </div>
-        )}
-      </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-16">
+          <Package className="mx-auto text-slate-600 mb-4" size={64} />
+          <p className="text-slate-400 text-lg">ไม่พบสินค้าที่ค้นหา</p>
+        </div>
+      )}
 
       {/* Review Modal */}
       {currentUser && (
