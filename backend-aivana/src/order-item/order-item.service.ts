@@ -29,8 +29,8 @@ export class OrderItemService {
                 sellerId: product.seller.id,
                 price: product.price,
                 commissionRate: COMMISSION_RATE,
-                commissionAmount: (product.price * COMMISSION_RATE) / 100,
-                sellerAmount: product.price - (product.price * COMMISSION_RATE) / 100,
+                commissionAmount: product.price * COMMISSION_RATE,
+                sellerAmount: product.price - (product.price * COMMISSION_RATE),
             });
         }));
 
