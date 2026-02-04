@@ -261,7 +261,7 @@ export class PayoutService {
         grossSales: Number(r.grossSales || 0),
         netPayout: Number(r.netPayout),
         calculatedFromItems: Number(r.calculatedNet),
-        status: r.status === 'PAID' ? 'โอนแล้ว' : 'รอโอน',
+        status: r.status === 'paid' ? 'โอนแล้ว' : 'รอโอน',
       })),
     };
   }
