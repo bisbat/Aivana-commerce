@@ -44,6 +44,22 @@ export class UserService {
     });
   }
 
+  async findUserByUsername(username: string): Promise<UserEntity | null> {
+    console.log('Service: Searching for user by username:', username);
+    const user = await this.userRepository.findOne({
+      where: { username },
+      relations: ['sellerProfile'], // optional
+    });
+
+    if (user) {
+      console.log('Service: Found user:', user.id, user.username, user.email);
+    } else {
+      console.log('Service: No user found with username:', username);
+    }
+
+    return user;
+  }
+
   async update(
     userId: string,
     updateUserDto: Partial<CreateUserDto>,

@@ -23,18 +23,21 @@ const ProfilePage = () => {
       try {
         const profileUser = await getUserByUsername(username);
 
+        const loggedInUser = await getCurrentUser();
+        setCurrentUser(loggedInUser);
+
         if (!profileUser) {
           router.replace("/");
           return;
         }
 
-        const loggedInUser = await getCurrentUser();
-        setCurrentUser(loggedInUser);
-
         setUser(profileUser);
 
+        const userStats = await getUserStats(profileUser.id);
+        setStats(userStats);
+
         if (loggedInUser?.id === profileUser.id) {
-          const userStats = await getUserStats();
+          const userStats = await getUserStats(profileUser.id);
           setStats(userStats);
         }
       } catch (error) {

@@ -26,7 +26,7 @@ export async function getUserByUserId(userId: string): Promise<UserProfile> {
   return response.json();
 }
 
-export async function getUserStats() {
+export async function getUserStats(id: string) {
   const token = await getAccessToken();
 
   if (!token) {
@@ -71,7 +71,10 @@ export async function getUserByUsername(
   username: string,
 ): Promise<UserProfile | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/username/${username}`, {
+    const url = `${API_BASE_URL}/users/username/${username}`;
+    console.log("Fetching user by username from:", url);
+
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -79,11 +82,16 @@ export async function getUserByUsername(
       cache: "no-store",
     });
 
+    console.log("Response status:", response.status, response.statusText);
+
     if (!response.ok) {
+      console.error("Response not OK for username:", username);
       return null;
     }
 
-    return response.json();
+    const data = await response.json();
+    console.log("Successfully fetched user:", data?.username, data?.id);
+    return data;
   } catch (error) {
     console.error("Error fetching user by username:", error);
     return null;
