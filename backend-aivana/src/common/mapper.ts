@@ -1,11 +1,11 @@
-import { PaymentStatusEnum } from "src/order/enum/order-status.enum";
+import { PaymentStatusEnum } from "src/payment/enum/payment-status.enum";
 
 export function mapOmiseStatusToPaymentStatus(
   omiseStatus: string,
 ): PaymentStatusEnum {
   switch (omiseStatus) {
     case 'successful':
-      return PaymentStatusEnum.PAID;
+      return PaymentStatusEnum.SUCCESS;
 
     case 'failed':
     case 'expired':

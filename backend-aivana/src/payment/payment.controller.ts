@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, ParseIntPipe, Req } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('payment')
 export class PaymentController {
@@ -21,6 +22,16 @@ export class PaymentController {
     @Param('orderId', ParseIntPipe) orderId: number,
   ) {
     return this.paymentService.getQrPromptpay(orderId);
+  }
+
+  @Public()
+  @Post('webhook/omise/charge')
+  async webhookOmiseCharge(@Req() req: Request, @Body() body: any) {
+    console.log('Received webhook:', body);
+    await this.paymentService.webhookOmiseCharge(body);
+
+    // Return 200 OK แบบชัดเจน
+    return { received: true };
   }
 
 }

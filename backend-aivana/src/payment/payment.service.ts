@@ -6,7 +6,8 @@ import { PaymentEntity } from './entities/payment.entity';
 import { Repository } from 'typeorm';
 import { mapOmiseStatusToPaymentStatus } from 'src/common/mapper';
 import { PaymentMethodEnum } from 'src/order/enum/payment.enum';
-import { PaymentStatusEnum } from 'src/order/enum/order-status.enum';
+import { PaymentStatusEnum } from './enum/payment-status.enum';
+
 
 @Injectable()
 export class PaymentService {
@@ -27,6 +28,9 @@ export class PaymentService {
 
     const charge = await this.omiseService.createChargeWithSource(sourceId, amount)
 
+    order.omiseChargeId = charge.id;
+    await this.orderService['orderRepository'].save(order);
+
     const paymentStatus = mapOmiseStatusToPaymentStatus(
       charge.status,
     );
@@ -38,7 +42,8 @@ export class PaymentService {
       chargeId: charge.id,
       sourceId: sourceId,
       qrImageUrl: charge.source?.scannable_code?.image?.download_uri,
-      status: paymentStatus
+      status: paymentStatus,
+      createdAt: new Date(),
     })
 
     return {
@@ -61,9 +66,9 @@ export class PaymentService {
       throw new NotFoundException('Payment not found');
     }
 
-    if (payment.status === PaymentStatusEnum.PAID) {
+    if (payment.status === PaymentStatusEnum.SUCCESS) {
       return {
-        status: PaymentStatusEnum.PAID,
+        status: PaymentStatusEnum.SUCCESS,
         redirect: '/payment/success',
       };
     }
@@ -71,9 +76,27 @@ export class PaymentService {
     return {
       orderId,
       paymentId: payment.id,
+      amount: payment.amount,
       status: payment.status,
       qrImageUrl: payment.qrImageUrl,
     };
   }
+
+  async webhookOmiseCharge(event: any) {
+    if (event.data.object !== 'charge') return;
+
+    const charge = event.data;
+
+    if (charge.status === 'successful') {
+      await this.orderService.markAsPaid(charge.metadata.orderId);
+    }
+
+    if (charge.status === 'failed') {
+      await this.orderService.markAsFailed(charge.metadata.orderId);
+    }
+  }
+
+
+
 
 }

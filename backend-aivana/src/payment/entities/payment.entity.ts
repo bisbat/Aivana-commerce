@@ -1,6 +1,6 @@
-import { PaymentStatusEnum } from "src/order/enum/order-status.enum";
 import { PaymentMethodEnum } from "src/order/enum/payment.enum";
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { PaymentStatusEnum } from "../enum/payment-status.enum";
 
 @Entity('payment')
 export class PaymentEntity {
@@ -48,6 +48,12 @@ export class PaymentEntity {
 
   @Column({ type: 'timestamp', nullable: true })
   paidAt: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  failedAt: Date;
+
+  @Column({ type: 'text', nullable: true })
+  failureReason: string;
 
   // ---- audit ----
   @CreateDateColumn()

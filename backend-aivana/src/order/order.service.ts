@@ -1,11 +1,14 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Cart } from 'src/cart/entities/cart.entity';
 import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
 import { OrderEntity } from './entities/order.entity';
 import { OrderItemService } from 'src/order-item/order-item.service';
+import { OrderStatusEnum } from './enum/order-status.enum';
+import { PaymentStatusEnum } from 'src/payment/enum/payment-status.enum';
+import { PaymentEntity } from 'src/payment/entities/payment.entity';
 
 @Injectable()
 export class OrderService {
@@ -16,6 +19,8 @@ export class OrderService {
         private readonly orderItemRepository: Repository<OrderItemEntity>,
         @InjectRepository(OrderEntity)
         private readonly orderRepository: Repository<OrderEntity>,
+        @InjectRepository(PaymentEntity)
+        private readonly paymentRepository: Repository<PaymentEntity>,
 
         private readonly orderItemService: OrderItemService,
     ) { }
@@ -38,6 +43,7 @@ export class OrderService {
             userId,
             totalAmount: 0,
             paymentMethod: createOrderDto.paymentMethod,
+            createdAt: new Date(),
         });
 
         const orderItems = await this.orderItemService.createOrderItem({ orderId: order.id, cartItems: cart.items });
@@ -54,13 +60,13 @@ export class OrderService {
         });
     }
 
-    async getOrderById(orderId: number){
-        console.log('order id : '+ orderId)
+    async getOrderById(orderId: number) {
+        console.log('order id : ' + orderId)
         const order = await this.orderRepository.findOne({
-            where:{id: orderId},
+            where: { id: orderId },
             relations: ['items', 'items.product']
         })
-        if(!order){
+        if (!order) {
             throw new NotFoundException('Not found order!')
         }
 
@@ -83,4 +89,77 @@ export class OrderService {
             .andWhere('order.status = :status', { status: 'PAID' })
             .getExists();
     }
+
+    async markAsPaid(orderId: number) {
+        const order = await this.orderRepository.findOne({
+            where: { id: orderId },
+        });
+
+        const payment = await this.paymentRepository.findOne({
+            where: { orderId: orderId },
+        })
+
+        if (!payment) {
+            throw new NotFoundException('Payment not found');
+        }
+
+        if (payment.status === PaymentStatusEnum.SUCCESS) {
+            return order;
+        }
+
+        if (!order) {
+            throw new NotFoundException('Order not found');
+        }
+
+        if (order.status === OrderStatusEnum.PAID) {
+            return order;
+        }
+
+        order.status = OrderStatusEnum.PAID;
+        order.paidAt = new Date();
+
+        payment.status = PaymentStatusEnum.SUCCESS;
+        payment.paidAt = new Date();
+        payment.updatedAt = new Date();
+
+        await this.paymentRepository.save(payment);
+        return this.orderRepository.save(order);
+    }
+
+    async markAsFailed(orderId: number, reason?: string) {
+        const order = await this.orderRepository.findOne({
+            where: { id: orderId },
+        });
+
+        if (!order) {
+            throw new NotFoundException('Order not found');
+        }
+
+        const payment = await this.paymentRepository.findOne({
+            where: { orderId },
+        });
+
+        if (!payment) {
+            throw new NotFoundException('Payment not found');
+        }
+
+        // กัน webhook ยิงซ้ำ
+        if (payment.status === PaymentStatusEnum.FAILED) {
+            return order;
+        }
+
+        payment.status = PaymentStatusEnum.FAILED;
+        payment.failedAt = new Date();
+        payment.failureReason = reason ?? 'Payment failed';
+
+        // จะ FAILED หรือ PENDING ขึ้นกับ business logic
+        order.status = OrderStatusEnum.FAILED;
+        order.updatedAt = new Date();
+
+        await this.paymentRepository.save(payment);
+        return this.orderRepository.save(order);
+    }
+
+
+
 }

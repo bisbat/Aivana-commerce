@@ -9,7 +9,7 @@ import {
 import { OrderItemEntity } from '../../order-item/entities/order-item.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { ManyToOne, JoinColumn } from 'typeorm';
-import { PaymentStatusEnum } from '../enum/order-status.enum';
+import { OrderStatusEnum } from '../enum/order-status.enum';
 import { PaymentMethodEnum } from '../enum/payment.enum';
 
 @Entity('order')
@@ -25,10 +25,10 @@ export class OrderEntity {
 
   @Column({
     type: 'enum',
-    enum: PaymentStatusEnum,
-    default: PaymentStatusEnum.PENDING,
+    enum: OrderStatusEnum,
+    default: OrderStatusEnum.PENDING,
   })
-  status: PaymentStatusEnum;
+  status: OrderStatusEnum;
 
   @Column({
     type: 'enum',
@@ -38,6 +38,9 @@ export class OrderEntity {
 
   @Column({ nullable: true })
   omiseChargeId: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  paidAt: Date;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -51,5 +54,5 @@ export class OrderEntity {
   @ManyToOne(() => UserEntity, (user) => user.orders)
   @JoinColumn({ name: 'userId' })
   user: UserEntity;
-    static status: any;
+  static status: any;
 }
