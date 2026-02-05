@@ -37,7 +37,7 @@ function ViewRoundButton({ periodStart, periodEnd }: { periodStart: string; peri
         gap: 6,
       }}
     >
-      View Round
+      ตรวจสอบรอบ
       <span style={{ fontSize: 14, transition: "transform 0.2s", transform: hovered ? "translateX(2px)" : "translateX(0)" }}>
         →
       </span>
@@ -47,7 +47,7 @@ function ViewRoundButton({ periodStart, periodEnd }: { periodStart: string; peri
 
 // ─── Main exported component ─────────────────────────────────────────────────
 export default function PayoutRoundsTable({
-  rounds,
+  rounds
 }: {
   rounds: PayoutRound[];
 }) {

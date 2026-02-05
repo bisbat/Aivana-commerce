@@ -10,14 +10,14 @@ const CONFIG: Record<
   { label: string; bg: string; text: string; border: string; pulse: boolean }
 > = {
   processing: {
-    label: "Processing",
+    label: "กำลังดำเนินการ",
     bg: "rgba(139,92,246,0.15)",
     text: "#a78bfa",
     border: "rgba(139,92,246,0.3)",
     pulse: true,
   },
   completed: {
-    label: "Completed",
+    label: "เสร็จสิ้น",
     bg: "rgba(34,197,94,0.12)",
     text: "#4ade80",
     border: "rgba(34,197,94,0.25)",

@@ -34,46 +34,75 @@ export default async function RoundDetailPage({
 
       {/* ── Round info card ──────────────────────────────────────────────── */}
       {round && (
+  <div
+    style={{
+      background: "linear-gradient(145deg, #1c1f2b, #141622)",
+      border: "1px solid rgba(139,92,246,0.25)",
+      borderRadius: 18,
+      padding: "28px 32px",
+      marginBottom: 40,
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
+    }}
+  >
+    {/* LEFT SIDE — ROUND PERIOD */}
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", letterSpacing: 1 }}>
+        PAYOUT PERIOD
+      </span>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <div
           style={{
-            background: "linear-gradient(135deg, rgba(30,33,46,0.95), rgba(20,22,32,0.98))",
-            border: "1px solid rgba(139,92,246,0.2)",
-            borderRadius: 14,
-            padding: "24px 28px",
-            marginBottom: 36,
+            width: 36,
+            height: 36,
+            borderRadius: 10,
+            background: "rgba(139,92,246,0.15)",
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 18,
           }}
         >
-          {/* Left — title + period */}
-          <div>
-            <p style={{ fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 6 }}>
-              รอบโอนเงินครั้งที่ 15
-            </p>
-            <p style={{ fontSize: 18, color: "rgba(255,255,255,0.5)" }}>
-              ช่วงวันที่:{" "}
-              <strong style={{ color: "#fff" }}>
-                {displayStart} – {displayEnd}
-              </strong>
-            </p>
-          </div>
-
-          {/* Right — round totals */}
-          <div style={{ textAlign: "right", display: "flex", flexDirection: "column", gap: 4 }}>
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>
-              ยอดรวมทั้งของรอบ:{" "}
-              <strong style={{ color: "#fff", fontSize: 15 }}>
-                {formatBaht(round.totalAmount)}
-              </strong>
-            </p>
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>
-              จำนวนร้านค้า:{" "}
-              <strong style={{ color: "#fff" }}>{round.sellerCount} ร้าน</strong>
-            </p>
-          </div>
+          🗓️
         </div>
-      )}
+
+        <strong style={{ fontSize: 20, color: "#fff", fontWeight: 600 }}>
+          {displayStart} — {displayEnd}
+        </strong>
+      </div>
+    </div>
+
+    {/* RIGHT SIDE — STATS */}
+    <div style={{ display: "flex", gap: 40 }}>
+      {/* TOTAL AMOUNT */}
+      <div style={{ textAlign: "right" }}>
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>
+          TOTAL PAYOUT
+        </p>
+        <p style={{ fontSize: 22, fontWeight: 700, color: "#fff" }}>
+          {formatBaht(round.totalAmount)}
+        </p>
+      </div>
+
+      {/* SELLER COUNT */}
+      <div style={{ textAlign: "right" }}>
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>
+          SELLERS
+        </p>
+        <p style={{ fontSize: 22, fontWeight: 700, color: "#fff" }}>
+          {round.sellerCount}
+          <span style={{ fontSize: 14, fontWeight: 400, marginLeft: 6, color: "rgba(255,255,255,0.5)" }}>
+            
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
+)}
+
 
       {/* ── Error banner ─────────────────────────────────────────────────── */}
       {error && (

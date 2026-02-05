@@ -6,6 +6,13 @@ import type { PayoutDetailResponse } from "@/lib/types/admin/payout";
 import { formatDate, formatBaht } from "@/lib/utils/formatPayout";
 import { markPayoutAsPaid } from "@/lib/actions/payout.actions";
 
+const cardStyle: React.CSSProperties = {
+  background: "rgba(255,255,255,0.025)",
+  border: "1px solid rgba(255,255,255,0.07)",
+  borderRadius: 14,
+  padding: "22px 24px",
+};
+
 // ─── Seller info card (left side) ───────────────────────────────────────────
 function SellerInfoCard({ data }: { data: PayoutDetailResponse }) {
   const periodStart = formatDate(data.period.start);
@@ -58,8 +65,9 @@ function SellerInfoCard({ data }: { data: PayoutDetailResponse }) {
           บัญชีธนาคาร: {data.seller.bankName}
         </p>
         <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>
-          เลขบัญชี: •••• {data.seller.accountNumber.slice(-4)}
+          เลขบัญชี: {data.seller.accountNumber}
         </p>
+
         <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>
           ชื่อบัญชี: {data.seller.accountName}
         </p>
@@ -73,29 +81,14 @@ function AmountStatusCard({ data }: { data: PayoutDetailResponse }) {
   const isPending = data.payout.status === "รอโอน";
 
   return (
-    <div
-      style={{
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        borderRadius: 14,
-        padding: "24px",
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-        justifyContent: "center",
-      }}
-    >
-      <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>
-        ยอดที่ต้องจ่าย:{" "}
-        <strong style={{ fontSize: 22, color: "#a78bfa" }}>
-          {formatBaht(data.payout.amountDue)} บาท
-        </strong>
+    <div style={{ ...cardStyle }}>
+      <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>ยอดที่ต้องจ่าย</p>
+      <p style={{ fontSize: 26, fontWeight: 700, color: "#a78bfa", marginBottom: 10 }}>
+        {formatBaht(data.payout.amountDue)}
       </p>
-      <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>
-        สถานะ:{" "}
-        <strong style={{ color: isPending ? "#fb923c" : "#4ade80", fontSize: 16 }}>
-          {data.payout.status}
-        </strong>
+      <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>สถานะ</p>
+      <p style={{ fontSize: 22, color: isPending ? "#fb923c" : "#4ade80", fontWeight: 600 }}>
+        {data.payout.status}
       </p>
     </div>
   );
@@ -103,212 +96,133 @@ function AmountStatusCard({ data }: { data: PayoutDetailResponse }) {
 
 // ─── Order breakdown table ──────────────────────────────────────────────────
 function OrderTable({ data }: { data: PayoutDetailResponse }) {
-  const HEADERS = ["Order ID", "วันที่", "ชื่อสินค้า", "ราคาขาย", "คอมมิสชั่น", "เงินที่ seller ได้"];
+  const HEADERS = ["Order ID", "วันที่", "สินค้า", "ราคาขาย", "คอมมิสชั่น", "เงินที่ได้"];
 
   return (
-    <>
-      <h3 style={{ fontSize: 16, fontWeight: 600, color: "#fff", marginBottom: 14 }}>
-        รายการที่ขายได้
-      </h3>
-      <div
-        style={{
-          background: "#fff",
-          borderRadius: 12,
-          overflow: "hidden",
-          border: "1px solid #e5e7eb",
-          marginBottom: 32,
-        }}
-      >
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ background: "#f9fafb", borderBottom: "2px solid #e5e7eb" }}>
-              {HEADERS.map((col) => (
-                <th
-                  key={col}
-                  style={{
-                    padding: "11px 16px",
-                    textAlign: "left",
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: "#6b7280",
-                    letterSpacing: 0.3,
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {col}
-                </th>
-              ))}
+    <div style={{ ...cardStyle, padding: 0, overflow: "hidden", marginBottom: 28 }}>
+      <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+        <h3 style={{ fontSize: 15, color: "#fff", fontWeight: 600 }}>รายการที่ขายได้</h3>
+      </div>
+
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+            {HEADERS.map((col) => (
+              <th
+                key={col}
+                style={{
+                  padding: "12px 20px",
+                  textAlign: "left",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: "rgba(255,255,255,0.3)",
+                  textTransform: "uppercase",
+                }}
+              >
+                {col}
+              </th>
+            ))}
+          </tr>
+        </thead>
+
+        <tbody>
+          {data.orders.map((o, i) => (
+            <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+              <td style={{ padding: "14px 20px", color: "#a78bfa", fontWeight: 600 }}>#{o.orderId}</td>
+              <td style={{ padding: "14px 20px", color: "rgba(255,255,255,0.55)" }}>
+                {formatDate(o.date)}
+              </td>
+              <td style={{ padding: "14px 20px", color: "#e2e8f0" }}>{o.productName}</td>
+              <td style={{ padding: "14px 20px", color: "rgba(255,255,255,0.6)" }}>
+                {formatBaht(o.price)}
+              </td>
+              <td style={{ padding: "14px 20px", color: "rgba(255,255,255,0.6)" }}>
+                {formatBaht(o.commission)}
+              </td>
+              <td style={{ padding: "14px 20px", color: "#fff", fontWeight: 600 }}>
+                {formatBaht(o.sellerEarn)}
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {data.orders.map((order, idx) => {
-              const orderDate = formatDate(order.date);
-              
-              return (
-                <tr
-                  key={idx}
-                  style={{
-                    borderBottom: "1px solid #e5e7eb",
-                    background: idx % 2 === 0 ? "#fff" : "#fafafa",
-                    animation: `fadeSlideIn 0.3s ease ${idx * 0.06}s both`,
-                  }}
-                >
-                  <td style={{ padding: "12px 16px", fontSize: 13, color: "#a78bfa", fontWeight: 600 }}>
-                    #{order.orderId}
-                  </td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, color: "#374151" }}>
-                    {orderDate}
-                  </td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, color: "#1e1e2e" }}>
-                    {order.productName}
-                  </td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, color: "#374151" }}>
-                    {formatBaht(order.price)}
-                  </td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, color: "#374151" }}>
-                    {formatBaht(order.commission)}
-                  </td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, fontWeight: 600, color: "#1e1e2e" }}>
-                    {formatBaht(order.sellerEarn)}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </>
-  );
-}
-
-// ─── Summary box (left) ─────────────────────────────────────────────────────
-function SummaryBox({ data }: { data: PayoutDetailResponse }) {
-  return (
-    <div
-      style={{
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        borderRadius: 14,
-        padding: "24px",
-      }}
-    >
-      <h4 style={{ fontSize: 15, fontWeight: 600, color: "#fff", marginBottom: 16 }}>
-        สรุปยอด
-      </h4>
-
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-        <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>ยอดขายรวม</span>
-        <span style={{ fontSize: 13, color: "#a78bfa" }}>
-          {formatBaht(data.summary.grossSales)}
-        </span>
-      </div>
-
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
-        <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>- ค่าคอมมิสชั่น</span>
-        <span style={{ fontSize: 13, color: "#a78bfa" }}>
-          {formatBaht(data.summary.totalCommission)}
-        </span>
-      </div>
-
-      {/* Divider */}
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", marginBottom: 12 }} />
-
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <span style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>ยอดโอนสุทธิ</span>
-        <span style={{ fontSize: 18, fontWeight: 700, color: "#a78bfa" }}>
-          {formatBaht(data.summary.netTransfer)}
-        </span>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
 
+
+function SummaryBox({ data }: { data: PayoutDetailResponse }) {
+  return (
+    <div style={cardStyle}>
+      <h4 style={{ fontSize: 14, color: "#fff", fontWeight: 600, marginBottom: 14 }}>สรุปยอด</h4>
+
+      <Row label="ยอดขายรวม" value={formatBaht(data.summary.grossSales)} />
+      <Row label="- ค่าคอมมิสชั่น" value={formatBaht(data.summary.totalCommission)} />
+
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", margin: "12px 0" }} />
+
+      <Row
+        label="ยอดโอนสุทธิ"
+        value={formatBaht(data.summary.netTransfer)}
+        bold
+      />
+    </div>
+  );
+}
+
+function Row({ label, value, bold = false }: any) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+      <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 13 }}>{label}</span>
+      <span style={{ color: bold ? "#a78bfa" : "#e2e8f0", fontWeight: bold ? 700 : 500 }}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
+
 // ─── Upload zone (right) ────────────────────────────────────────────────────
-function UploadZone({
-  file,
-  preview,
-  onFileSelect,
-}: {
-  file: File | null;
-  preview: string | null;
-  onFileSelect: (f: File) => void;
-}) {
-  const [dragging, setDragging] = useState(false);
+function UploadZone({ file, preview, onFileSelect }: any) {
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const handleFile = useCallback(
-    (f: File | null) => {
-      if (f) onFileSelect(f);
-    },
-    [onFileSelect]
-  );
-
   return (
-    <div>
-      <h4 style={{ fontSize: 15, fontWeight: 600, color: "#fff", marginBottom: 14 }}>
+    <div style={cardStyle}>
+      <h4 style={{ fontSize: 14, color: "#fff", fontWeight: 600, marginBottom: 12 }}>
         อัพโหลดหลักฐานการโอน
       </h4>
+
       <div
         onClick={() => fileRef.current?.click()}
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragging(true);
-        }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragging(false);
-          handleFile(e.dataTransfer.files[0] ?? null);
-        }}
         style={{
-          border: `2px dashed ${dragging ? "rgba(139,92,246,0.6)" : "rgba(255,255,255,0.15)"}`,
-          borderRadius: 14,
-          padding: preview ? "12px" : "36px 24px",
+          border: "2px dashed rgba(255,255,255,0.15)",
+          borderRadius: 12,
+          padding: preview ? 10 : "30px 20px",
           textAlign: "center",
           cursor: "pointer",
-          background: dragging ? "rgba(139,92,246,0.06)" : "rgba(255,255,255,0.02)",
-          transition: "all 0.2s ease",
-          minHeight: 140,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          background: "rgba(255,255,255,0.02)",
         }}
       >
         {preview ? (
-          <img
-            src={preview}
-            alt="slip preview"
-            style={{
-              maxHeight: 110,
-              maxWidth: "100%",
-              borderRadius: 8,
-              objectFit: "contain",
-            }}
-          />
+          <img src={preview} style={{ maxHeight: 100, borderRadius: 8 }} />
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 26, color: "rgba(255,255,255,0.25)" }}>↑</span>
-            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>
-              รองรับ jpg / png / pdf
-            </p>
-          </div>
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>
+            คลิกเพื่ออัพโหลดสลิป
+          </p>
         )}
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/*,.pdf"
-          style={{ display: "none" }}
-          onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
-        />
       </div>
-      {file && (
-        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 8 }}>
-          📎 {file.name}
-        </p>
-      )}
+
+      <input
+        ref={fileRef}
+        type="file"
+        hidden
+        accept="image/*,.pdf"
+        onChange={(e) => onFileSelect(e.target.files?.[0])}
+      />
     </div>
   );
 }
+
 
 // ─── Main component ─────────────────────────────────────────────────────────
 export default function SellerPayoutDetail({ data }: { data: PayoutDetailResponse }) {

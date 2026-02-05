@@ -25,8 +25,8 @@ export default async function PayoutRoundsPage() {
   const currentRound =
     rounds.length > 0
       ? [...rounds].sort(
-          (a, b) => new Date(b.periodStart).getTime() - new Date(a.periodStart).getTime()
-        )[0]
+        (a, b) => new Date(b.periodStart).getTime() - new Date(a.periodStart).getTime()
+      )[0]
       : null;
 
   return (
@@ -58,40 +58,9 @@ export default async function PayoutRoundsPage() {
         </div>
       )}
 
-      {/* Current round info card — only shows when data exists */}
-      {currentRound && (
-        <CurrentRoundCard round={currentRound} />
-      )}
 
       {/* Summary stats + table — client component for interactivity */}
-      <PayoutRoundsTable rounds={rounds} stats={stats} />
-    </div>
-  );
-}
-
-// ─── Stateless sub-component (still server-rendered, no interactivity needed) ─
-function CurrentRoundCard({ round }: { round: PayoutRound }) {
-  const { formatDate } = require("@/lib/utils/formatPayout");
-
-  return (
-    <div
-      style={{
-        background: "linear-gradient(135deg, rgba(30,33,46,0.9), rgba(20,22,32,0.95))",
-        border: "1px solid rgba(139,92,246,0.2)",
-        borderRadius: 14,
-        padding: "22px 24px",
-        marginBottom: 28,
-      }}
-    >
-      <p style={{ fontSize: 13, fontWeight: 600, color: "#a78bfa", marginBottom: 6 }}>
-        รอบโอนเงินปัจจุบันของระบบ
-      </p>
-      <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>
-        ช่วงวันที่:{" "}
-        <strong style={{ color: "rgba(255,255,255,0.7)" }}>
-          {formatDate(round.periodStart)} – {formatDate(round.periodEnd)}
-        </strong>
-      </p>
+      <PayoutRoundsTable rounds={rounds} />
     </div>
   );
 }
