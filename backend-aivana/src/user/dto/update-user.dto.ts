@@ -21,6 +21,11 @@ export class UpdateUserDto {
   @IsOptional()
   lastName?: string;
 
+  @IsString()
   @IsOptional()
-  avatarUrl?: File;
+  avatarUrl?: string;
+
+  @IsString()
+  @IsOptional()
+  bio?: string;
 }

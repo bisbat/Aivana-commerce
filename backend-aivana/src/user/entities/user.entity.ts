@@ -37,6 +37,9 @@ export class UserEntity {
   @Column({ type: 'text', nullable: true })
   avatarUrl: string | null;
 
+  @Column({ type: 'text', nullable: true })
+  bio: string | null;
+
   @Column({ type: 'enum', enum: Role, default: Role.CUSTOMER })
   role: Role;
 

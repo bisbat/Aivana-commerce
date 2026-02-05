@@ -7,7 +7,10 @@ import {
   Put,
   Param,
   NotFoundException,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { ResponseUserDto } from './dto/response-user.dto';
 import { plainToInstance } from 'class-transformer';
@@ -16,6 +19,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enum/role.enum';
 import { Public } from 'src/auth/decorators/public.decorator';
+import type { UploadedFileType } from '../product/interfaces/uploaded-file.interface';
 
 @Controller('users')
 export class UserController {
@@ -56,15 +60,19 @@ export class UserController {
 
   @Put('/:userId')
   @Roles(Role.SELLER, Role.CUSTOMER)
+  @UseInterceptors(FileInterceptor('avatar'))
   async updateUser(
     @Param('userId') userId: string,
     @Body() updateUserDto: UpdateUserDto,
+    @UploadedFile() avatar?: UploadedFileType,
   ) {
-    console.log('email:', updateUserDto.email);
+    console.log('Update user data:', updateUserDto);
+    console.log('Avatar file:', avatar ? avatar.originalname : 'No file');
 
     const updatedUser = await this.userService.updateUser(
       userId,
       updateUserDto,
+      avatar,
     );
 
     return plainToInstance(ResponseUserDto, updatedUser, {

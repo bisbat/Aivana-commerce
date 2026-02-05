@@ -1,15 +1,18 @@
-'use client';
-export default function EditButton({ username }: { username: string}) {
-    const handleEdit = () => {
-        window.location.href = `/seller/${username}/edit`;
-    };
+"use client";
+import { Edit } from "lucide-react";
 
-    return (
-        <button
-            onClick={handleEdit}
-            className="px-4 py-2 text-sm bg-blue-600 rounded-md hover:bg-blue-700 transition"
-        >
-            Edit
-        </button>
-    );
+export default function EditButton({ username }: { username: string }) {
+  const handleEdit = () => {
+    window.location.href = `/seller/${username}/edit`;
+  };
+
+  return (
+    <button
+      onClick={handleEdit}
+      className="px-5 py-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-lg transition-colors flex items-center gap-2 border border-slate-600 text-sm"
+    >
+      <Edit size={16} />
+      <span>แก้ไขโปรไฟล์</span>
+    </button>
+  );
 }

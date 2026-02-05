@@ -33,11 +33,8 @@ const ProfilePage = () => {
 
         setUser(profileUser);
 
-        const userStats = await getUserStats(profileUser.id);
-        setStats(userStats);
-
         if (loggedInUser?.id === profileUser.id) {
-          const userStats = await getUserStats(profileUser.id);
+          const userStats = await getUserStats();
           setStats(userStats);
         }
       } catch (error) {
@@ -125,10 +122,15 @@ const ProfilePage = () => {
             </div>
           </div>
         </div>
-        <button className="mt-3 px-5 py-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-lg transition-colors flex items-center gap-2 border border-slate-600 text-sm">
-          <Edit size={16} />
-          <span>แก้ไขโปรไฟล์</span>
-        </button>
+        {currentUser?.id === user.id && (
+          <button
+            className="mt-3 px-5 py-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-lg transition-colors flex items-center gap-2 border border-slate-600 text-sm"
+            onClick={() => router.push("/profile/edit")}
+          >
+            <Edit size={16} />
+            <span>แก้ไขโปรไฟล์</span>
+          </button>
+        )}
       </div>
 
       {/* แสดง stats เฉพาะเมื่อดูโปรไฟล์ตัวเอง */}
