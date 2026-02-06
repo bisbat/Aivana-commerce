@@ -40,7 +40,6 @@ export default function MyCollectionPage() {
       try {
         setLoading(true);
         const user = await getCurrentUser();
-
         // ตรวจสอบ authentication
         if (!user) {
           router.push("/");
@@ -66,7 +65,7 @@ export default function MyCollectionPage() {
     item.product.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const handleDownload = (id: string, name: string, filePath: string) => {
+  const handleDownload = (filePath: string) => {
     window.open(filePath, "_blank");
   };
 
@@ -264,11 +263,7 @@ export default function MyCollectionPage() {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDownload(
-                        item.product.id,
-                        item.product.name,
-                        item.product.uploadedFilePath,
-                      );
+                      handleDownload(item.product.uploadedFilePath);
                     }}
                     aria-label="Download"
                     title="ดาวน์โหลด"

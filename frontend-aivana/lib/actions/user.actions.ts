@@ -71,7 +71,9 @@ export async function getUserByUsername(
   username: string,
 ): Promise<UserProfile | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/username/${username}`, {
+    const url = `${API_BASE_URL}/users/username/${username}`;
+
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -80,12 +82,61 @@ export async function getUserByUsername(
     });
 
     if (!response.ok) {
+      console.error("Response not OK for username:", username);
       return null;
     }
 
-    return response.json();
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error("Error fetching user by username:", error);
     return null;
   }
+}
+
+export async function updateUserProfile(
+  userId: string,
+  data: {
+    username?: string;
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    avatarUrl?: string;
+    bio?: string;
+  },
+  avatarFile?: File,
+): Promise<UserProfile> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
+  const formData = new FormData();
+
+  if (data.username) formData.append("username", data.username);
+  if (data.email) formData.append("email", data.email);
+  if (data.firstName) formData.append("firstName", data.firstName);
+  if (data.lastName) formData.append("lastName", data.lastName);
+  if (data.avatarUrl) formData.append("avatarUrl", data.avatarUrl);
+  if (data.bio) formData.append("bio", data.bio);
+
+  if (avatarFile) {
+    formData.append("avatar", avatarFile);
+  }
+
+  const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Failed to update profile");
+  }
+
+  return response.json();
 }
