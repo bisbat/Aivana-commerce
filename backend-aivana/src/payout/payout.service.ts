@@ -186,8 +186,9 @@ export class PayoutService {
   }
 
   async getRoundDetail(periodStart: string, periodEnd: string) {
-    const start = new Date(periodStart);
-    const end = new Date(periodEnd);
+    const start = new Date(`${periodStart}T00:00:00+07:00`);
+    const end = new Date(`${periodEnd}T23:59:59+07:00`);
+
 
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
       throw new BadRequestException('Invalid date format');
@@ -201,8 +202,8 @@ export class PayoutService {
       .createQueryBuilder('p')
       .select('COUNT(p.id)', 'sellerCount')
       .addSelect('SUM(p.totalAmount)', 'totalAmount')
-      .where('p.periodStart = :start', { start })
-      .andWhere('p.periodEnd = :end', { end })
+      .where('p.periodStart >= :start', { start })
+      .andWhere('p.periodEnd <= :end', { end })
       .getRawOne();
 
     /**
@@ -214,29 +215,16 @@ export class PayoutService {
       .leftJoin('p.payoutItem', 'pi')
       .leftJoin('pi.orderItem', 'oi')
 
-      // payout id
       .select('p.id', 'payoutId')
-
-      // seller name
       .addSelect('s.storeName', 'sellerName')
-
-      // จำนวน order item (เพราะ 1 item = 1 แถว)
       .addSelect('COUNT(oi.id)', 'orderCount')
-
-      // 💰 ยอดขายรวม (gross)
       .addSelect('SUM(oi.price)', 'grossSales')
-
-      // 💵 เงินที่ seller ควรได้จริงจาก item ทั้งหมด
       .addSelect('SUM(oi.sellerAmount)', 'calculatedNet')
-
-      // เงินสุทธิที่ payout table บันทึกไว้
       .addSelect('p.totalAmount', 'netPayout')
-
-      // status
       .addSelect('p.status', 'status')
 
-      .where('p.periodStart = :start', { start })
-      .andWhere('p.periodEnd = :end', { end })
+      .where('p.periodStart >= :start', { start })
+      .andWhere('p.periodEnd <= :end', { end })
 
       .groupBy('p.id')
       .addGroupBy('s.storeName')
@@ -245,6 +233,7 @@ export class PayoutService {
 
       .orderBy('s.storeName', 'ASC')
       .getRawMany();
+
 
     return {
       round: {

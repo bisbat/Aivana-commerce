@@ -13,9 +13,16 @@ function ViewRoundButton({ periodStart, periodEnd }: { periodStart: string; peri
   const [hovered, setHovered] = useState(false);
 
   const handleClick = () => {
-    const url = `/admin/payouts/${toDateParam(periodStart)}/${toDateParam(periodEnd)}`;
-    router.push(url);
+    const start = new Date(periodStart);
+    const end = new Date(periodEnd);
+
+    // 🔥 normalize to Asia/Bangkok date
+    const startDate = start.toLocaleDateString("en-CA", { timeZone: "Asia/Bangkok" });
+    const endDate = end.toLocaleDateString("en-CA", { timeZone: "Asia/Bangkok" });
+
+    router.push(`/admin/payouts/${startDate}/${endDate}`);
   };
+
 
   return (
     <button

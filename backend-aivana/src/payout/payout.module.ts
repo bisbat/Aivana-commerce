@@ -7,6 +7,7 @@ import { PayoutService } from './payout.service';
 import { InternalPayoutController } from './internal-payout.controller';
 import { AdminPayoutController } from './admin-payout.controller';
 import { MinioModule } from 'src/minio/minio.module';
+import { PayoutCronService } from './payout-cron.service';
 
 @Module({
   imports: [
@@ -21,6 +22,6 @@ import { MinioModule } from 'src/minio/minio.module';
     InternalPayoutController,
     AdminPayoutController
   ],
-  providers: [PayoutService],
+  providers: [PayoutService, PayoutCronService],
 })
 export class PayoutModule {}
