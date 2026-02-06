@@ -144,21 +144,35 @@ export class OrderService {
         }
 
         // กัน webhook ยิงซ้ำ
-        if (payment.status === PaymentStatusEnum.FAILED) {
+        if (
+            payment.status === PaymentStatusEnum.FAILED ||
+            payment.status === PaymentStatusEnum.EXPIRED
+        ) {
             return order;
         }
 
-        payment.status = PaymentStatusEnum.FAILED;
-        payment.failedAt = new Date();
-        payment.failureReason = reason ?? 'Payment failed';
+        const now = new Date();
 
-        // จะ FAILED หรือ PENDING ขึ้นกับ business logic
+        // แยกกรณีหมดอายุ vs failed
+        if (reason === 'expired') {
+            payment.status = PaymentStatusEnum.EXPIRED;
+            payment.failureReason = 'QR expired';
+            payment.expiredAt = now;
+        } else {
+            payment.status = PaymentStatusEnum.FAILED;
+            payment.failureReason = reason ?? 'Payment failed';
+            payment.failedAt = now;
+        }
+
+        payment.updatedAt = now;
+
         order.status = OrderStatusEnum.FAILED;
-        order.updatedAt = new Date();
+        order.updatedAt = now;
 
         await this.paymentRepository.save(payment);
         return this.orderRepository.save(order);
     }
+
 
 
 

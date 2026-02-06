@@ -18,10 +18,13 @@ export class OmiseService {
   }
 
   createChargeWithSource(sourceId:string, amount: number){
+    const expiresAt = new Date(Date.now() + 2 * 60 * 1000).toISOString(); // +2 นาที
     return this.omise.charges.create({
       amount: amount,
       currency: 'THB',
-      source: sourceId
+      source: sourceId,
+      // 2minutes
+      expires_at: expiresAt,
     })
   }
 } 

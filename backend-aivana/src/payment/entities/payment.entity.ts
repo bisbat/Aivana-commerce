@@ -46,6 +46,10 @@ export class PaymentEntity {
   })
   status: PaymentStatusEnum;
 
+  // qr exprires at
+  @Column({ type: 'timestamp', nullable: true })
+  expiredAt: Date;
+
   @Column({ type: 'timestamp', nullable: true })
   paidAt: Date;
 

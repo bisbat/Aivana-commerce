@@ -8,8 +8,10 @@ export function mapOmiseStatusToPaymentStatus(
       return PaymentStatusEnum.SUCCESS;
 
     case 'failed':
-    case 'expired':
       return PaymentStatusEnum.FAILED;
+      
+    case 'expired':
+      return PaymentStatusEnum.EXPIRED;
 
     case 'pending':
     default:
