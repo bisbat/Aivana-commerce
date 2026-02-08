@@ -11,6 +11,9 @@ import { UpdateSellerDto } from './dto/update-seller.dto';
 import { ResponseProductDto } from 'src/product/dto/response-product.dto';
 import { ProductMapper } from 'src/product/product.mapper';
 import { JwtService } from '@nestjs/jwt/dist/jwt.service';
+import { PayoutEntity } from 'src/payout/entities/payout.entity';
+import { SellerEarningsSummaryDto } from './dto/seller-earnings-summary.dto';
+import { SellerEarningsRoundDto } from './dto/seller-earnings-round.dto';
 
 @Injectable()
 export class SellerService {
@@ -21,7 +24,9 @@ export class SellerService {
     private readonly userRepository: Repository<UserEntity>,
     private readonly productMapper: ProductMapper,
     private readonly jwtService: JwtService,
-  ) {}
+    @InjectRepository(PayoutEntity)
+    private readonly payoutRepository: Repository<PayoutEntity>,
+  ) { }
 
   async upgradeToSeller(
     userId: string,
@@ -141,4 +146,58 @@ export class SellerService {
       excludeExtraneousValues: true,
     });
   }
+
+  async getSellerEarningsSummary(
+    sellerId: string,
+  ): Promise<SellerEarningsSummaryDto> {
+    const rows = await this.payoutRepository
+      .createQueryBuilder('p')
+      .select([
+        `SUM(CASE WHEN p.status = 'paid' THEN p.totalAmount ELSE 0 END) AS "paidAmount"`,
+        `SUM(CASE WHEN p.status = 'pending' THEN p.totalAmount ELSE 0 END) AS "pendingAmount"`,
+      ])
+      .where('p.sellerId = :sellerId', { sellerId })
+      .getRawOne();
+
+    return {
+      paidAmount: Number(rows.paidAmount || 0),
+      pendingAmount: Number(rows.pendingAmount || 0),
+    };
+  }
+
+
+  async getSellerEarningsRound(
+    sellerId: string,
+  ): Promise<SellerEarningsRoundDto[]> {
+    const rows = await this.payoutRepository
+      .createQueryBuilder('p')
+      .leftJoin('p.payoutItem', 'pi')
+      .leftJoin('pi.orderItem', 'oi')
+      .select([
+        'p.periodStart AS "periodStart"',
+        'p.periodEnd AS "periodEnd"',
+        'p.totalAmount AS "netAmount"',
+        'p.status AS "status"',
+        'p.slipUrl AS "slipUrl"',
+        'COALESCE(SUM(oi.price), 0) AS "grossSales"',
+        'COALESCE(SUM(oi.price - oi.sellerAmount), 0) AS "commission"',
+      ])
+      .where('p.sellerId = :sellerId', { sellerId })
+      .groupBy('p.id')
+      .orderBy('p.periodStart', 'DESC')
+      .getRawMany();
+
+    return rows.map((r) => ({
+      periodStart: r.periodStart,
+      periodEnd: r.periodEnd,
+      grossSales: Number(r.grossSales),
+      commission: Number(r.commission),
+      netAmount: Number(r.netAmount),
+      status: r.status,
+      slipUrl: r.slipUrl,
+    }));
+  }
+
 }
+
+
