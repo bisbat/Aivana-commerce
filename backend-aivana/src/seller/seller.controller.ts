@@ -63,8 +63,17 @@ export class SellerController {
 
   @Roles(Role.SELLER)
   @Get('earnings/summary/:sellerId')
-  getSellerEarnings( @Param('sellerId') sellerId: string
+  getSellerEarningsSummary( @Param('sellerId') sellerId: string
   ) {
     return this.sellerService.getSellerEarningsSummary(sellerId);  
   }
+
+  @Roles(Role.SELLER)
+  @Get('earnings/round/:sellerId')
+  getSellerEarningsRound( @Param('sellerId') sellerId: string
+  ) {
+    return this.sellerService.getSellerEarningsRound(sellerId);  
+  }
+
+
 }

@@ -24,7 +24,7 @@ export class SellerService {
     private readonly jwtService: JwtService,
     @InjectRepository(PayoutEntity)
     private readonly payoutRepository: Repository<PayoutEntity>,
-  ) {}
+  ) { }
 
   async upgradeToSeller(
     userId: string,
@@ -171,4 +171,37 @@ export class SellerService {
       pendingAmount,
     };
   }
+
+  async getSellerEarningsRound(sellerId: string) {
+    const rows = await this.payoutRepository
+      .createQueryBuilder('p')
+      .leftJoin('p.payoutItem', 'pi')
+      .leftJoin('pi.orderItem', 'oi')
+      .select([
+        'p.id AS "payoutId"',
+        'p.periodStart AS "periodStart"',
+        'p.periodEnd AS "periodEnd"',
+        'p.totalAmount AS "netAmount"',
+        'p.status AS "status"',
+        'p.slipUrl AS "slipUrl"',
+        'SUM(oi.price) AS "grossSales"',
+        'SUM(oi.price - oi.sellerAmount) AS "commission"',
+      ])
+      .where('p.sellerId = :sellerId', { sellerId })
+      .groupBy('p.id')
+      .orderBy('p.periodStart', 'DESC')
+      .getRawMany();
+
+    return rows.map(r => ({
+      periodStart: r.periodStart,
+      periodEnd: r.periodEnd,
+      grossSales: Number(r.grossSales || 0),
+      commission: Number(r.commission || 0),
+      netAmount: Number(r.netAmount),
+      status: r.status,
+      slipUrl: r.slipUrl,
+    }));
+  }
 }
+
+
