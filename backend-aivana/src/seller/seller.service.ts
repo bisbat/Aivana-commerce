@@ -11,6 +11,7 @@ import { UpdateSellerDto } from './dto/update-seller.dto';
 import { ResponseProductDto } from 'src/product/dto/response-product.dto';
 import { ProductMapper } from 'src/product/product.mapper';
 import { JwtService } from '@nestjs/jwt/dist/jwt.service';
+import { PayoutEntity } from 'src/payout/entities/payout.entity';
 
 @Injectable()
 export class SellerService {
@@ -21,6 +22,8 @@ export class SellerService {
     private readonly userRepository: Repository<UserEntity>,
     private readonly productMapper: ProductMapper,
     private readonly jwtService: JwtService,
+    @InjectRepository(PayoutEntity)
+    private readonly payoutRepository: Repository<PayoutEntity>,
   ) {}
 
   async upgradeToSeller(
@@ -140,5 +143,32 @@ export class SellerService {
     return plainToInstance(ResponseSellerDto, seller, {
       excludeExtraneousValues: true,
     });
+  }
+
+  async getSellerEarningsSummary(sellerId: string) {
+    const rows = await this.payoutRepository
+      .createQueryBuilder('p')
+      .select('p.status', 'status')
+      .addSelect('SUM(p.totalAmount)', 'amount')
+      .where('p.sellerId = :sellerId', { sellerId })
+      .groupBy('p.status')
+      .getRawMany();
+
+    let paidAmount = 0;
+    let pendingAmount = 0;
+
+    for (const r of rows) {
+      if (r.status === 'paid') {
+        paidAmount = Number(r.amount);
+      }
+      if (r.status === 'pending') {
+        pendingAmount = Number(r.amount);
+      }
+    }
+
+    return {
+      paidAmount,
+      pendingAmount,
+    };
   }
 }
