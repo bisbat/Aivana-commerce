@@ -3,9 +3,8 @@
 import { Product } from "@/lib/types/product/product";
 import { SellerProfile } from "@/lib/types/user/sellerProfile";
 import BackgroundAivana from "@/components/common/BackgroundAivana";
-import EditButton from "./EditButton";
+import EditProfileButton from "@/components/common/EditProfileButton";
 import { ProductGrid } from "@/components/home/ProductGrid";
-import { useRouter } from "next/navigation";
 import {
   Package,
   ShoppingBag,
@@ -24,21 +23,20 @@ type Props = {
   seller: SellerProfile;
   products: Product[];
   productsTotal: number;
+  currentUserId?: number;
 };
 
 export default function SellerProfilePage({
   seller,
   products,
   productsTotal,
+  currentUserId,
 }: Props) {
-  const router = useRouter();
   return (
     <div className="relative max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-2 py-15">
       <BackgroundAivana />
 
-      {/* Header Section - Centered like User Profile */}
       <div className="flex flex-col items-center text-center gap-4">
-        {/* Avatar */}
         <div className="w-28 h-28 rounded-full">
           {seller.user.avatarUrl ? (
             <img
@@ -53,7 +51,6 @@ export default function SellerProfilePage({
           )}
         </div>
 
-        {/* Store Info */}
         <div>
           <h1 className="text-2xl font-bold text-white mb-1">
             {seller.storeName}
@@ -85,7 +82,11 @@ export default function SellerProfilePage({
             <MessageCircle size={16} />
             <span>ติดต่อร้านค้า</span>
           </button>
-          <EditButton username={seller.user.username} />
+          {currentUserId === Number(seller.user.id) && (
+            <EditProfileButton
+              editPath={`/seller/${seller.user.username}/edit`}
+            />
+          )}
         </div>
       </div>
 

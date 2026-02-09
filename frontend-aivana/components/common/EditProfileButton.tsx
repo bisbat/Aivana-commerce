@@ -1,9 +1,18 @@
 "use client";
 import { Edit } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-export default function EditButton({ username }: { username: string }) {
+interface EditProfileButtonProps {
+  editPath: string;
+}
+
+export default function EditProfileButton({
+  editPath,
+}: EditProfileButtonProps) {
+  const router = useRouter();
+
   const handleEdit = () => {
-    window.location.href = `/seller/${username}/edit`;
+    router.push(editPath);
   };
 
   return (

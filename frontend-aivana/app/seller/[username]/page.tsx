@@ -4,6 +4,7 @@ import {
 } from "@/lib/actions/seller.actions";
 import { getProductsBySellerId } from "@/lib/actions/seller.actions";
 import { getDashboardStats } from "@/lib/actions/dashboard.actions";
+import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import SellerProfile from "./SellerProfile";
 
@@ -34,12 +35,14 @@ export default async function SellerProfilePage({
 
   const products = await getProductsBySellerId(seller.id);
   const dashboard = await getDashboardStats(seller.id);
+  const currentUser = await getCurrentUser();
 
   return (
     <SellerProfile
       seller={seller}
       products={products}
       productsTotal={dashboard.productCount}
+      currentUserId={currentUser?.id ? parseInt(currentUser.id) : undefined}
     />
   );
 }

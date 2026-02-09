@@ -289,12 +289,6 @@ export default function OrderHistoryPage() {
                               <p className="text-white font-semibold">
                                 {formatPriceWithCurrency(Number(item.price))}
                               </p>
-                              <p className="text-xs text-slate-500 mt-1">
-                                ค่าคอมมิชชั่น:{" "}
-                                {formatPriceWithCurrency(
-                                  Number(item.commissionAmount),
-                                )}
-                              </p>
                             </div>
                           </Link>
                         );
