@@ -10,6 +10,7 @@ import {
 import { DashboardService } from './dashboard.service';
 import { CreateDashboardDto } from './dto/create-dashboard.dto';
 import { UpdateDashboardDto } from './dto/update-dashboard.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('dashboard')
 export class DashboardController {
@@ -21,6 +22,7 @@ export class DashboardController {
   }
 
   @Get(':id')
+  @Public()
   async getDashboard(@Param('id') sellerId: string) {
     return this.dashboardService.getDashboardData(sellerId);
   }

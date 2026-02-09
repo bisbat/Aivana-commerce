@@ -23,7 +23,7 @@ type Props = {
   seller: SellerProfile;
   products: Product[];
   productsTotal: number;
-  currentUserId?: number;
+  currentUserId?: string;
 };
 
 export default function SellerProfilePage({
@@ -32,6 +32,11 @@ export default function SellerProfilePage({
   productsTotal,
   currentUserId,
 }: Props) {
+  // Debug: ตรวจสอบค่า
+  console.log("currentUserId:", currentUserId, typeof currentUserId);
+  console.log("seller.user.id:", seller.user.id, typeof seller.user.id);
+  console.log("Are they equal?", currentUserId === seller.user.id);
+
   return (
     <div className="relative max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-2 py-15">
       <BackgroundAivana />
@@ -82,7 +87,7 @@ export default function SellerProfilePage({
             <MessageCircle size={16} />
             <span>ติดต่อร้านค้า</span>
           </button>
-          {currentUserId === Number(seller.user.id) && (
+          {currentUserId && currentUserId === seller.user.id && (
             <EditProfileButton
               editPath={`/seller/${seller.user.username}/edit`}
             />

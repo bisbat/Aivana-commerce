@@ -42,7 +42,7 @@ export default async function SellerProfilePage({
       seller={seller}
       products={products}
       productsTotal={dashboard.productCount}
-      currentUserId={currentUser?.id ? parseInt(currentUser.id) : undefined}
+      currentUserId={currentUser?.id}
     />
   );
 }

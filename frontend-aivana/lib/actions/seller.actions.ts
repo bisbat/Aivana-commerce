@@ -44,17 +44,10 @@ export async function becomeSeller(
 export async function getProductsBySellerId(
   sellerId: string,
 ): Promise<Product[]> {
-  const token = await getAccessToken();
-
-  if (!token) {
-    throw new Error("Unauthorized");
-  }
-
   const response = await fetch(`${API_BASE_URL}/seller/${sellerId}/products`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -118,20 +111,30 @@ export async function updateSellerProfile(
 export async function getSellerByUsername(
   username: string,
 ): Promise<SellerProfile> {
-  const token = await getAccessToken();
-  if (!token) {
-    throw new Error("Unauthorized");
+  try {
+    console.log("Fetching seller by username:", username);
+    console.log("API URL:", `${API_BASE_URL}/seller/username/${username}`);
+
+    const response = await fetch(
+      `${API_BASE_URL}/seller/username/${username}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      },
+    );
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to fetch seller by username");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching seller by username:", error);
+    throw error;
   }
-  const response = await fetch(`${API_BASE_URL}/seller/username/${username}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to fetch seller by username");
-  }
-  return await response.json();
 }
