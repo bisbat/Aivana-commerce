@@ -3,7 +3,14 @@
 import { usePathname } from "next/navigation";
 import { Navbar } from "../components/layout/Navbar";
 
-const ROUTES_WITHOUT_NAVBAR = ["/login", "/register", "/stores", "/seller", "/payment"];
+const ROUTES_WITHOUT_NAVBAR = [
+  "/login",
+  "/register",
+  "/stores",
+  "/seller",
+  "/payment",
+  "/admin",
+];
 
 export function LayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
