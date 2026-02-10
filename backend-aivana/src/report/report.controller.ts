@@ -6,11 +6,14 @@ import {
   Param,
   Delete,
   Req,
+  Patch,
 } from '@nestjs/common';
 import { ReportService } from './report.service';
 import { CreateReportDto } from './dto/create-report.dto';
+import { UpdateReportStatusDto } from './dto/update-report-status.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enum/role.enum';
+import { NotFoundException } from '@nestjs/common';
 
 @Controller('reports')
 export class ReportController {
@@ -37,7 +40,11 @@ export class ReportController {
   // ดู report ตาม orderItemId
   @Get('order-item/:orderItemId')
   async getByOrderItem(@Param('orderItemId') orderItemId: string) {
-    return await this.reportService.findByOrderItem(+orderItemId);
+    const report = await this.reportService.findByOrderItem(+orderItemId);
+    if (!report) {
+      throw new NotFoundException('ไม่พบรายงานสำหรับรายการสั่งซื้อนี้');
+    }
+    return report;
   }
 
   // ดู report ทั้งหมด (สำหรับ admin)
@@ -45,6 +52,23 @@ export class ReportController {
   @Get()
   async findAll() {
     return await this.reportService.findAll();
+  }
+
+  // ดู report by id (สำหรับ admin)
+  @Roles(Role.ADMIN)
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return await this.reportService.findOne(+id);
+  }
+
+  // อัปเดตสถานะ report (สำหรับ admin)
+  @Roles(Role.ADMIN)
+  @Patch(':id/status')
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() updateReportStatusDto: UpdateReportStatusDto,
+  ) {
+    return await this.reportService.updateStatus(+id, updateReportStatusDto);
   }
 
   // ดูรายงานที่ขายให้ตัวเอง (สำหรับ seller)

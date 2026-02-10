@@ -6,12 +6,16 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ResponseUserDto } from './dto/response-user.dto';
 import { plainToClass } from 'class-transformer';
+import { MinioService } from 'src/minio/minio.service';
+import { MINIO_FOLDERS } from 'src/constants/minio-folders.constant';
+import type { UploadedFileType } from '../product/interfaces/uploaded-file.interface';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private readonly minioService: MinioService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserEntity> {
@@ -44,6 +48,22 @@ export class UserService {
     });
   }
 
+  async findUserByUsername(username: string): Promise<UserEntity | null> {
+    console.log('Service: Searching for user by username:', username);
+    const user = await this.userRepository.findOne({
+      where: { username },
+      relations: ['sellerProfile'], // optional
+    });
+
+    if (user) {
+      console.log('Service: Found user:', user.id, user.username, user.email);
+    } else {
+      console.log('Service: No user found with username:', username);
+    }
+
+    return user;
+  }
+
   async update(
     userId: string,
     updateUserDto: Partial<CreateUserDto>,
@@ -59,6 +79,7 @@ export class UserService {
   async updateUser(
     userId: string,
     updateData: UpdateUserDto,
+    avatarFile?: UploadedFileType,
   ): Promise<ResponseUserDto> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
@@ -67,6 +88,20 @@ export class UserService {
     }
 
     console.log('Update Data:', updateData);
+
+    // Handle avatar upload if provided
+    if (avatarFile) {
+      console.log('Uploading avatar file:', avatarFile.originalname);
+      const timestamp = Date.now();
+      const folderPath = MINIO_FOLDERS.USERS.AVATARS(userId);
+      const fileName = `${folderPath}/${timestamp}-${avatarFile.originalname}`;
+
+      await this.minioService.uploadFile(avatarFile, fileName);
+      const avatarUrl = this.minioService.getFileUrl(fileName);
+
+      updateData.avatarUrl = avatarUrl;
+      console.log('Avatar uploaded successfully:', avatarUrl);
+    }
 
     // Merge the updates
     Object.assign(user, updateData);

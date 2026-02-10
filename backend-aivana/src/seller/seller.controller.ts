@@ -60,4 +60,20 @@ export class SellerController {
   ) {
     return this.sellerService.updateSellerProfile(sellerId, updateSellerDto);
   }
+
+  @Roles(Role.SELLER)
+  @Get('earnings/summary/:sellerId')
+  getSellerEarningsSummary( @Param('sellerId') sellerId: string
+  ) {
+    return this.sellerService.getSellerEarningsSummary(sellerId);  
+  }
+
+  @Roles(Role.SELLER)
+  @Get('earnings/round/:sellerId')
+  getSellerEarningsRound( @Param('sellerId') sellerId: string
+  ) {
+    return this.sellerService.getSellerEarningsRound(sellerId);  
+  }
+
+
 }

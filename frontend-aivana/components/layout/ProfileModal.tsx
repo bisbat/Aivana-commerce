@@ -77,6 +77,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           </Link>
           <Link
             className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
+            href="/orders"
+            onClick={onClose}
+          >
+            ประวัติการซื้อ
+          </Link>
+          <Link
+            className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
             href="/collections"
             onClick={onClose}
           >

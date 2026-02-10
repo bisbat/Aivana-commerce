@@ -20,6 +20,9 @@ export class ResponseUserDto {
   avatarUrl?: string;
 
   @Expose()
+  bio?: string;
+
+  @Expose()
   role: string;
 
   @Expose()
