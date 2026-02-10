@@ -11,12 +11,15 @@ import { PaymentStatusEnum } from 'src/payment/enum/payment-status.enum';
 import { PaymentEntity } from 'src/payment/entities/payment.entity';
 import { UserCollectionEntity } from 'src/user-collection/entities/user-collection.entity';
 import { ProductEntity } from 'src/product/entities/product.entity';
+import { CartItem } from 'src/cart/entities/cart-item.entity';
 
 @Injectable()
 export class OrderService {
     constructor(
         @InjectRepository(Cart)
         private readonly cartRepository: Repository<Cart>,
+        @InjectRepository(CartItem)
+        private readonly cartItemRepository: Repository<CartItem>,
         @InjectRepository(OrderItemEntity)
         private readonly orderItemRepository: Repository<OrderItemEntity>,
         @InjectRepository(OrderEntity)
@@ -112,6 +115,23 @@ export class OrderService {
         if (!payment) {
             throw new NotFoundException('Payment not found');
         }
+
+        const cart = await this.cartRepository.findOne({
+            where: { userId: order.userId }
+        });
+
+        if(cart){
+            const cartItems = await this.cartItemRepository.find({
+                where: { cartId: cart.cartId }
+            });
+
+            for (const item of cartItems) {
+                await this.cartItemRepository.remove(item);
+            }
+
+            await this.cartRepository.remove(cart);
+        }
+
 
         if (payment.status === PaymentStatusEnum.SUCCESS) {
             return order;
