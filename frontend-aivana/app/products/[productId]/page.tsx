@@ -13,6 +13,9 @@ import { getAllProductsAction } from "@/lib/actions/product.actions";
 import { useRouter } from "next/navigation";
 import MarkdownRenderer from "@/components/common/MarkdownRenderer";
 import { showSuccessToast, showErrorToast } from "@/lib/toast";
+import { UserProfile } from "@/lib/types/user/user";
+import { getUserCollections } from "@/lib/actions/user-collection.actions";
+import { UserCollection } from "@/lib/types/userCollection";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -26,6 +29,17 @@ export default function ProductDetailPage() {
   const [addingToCart, setAddingToCart] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [collections, setCollections] = useState<UserCollection[]>([]);
+
+  const prohibitedRolesForPurchase =
+    currentUser?.role === "seller" || currentUser?.role === "admin";
+
+  const isUserProduct = collections.some(
+    (collection) => collection.product.id === product?.id,
+  );
+
+  const isPurchaseDisabled = prohibitedRolesForPurchase || isUserProduct;
 
   const allImages = product
     ? [
@@ -41,10 +55,13 @@ export default function ProductDetailPage() {
       setAddingToCart(true);
 
       const user = await getCurrentUser();
+
       if (!user) {
         showErrorToast("กรุณาเข้าสู่ระบบก่อนเพิ่มสินค้าลงตะกร้า");
         return;
       }
+
+      setCurrentUser(user);
 
       await addToCart({
         userId: user.id,
@@ -86,8 +103,24 @@ export default function ProductDetailPage() {
       }
     };
 
+    const fetchCurrentUser = async () => {
+      try {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+
+        // Fetch user collections if user exists
+        if (user) {
+          const userCollections = await getUserCollections();
+          setCollections(userCollections);
+        }
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+      }
+    };
+
     fetchProduct();
     fetchAllProducts();
+    fetchCurrentUser();
   }, [productId]);
 
   useEffect(() => {
@@ -398,14 +431,12 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
-                {/* Product Blurb */}
                 <div className="flex items-center gap-3">
                   <p className="text-white text-base font-light drop-shadow-sm leading-relaxed">
                     {product.blurb}
                   </p>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex gap-2 flex-wrap">
                   <button
                     onClick={() => handlePreview(product.previewUrl ?? "")}
@@ -413,21 +444,25 @@ export default function ProductDetailPage() {
                   >
                     คลิกเพื่อดูตัวอย่าง
                   </button>
+
                   <button
                     onClick={handleAddToCart}
-                    disabled={addingToCart}
+                    disabled={addingToCart || isPurchaseDisabled}
                     className="px-4 py-2 bg-gradient-to-r from-purple-500/90 to-pink-500/90 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-colors font-medium text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow"
                   >
                     {addingToCart
                       ? "กำลังเพิ่ม..."
-                      : `เพิ่มลงตะกร้า ${formatPriceWithCurrency(
-                          product.price,
-                        )}`}
+                      : isUserProduct
+                        ? "คุณมีสินค้านี้แล้ว"
+                        : prohibitedRolesForPurchase
+                          ? "ไม่สามารถซื้อได้"
+                          : `เพิ่มลงตะกร้า ${formatPriceWithCurrency(
+                              product.price,
+                            )}`}
                   </button>
                 </div>
               </div>
 
-              {/* Compatibility Section */}
               <h3 className="text-lg font-semibold text-white/90 flex items-center gap-2">
                 <svg
                   className="w-5 h-5 text-purple-400/70"

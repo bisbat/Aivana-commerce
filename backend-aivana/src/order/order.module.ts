@@ -5,11 +5,14 @@ import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
 import { OrderEntity } from './entities/order.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Cart } from 'src/cart/entities/cart.entity';
-import { OrderItemService } from 'src/order-item/order-item.service';
 import { OrderItemModule } from 'src/order-item/order-item.module';
+import { PaymentEntity } from 'src/payment/entities/payment.entity';
+import { UserCollectionEntity } from 'src/user-collection/entities/user-collection.entity';
+import { ProductEntity } from 'src/product/entities/product.entity';
+import { CartItem } from 'src/cart/entities/cart-item.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([OrderEntity, Cart, OrderItemEntity]), OrderItemModule],
+  imports: [TypeOrmModule.forFeature([OrderEntity, Cart, OrderItemEntity, PaymentEntity, UserCollectionEntity, ProductEntity, CartItem]), OrderItemModule],
   controllers: [OrderController],
   providers: [OrderService],
   exports: [OrderService], 

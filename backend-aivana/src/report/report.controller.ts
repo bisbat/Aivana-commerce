@@ -6,9 +6,11 @@ import {
   Param,
   Delete,
   Req,
+  Patch,
 } from '@nestjs/common';
 import { ReportService } from './report.service';
 import { CreateReportDto } from './dto/create-report.dto';
+import { UpdateReportStatusDto } from './dto/update-report-status.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enum/role.enum';
 import { NotFoundException } from '@nestjs/common';
@@ -49,7 +51,25 @@ export class ReportController {
   @Roles(Role.ADMIN)
   @Get()
   async findAll() {
+    console.log('Fetching all reports');
     return await this.reportService.findAll();
+  }
+
+  // ดู report by id (สำหรับ admin)
+  @Roles(Role.ADMIN)
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return await this.reportService.findOne(+id);
+  }
+
+  // อัปเดตสถานะ report (สำหรับ admin)
+  @Roles(Role.ADMIN)
+  @Patch(':id/status')
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() updateReportStatusDto: UpdateReportStatusDto,
+  ) {
+    return await this.reportService.updateStatus(+id, updateReportStatusDto);
   }
 
   // ดูรายงานที่ขายให้ตัวเอง (สำหรับ seller)

@@ -1,5 +1,6 @@
 "use server";
 import { getAccessToken } from "../auth";
+import type { Report, ReportStatus } from "../types/report";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -72,12 +73,10 @@ export async function getReportByOrderItemAction(orderItemId: number) {
   });
 
   if (!res.ok) {
-    // Return null if report not found (404)
     if (res.status === 404) {
       return null;
     }
 
-    // Handle other errors
     try {
       const error = await res.json();
       throw new Error(error.message || "Failed to fetch report");
@@ -86,7 +85,6 @@ export async function getReportByOrderItemAction(orderItemId: number) {
     }
   }
 
-  // Check for empty response
   const text = await res.text();
   if (!text || text.trim() === "" || text === "null") {
     return null;
@@ -98,4 +96,82 @@ export async function getReportByOrderItemAction(orderItemId: number) {
     console.error("Failed to parse report response:", text);
     return null;
   }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Admin Actions
+// ────────────────────────────────────────────────────────────────────────────
+
+export async function getAllReportsAction(): Promise<Report[]> {
+  console.log('getAllReportsAction called');
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
+  const res = await fetch(`${API_BASE_URL}/reports`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || "Failed to fetch reports");
+  }
+
+  return await res.json();
+}
+
+export async function getReportByIdAction(id: number): Promise<Report> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
+  const res = await fetch(`${API_BASE_URL}/reports/${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || "Failed to fetch report");
+  }
+
+  return await res.json();
+}
+
+export async function updateReportStatusAction(
+  id: number,
+  status: ReportStatus,
+): Promise<Report> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
+  const res = await fetch(`${API_BASE_URL}/reports/${id}/status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ status }),
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || "Failed to update report status");
+  }
+
+  return await res.json();
 }

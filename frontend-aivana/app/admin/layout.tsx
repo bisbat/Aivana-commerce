@@ -9,21 +9,11 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        fontFamily: "'Geist', 'SF Pro Display', system-ui, sans-serif",
-        background: "#0f1117",
-        color: "#e2e8f0",
-      }}
-    >
+    <div className="flex min-h-screen bg-[#141332] text-slate-200">
       <Sidebar />
 
       {/* Main content area — shared padding & scroll behaviour */}
-      <main style={{ flex: 1, padding: "36px 40px", overflowY: "auto" }}>
-        {children}
-      </main>
+      <main className="flex-1 px-10 py-9 overflow-y-auto">{children}</main>
     </div>
   );
 }

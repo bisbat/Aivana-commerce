@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { loginAction } from "@/lib/actions/auth.server";
+import { getCurrentUser } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -55,6 +56,16 @@ export default function LoginPage() {
         username: formData.username,
         password: formData.password,
       });
+
+      const isAdmin = await getCurrentUser().then(
+        (user) => user?.role === "admin",
+      );
+
+      if (isAdmin) {
+        router.push("/admin/payouts");
+        router.refresh();
+        return;
+      }
 
       router.push("/");
       router.refresh();

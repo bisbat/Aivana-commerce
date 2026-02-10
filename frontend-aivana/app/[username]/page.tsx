@@ -1,7 +1,8 @@
 "use client";
 
-import { Calendar, Mail, Edit, ShoppingBag, Star, Package } from "lucide-react";
+import { Calendar, Mail, ShoppingBag, Star, Package } from "lucide-react";
 import BackgroundAivana from "@/components/common/BackgroundAivana";
+import EditProfileButton from "@/components/common/EditProfileButton";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserStats, getUserByUsername } from "@/lib/actions/user.actions";
@@ -123,13 +124,7 @@ const ProfilePage = () => {
           </div>
         </div>
         {currentUser?.id === user.id && (
-          <button
-            className="mt-3 px-5 py-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-lg transition-colors flex items-center gap-2 border border-slate-600 text-sm"
-            onClick={() => router.push("/profile/edit")}
-          >
-            <Edit size={16} />
-            <span>แก้ไขโปรไฟล์</span>
-          </button>
+          <EditProfileButton editPath="/profile/edit" />
         )}
       </div>
 
