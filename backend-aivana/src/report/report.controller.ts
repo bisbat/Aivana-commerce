@@ -51,6 +51,7 @@ export class ReportController {
   @Roles(Role.ADMIN)
   @Get()
   async findAll() {
+    console.log('Fetching all reports');
     return await this.reportService.findAll();
   }
 

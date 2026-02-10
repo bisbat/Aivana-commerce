@@ -20,7 +20,6 @@ export default async function ReportsPage() {
     error = (e as Error).message;
   }
 
-  // Pre-compute summary stats
   const pendingCount = reports.filter((r) => r.status === "pending").length;
   const underReviewCount = reports.filter(
     (r) => r.status === "under_review",

@@ -73,12 +73,10 @@ export async function getReportByOrderItemAction(orderItemId: number) {
   });
 
   if (!res.ok) {
-    // Return null if report not found (404)
     if (res.status === 404) {
       return null;
     }
 
-    // Handle other errors
     try {
       const error = await res.json();
       throw new Error(error.message || "Failed to fetch report");
@@ -87,7 +85,6 @@ export async function getReportByOrderItemAction(orderItemId: number) {
     }
   }
 
-  // Check for empty response
   const text = await res.text();
   if (!text || text.trim() === "" || text === "null") {
     return null;
@@ -106,6 +103,7 @@ export async function getReportByOrderItemAction(orderItemId: number) {
 // ────────────────────────────────────────────────────────────────────────────
 
 export async function getAllReportsAction(): Promise<Report[]> {
+  console.log('getAllReportsAction called');
   const token = await getAccessToken();
 
   if (!token) {

@@ -165,16 +165,6 @@ export default function ReportDetailCard({ report }: { report: Report }) {
                 label="ราคา"
                 value={formatPrice(report.orderItem.product.price)}
               />
-              <InfoRow
-                label="จำนวนที่สั่ง"
-                value={`${report.orderItem.quantity} ชิ้น`}
-              />
-              <InfoRow
-                label="ราคารวม"
-                value={formatPrice(
-                  report.orderItem.price * report.orderItem.quantity,
-                )}
-              />
             </div>
           </div>
         </div>

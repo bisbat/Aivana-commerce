@@ -64,39 +64,53 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           <p className="text-slate-400 text-sm mt-0.5"> {userData?.role}</p>
         </div>
         <div className="py-2">
-          <Link
-            className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
-            href={
-              userData?.role === "seller"
-                ? `/seller/${userData?.username ?? ""}`
-                : `/${userData?.username ?? ""}`
-            }
-            onClick={onClose}
-          >
-            โปรไฟล์
-          </Link>
-          <Link
-            className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
-            href="/orders"
-            onClick={onClose}
-          >
-            ประวัติการซื้อ
-          </Link>
-          <Link
-            className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
-            href="/collections"
-            onClick={onClose}
-          >
-            คอลเลกชัน
-          </Link>
-          {userData?.role === "seller" && (
+          {userData?.role === "admin" ? (
+            // เมนูสำหรับ Admin
             <Link
               className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
-              href="/stores"
+              href="/admin/payouts"
               onClick={onClose}
             >
-              ร้านค้าของฉัน
+              แดชบอร์ดแอดมิน
             </Link>
+          ) : (
+            // เมนูสำหรับ Customer และ Seller
+            <>
+              <Link
+                className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
+                href={
+                  userData?.role === "seller"
+                    ? `/seller/${userData?.username ?? ""}`
+                    : `/${userData?.username ?? ""}`
+                }
+                onClick={onClose}
+              >
+                โปรไฟล์
+              </Link>
+              <Link
+                className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
+                href="/orders"
+                onClick={onClose}
+              >
+                ประวัติการซื้อ
+              </Link>
+              <Link
+                className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
+                href="/collections"
+                onClick={onClose}
+              >
+                คอลเลกชัน
+              </Link>
+              {userData?.role === "seller" && (
+                <Link
+                  className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
+                  href="/stores"
+                  onClick={onClose}
+                >
+                  ร้านค้าของฉัน
+                </Link>
+              )}
+            </>
           )}
         </div>
         <div className="py-2 border-t border-[#262549]">
