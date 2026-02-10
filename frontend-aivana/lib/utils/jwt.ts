@@ -22,6 +22,10 @@ export function getRoleFromToken(token: string) {
   return decodeJWT(token)?.role;
 }
 
+export function getUserIdFromToken(token: string) {
+  return decodeJWT(token)?.sub;
+}
+
 export function isTokenExpired(token: string) {
   const payload = decodeJWT(token);
   if (!payload || typeof payload.exp !== 'number') return true;
