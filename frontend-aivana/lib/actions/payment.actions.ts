@@ -53,3 +53,21 @@ export async function fetchQrPromptpay(orderId: number) {
 
   return response.json() as Promise<PromptpayQrResponse>;
 }
+
+export async function cancelPayment(orderId: number) {
+  const token = await getAccessToken();
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+  const response = await fetch(`${API_BASE_URL}/payment/cancel/${orderId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(err);
+  }
+  return response.json();
+}

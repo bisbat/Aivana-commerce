@@ -3,7 +3,8 @@ export interface PromptpayQrResponse {
   paymentId: number;
   amount: number;
   status: 'pending' | 'paid' | 'failed';
-  qrImageUrl?: string;
-  redirect?: string;
+  qrImageUrl: string;
+  redirect: string;
+  action: 'SHOW_QR' | 'REDIRECT';
 }
  

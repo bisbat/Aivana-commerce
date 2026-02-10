@@ -141,5 +141,21 @@ export class PaymentService {
     }
   }
 
+  async cancelPayment(orderId: number) {
+
+    console.log(`Cancelling payment for orderId: ${orderId}`);
+    const payment = await this.paymentRepository.findOne({
+      where: {
+        orderId,
+        paymentMethod: PaymentMethodEnum.PROMPTPAY,
+      },
+      order: { createdAt: 'DESC' },
+    });
+    if (!payment) {
+      throw new NotFoundException('Payment not found');
+    }
+    await this.orderService.markAsFailed(orderId, 'cancelled');
+  }
+
 
 }

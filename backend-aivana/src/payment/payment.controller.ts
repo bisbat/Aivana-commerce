@@ -34,4 +34,10 @@ export class PaymentController {
     return { received: true };
   }
 
+  @Post('cancel/:orderId')
+  async cancelPayment(@Param('orderId', ParseIntPipe) orderId: number) {
+    console.log(`Cancelling payment for orderId eieiei: ${orderId}`);
+    return this.paymentService.cancelPayment(orderId);
+  }
+
 }

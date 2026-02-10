@@ -3,10 +3,14 @@
 import { fetchQrPromptpay } from "@/lib/actions/payment.actions";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { cancelPayment } from "@/lib/actions/payment.actions";
 
 const PAYMENT_TIMEOUT = 2 * 60; // 15 นาที (วินาที)
 
 export default function PaymentPage() {
+  const router = useRouter();
+
   const { orderId } = useParams();
   const [qrPromptpay, setQrPromptpay] = useState<string | null>(null);
   const [amount, setAmount] = useState<number>();
@@ -18,21 +22,39 @@ export default function PaymentPage() {
   useEffect(() => {
     if (!orderId) return;
 
+    let stopped = false;
+
     const fetchQr = async () => {
       try {
         const data = await fetchQrPromptpay(Number(orderId));
-        console.log("hi", data);
-        setQrPromptpay(data.qrImageUrl!);
-        setAmount(data.amount / 100);
+        setLoading(false);
+
+        // 🔁 backend คุม flow
+        if (data.action === 'REDIRECT') {
+          stopped = true;
+          router.push(data.redirect);
+          return;
+        }
+
+        if (data.action === 'SHOW_QR') {
+          setQrPromptpay(data.qrImageUrl);
+          setAmount(data.amount / 100);
+        }
       } catch (err) {
         console.error(err);
-      } finally {
-        setLoading(false);
       }
     };
 
+    // initial fetch
     fetchQr();
+
+    const interval = setInterval(() => {
+      if (!stopped) fetchQr();
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, [orderId]);
+
 
   // Timer Countdown
   useEffect(() => {
@@ -59,20 +81,13 @@ export default function PaymentPage() {
   };
 
   const handleRefresh = async () => {
-    setLoading(true);
-    setIsExpired(false);
-    setTimeLeft(PAYMENT_TIMEOUT);
-
-    try {
-      const data = await fetchQrPromptpay(Number(orderId));
-      setQrPromptpay(data.qrImageUrl!);
-      setAmount(data.amount / 100);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    router.push(`/`);
   };
+
+  const handleCancelOrder = async () => {
+    if (!orderId) return;
+    await cancelPayment(Number(orderId));
+  }
 
   if (loading)
     return (
@@ -111,22 +126,20 @@ export default function PaymentPage() {
         {/* Timer */}
         <div className="mb-6 text-center">
           <div
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${
-              isExpired
-                ? "bg-red-100"
-                : timeLeft < 300
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${isExpired
+              ? "bg-red-100"
+              : timeLeft < 300
                 ? "bg-orange-100"
                 : "bg-green-100"
-            }`}
+              }`}
           >
             <svg
-              className={`w-5 h-5 ${
-                isExpired
-                  ? "text-red-600"
-                  : timeLeft < 300
+              className={`w-5 h-5 ${isExpired
+                ? "text-red-600"
+                : timeLeft < 300
                   ? "text-orange-600"
                   : "text-green-600"
-              }`}
+                }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -139,13 +152,12 @@ export default function PaymentPage() {
               />
             </svg>
             <span
-              className={`font-mono text-lg font-bold ${
-                isExpired
-                  ? "text-red-700"
-                  : timeLeft < 300
+              className={`font-mono text-lg font-bold ${isExpired
+                ? "text-red-700"
+                : timeLeft < 300
                   ? "text-orange-700"
                   : "text-green-700"
-              }`}
+                }`}
             >
               {isExpired ? "หมดเวลา" : formatTime(timeLeft)}
             </span>
@@ -173,12 +185,12 @@ export default function PaymentPage() {
                 <h3 className="text-xl font-bold text-gray-800 mb-2">
                   QR หมดอายุ
                 </h3>
-                <p className="text-gray-600 mb-4">กรุณาสร้าง QR Code ใหม่</p>
+                <p className="text-gray-600 mb-4">ถูกยกเลิกออเดอร์ กดกลับเพื่อซื้อใหม่อีกครั้ง</p>
                 <button
                   onClick={handleRefresh}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
                 >
-                  ถูกยกเลิกออเดอร์ กดกลับเพื่อซื้อใหม่อีกครั้ง
+                  กลับไปหน้าร้านค้า
                 </button>
               </div>
             </div>
@@ -222,14 +234,15 @@ export default function PaymentPage() {
           </p>
         </div>
 
-        {/* Warning when time is low */}
-        {!isExpired && timeLeft < 300 && (
-          <div className="mt-4 bg-orange-50 border border-orange-200 rounded-lg p-3">
-            <p className="text-sm text-orange-800 text-center">
-              ⚠️ QR Code จะหมดอายุในอีก {Math.floor(timeLeft / 60)} นาที
-            </p>
-          </div>
-        )}
+        {/* Cancel Order Button */}
+        <div className="mt-6">
+          <button
+            onClick={handleCancelOrder}
+            className="w-full bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-lg font-medium transition-colors"
+          >
+            ยกเลิกออเดอร์
+          </button>
+        </div>
 
         {/* Instructions */}
         <div className="mt-6 bg-blue-50 rounded-lg p-4">
