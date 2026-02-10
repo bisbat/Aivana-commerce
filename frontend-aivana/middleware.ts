@@ -30,9 +30,9 @@ export function middleware(request: NextRequest) {
   }
 
   // seller พยายามเข้า admin zone
-  if (role === 'seller' && pathname.startsWith('/admin')) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
+  // if (role === 'seller' && pathname.startsWith('/admin')) {
+  //   return NextResponse.redirect(new URL('/', request.url));
+  // }
 
   return NextResponse.next();
 }

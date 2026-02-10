@@ -7,6 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateReportDto } from './dto/create-report.dto';
+import { UpdateReportStatusDto } from './dto/update-report-status.dto';
 import { ReportEntity } from './entities/report.entity';
 import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
 
@@ -126,5 +127,15 @@ export class ReportService {
     }
 
     await this.reportRepository.remove(report);
+  }
+
+  async updateStatus(
+    id: number,
+    updateReportStatusDto: UpdateReportStatusDto,
+  ): Promise<ReportEntity> {
+    const report = await this.findOne(id);
+
+    report.status = updateReportStatusDto.status;
+    return await this.reportRepository.save(report);
   }
 }
