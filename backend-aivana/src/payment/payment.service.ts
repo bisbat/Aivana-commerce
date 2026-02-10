@@ -40,7 +40,7 @@ export class PaymentService {
     await this.paymentRepository.save({
       orderId: orderId,
       paymentMethod: order.paymentMethod,
-      amount: amount,
+      amount: amount / 100,
       chargeId: charge.id,
       sourceId: sourceId,
       qrImageUrl: charge.source?.scannable_code?.image?.download_uri,
@@ -100,14 +100,18 @@ export class PaymentService {
   }
 
   async webhookOmiseCharge(event: any) {
-    if (event.object !== 'event') return;
-    if (event.data?.object?.object !== 'charge') return;
+    if (event.data.object !== 'charge') return;
+    const charge = event.data;
 
-    const charge = event.data.object;
     console.log('Processing charge webhook:', charge);
 
-    const orderId = charge.metadata?.orderId;
-    if (!orderId) return;
+    const payment = await this.paymentRepository.findOne({
+      where: {
+        chargeId: charge.id,
+      }
+    });
+    if (!payment) return;
+    const orderId = payment.orderId;
 
     if (charge.status === 'successful') {
       await this.orderService.markAsPaid(orderId);

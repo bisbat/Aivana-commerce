@@ -178,7 +178,7 @@ export default function PaymentPage() {
                   onClick={handleRefresh}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
                 >
-                  สร้าง QR ใหม่
+                  ถูกยกเลิกออเดอร์ กดกลับเพื่อซื้อใหม่อีกครั้ง
                 </button>
               </div>
             </div>
