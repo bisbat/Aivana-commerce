@@ -198,6 +198,36 @@ export class SellerService {
     }));
   }
 
+  async getSellerEarningsSummaryByUserId(
+    userId: string,
+  ): Promise<SellerEarningsSummaryDto> {
+    
+    const seller = await this.sellerRepository.findOne({
+      where: { user: { id: userId } },
+    });
+
+    if (!seller) {
+      throw new NotFoundException('Seller not found');
+    }
+
+    return this.getSellerEarningsSummary(seller.id);
+  }
+
+
+  async getSellerEarningsRoundByUserId(
+    userId: string,
+  ): Promise<SellerEarningsRoundDto[]> {
+    const seller = await this.sellerRepository.findOne({
+      where: { user: { id: userId } },
+    });
+
+    if (!seller) {
+      throw new NotFoundException('Seller not found');
+    }
+
+    return this.getSellerEarningsRound(seller.id);
+  }
+
 }
 
 

@@ -3,10 +3,9 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
   Put,
+  Req,
 } from '@nestjs/common';
 import { SellerService } from './seller.service';
 import { CreateSellerDto } from './dto/create-seller.dto';
@@ -17,7 +16,7 @@ import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('seller')
 export class SellerController {
-  constructor(private readonly sellerService: SellerService) {}
+  constructor(private readonly sellerService: SellerService) { }
 
   @Post('upgrade/:userId')
   @Roles(Role.CUSTOMER)
@@ -63,17 +62,31 @@ export class SellerController {
 
   @Roles(Role.SELLER)
   @Get('earnings/summary/:sellerId')
-  getSellerEarningsSummary( @Param('sellerId') sellerId: string
+  getSellerEarningsSummary(@Param('sellerId') sellerId: string
   ) {
-    return this.sellerService.getSellerEarningsSummary(sellerId);  
+    return this.sellerService.getSellerEarningsSummary(sellerId);
   }
+
 
   @Roles(Role.SELLER)
   @Get('earnings/round/:sellerId')
-  getSellerEarningsRound( @Param('sellerId') sellerId: string
+  getSellerEarningsRound(@Param('sellerId') sellerId: string
   ) {
-    return this.sellerService.getSellerEarningsRound(sellerId);  
+    return this.sellerService.getSellerEarningsRound(sellerId);
   }
+
+  @Get('earnings/summary')
+  getMyEarningsSummary(@Req() req) {
+    const userId = req.user.userId;
+    return this.sellerService.getSellerEarningsSummaryByUserId(userId);
+  }
+
+  @Get('earnings/round')
+  getMyEarningsRound(@Req() req) {
+    const userId = req.user.userId;
+    return this.sellerService.getSellerEarningsRoundByUserId(userId);
+  }
+
 
 
 }
