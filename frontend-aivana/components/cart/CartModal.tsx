@@ -9,7 +9,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { RefObject } from "react";
 import { createPayment } from "@/lib/actions/payment.actions";
 import { createOrder } from "@/lib/actions/order.actions";
-import { PaymentMethod } from "@/lib/actions/order.actions";
+import { PaymentMethod } from "@/lib/constants/paymentMethod";
 
 interface CartModalProps {
   isOpen: boolean;

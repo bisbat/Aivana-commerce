@@ -1,13 +1,9 @@
 "use server";
 
 import { getAccessToken } from "../auth";
+import { PaymentMethod } from "../constants/paymentMethod";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-
-export enum PaymentMethod {
-  CREDIT_CARD = 'credit_card',
-  PROMPTPAY = 'promptpay',
-}
 
 export async function createOrder(paymentMethod: PaymentMethod) {
   const token = await getAccessToken();

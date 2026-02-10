@@ -9,6 +9,8 @@ import { OrderItemService } from 'src/order-item/order-item.service';
 import { OrderStatusEnum } from './enum/order-status.enum';
 import { PaymentStatusEnum } from 'src/payment/enum/payment-status.enum';
 import { PaymentEntity } from 'src/payment/entities/payment.entity';
+import { UserCollectionEntity } from 'src/user-collection/entities/user-collection.entity';
+import { ProductEntity } from 'src/product/entities/product.entity';
 
 @Injectable()
 export class OrderService {
@@ -21,6 +23,10 @@ export class OrderService {
         private readonly orderRepository: Repository<OrderEntity>,
         @InjectRepository(PaymentEntity)
         private readonly paymentRepository: Repository<PaymentEntity>,
+        @InjectRepository(UserCollectionEntity)
+        private readonly userCollectionRepository: Repository<UserCollectionEntity>,
+        @InjectRepository(ProductEntity)
+        private readonly productRepository: Repository<ProductEntity>,
 
         private readonly orderItemService: OrderItemService,
     ) { }
@@ -95,6 +101,10 @@ export class OrderService {
             where: { id: orderId },
         });
 
+        if (!order) {
+            throw new NotFoundException('Order not found');
+        }
+
         const payment = await this.paymentRepository.findOne({
             where: { orderId: orderId },
         })
@@ -107,12 +117,30 @@ export class OrderService {
             return order;
         }
 
-        if (!order) {
-            throw new NotFoundException('Order not found');
-        }
-
         if (order.status === OrderStatusEnum.PAID) {
             return order;
+        }
+
+        const orderItems = await this.orderItemRepository.find({
+            where: { orderId: In([order.id]) },
+        });
+
+        console.log('Order Items:', orderItems);
+
+        for (const item of orderItems) {
+            const product = await this.productRepository.findOne({
+                where: { id: item.productId },
+            });
+
+            if (product) {
+                const userCollection = this.userCollectionRepository.create({
+                    userId: order.userId,
+                    productId: product.id,
+                    orderItemId: item.id,
+                    createdAt: new Date(),
+                });
+                await this.userCollectionRepository.save(userCollection);
+            }
         }
 
         order.status = OrderStatusEnum.PAID;

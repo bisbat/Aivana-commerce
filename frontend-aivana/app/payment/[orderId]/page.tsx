@@ -38,7 +38,7 @@ export default function PaymentPage() {
 
         if (data.action === 'SHOW_QR') {
           setQrPromptpay(data.qrImageUrl);
-          setAmount(data.amount / 100);
+          setAmount(data.amount);
         }
       } catch (err) {
         console.error(err);

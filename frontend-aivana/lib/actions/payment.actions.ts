@@ -69,5 +69,4 @@ export async function cancelPayment(orderId: number) {
     const err = await response.text();
     throw new Error(err);
   }
-  return response.json();
 }
