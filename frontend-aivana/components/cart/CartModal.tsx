@@ -7,6 +7,9 @@ import { GetCartResponse } from "@/lib/types/cart/GetCart";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { getCurrentUser } from "@/lib/auth";
 import { RefObject } from "react";
+import { createPayment } from "@/lib/actions/payment.actions";
+import { createOrder } from "@/lib/actions/order.actions";
+import { PaymentMethod } from "@/lib/constants/paymentMethod";
 
 interface CartModalProps {
   isOpen: boolean;
@@ -19,9 +22,14 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
   const [cartData, setCartData] = useState<GetCartResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [removingItemId, setRemovingItemId] = useState<number | null>(null);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
-    "promptpay" | "credit-card"
-  >("promptpay");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'promptpay' | 'credit-card'>('promptpay');
+  const omisePublicKey = process.env.NEXT_PUBLIC_OMISE_PUBLIC_KEY
+
+  useEffect(() => {
+    (window as any).Omise.setPublicKey(
+      process.env.NEXT_PUBLIC_OMISE_PUBLIC_KEY
+    );
+  }, []);
 
   const fetchCart = async () => {
     try {
@@ -75,7 +83,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
     };
   }, [isOpen]);
 
-  const total = (() => {
+  const displayTotal = (() => {
     if (!cartData?.items?.length) return "0.00";
 
     const sum = cartData.items.reduce((acc, item) => {
@@ -86,13 +94,63 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
     return Number(sum).toFixed(2);
   })();
 
+  const numericTotal = (() => {
+    if (!cartData?.items?.length) return 0;
+
+    return cartData.items.reduce((acc, item) => {
+      const price = Number(item.product.price) || 0;
+      return acc + price;
+    }, 0);
+  })();
+
+
   if (!isOpen) return null;
 
-  const handleCheckout = () => {
-    return cartData;
-    // router.push("/checkout");
-    // onClose();
+  const createPromptpaySource = (amount: number): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      (window as any).Omise.createSource(
+        'promptpay',
+        {
+          amount: amount * 100,
+          currency: 'THB',
+          type: 'promptpay',
+        },
+        (statusCode: number, response: any) => {
+          if (statusCode !== 200) {
+            reject(response);
+          } else {
+            resolve(response);
+          }
+        }
+      );
+    });
   };
+
+
+  const createSource = async (amount: number, orderId: number) => {
+    try {
+      const source = await createPromptpaySource(amount);
+      console.log('source:', source);
+
+      await createPayment(source.id, orderId);
+
+      router.push(`/payment/${orderId}`);
+    } catch (err) {
+      console.error('Create source failed', err);
+    }
+  };
+
+
+  const handleCheckout = async () => {
+    if (selectedPaymentMethod == 'promptpay') {
+      const order = await createOrder(PaymentMethod.PROMPTPAY);
+      createSource(numericTotal, order.id);
+    } else {
+      const order = await createOrder(PaymentMethod.CREDIT_CARD);
+      createSource(numericTotal, order.id);
+    }
+  };
+
 
   return (
     <>
@@ -119,12 +177,16 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
               </div>
               {/* Footer - Total and Checkout */}
               {!loading && cartData && cartData.items.length > 0 && (
-                <div className="border-t border-[#262549]">
-                  <div className="flex items-center justify-between flex-col">
-                    <span className="text-md text-slate-400">ราคารวม</span>
-                    <span className="text-xl font-semibold text-white">
-                      {formatPriceWithCurrency(total)}
-                    </span>
+                <div className="py-2 border-t border-[#262549]">
+                  <div className="px-4 py-2">
+                    <div className="flex items-center justify-between flex-col">
+                      <span className="text-md text-slate-400">
+                        ราคารวม
+                      </span>
+                      <span className="text-xl font-semibold text-white">
+                        {formatPriceWithCurrency(displayTotal)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -233,21 +295,19 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                       <button
                         onClick={() => handlePaymentMethod("credit-card")}
                         className={`w-full p-3 cursor-pointer rounded-xl transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-purple-500 group
-    ${
-      selectedPaymentMethod === "credit-card"
-        ? "bg-[#2d2a52] border-2 border-purple-500" // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
-        : "bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30"
-    }
+    ${selectedPaymentMethod === "credit-card"
+                            ? "bg-[#2d2a52] border-2 border-purple-500" // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
+                            : "bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30"
+                          }
   `}
                       >
                         <div className="flex items-center gap-3">
                           <div
                             className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors
-      ${
-        selectedPaymentMethod === "credit-card"
-          ? "bg-purple-500/20" // เมื่อถูกเลือก
-          : "bg-[#1e1b3d] group-hover:bg-[#262549]"
-      }
+      ${selectedPaymentMethod === "credit-card"
+                                ? "bg-purple-500/20" // เมื่อถูกเลือก
+                                : "bg-[#1e1b3d] group-hover:bg-[#262549]"
+                              }
     `}
                           >
                             <svg
@@ -288,21 +348,19 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                       <button
                         onClick={() => handlePaymentMethod("promptpay")}
                         className={`w-full p-3 cursor-pointer rounded-xl transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-purple-500 group
-    ${
-      selectedPaymentMethod === "promptpay"
-        ? "bg-[#2d2a52] border-2 border-purple-500" // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
-        : "bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30"
-    }
+    ${selectedPaymentMethod === "promptpay"
+                            ? "bg-[#2d2a52] border-2 border-purple-500" // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
+                            : "bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30"
+                          }
   `}
                       >
                         <div className="flex items-center gap-3">
                           <div
                             className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors
-      ${
-        selectedPaymentMethod === "promptpay"
-          ? "bg-purple-500/20" // เมื่อถูกเลือก
-          : "bg-[#1e1b3d] group-hover:bg-[#262549]"
-      }
+      ${selectedPaymentMethod === "promptpay"
+                                ? "bg-purple-500/20" // เมื่อถูกเลือก
+                                : "bg-[#1e1b3d] group-hover:bg-[#262549]"
+                              }
     `}
                           >
                             <img
@@ -355,6 +413,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                     <div>
                       <div className="p-4 pt-0">
                         <button
+                          onClick={handleCheckout}
                           className="w-full py-3.5 text-md bg-[#8a57fb] hover:bg-[#7a47eb] text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={
                             !cartData?.items || cartData.items.length === 0

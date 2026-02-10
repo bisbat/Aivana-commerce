@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { LayoutContent } from "./layoutContent";
+import Script from "next/script";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
@@ -29,6 +30,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <LayoutContent>{children}</LayoutContent>
+        <Script
+          src="https://cdn.omise.co/omise.js"
+          strategy="afterInteractive"
+        />
         <Toaster
           position="top-right"
           toastOptions={{
