@@ -14,7 +14,7 @@ import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 import { PayoutEntity } from 'src/payout/entities/payout.entity';
 import { SellerEarningsSummaryDto } from './dto/seller-earnings-summary.dto';
 import { SellerEarningsRoundDto } from './dto/seller-earnings-round.dto';
-
+import { SellerRoundDetailDto, SellerRoundItemDto } from './dto/seller-round-detail.dto';
 @Injectable()
 export class SellerService {
   constructor(
@@ -165,7 +165,6 @@ export class SellerService {
     };
   }
 
-
   async getSellerEarningsRound(
     sellerId: string,
   ): Promise<SellerEarningsRoundDto[]> {
@@ -201,7 +200,7 @@ export class SellerService {
   async getSellerEarningsSummaryByUserId(
     userId: string,
   ): Promise<SellerEarningsSummaryDto> {
-    
+
     const seller = await this.sellerRepository.findOne({
       where: { user: { id: userId } },
     });
@@ -227,6 +226,60 @@ export class SellerService {
 
     return this.getSellerEarningsRound(seller.id);
   }
+
+  async getSellerRoundDetailByPayoutId(
+    userId: string,
+    payoutId: string,
+  ): Promise<SellerRoundDetailDto> {
+    const payoutIdNumber = Number(payoutId);
+
+    const seller = await this.sellerRepository.findOne({
+      where: { user: { id: userId } },
+    });
+
+    if (!seller) {
+      throw new NotFoundException('Seller not found');
+    }
+
+    const payout = await this.payoutRepository.findOne({
+      where: {
+        id: payoutIdNumber,
+        seller: { id: seller.id },
+      },
+      relations: {
+        payoutItem: {
+          orderItem: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    if (!payout) {
+      throw new NotFoundException('Payout not found');
+    }
+
+    const items: SellerRoundItemDto[] = payout.payoutItem.map((pi) => ({
+      productName: pi.orderItem.product.name,
+      price: Number(pi.orderItem.price),
+      commission: Number(pi.orderItem.commissionAmount),
+      sellerEarning: Number(pi.orderItem.sellerAmount),
+    }));
+
+    const totalGrossSales = items.reduce((sum, item) => sum + item.price, 0);
+    const totalCommission = items.reduce((sum, item) => sum + item.commission, 0);
+    const totalNetAmount = items.reduce((sum, item) => sum + item.sellerEarning, 0);
+
+    return {
+      periodStart: payout.periodStart.toISOString(),
+      periodEnd: payout.periodEnd.toISOString(),
+      totalGrossSales,
+      totalCommission,
+      totalNetAmount,
+      items,
+    };
+  }
+
 
 }
 
