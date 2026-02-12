@@ -173,6 +173,7 @@ export class SellerService {
       .leftJoin('p.payoutItem', 'pi')
       .leftJoin('pi.orderItem', 'oi')
       .select([
+        'p.id AS "payoutId"',
         'p.periodStart AS "periodStart"',
         'p.periodEnd AS "periodEnd"',
         'p.totalAmount AS "netAmount"',
@@ -187,6 +188,7 @@ export class SellerService {
       .getRawMany();
 
     return rows.map((r) => ({
+      payoutId: r.payoutId,
       periodStart: r.periodStart,
       periodEnd: r.periodEnd,
       grossSales: Number(r.grossSales),
@@ -271,6 +273,7 @@ export class SellerService {
     const totalNetAmount = items.reduce((sum, item) => sum + item.sellerEarning, 0);
 
     return {
+      payoutId: payoutIdNumber,
       periodStart: payout.periodStart.toISOString(),
       periodEnd: payout.periodEnd.toISOString(),
       totalGrossSales,

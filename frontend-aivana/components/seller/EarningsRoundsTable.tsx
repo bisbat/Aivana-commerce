@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { SellerEarningsRound } from "@/lib/types/earning";
 
 function formatBaht(value: number): string {
@@ -18,7 +19,6 @@ function formatPeriod(start: string, end: string): string {
   return `${startDay}-${endDay} ${month}`;
 }
 
-// ─── Status badge matching screenshot ───────────────────────────────────────
 function StatusBadge({ status }: { status: "paid" | "pending" }) {
   const isPaid = status === "paid";
   
@@ -49,52 +49,51 @@ function StatusBadge({ status }: { status: "paid" | "pending" }) {
   );
 }
 
-// ─── Single table row ───────────────────────────────────────────────────────
+// ─── UPDATED: Navigate by payoutId instead of dates ─────────────────────────
 function RoundRow({ round, index }: { round: SellerEarningsRound; index: number }) {
+  const router = useRouter();
   const [hovered, setHovered] = useState(false);
+
+  const handleRowClick = () => {
+    router.push(`/stores/earnings/payout/${round.payoutId}`);
+  };
 
   return (
     <tr
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={handleRowClick}
       style={{
         borderBottom: "1px solid #e5e7eb",
         background: hovered ? "#f3f4f6" : index % 2 === 0 ? "#fff" : "#fafafa",
         transition: "background 0.12s ease",
+        cursor: "pointer",
       }}
     >
-      {/* รอบ (round number) */}
-      <td style={{ padding: "14px 16px", fontSize: 13, color: "#6366f1", fontWeight: 600 }}>
-        #{index + 12}
-      </td>
-
-      {/* ช่วงวันที่ */}
       <td style={{ padding: "14px 16px", fontSize: 13, color: "#374151" }}>
         {formatPeriod(round.periodStart, round.periodEnd)}
       </td>
 
-      {/* ยอดขายรวม */}
       <td style={{ padding: "14px 16px", fontSize: 13, color: "#374151" }}>
         {formatBaht(round.grossSales)}
       </td>
 
-      {/* ค่าคอมมิชชั่น */}
       <td style={{ padding: "14px 16px", fontSize: 13, color: "#374151" }}>
         {formatBaht(round.commission)}
       </td>
 
-      {/* เงินสุทธิ */}
       <td style={{ padding: "14px 16px", fontSize: 13, fontWeight: 600, color: "#1e1e2e" }}>
         {formatBaht(round.netAmount)}
       </td>
 
-      {/* สถานะ */}
       <td style={{ padding: "14px 16px" }}>
         <StatusBadge status={round.status} />
       </td>
 
-      {/* สลิป */}
-      <td style={{ padding: "14px 16px", fontSize: 13, color: "#6366f1" }}>
+      <td 
+        style={{ padding: "14px 16px", fontSize: 13, color: "#6366f1" }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {round.slipUrl ? (
           <a
             href={round.slipUrl}
@@ -112,9 +111,8 @@ function RoundRow({ round, index }: { round: SellerEarningsRound; index: number 
   );
 }
 
-// ─── Main table component ───────────────────────────────────────────────────
 export default function EarningsRoundsTable({ rounds }: { rounds: SellerEarningsRound[] }) {
-  const HEADERS = ["รอบ", "ช่วงวันที่", "ยอดขายรวม", "ค่าคอมมิชชั่น", "เงินสุทธิ", "สถานะ", "สลิป"];
+  const HEADERS = ["ช่วงวันที่", "ยอดขายรวม", "ค่าคอมมิชชั่น", "เงินสุทธิ", "สถานะ", "สลิป"];
 
   return (
     <div
@@ -150,12 +148,11 @@ export default function EarningsRoundsTable({ rounds }: { rounds: SellerEarnings
 
         <tbody>
           {rounds.map((round, idx) => (
-            <RoundRow key={idx} round={round} index={idx} />
+            <RoundRow key={round.payoutId} round={round} index={idx} />
           ))}
         </tbody>
       </table>
 
-      {/* Empty state */}
       {rounds.length === 0 && (
         <div
           style={{
