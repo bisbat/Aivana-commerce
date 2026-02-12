@@ -26,7 +26,7 @@ export class SellerService {
     private readonly jwtService: JwtService,
     @InjectRepository(PayoutEntity)
     private readonly payoutRepository: Repository<PayoutEntity>,
-  ) { }
+  ) {}
 
   async upgradeToSeller(
     userId: string,
@@ -130,7 +130,10 @@ export class SellerService {
 
     if (!seller) return [];
 
-    return this.productMapper.toResponseList(seller.products);
+    // Filter out deleted products
+    const activeProducts = seller.products.filter((p) => !p.isDeleted);
+
+    return this.productMapper.toResponseList(activeProducts);
   }
 
   async getSellerByUsername(username: string): Promise<ResponseSellerDto> {
@@ -164,7 +167,6 @@ export class SellerService {
       pendingAmount: Number(rows.pendingAmount || 0),
     };
   }
-
 
   async getSellerEarningsRound(
     sellerId: string,
@@ -201,7 +203,6 @@ export class SellerService {
   async getSellerEarningsSummaryByUserId(
     userId: string,
   ): Promise<SellerEarningsSummaryDto> {
-    
     const seller = await this.sellerRepository.findOne({
       where: { user: { id: userId } },
     });
@@ -212,7 +213,6 @@ export class SellerService {
 
     return this.getSellerEarningsSummary(seller.id);
   }
-
 
   async getSellerEarningsRoundByUserId(
     userId: string,
@@ -227,7 +227,4 @@ export class SellerService {
 
     return this.getSellerEarningsRound(seller.id);
   }
-
 }
-
-

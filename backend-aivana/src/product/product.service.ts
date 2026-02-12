@@ -44,6 +44,7 @@ export class ProductService {
 
   async getAllProducts(): Promise<ResponseProductDto[]> {
     const products = await this.productsRepository.find({
+      where: { isDeleted: false },
       relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
     });
 
@@ -51,6 +52,19 @@ export class ProductService {
   }
 
   async findOne(productId: number): Promise<ResponseProductDto | null> {
+    const product = await this.productsRepository.findOne({
+      where: { id: productId, isDeleted: false },
+      relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
+    });
+
+    if (!product) return null;
+
+    return this.productMapper.toResponse(product);
+  }
+
+  async findOneWithDeleted(
+    productId: number,
+  ): Promise<ResponseProductDto | null> {
     const product = await this.productsRepository.findOne({
       where: { id: productId },
       relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
@@ -71,6 +85,7 @@ export class ProductService {
       where: {
         name: productData.name,
         seller: { id: sellerId },
+        isDeleted: false,
       },
     });
 
@@ -181,7 +196,11 @@ export class ProductService {
   }
 
   async deleteProduct(id: number): Promise<void> {
-    await this.productsRepository.delete(id);
+    // Soft delete - just mark as deleted
+    await this.productsRepository.update(id, {
+      isDeleted: true,
+      deletedAt: new Date(),
+    });
   }
 
   async updateUploadedFilePath(
@@ -470,22 +489,33 @@ export class ProductService {
       .leftJoinAndSelect('product.productImages', 'images')
       .leftJoinAndSelect('product.seller', 'seller')
       .leftJoinAndSelect('seller.user', 'user')
-      .leftJoinAndSelect('product.tags', 'tag');
+      .leftJoinAndSelect('product.tags', 'tag')
+      .where('product.isDeleted = :isDeleted', { isDeleted: false });
 
     // ✅ name ต้อง search เสมอ
-    qb.where('product.name ILIKE :q', { q });
+    qb.andWhere('product.name ILIKE :q', { q });
 
     // ✅ cate / compatibility ช่วยกรอง
-    qb.orWhere('category.name ILIKE :q', { q }).orWhere(
-      ':q ILIKE ANY(product.compatibility)',
+    qb.orWhere('(category.name ILIKE :q AND product.isDeleted = false)', {
+      q,
+    }).orWhere(
+      '(:q ILIKE ANY(product.compatibility) AND product.isDeleted = false)',
       { q },
     );
 
     // ✅ คำยาว ค่อยเปิด field กว้าง
     if (!isShortKeyword) {
-      qb.orWhere('product.blurb ILIKE :q', { q })
-        .orWhere('product.description ILIKE :q', { q })
-        .orWhere(':q ILIKE ANY(product.features)', { q });
+      qb.orWhere('(product.blurb ILIKE :q AND product.isDeleted = false)', {
+        q,
+      })
+        .orWhere(
+          '(product.description ILIKE :q AND product.isDeleted = false)',
+          { q },
+        )
+        .orWhere(
+          '(:q ILIKE ANY(product.features) AND product.isDeleted = false)',
+          { q },
+        );
     }
 
     const products = await qb
@@ -504,6 +534,7 @@ export class ProductService {
     const products = await this.productsRepository.find({
       where: {
         tags: { name: normalized },
+        isDeleted: false,
       },
       relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
     });

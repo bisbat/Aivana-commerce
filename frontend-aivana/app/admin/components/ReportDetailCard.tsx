@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Report, ReportStatus } from "@/lib/types/report";
 import { updateReportStatusAction } from "@/lib/actions/report.actions";
 import { User, Package, FileText, MessageSquare } from "lucide-react";
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 // ─── Status Badge ───────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: ReportStatus }) {
@@ -87,10 +88,12 @@ export default function ReportDetailCard({ report }: { report: Report }) {
     try {
       setIsUpdating(true);
       await updateReportStatusAction(report.id, selectedStatus);
+      showSuccessToast("อัปเดตสถานะรายงานเรียบร้อยแล้ว");
+
       router.refresh();
     } catch (error) {
       console.error("Failed to update status:", error);
-      alert("ไม่สามารถอัปเดตสถานะได้");
+      showErrorToast("ไม่สามารถอัปเดตสถานะรายงานได้ กรุณาลองใหม่อีกครั้ง");
     } finally {
       setIsUpdating(false);
     }

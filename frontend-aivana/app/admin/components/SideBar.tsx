@@ -4,7 +4,6 @@ import Sidebar, { SidebarNavItem } from "@/components/common/Sidebar";
 import { Store, DollarSign, BarChart3 } from "lucide-react";
 
 const NAV_ITEMS: SidebarNavItem[] = [
-  { label: "Market Place", icon: <Store size={20} />, href: "/" },
   {
     label: "Payout Management",
     href: "/admin/payouts",
@@ -15,6 +14,7 @@ const NAV_ITEMS: SidebarNavItem[] = [
     href: "/admin/reports",
     icon: <BarChart3 size={20} />,
   },
+  { label: "Market Place", icon: <Store size={20} />, href: "/" },
 ];
 
 export default function AdminSidebar() {

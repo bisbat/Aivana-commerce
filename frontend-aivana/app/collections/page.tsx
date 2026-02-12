@@ -207,37 +207,51 @@ export default function MyCollectionPage() {
             <div
               key={item.id}
               onClick={() => router.push(`/products/${item.product.id}`)}
-              className="group cursor-pointer rounded-lg p-0 shadow hover:shadow-xl transition-all duration-300 h-auto w-full overflow-hidden bg-slate-800/60"
+              className="group cursor-pointer rounded-lg p-0 shadow hover:shadow-xl transition-all duration-300 h-auto w-full overflow-hidden bg-slate-800/60 relative"
             >
+              {/* Overlay for deleted products - แทนการใช้ opacity ทั้ง card */}
+              {item.product.isDeleted && (
+                <div className="absolute inset-0 bg-black/30 z-[1] pointer-events-none"></div>
+              )}
+
               {/* Thumbnail */}
-              <div className="relative h-48 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 overflow-hidden">
+              <div className="relative h-48 overflow-hidden">
                 <img
                   src={
                     item.product.heroImageUrl ||
                     "https://via.placeholder.com/200x150"
                   }
                   alt={item.product.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${
+                    item.product.isDeleted ? "grayscale opacity-60" : ""
+                  }`}
                 />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                <div className="absolute top-2 right-2 flex flex-col gap-1.5 items-end">
-                  {item.product.hasReviewed ? (
-                    <div className="bg-green-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit">
-                      <Star size={10} fill="white" />
-                      <span>รีวิวแล้ว</span>
+                <div className="absolute top-2 right-2 flex flex-col gap-1.5 items-end z-20">
+                  {item.product.isDeleted ? (
+                    <div className="bg-red-500/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-bold w-fit shadow-xl text-white">
+                      <span>⚠️ สินค้าถูกลบ</span>
                     </div>
                   ) : (
-                    <div className="bg-amber-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit animate-pulse">
-                      <Star size={10} fill="white" />
-                      <span>รอรีวิว</span>
-                    </div>
-                  )}
-                  {item.product.hasReported && (
-                    <div className="bg-red-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit">
-                      <Flag size={10} fill="white" />
-                      <span>รีพอร์ตแล้ว</span>
-                    </div>
+                    <>
+                      {item.product.hasReviewed ? (
+                        <div className="bg-green-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit">
+                          <Star size={10} fill="white" />
+                          <span>รีวิวแล้ว</span>
+                        </div>
+                      ) : (
+                        <div className="bg-amber-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit animate-pulse">
+                          <Star size={10} fill="white" />
+                          <span>รอรีวิว</span>
+                        </div>
+                      )}
+                      {item.product.hasReported && (
+                        <div className="bg-red-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit">
+                          <Flag size={10} fill="white" />
+                          <span>รีพอร์ตแล้ว</span>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -245,7 +259,9 @@ export default function MyCollectionPage() {
               {/* Content */}
               <div className="p-3 flex flex-col gap-3">
                 <h3
-                  className="text-base font-semibold line-clamp-2 mb-1 truncate group-hover:text-purple-400 transition-colors"
+                  className={`text-base font-semibold line-clamp-2 mb-1 truncate group-hover:text-purple-400 transition-colors ${
+                    item.product.isDeleted ? "text-slate-400" : ""
+                  }`}
                   title={item.product.name}
                 >
                   {item.product.name}
@@ -275,20 +291,28 @@ export default function MyCollectionPage() {
 
                   <button
                     type="button"
-                    disabled={item.product.hasReviewed}
+                    disabled={
+                      item.product.hasReviewed || item.product.isDeleted
+                    }
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleReview(item.product.id, item.product.name);
+                      if (!item.product.isDeleted) {
+                        handleReview(item.product.id, item.product.name);
+                      }
                     }}
                     aria-label="Review"
                     title={
-                      item.product.hasReviewed ? "รีวิวแล้ว" : "คลิกเพื่อรีวิว"
+                      item.product.isDeleted
+                        ? "สินค้าถูกลบแล้ว"
+                        : item.product.hasReviewed
+                          ? "รีวิวแล้ว"
+                          : "คลิกเพื่อรีวิว"
                     }
                     className={`
                         w-9 h-9 flex items-center justify-center rounded-lg
                         transition-all duration-150 
                         ${
-                          item.product.hasReviewed
+                          item.product.isDeleted || item.product.hasReviewed
                             ? "bg-slate-700 cursor-not-allowed opacity-60"
                             : "bg-amber-500 hover:bg-amber-600 cursor-pointer animate-pulse"
                         }
@@ -299,22 +323,31 @@ export default function MyCollectionPage() {
 
                   <button
                     type="button"
+                    disabled={item.product.isDeleted}
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleReport(
-                        item.product.id,
-                        item.product.name,
-                        item.orderItemId,
-                      );
+                      if (!item.product.isDeleted) {
+                        handleReport(
+                          item.product.id,
+                          item.product.name,
+                          item.orderItemId,
+                        );
+                      }
                     }}
                     aria-label="Report"
                     title={
-                      item.product.hasReported ? "แก้ไขรีพอร์ต" : "รีพอร์ต"
+                      item.product.isDeleted
+                        ? "สินค้าถูกลบแล้ว"
+                        : item.product.hasReported
+                          ? "แก้ไขรีพอร์ต"
+                          : "รีพอร์ต"
                     }
-                    className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 cursor-pointer ${
-                      item.product.hasReported
-                        ? "bg-red-600 hover:bg-red-700"
-                        : "bg-slate-700 hover:bg-red-600"
+                    className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 ${
+                      item.product.isDeleted
+                        ? "bg-slate-700 cursor-not-allowed opacity-60"
+                        : item.product.hasReported
+                          ? "bg-red-600 hover:bg-red-700 cursor-pointer"
+                          : "bg-slate-700 hover:bg-red-600 cursor-pointer"
                     }`}
                   >
                     <Flag className="w-4 h-4" />

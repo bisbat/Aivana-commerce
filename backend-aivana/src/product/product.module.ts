@@ -12,6 +12,7 @@ import { ProductImage } from 'src/product-image/entities/product-image.entity';
 import { ProductMapper } from './product.mapper';
 import { ReviewModule } from 'src/review/review.module';
 import { ReviewEntity } from '../review/entities/review.entity';
+import { OrderModule } from 'src/order/order.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ReviewEntity } from '../review/entities/review.entity';
     ReviewModule,
     MinioModule,
     forwardRef(() => ProductImageModule),
+    forwardRef(() => OrderModule),
   ],
   controllers: [ProductController],
   providers: [ProductService, ProductMapper],

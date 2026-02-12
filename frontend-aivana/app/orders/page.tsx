@@ -278,9 +278,16 @@ export default function OrderHistoryPage() {
                               )}
                             </div>
                             <div className="flex-1">
-                              <h4 className="text-white group-hover:text-purple-300 transition-colors font-medium line-clamp-2">
-                                {product?.name || "กำลังโหลดข้อมูลสินค้า..."}
-                              </h4>
+                              <div className="flex items-start gap-2">
+                                <h4 className="text-white group-hover:text-purple-300 transition-colors font-medium line-clamp-2 flex-1">
+                                  {product?.name || "กำลังโหลดข้อมูลสินค้า..."}
+                                </h4>
+                                {product?.isDeleted && (
+                                  <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded border border-red-500/30 whitespace-nowrap">
+                                    สินค้าถูกลบ
+                                  </span>
+                                )}
+                              </div>
                               <p className="text-sm text-slate-500 mt-1">
                                 Product ID: {item.productId}
                               </p>

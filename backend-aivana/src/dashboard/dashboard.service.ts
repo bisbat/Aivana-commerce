@@ -21,7 +21,7 @@ export class DashboardService {
 
   async getDashboardData(sellerId: string) {
     const productCount = await this.productRepository.count({
-      where: { seller: { id: sellerId } },
+      where: { seller: { id: sellerId }, isDeleted: false },
     });
     return {
       productCount,

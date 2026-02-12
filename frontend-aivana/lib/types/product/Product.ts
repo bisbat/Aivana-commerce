@@ -30,4 +30,6 @@ export interface Product {
   reviews: Review[];
   averageRating?: number;
   totalReviews?: number;
+  isDeleted: boolean;
+  deletedAt?: string;
 }

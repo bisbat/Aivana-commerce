@@ -112,10 +112,14 @@ export async function deleteProductAction(productId: string) {
     },
   });
 
-  if (res.ok) {
-    // 2. ✅ อัปเดตข้อมูลใน Cache
-    revalidatePath(`/stores/products/${productId}`);
+  if (!res.ok) {
+    // Get error message from response
+    const errorData = await res.json().catch(() => ({}));
+    const errorMessage = errorData.message || "Failed to delete product";
+    throw new Error(errorMessage);
   }
+
+  revalidatePath(`/stores/products/${productId}`);
 }
 
 export async function getAllProductsAction() {
@@ -137,21 +141,32 @@ export async function getAllProductsAction() {
 }
 
 export async function getProductByIdAction(productId: string) {
+  const token = await getAccessToken();
+
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers,
   });
 
   if (res.ok) {
-    const data = await res.json();
-    return data;
+    const text = await res.text();
+    // ถ้า response เป็น empty หรือ "null" แสดงว่าสินค้าไม่มี
+    if (!text || text === "null") {
+      return null;
+    }
+    return JSON.parse(text);
   }
 
   throw new Error("Failed to fetch product");
 }
-
 
 export async function createCompleteProduct(
   uploadFileData: UploadFileFormData, // Step 1 data

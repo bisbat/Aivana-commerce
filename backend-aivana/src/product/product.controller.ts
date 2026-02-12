@@ -22,25 +22,29 @@ import { Public } from 'src/auth/decorators/public.decorator';
 import { Query } from '@nestjs/common/decorators';
 import { Role } from 'src/auth/enum/role.enum';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { OrderService } from 'src/order/order.service';
 
 @Controller('products')
 export class ProductController {
-  constructor(private readonly ProductService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly orderService: OrderService,
+  ) {}
 
   @Public()
   @Get()
   async getProducts(@Query('tag') tag?: string) {
     if (tag) {
-      return this.ProductService.getProductsByTag(tag);
+      return this.productService.getProductsByTag(tag);
     }
 
-    return this.ProductService.getAllProducts();
+    return this.productService.getAllProducts();
   }
 
   @Public()
   @Get()
   async getAllProducts(): Promise<ResponseProductDto[]> {
-    return this.ProductService.getAllProducts();
+    return this.productService.getAllProducts();
   }
 
   @Post()
@@ -65,7 +69,7 @@ export class ProductController {
 
     const createProductDto = plainToInstance(CreateProductDto, body);
 
-    const result = await this.ProductService.createProductWithFiles(
+    const result = await this.productService.createProductWithFiles(
       createProductDto,
       validatedFiles,
     );
@@ -79,15 +83,43 @@ export class ProductController {
   @Public()
   @Get('search')
   search(@Query('q') q: string) {
-    return this.ProductService.searchProducts(q);
+    return this.productService.searchProducts(q);
   }
 
   @Public()
   @Get(':id')
   async getProductById(
     @Param('id') id: number,
+    @Req() req: any,
   ): Promise<ResponseProductDto | null> {
-    return this.ProductService.getProductById(id);
+    const product = await this.productService.getProductById(id);
+
+    if (!product) {
+      return null;
+    }
+
+    // ถ้าสินค้าถูกลบ และ user ไม่ได้ login หรือไม่เคยซื้อ -> ซ่อน
+    if (product.isDeleted) {
+      const userId = req.user?.userId;
+
+      // ถ้าไม่ได้ login -> return null
+      if (!userId) {
+        return null;
+      }
+
+      // เช็คว่า user เคยซื้อสินค้านี้หรือไม่
+      const hasPurchased = await this.orderService.hasUserPurchasedProduct(
+        userId,
+        id,
+      );
+
+      // ถ้าไม่เคยซื้อ -> return null
+      if (!hasPurchased) {
+        return null;
+      }
+    }
+
+    return product;
   }
 
   @Put(':id')
@@ -113,7 +145,7 @@ export class ProductController {
     const userId = req.user.userId;
     const updateProductDto = plainToInstance(UpdateProductDto, body);
 
-    const result = await this.ProductService.updateProductWithFiles(
+    const result = await this.productService.updateProductWithFiles(
       id,
       userId,
       updateProductDto,
@@ -129,7 +161,7 @@ export class ProductController {
   @Delete(':id')
   @Roles(Role.SELLER, Role.ADMIN)
   async deleteProduct(@Param('id') id: number) {
-    await this.ProductService.deleteProduct(id);
+    await this.productService.deleteProduct(id);
     return { message: 'Product deleted successfully' };
   }
 
@@ -165,8 +197,6 @@ export class ProductController {
   @Public()
   @Get(':id/reviews')
   async getProductReviews(@Param('id') id: number) {
-
-    
-    return this.ProductService.getProductReviews(id);
+    return this.productService.getProductReviews(id);
   }
 }

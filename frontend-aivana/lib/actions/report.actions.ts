@@ -103,7 +103,7 @@ export async function getReportByOrderItemAction(orderItemId: number) {
 // ────────────────────────────────────────────────────────────────────────────
 
 export async function getAllReportsAction(): Promise<Report[]> {
-  console.log('getAllReportsAction called');
+  console.log("getAllReportsAction called");
   const token = await getAccessToken();
 
   if (!token) {
@@ -121,6 +121,31 @@ export async function getAllReportsAction(): Promise<Report[]> {
   if (!res.ok) {
     const error = await res.json();
     throw new Error(error.message || "Failed to fetch reports");
+  }
+
+  return await res.json();
+}
+
+export async function getReportsByProductAction(
+  productId: number,
+): Promise<Report[]> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
+  const res = await fetch(`${API_BASE_URL}/reports/product/${productId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || "Failed to fetch reports for product");
   }
 
   return await res.json();

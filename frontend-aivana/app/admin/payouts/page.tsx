@@ -17,47 +17,45 @@ export default async function PayoutRoundsPage() {
   // Pre-compute summary stats here on the server — no client JS needed
   const totalSellers = rounds.reduce((sum, r) => sum + r.sellerCount, 0);
   const totalPayout = rounds.reduce((sum, r) => sum + r.totalAmount, 0);
-  const processingCount = rounds.filter((r) => r.roundStatus === "processing").length;
+  const processingCount = rounds.filter(
+    (r) => r.roundStatus === "processing",
+  ).length;
 
-  const stats = { totalSellers, totalPayout, processingCount, roundCount: rounds.length };
+  const stats = {
+    totalSellers,
+    totalPayout,
+    processingCount,
+    roundCount: rounds.length,
+  };
 
   // Find the most recent round (first item after sort by periodStart desc)
   const currentRound =
     rounds.length > 0
       ? [...rounds].sort(
-        (a, b) => new Date(b.periodStart).getTime() - new Date(a.periodStart).getTime()
-      )[0]
+          (a, b) =>
+            new Date(b.periodStart).getTime() -
+            new Date(a.periodStart).getTime(),
+        )[0]
       : null;
 
   return (
-    <div style={{ maxWidth: 960 }}>
+    <div className="max-w-6xl">
       {/* Page title */}
-      <div style={{ marginBottom: 28 }}>
-        <h2 style={{ fontSize: 24, fontWeight: 700, color: "#fff", letterSpacing: -0.3 }}>
+      <div className="mb-7">
+        <h2 className="text-2xl font-bold text-white tracking-tight">
           รอบโอนเงิน
         </h2>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>
+        <p className="text-sm text-white/35 mt-1">
           Payout Rounds — manage seller payment cycles
         </p>
       </div>
 
       {/* Error state */}
       {error && (
-        <div
-          style={{
-            background: "primary: rgba(239,68,68,0.1)",
-            border: "1px solid rgba(239,68,68,0.3)",
-            borderRadius: 12,
-            padding: "16px 20px",
-            color: "#f87171",
-            fontSize: 13,
-            marginBottom: 24,
-          }}
-        >
+        <div className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 px-5 py-4 text-sm text-red-300">
           Failed to load rounds: {error}
         </div>
       )}
-
 
       {/* Summary stats + table — client component for interactivity */}
       <PayoutRoundsTable rounds={rounds} />
