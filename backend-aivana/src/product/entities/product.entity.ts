@@ -65,6 +65,12 @@ export class ProductEntity {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
+  @Column({ type: 'boolean', default: false })
+  isDeleted: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  deletedAt: Date;
+
   @OneToMany(() => ProductImage, (image) => image.product)
   productImages: ProductImage[];
 

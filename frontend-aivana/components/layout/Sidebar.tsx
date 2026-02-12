@@ -31,7 +31,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = "/" }) => {
   }, [sellerId]);
 
   const navItems: SidebarNavItem[] = [
-    { label: "Market Place", icon: <Store size={20} />, href: "/" },
     {
       label: "Dashboard",
       icon: <LayoutDashboard size={20} />,

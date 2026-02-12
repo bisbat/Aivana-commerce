@@ -72,6 +72,8 @@ export class ProductMapper {
         reviews, // ✅ รีวิวทั้งหมด
         averageRating: Math.round(averageRating * 10) / 10, // ✅ rating เฉลี่ย
         totalReviews, // ✅ จำนวนรีวิว
+        isDeleted: product.isDeleted,
+        deletedAt: product.deletedAt,
       },
       { excludeExtraneousValues: true },
     );

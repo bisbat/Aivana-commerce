@@ -5,18 +5,46 @@ import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 @Injectable()
 export class PassportJwtAuthGuard extends AuthGuard('jwt') {
-    constructor(private reflector: Reflector) {
-        super();
+  constructor(private reflector: Reflector) {
+    super();
+  }
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    // For public routes, try to authenticate but don't throw error if it fails
+    if (isPublic) {
+      try {
+        await super.canActivate(context);
+      } catch (err) {
+        // Silent fail for public routes - user will just be undefined
+      }
+      return true;
     }
 
-    canActivate(context: ExecutionContext) {
-        const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-            context.getHandler(),
-            context.getClass(),
-        ]);
+    // For protected routes, throw error if authentication fails
+    return super.canActivate(context) as Promise<boolean>;
+  }
 
-        if (isPublic) return true;
+  handleRequest(err, user, info, context) {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
-        return super.canActivate(context);
+    // If public route and no user, allow but don't set user
+    if (isPublic) {
+      return user || null; // Return user if available, null otherwise
     }
+
+    // For protected routes, throw error if no user
+    if (err || !user) {
+      throw err || new Error('Unauthorized');
+    }
+
+    return user;
+  }
 }
