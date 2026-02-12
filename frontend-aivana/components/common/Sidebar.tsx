@@ -28,8 +28,8 @@ export default function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const activeItem = navItems
-  .filter((item) => pathname.startsWith(item.href))
-  .sort((a, b) => b.href.length - a.href.length)[0];
+    .filter((item) => pathname.startsWith(item.href))
+    .sort((a, b) => b.href.length - a.href.length)[0];
 
   return (
     <nav
@@ -48,10 +48,9 @@ export default function Sidebar({
 
       {/* Nav Items */}
       {navItems.map((item) => {
-        // ── FIXED: Better active state logic 
+        // ── FIXED: Better active state logic
         // ──────────────────────────────
         const isActive = activeItem?.href === item.href;
-
 
         return (
           <Link
