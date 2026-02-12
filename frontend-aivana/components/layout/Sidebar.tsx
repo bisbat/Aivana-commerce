@@ -38,7 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = "/" }) => {
       href: "/dashboard",
     },
     { label: "Product", icon: <Package size={20} />, href: "/stores" },
-    { label: "Earning", icon: <DollarSign size={20} />, href: "stores/earnings" },
+    { label: "Earning", icon: <DollarSign size={20} />, href: "/stores/earnings" }, // ← FIXED: Added leading /
   ];
 
   const handleAddProduct = () => {

@@ -27,6 +27,9 @@ export default function Sidebar({
   children,
 }: SidebarProps) {
   const pathname = usePathname();
+  const activeItem = navItems
+  .filter((item) => pathname.startsWith(item.href))
+  .sort((a, b) => b.href.length - a.href.length)[0];
 
   return (
     <nav
@@ -45,9 +48,10 @@ export default function Sidebar({
 
       {/* Nav Items */}
       {navItems.map((item) => {
-        // Exact match for "/" to avoid matching all routes
-        const isActive =
-          item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+        // ── FIXED: Better active state logic 
+        // ──────────────────────────────
+        const isActive = activeItem?.href === item.href;
+
 
         return (
           <Link

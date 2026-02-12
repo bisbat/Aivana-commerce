@@ -1,5 +1,7 @@
 import { fetchSellerRoundDetail } from "@/lib/actions/earning.actions";
-import SellerRoundDetailTable from "@/components/seller/EarningRoundsDetailTable"
+import SellerRoundDetailTable from "@/components/seller/EarningRoundsDetailTable";
+import Link from "next/link";
+
 // ── Next.js 15: params is a Promise ──────────────────────────────────────────
 export default async function PayoutDetailPage({
   params,
@@ -25,6 +27,22 @@ export default async function PayoutDetailPage({
 
   return (
     <div style={{ maxWidth: 1200, padding: "32px 24px" }}>
+      {/* Back Button */}
+      <Link
+        href="/stores/earnings"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          marginBottom: 20,
+          fontSize: 14,
+          color: "rgba(255,255,255,0.7)",
+          textDecoration: "none",
+        }}
+      >
+        ← กลับ
+      </Link>
+
       {/* Title */}
       <h1 style={{ fontSize: 24, fontWeight: 700, color: "#fff", marginBottom: 8 }}>
         รายการขายในรอบนี้
