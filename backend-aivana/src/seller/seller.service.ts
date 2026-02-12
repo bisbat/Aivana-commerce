@@ -166,38 +166,42 @@ export class SellerService {
   }
 
   async getSellerEarningsRound(
-    sellerId: string,
-  ): Promise<SellerEarningsRoundDto[]> {
-    const rows = await this.payoutRepository
-      .createQueryBuilder('p')
-      .leftJoin('p.payoutItem', 'pi')
-      .leftJoin('pi.orderItem', 'oi')
-      .select([
-        'p.id AS "payoutId"',
-        'p.periodStart AS "periodStart"',
-        'p.periodEnd AS "periodEnd"',
-        'p.totalAmount AS "netAmount"',
-        'p.status AS "status"',
-        'p.slipUrl AS "slipUrl"',
-        'COALESCE(SUM(oi.price), 0) AS "grossSales"',
-        'COALESCE(SUM(oi.price - oi.sellerAmount), 0) AS "commission"',
-      ])
-      .where('p.sellerId = :sellerId', { sellerId })
-      .groupBy('p.id')
-      .orderBy('p.periodStart', 'DESC')
-      .getRawMany();
+  sellerId: string,
+): Promise<SellerEarningsRoundDto[]> {
+  const rows = await this.payoutRepository
+    .createQueryBuilder('p')
+    .leftJoin('p.payoutItem', 'pi')
+    .leftJoin('pi.orderItem', 'oi')
+    .select([
+      'p.id AS "payoutId"',
+      'p.periodStart AS "periodStart"',
+      'p.periodEnd AS "periodEnd"',
+      'p.status AS "status"',
+      'p.slipUrl AS "slipUrl"',
+      'COALESCE(SUM(oi.price), 0) AS "grossSales"',
+      'COALESCE(SUM(oi.commissionAmount), 0) AS "commission"',  // ← Fixed: use commissionAmount
+      'COALESCE(SUM(oi.sellerAmount), 0) AS "netAmount"',       // ← Fixed: calculate from items
+    ])
+    .where('p.sellerId = :sellerId', { sellerId })
+    .groupBy('p.id')
+    .addGroupBy('p.periodStart')
+    .addGroupBy('p.periodEnd')
+    .addGroupBy('p.status')
+    .addGroupBy('p.slipUrl')
+    .orderBy('p.periodStart', 'DESC')
+    .getRawMany();
 
-    return rows.map((r) => ({
-      payoutId: r.payoutId,
-      periodStart: r.periodStart,
-      periodEnd: r.periodEnd,
-      grossSales: Number(r.grossSales),
-      commission: Number(r.commission),
-      netAmount: Number(r.netAmount),
-      status: r.status,
-      slipUrl: r.slipUrl,
-    }));
-  }
+  return rows.map((r) => ({
+    payoutId: Number(r.payoutId),  // ← Also convert to number
+    periodStart: r.periodStart,
+    periodEnd: r.periodEnd,
+    grossSales: Number(r.grossSales),
+    commission: Number(r.commission),
+    netAmount: Number(r.netAmount),
+    status: r.status,
+    slipUrl: r.slipUrl,
+  }));
+}
 
   async getSellerEarningsSummaryByUserId(
     userId: string,
