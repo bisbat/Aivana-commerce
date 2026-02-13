@@ -34,6 +34,12 @@ function StatusBadge({ status }: { status: ReportStatus }) {
       border: "rgba(248,113,113,0.3)",
       color: "#f87171",
     },
+    product_deleted: {
+      label: "ยกเลิกการขายสินค้า",
+      bg: "rgba(139,92,246,0.12)",
+      border: "rgba(139,92,246,0.3)",
+      color: "#8b5cf6",
+    },
   };
 
   const { label, bg, border, color } = config[status];
@@ -204,12 +210,13 @@ export default function ReportDetailCard({ report }: { report: Report }) {
       <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-6">
         <h4 className="text-lg font-semibold text-white mb-4">อัปเดตสถานะ</h4>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
           {[
             { value: "pending" as ReportStatus, label: "รอดำเนินการ" },
             { value: "under_review" as ReportStatus, label: "กำลังตรวจสอบ" },
             { value: "resolved" as ReportStatus, label: "แก้ไขแล้ว" },
-            { value: "rejected" as ReportStatus, label: "ปฏิเสธ" },
+            { value: "rejected" as ReportStatus, label: "ไม่ผ่าน" },
+            { value: "product_deleted" as ReportStatus, label: "ยกเลิกการขายสินค้า" },
           ].map((option) => (
             <button
               key={option.value}

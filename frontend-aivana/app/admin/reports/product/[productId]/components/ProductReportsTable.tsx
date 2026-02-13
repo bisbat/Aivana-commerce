@@ -27,10 +27,16 @@ function ReportStatusBadge({ status }: { status: ReportStatus }) {
       color: "#4ade80",
     },
     rejected: {
-      label: "ปฏิเสธ",
+      label: "ไม่ผ่านการตรวจสอบ",
       bg: "rgba(248,113,113,0.12)",
       border: "rgba(248,113,113,0.3)",
       color: "#f87171",
+    },
+    product_deleted: {
+      label: "ยกเลิกการขายสินค้า",
+      bg: "rgba(107,114,128,0.12)",
+      border: "rgba(107,114,128,0.3)",
+      color: "#6b7280",
     },
   };
 
@@ -146,11 +152,6 @@ function ReportRow({ report, index }: { report: Report; index: number }) {
         </div>
       </td>
 
-      {/* Action */}
-      <td className="px-6 py-4">
-        <ViewDetailButton reportId={report.id} />
-      </td>
-
       {/* Seller Response */}
       <td className="px-6 py-4">
         {report.sellerRespondedAt ? (
@@ -171,6 +172,11 @@ function ReportRow({ report, index }: { report: Report; index: number }) {
           </span>
         )}
       </td>
+
+      {/* Action */}
+      <td className="px-6 py-4">
+        <ViewDetailButton reportId={report.id} />
+      </td>
     </tr>
   );
 }
@@ -183,12 +189,12 @@ export default function ProductReportsTable({
 }) {
   const tableHeaders = [
     { label: "ID", className: "w-[70px]" },
-    { label: "ผู้รายงาน", className: "w-[200px]" },
+    { label: "ผู้รายงาน", className: "w-[180px]" },
     { label: "เหตุผล", className: "w-[30%]" },
-    { label: "สถานะ", className: "w-[150px]" },
-    { label: "วันที่รายงาน", className: "w-[160px]" },
-    { label: "การดำเนินการ", className: "w-[120px]" },
-    { label: "การตอบกลับ", className: "w-auto" },
+    { label: "สถานะ", className: "w-[140px]" },
+    { label: "วันที่รายงาน", className: "w-[150px]" },
+    { label: "การตอบกลับ", className: "w-[180px]" },
+    { label: "การดำเนินการ", className: "w-[100px]" },
   ];
 
   return (

@@ -199,35 +199,6 @@ export default function MyCollectionPage() {
     }
   };
 
-  const renderReportStatusBadge = (orderItemId?: number) => {
-    if (!orderItemId) return null;
-
-    const report = reportsByOrderItemId[orderItemId];
-    if (!report) return null;
-
-    if (report.status === "resolved") {
-      return (
-        <div
-          className="bg-emerald-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit shadow-xl text-white"
-          title="รายงานของคุณได้รับการแก้ไขแล้ว"
-        >
-          <CheckCircle size={10} />
-          <span>รายงานได้แก้ไขแล้ว</span>
-        </div>
-      );
-    }
-
-    return (
-      <div
-        className="bg-red-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit"
-        title="คุณได้ส่งรายงานไปแล้ว"
-      >
-        <Flag size={10} fill="white" />
-        <span>รีพอร์ตแล้ว</span>
-      </div>
-    );
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -312,25 +283,28 @@ export default function MyCollectionPage() {
                     item.product.isDeleted ? "grayscale opacity-60" : ""
                   }`}
                 />
-                {/* Badges มุมขวาบน (เฉพาะ Status สินค้า และ Review) */}
                 <div className="absolute top-2 right-2 flex flex-col gap-1.5 items-end z-20">
                   {item.product.isDeleted ? (
-                    <div className="bg-red-500/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-bold w-fit shadow-xl text-white">
+                    <div className="bg-red-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-[10px] font-bold w-fit shadow-xl text-white">
                       <span>⚠️ ยกเลิกการขาย</span>
                     </div>
                   ) : (
                     <>
-                      {item.product.hasReviewed ? (
-                        <div className="bg-amber-500/90 text-white backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit shadow-md">
-                          <Star size={10} fill="currentColor" />
-                          <span>รีวิวแล้ว</span>
-                        </div>
-                      ) : (
-                        <div className="bg-indigo-500/90 text-white backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit animate-pulse cursor-pointer">
-                          <Star size={10} />
-                          <span>รอรีวิว</span>
-                        </div>
-                      )}
+                      <div
+                        className={`text-white backdrop-blur-sm px-2 py-1 rounded-full 
+                        flex items-center gap-1 text-[10px] font-bold w-fit shadow-md transition-all duration-150
+                        ${item.product.hasReviewed ? "bg-slate-700" : "bg-amber-500/90 animate-pulse"}`}
+                      >
+                        <Star
+                          size={10}
+                          fill={
+                            item.product.hasReviewed ? "currentColor" : "none"
+                          }
+                        />
+                        <span>
+                          {item.product.hasReviewed ? "รีวิวแล้ว" : "รอรีวิว"}
+                        </span>
+                      </div>
 
                       {item.product.hasReported &&
                         item.orderItemId &&
@@ -339,17 +313,29 @@ export default function MyCollectionPage() {
                             reportsByOrderItemId[item.orderItemId]?.status;
 
                           if (reportStatus === "resolved") {
-                            // แสดง badge เขียว เมื่อแก้ไขแล้ว
                             return (
-                              <div className="bg-emerald-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit shadow-xl text-white">
+                              <div className="bg-emerald-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-[10px] font-bold w-fit shadow-xl text-white">
                                 <CheckCircle size={10} />
                                 <span>รีพอร์ตได้แก้ไขแล้ว</span>
                               </div>
                             );
-                          } else {
-                            // แสดง badge แดง เมื่อยังไม่แก้
+                          } else if (reportStatus === "rejected") {
                             return (
-                              <div className="bg-red-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium w-fit">
+                              <div className="bg-red-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-[10px] font-bold w-fit shadow-md text-white">
+                                <XCircle size={10} />
+                                <span>รีพอร์ตไม่ผ่านการตรวจสอบ</span>
+                              </div>
+                            );
+                          } else if (reportStatus === "product_deleted") {
+                            return (
+                              <div className="bg-purple-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-[10px] font-bold w-fit shadow-md text-white">
+                                <CheckCircle size={10} />
+                                <span>ยกเลิกการขายสินค้า</span>
+                              </div>
+                            );
+                          } else {
+                            return (
+                              <div className="bg-orange-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-[10px] font-bold w-fit text-white">
                                 <Flag size={10} fill="white" />
                                 <span>รีพอร์ตแล้ว</span>
                               </div>
@@ -411,7 +397,7 @@ export default function MyCollectionPage() {
                       className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 ${
                         item.product.isDeleted || item.product.hasReviewed
                           ? "bg-slate-700 cursor-not-allowed opacity-60 text-slate-400"
-                          : "bg-indigo-500 hover:bg-indigo-600 text-white cursor-pointer shadow-lg"
+                          : "bg-amber-500/90 text-white shadow-lg hover:bg-amber-500"
                       }`}
                     >
                       <Star
@@ -428,6 +414,7 @@ export default function MyCollectionPage() {
                         ? reportsByOrderItemId[item.orderItemId]
                         : null;
                       const isResolved = report?.status === "resolved";
+                      const isRejected = report?.status === "rejected";
 
                       if (isResolved) {
                         // ✅ Case: แก้ไขแล้ว (แสดงปุ่มเขียว)
@@ -440,6 +427,19 @@ export default function MyCollectionPage() {
                             title="รายงานได้รับการแก้ไขแล้ว"
                           >
                             <CheckCircle className="w-5 h-5" />
+                          </button>
+                        );
+                      } else if (isRejected) {
+                        // ❌ Case: ถูกปฏิเสธ (แสดงปุ่มแดง)
+                        return (
+                          <button
+                            type="button"
+                            disabled={true}
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-500 text-white shadow-lg cursor-not-allowed opacity-75"
+                            title="รายงานไม่ผ่านการตรวจสอบ"
+                          >
+                            <XCircle className="w-5 h-5" />
                           </button>
                         );
                       }
@@ -463,8 +463,8 @@ export default function MyCollectionPage() {
                             item.product.isDeleted
                               ? "bg-slate-700 cursor-not-allowed opacity-60 text-slate-400"
                               : item.product.hasReported
-                                ? "bg-slate-700 hover:bg-slate-600 text-red-400 border border-red-500/30"
-                                : "bg-slate-700 hover:bg-red-600 hover:text-white text-slate-400"
+                                ? "bg-orange-500 text-white shadow-lg hover:bg-orange-600"
+                                : "bg-slate-700/50 hover:bg-red-500/20 hover:text-red-400 text-slate-400 border border-slate-600"
                           }`}
                         >
                           <Flag
@@ -478,25 +478,29 @@ export default function MyCollectionPage() {
                     })()}
                   </div>
                 </div>
-                {/* Footer Strip (เฉพาะ Resolved) */}
                 {(() => {
                   const report = item.orderItemId
                     ? reportsByOrderItemId[item.orderItemId]
                     : null;
-                  if (report?.status === "resolved") {
+                  if (
+                    report?.status === "resolved" ||
+                    report?.status === "rejected"
+                  ) {
                     return (
-                      <div className="px-3 py-2 bg-emerald-500/10 border-t border-emerald-500/20">
-                        <div className="flex items-center justify-center gap-1.5">
-                          <span className="text-[10px] text-slate-400">
-                            ยังพบปัญหา?
-                          </span>
-                          <a
-                            href="mailto:labuboon@gmail.com"
-                            onClick={(e) => e.stopPropagation()}
-                            className="text-[10px] font-semibold text-emerald-400 hover:text-emerald-300 underline decoration-dotted underline-offset-2 transition-colors"
-                          >
-                            ติดต่อทีมสนับสนุน
-                          </a>
+                      <div className="max-h-0 group-hover:max-h-20 overflow-hidden transition-all duration-[650ms] ease-in-out">
+                        <div className="px-3 py-2 bg-purple-500/10 border-t border-purple-500/20">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <span className="text-[10px] text-slate-400">
+                              ยังพบปัญหา?
+                            </span>
+                            <a
+                              href="mailto:labuboon@gmail.com"
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-[10px] font-semibold text-purple-400 hover:text-purple-300  px-2 py-1 rounded-md underline decoration-dotted underline-offset-2 transition-all duration-200 cursor-pointer relative z-30"
+                            >
+                              ติดต่อทีมสนับสนุน
+                            </a>
+                          </div>
                         </div>
                       </div>
                     );

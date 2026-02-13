@@ -1,4 +1,3 @@
-// user-collection.controller.ts
 import { Controller, Get, Req } from '@nestjs/common';
 import { UserCollectionService } from './user-collection.service';
 

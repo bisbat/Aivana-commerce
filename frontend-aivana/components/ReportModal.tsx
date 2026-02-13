@@ -88,8 +88,8 @@ export default function ReportModal({
         <div className="p-6">
           {/* Header */}
           <div className="text-center mb-6">
-            <div className="w-14 h-14 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-              <AlertTriangle className="text-red-500" size={28} />
+            <div className="w-14 h-14 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+              <AlertTriangle className="text-orange-500" size={28} />
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">
               รีพอร์ตสินค้า
@@ -112,7 +112,7 @@ export default function ReportModal({
                   onClick={() => setSelectedReason(reason)}
                   className={`w-full p-2.5 rounded-lg text-left text-sm transition-all ${
                     selectedReason === reason
-                      ? "bg-red-500/20 border-2 border-red-500 text-white font-medium"
+                      ? "bg-orange-500/20 border-2 border-orange-500 text-white font-medium"
                       : "bg-[#262549] border-2 border-transparent hover:bg-[#2d2a52] text-slate-300"
                   }`}
                 >
@@ -131,7 +131,7 @@ export default function ReportModal({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="อธิบายปัญหาที่พบ..."
-              className="w-full h-24 p-3 bg-[#262549] rounded-xl text-white text-sm placeholder:text-slate-500 resize-none border border-transparent focus:outline-none focus:border-red-500 transition"
+              className="w-full h-24 p-3 bg-[#262549] rounded-xl text-white text-sm placeholder:text-slate-500 resize-none border border-transparent focus:outline-none focus:border-orange-500 transition"
             />
           </div>
 
@@ -140,7 +140,7 @@ export default function ReportModal({
             <button
               onClick={handleSubmit}
               disabled={isSubmitting || !selectedReason || !hasChanged}
-              className="px-8 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-full transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-red-500"
+              className="px-8 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-full transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-orange-500"
             >
               {isSubmitting ? "กำลังส่ง..." : "ส่งรีพอร์ต"}
             </button>

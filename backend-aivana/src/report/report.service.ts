@@ -244,4 +244,23 @@ export class ReportService {
 
     return await this.reportRepository.save(report);
   }
+
+  async updateAllReportsByProductToDeleted(productId: number): Promise<number> {
+    const subQuery = this.reportRepository
+      .createQueryBuilder('oi')
+      .select('oi.id')
+      .from(OrderItemEntity, 'oi')
+      .where('oi.productId = :productId', { productId })
+      .getQuery();
+
+    const result = await this.reportRepository
+      .createQueryBuilder()
+      .update(ReportEntity)
+      .set({ status: ReportStatus.PRODUCT_DELETED })
+      .where('orderItemId IN ' + subQuery)
+      .setParameter('productId', productId)
+      .execute();
+
+    return result.affected || 0;
+  }
 }

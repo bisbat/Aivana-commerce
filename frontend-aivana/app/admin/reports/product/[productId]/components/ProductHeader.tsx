@@ -81,7 +81,7 @@ export default function ProductHeader({
               </div>
             </div>
             <div className="bg-red-500/10 rounded-lg p-3 border border-red-500/20">
-              <div className="text-xs text-red-400 mb-1">ปฏิเสธแล้ว</div>
+              <div className="text-xs text-red-400 mb-1">ปฏิเสธ</div>
               <div className="text-2xl font-bold text-red-400">
                 {rejectedCount}
               </div>
@@ -92,7 +92,7 @@ export default function ProductHeader({
           <div className="flex items-center gap-3 pt-3 border-t border-white/5">
             <div className="flex-1 text-sm text-red-400">
               ⚠️ สินค้านี้มีรายงานเกินเกณฑ์ ({reportCount} รายงาน) -
-              พิจารณาลบสินค้าออกจากระบบ
+              พิจารณายกเลิกการขายสินค้า
             </div>
             <DeleteProductButton
               productId={product.id}
