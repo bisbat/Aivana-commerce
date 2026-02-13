@@ -1,7 +1,3 @@
-import { InjectRepository } from '@nestjs/typeorm';
-import { CreateOmiseDto } from './dto/create-omise.dto';
-import { UpdateOmiseDto } from './dto/update-omise.dto';
-import { OmiseEntity } from './entities/omise.entity';
 import { Injectable } from '@nestjs/common';
 import Omise from 'omise';
 
