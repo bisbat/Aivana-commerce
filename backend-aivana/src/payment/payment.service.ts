@@ -104,6 +104,7 @@ export class PaymentService {
     const charge = event.data;
 
     console.log('Processing charge webhook:', charge);
+    console.log('status: eiei', charge.status);
 
     const payment = await this.paymentRepository.findOne({
       where: {
@@ -157,5 +158,42 @@ export class PaymentService {
     await this.orderService.markAsFailed(orderId, 'cancelled');
   }
 
+  async chargeWithToken(token: string, orderId: number) {
+    const order = await this.orderService.getOrderById(orderId)
+    if (!order) {
+      throw new BadRequestException('Order not found!')
+    }
+    const amount = Math.round(Number(order.totalAmount) * 100);
 
+    const charge = await this.omiseService.createChargeWithToken(token, amount)
+
+    const paymentStatus = mapOmiseStatusToPaymentStatus(
+      charge.status,
+    );
+
+    await this.paymentRepository.save({
+      orderId: orderId,
+      paymentMethod: order.paymentMethod,
+      amount: amount / 100,
+      chargeId: charge.id,
+      status: paymentStatus,
+      createdAt: new Date(),
+    })
+
+    order.omiseChargeId = charge.id;
+    await this.orderService['orderRepository'].save(order);
+
+    if (charge.status === 'successful') {
+      await this.orderService.markAsPaidCard(orderId);
+    }
+
+    if (charge.status === 'failed' || charge.status === 'expired') {
+      await this.orderService.markAsFailedCard(orderId);
+    }
+
+    return {
+      status: charge.status,
+      authorize_uri: charge.authorize_uri,
+    }
+  }
 }
