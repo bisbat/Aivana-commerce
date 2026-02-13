@@ -24,7 +24,6 @@ const reportReasons = [
 export default function ReportModal({
   isOpen,
   onClose,
-  productId,
   productName,
   existingReason,
   existingMessage,
