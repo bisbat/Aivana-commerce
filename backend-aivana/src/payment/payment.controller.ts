@@ -17,6 +17,15 @@ export class PaymentController {
     return this.paymentService.chargeWithSource(body.sourceId, body.orderId)
   }
 
+  @Post('charge/card')
+  async chargeWithToken(@Body() body: { omiseToken: string; orderId: number },) {
+    if (!body.omiseToken || !body.orderId) {
+      throw new BadRequestException('omiseToken and orderId are required')
+    }
+
+    return this.paymentService.chargeWithToken(body.omiseToken, body.orderId)
+  }
+
   @Get('qr/:orderId')
   async getQrPromptpay(
     @Param('orderId', ParseIntPipe) orderId: number,

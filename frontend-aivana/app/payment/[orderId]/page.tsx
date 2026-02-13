@@ -8,7 +8,7 @@ import { cancelPayment } from "@/lib/actions/payment.actions";
 
 const PAYMENT_TIMEOUT = 2 * 60; // 15 นาที (วินาที)
 
-export default function PaymentPage() {
+export default function PromptpayPage() {
   const router = useRouter();
 
   const { orderId } = useParams();
@@ -29,7 +29,6 @@ export default function PaymentPage() {
         const data = await fetchQrPromptpay(Number(orderId));
         setLoading(false);
 
-        // 🔁 backend คุม flow
         if (data.action === 'REDIRECT') {
           stopped = true;
           router.push(data.redirect);

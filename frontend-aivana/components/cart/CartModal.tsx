@@ -10,6 +10,8 @@ import { RefObject } from "react";
 import { createPayment } from "@/lib/actions/payment.actions";
 import { createOrder } from "@/lib/actions/order.actions";
 import { PaymentMethod } from "@/lib/constants/paymentMethod";
+import { number } from "framer-motion";
+import { createCreditCardToken, createPromptpaySource, initOmise } from "@/lib/omise";
 
 interface CartModalProps {
   isOpen: boolean;
@@ -29,6 +31,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
     (window as any).Omise.setPublicKey(
       process.env.NEXT_PUBLIC_OMISE_PUBLIC_KEY
     );
+    // initOmise();
   }, []);
 
   const fetchCart = async () => {
@@ -106,37 +109,67 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
 
   if (!isOpen) return null;
 
-  const createPromptpaySource = (amount: number): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      (window as any).Omise.createSource(
-        'promptpay',
-        {
-          amount: amount * 100,
-          currency: 'THB',
-          type: 'promptpay',
-        },
-        (statusCode: number, response: any) => {
-          if (statusCode !== 200) {
-            reject(response);
-          } else {
-            resolve(response);
-          }
-        }
-      );
-    });
-  };
+  // const createPromptpaySource = (amount: number): Promise<any> => {
+  //   return new Promise((resolve, reject) => {
+  //     (window as any).Omise.createSource(
+  //       'promptpay',
+  //       {
+  //         amount: amount * 100,
+  //         currency: 'THB',
+  //         type: 'promptpay',
+  //       },
+  //       (statusCode: number, response: any) => {
+  //         if (statusCode !== 200) {
+  //           reject(response);
+  //         } else {
+  //           resolve(response);
+  //         }
+  //       }
+  //     );
+  //   });
+  // };
+
+  // const createCreditCardToken = (amount: number): Promise<any> => {
+  //   return new Promise((resolve, reject) => {
+  //     (window as any).Omise.createToken('card', {
+  //       name: 'Aivana Customer',
+  //       number: '4242424242424242',
+  //       expiration_month: '12',
+  //       expiration_year: '2027',
+  //       security_code: '123',
+  //     }
+  //       , (statusCode: number, response: any) => {
+  //         if (statusCode !== 200) {
+  //           reject(response);
+  //         } else {
+  //           resolve(response);
+  //         }
+  //       }
+  //     );
+  //   });
+  // }
 
 
-  const createSource = async (amount: number, orderId: number) => {
-    try {
-      const source = await createPromptpaySource(amount);
-      console.log('source:', source);
 
-      await createPayment(source.id, orderId);
+  const createSource = async (amount: number, orderId: number, paymentMethod: PaymentMethod) => {
+    if (paymentMethod === PaymentMethod.CREDIT_CARD) {
+      // const token = await createCreditCardToken();
+      // console.log('token:', token);
+      // console.log('id:', token.id);
+      router.push(`/payment/${orderId}/card`);
 
-      router.push(`/payment/${orderId}`);
-    } catch (err) {
-      console.error('Create source failed', err);
+    }
+    if (paymentMethod === PaymentMethod.PROMPTPAY) {
+      try {
+        const source = await createPromptpaySource(amount);
+        console.log('source:', source);
+
+        await createPayment(source.id, orderId);
+
+        router.push(`/payment/${orderId}`);
+      } catch (err) {
+        console.error('Create source failed', err);
+      }
     }
   };
 
@@ -144,10 +177,10 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
   const handleCheckout = async () => {
     if (selectedPaymentMethod == 'promptpay') {
       const order = await createOrder(PaymentMethod.PROMPTPAY);
-      createSource(numericTotal, order.id);
+      createSource(numericTotal, order.id, PaymentMethod.PROMPTPAY);
     } else {
       const order = await createOrder(PaymentMethod.CREDIT_CARD);
-      createSource(numericTotal, order.id);
+      createSource(numericTotal, order.id, PaymentMethod.CREDIT_CARD);
     }
   };
 

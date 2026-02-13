@@ -79,10 +79,6 @@ export class OrderService {
             throw new NotFoundException('Not found order!')
         }
 
-        // if (order.status !== 'pending') {
-        // throw new BadRequestException('Order is not payable');
-        // }
-
         return order
     }
 
@@ -100,6 +96,7 @@ export class OrderService {
     }
 
     async markAsPaid(orderId: number) {
+        console.log('mark as paid called for orderId:', orderId);
         const order = await this.orderRepository.findOne({
             where: { id: orderId },
         });
@@ -116,11 +113,15 @@ export class OrderService {
             throw new NotFoundException('Payment not found');
         }
 
+        console.log('payment', payment)
+
         const cart = await this.cartRepository.findOne({
             where: { userId: order.userId }
         });
 
-        if(cart){
+        console.log('Cart:', cart);
+
+        if (cart) {
             const cartItems = await this.cartItemRepository.find({
                 where: { cartId: cart.cartId }
             });
@@ -222,6 +223,114 @@ export class OrderService {
     }
 
 
+    async markAsPaidCard(orderId: number) {
+        const order = await this.orderRepository.findOne({
+            where: { id: orderId },
+        });
+
+        if (!order) {
+            throw new NotFoundException('Order not found');
+        }
+
+        const payment = await this.paymentRepository.findOne({
+            where: { orderId: orderId },
+        })
+
+        if (!payment) {
+            throw new NotFoundException('Payment not found');
+        }
+
+        console.log('payment', payment)
+
+        const cart = await this.cartRepository.findOne({
+            where: { userId: order.userId }
+        });
+
+        console.log('Cart:', cart);
+
+        if (cart) {
+            const cartItems = await this.cartItemRepository.find({
+                where: { cartId: cart.cartId }
+            });
+
+            for (const item of cartItems) {
+                await this.cartItemRepository.remove(item);
+            }
+
+            await this.cartRepository.remove(cart);
+        }
+
+        const orderItems = await this.orderItemRepository.find({
+            where: { orderId: In([order.id]) },
+        });
+
+        console.log('Order Items:', orderItems);
+
+        for (const item of orderItems) {
+            const product = await this.productRepository.findOne({
+                where: { id: item.productId },
+            });
+
+            if (product) {
+                const userCollection = this.userCollectionRepository.create({
+                    userId: order.userId,
+                    productId: product.id,
+                    orderItemId: item.id,
+                    createdAt: new Date(),
+                });
+                await this.userCollectionRepository.save(userCollection);
+            }
+        }
+
+        order.status = OrderStatusEnum.PAID;
+        order.paidAt = new Date();
+
+        payment.status = PaymentStatusEnum.SUCCESS;
+        payment.paidAt = new Date();
+        payment.updatedAt = new Date();
+
+        await this.paymentRepository.save(payment);
+        return this.orderRepository.save(order);
+    }
+
+    async markAsFailedCard(orderId: number, reason?: string) {
+        const order = await this.orderRepository.findOne({
+            where: { id: orderId },
+        });
+
+        if (!order) {
+            throw new NotFoundException('Order not found');
+        }
+
+        const payment = await this.paymentRepository.findOne({
+            where: { orderId },
+        });
+
+        if (!payment) {
+            throw new NotFoundException('Payment not found');
+        }
+
+        const now = new Date();
+
+        // แยกกรณีหมดอายุ vs failed
+        if (reason === 'expired') {
+            payment.status = PaymentStatusEnum.EXPIRED;
+            payment.failureReason = 'QR expired';
+            payment.expiredAt = now;
+        } else {
+            payment.status = PaymentStatusEnum.FAILED;
+            payment.failureReason = reason ?? 'Payment failed';
+            payment.failedAt = now;
+        }
+
+        payment.updatedAt = now;
+
+        order.status = OrderStatusEnum.FAILED;
+        order.updatedAt = now;
+
+        await this.paymentRepository.save(payment);
+        return this.orderRepository.save(order);
+    }
 
 
 }
