@@ -1,8 +1,7 @@
 import { getSellerReportsAction } from "@/lib/actions/report.actions";
 import type { Report } from "@/lib/types/report";
 import SellerReportsTable from "@/components/seller/SellerReportsTable";
-import ReportsClientWrapper from "./ReportsClientWrapper";
-import { AlertCircle, ShieldAlert, ShieldCheck } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 export default async function SellerReportsPage() {
   let reports: Report[] = [];
@@ -15,23 +14,12 @@ export default async function SellerReportsPage() {
     error = (e as Error).message;
   }
 
-  // Count unique products (with defensive check)
   const uniqueProducts = new Set(
     reports
       .map((r) => r.orderItem.product?.id)
       .filter((id): id is number => id !== undefined && id !== null),
   );
   const productCount = uniqueProducts.size;
-
-  // Count deleted products
-  const deletedProductIds = Array.from(
-    new Set(
-      reports
-        .filter((r) => r.orderItem.product?.isDeleted)
-        .map((r) => r.orderItem.product?.id)
-        .filter((id): id is number => id !== undefined && id !== null),
-    ),
-  );
 
   return (
     <div
