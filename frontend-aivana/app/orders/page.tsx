@@ -264,6 +264,10 @@ export default function OrderHistoryPage() {
                             href={`/products/${item.productId}`}
                             className="flex gap-4 p-4 bg-[#1e1b3d]/80 rounded-lg border border-[#262549] hover:border-purple-500/30 transition-all group cursor-pointer"
                           >
+                            {/* Overlay for deleted products - แทนการใช้ opacity ทั้ง card */}
+                            {product?.isDeleted && (
+                              <div className="absolute inset-0 bg-black/30 z-[1] pointer-events-none"></div>
+                            )}
                             <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-[#262549] ring-1 ring-[#363455] group-hover:ring-purple-500/30 transition-all">
                               {product?.heroImageUrl ? (
                                 <img
@@ -277,14 +281,15 @@ export default function OrderHistoryPage() {
                                 </div>
                               )}
                             </div>
+
                             <div className="flex-1">
                               <div className="flex items-start gap-2">
                                 <h4 className="text-white group-hover:text-purple-300 transition-colors font-medium line-clamp-2 flex-1">
                                   {product?.name || "กำลังโหลดข้อมูลสินค้า..."}
                                 </h4>
                                 {product?.isDeleted && (
-                                  <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded border border-red-500/30 whitespace-nowrap">
-                                    สินค้าถูกลบ
+                                  <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded border border-red-500/30 whitespace-nowrap z-30">
+                                    ยกเลิกการขายแล้ว
                                   </span>
                                 )}
                               </div>

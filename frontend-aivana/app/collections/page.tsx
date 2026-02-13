@@ -230,7 +230,7 @@ export default function MyCollectionPage() {
                 <div className="absolute top-2 right-2 flex flex-col gap-1.5 items-end z-20">
                   {item.product.isDeleted ? (
                     <div className="bg-red-500/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-bold w-fit shadow-xl text-white">
-                      <span>⚠️ สินค้าถูกลบ</span>
+                      <span>⚠️ ยกเลิกการขาย</span>
                     </div>
                   ) : (
                     <>
@@ -283,7 +283,7 @@ export default function MyCollectionPage() {
                     }}
                     aria-label="Download"
                     title="ดาวน์โหลด"
-                    className="flex-1 h-9 flex items-center justify-center gap-1.5 rounded-lg transition-all duration-150 bg-[#8a57fb] hover:bg-[#7a47eb] cursor-pointer text-sm font-medium"
+                    className="flex-1 h-9 flex items-center justify-center gap-1.5 rounded-lg transition-all duration-150 bg-[#8a57fb] hover:bg-[#7a47eb] cursor-pointer text-sm font-medium z-20"
                   >
                     <Download className="w-4 h-4" />
                     <span>ดาวน์โหลด</span>
@@ -303,7 +303,7 @@ export default function MyCollectionPage() {
                     aria-label="Review"
                     title={
                       item.product.isDeleted
-                        ? "สินค้าถูกลบแล้ว"
+                        ? "ยกเลิกการขายแล้ว"
                         : item.product.hasReviewed
                           ? "รีวิวแล้ว"
                           : "คลิกเพื่อรีวิว"
@@ -337,7 +337,7 @@ export default function MyCollectionPage() {
                     aria-label="Report"
                     title={
                       item.product.isDeleted
-                        ? "สินค้าถูกลบแล้ว"
+                        ? "ยกเลิกการขายแล้ว"
                         : item.product.hasReported
                           ? "แก้ไขรีพอร์ต"
                           : "รีพอร์ต"

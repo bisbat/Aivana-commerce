@@ -493,7 +493,7 @@ export default function ProductDetailPage() {
                     {addingToCart
                       ? "กำลังเพิ่ม..."
                       : product.isDeleted
-                        ? "สินค้าถูกลบแล้ว"
+                        ? "ยกเลิกการขายแล้ว"
                         : isUserProduct
                           ? "คุณมีสินค้านี้แล้ว"
                           : prohibitedRolesForPurchase
