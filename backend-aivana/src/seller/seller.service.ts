@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SellerEntity } from './entities/seller.entity';
-import { Repository } from 'typeorm';
+import { Or, Repository } from 'typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { Role } from 'src/auth/enum/role.enum';
 import { plainToInstance } from 'class-transformer';
@@ -15,6 +15,8 @@ import { PayoutEntity } from 'src/payout/entities/payout.entity';
 import { SellerEarningsSummaryDto } from './dto/seller-earnings-summary.dto';
 import { SellerEarningsRoundDto } from './dto/seller-earnings-round.dto';
 import { SellerRoundDetailDto, SellerRoundItemDto } from './dto/seller-round-detail.dto';
+import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
+import { MonthlyPerformanceDto, SellerDashboardDto, TopSellingProductDto } from './dto/seller-dashboard.dto';
 @Injectable()
 export class SellerService {
   constructor(
@@ -26,7 +28,9 @@ export class SellerService {
     private readonly jwtService: JwtService,
     @InjectRepository(PayoutEntity)
     private readonly payoutRepository: Repository<PayoutEntity>,
-  ) {}
+    @InjectRepository(OrderItemEntity)
+    private readonly orderItemRepository: Repository<OrderItemEntity>,
+  ) { }
 
   async upgradeToSeller(
     userId: string,
@@ -169,42 +173,42 @@ export class SellerService {
   }
 
   async getSellerEarningsRound(
-  sellerId: string,
-): Promise<SellerEarningsRoundDto[]> {
-  const rows = await this.payoutRepository
-    .createQueryBuilder('p')
-    .leftJoin('p.payoutItem', 'pi')
-    .leftJoin('pi.orderItem', 'oi')
-    .select([
-      'p.id AS "payoutId"',
-      'p.periodStart AS "periodStart"',
-      'p.periodEnd AS "periodEnd"',
-      'p.status AS "status"',
-      'p.slipUrl AS "slipUrl"',
-      'COALESCE(SUM(oi.price), 0) AS "grossSales"',
-      'COALESCE(SUM(oi.commissionAmount), 0) AS "commission"',  // ← Fixed: use commissionAmount
-      'COALESCE(SUM(oi.sellerAmount), 0) AS "netAmount"',       // ← Fixed: calculate from items
-    ])
-    .where('p.sellerId = :sellerId', { sellerId })
-    .groupBy('p.id')
-    .addGroupBy('p.periodStart')
-    .addGroupBy('p.periodEnd')
-    .addGroupBy('p.status')
-    .addGroupBy('p.slipUrl')
-    .orderBy('p.periodStart', 'DESC')
-    .getRawMany();
+    sellerId: string,
+  ): Promise<SellerEarningsRoundDto[]> {
+    const rows = await this.payoutRepository
+      .createQueryBuilder('p')
+      .leftJoin('p.payoutItem', 'pi')
+      .leftJoin('pi.orderItem', 'oi')
+      .select([
+        'p.id AS "payoutId"',
+        'p.periodStart AS "periodStart"',
+        'p.periodEnd AS "periodEnd"',
+        'p.status AS "status"',
+        'p.slipUrl AS "slipUrl"',
+        'COALESCE(SUM(oi.price), 0) AS "grossSales"',
+        'COALESCE(SUM(oi.commissionAmount), 0) AS "commission"',  // ← Fixed: use commissionAmount
+        'COALESCE(SUM(oi.sellerAmount), 0) AS "netAmount"',       // ← Fixed: calculate from items
+      ])
+      .where('p.sellerId = :sellerId', { sellerId })
+      .groupBy('p.id')
+      .addGroupBy('p.periodStart')
+      .addGroupBy('p.periodEnd')
+      .addGroupBy('p.status')
+      .addGroupBy('p.slipUrl')
+      .orderBy('p.periodStart', 'DESC')
+      .getRawMany();
 
-  return rows.map((r) => ({
-    payoutId: Number(r.payoutId),  // ← Also convert to number
-    periodStart: r.periodStart,
-    periodEnd: r.periodEnd,
-    grossSales: Number(r.grossSales),
-    commission: Number(r.commission),
-    netAmount: Number(r.netAmount),
-    status: r.status,
-    slipUrl: r.slipUrl,
-  }));
-}
+    return rows.map((r) => ({
+      payoutId: Number(r.payoutId),  // ← Also convert to number
+      periodStart: r.periodStart,
+      periodEnd: r.periodEnd,
+      grossSales: Number(r.grossSales),
+      commission: Number(r.commission),
+      netAmount: Number(r.netAmount),
+      status: r.status,
+      slipUrl: r.slipUrl,
+    }));
+  }
 
   async getSellerEarningsSummaryByUserId(
     userId: string,
@@ -286,6 +290,102 @@ export class SellerService {
       totalCommission,
       totalNetAmount,
       items,
+    };
+  }
+
+  // Add this method to your SellerService class
+
+  async getSellerDashboard(userId: string): Promise<SellerDashboardDto> {
+
+    // 1. Find seller by userId
+    const seller = await this.sellerRepository.findOne({
+      where: { user: { id: userId } },
+    });
+
+    if (!seller) {
+      throw new NotFoundException('Seller not found');
+    }
+
+    // ───────────────────────────────────────────────────────────────────────────
+    // 2. TOTAL REVENUE & TOTAL ITEMS SOLD
+    // ───────────────────────────────────────────────────────────────────────────
+    const totals = await this.orderItemRepository
+      .createQueryBuilder('oi')
+      .innerJoin('oi.order', 'o')
+      .select([
+        'COALESCE(SUM(oi.sellerAmount), 0) AS "totalRevenue"',
+        'COALESCE(COUNT(oi.id), 0) AS "totalItemsSold"',
+      ])
+      .where('oi.sellerId = :sellerId', { sellerId: seller.id })
+      .andWhere('o.status = :status', { status: 'PAID' })
+      .getRawOne();
+
+    // ───────────────────────────────────────────────────────────────────────────
+    // 3. MONTHLY PERFORMANCE (last 12 months)
+    // ───────────────────────────────────────────────────────────────────────────
+    const monthlyData = await this.orderItemRepository
+      .createQueryBuilder('oi')
+      .innerJoin('oi.order', 'o')
+      .select([
+        `TO_CHAR(oi.createdAt, 'YYYY-MM') AS "month"`,
+        'COALESCE(SUM(oi.sellerAmount), 0) AS "revenue"',
+        'COALESCE(COUNT(oi.id), 0) AS "itemsSold"',
+        'COALESCE(COUNT(DISTINCT o.id), 0) AS "ordersCount"',
+      ])
+      .where('oi.sellerId = :sellerId', { sellerId: seller.id })
+      .andWhere('o.status = :status', { status: 'PAID' })
+      .andWhere('oi.createdAt >= NOW() - INTERVAL \'12 months\'')
+      .groupBy(`TO_CHAR(oi.createdAt, 'YYYY-MM')`)
+      .orderBy(`TO_CHAR(oi.createdAt, 'YYYY-MM')`, 'ASC')
+      .getRawMany();
+
+    const monthlyPerformance: MonthlyPerformanceDto[] = monthlyData.map((m) => ({
+      month: m.month,
+      revenue: Number(m.revenue),
+      itemsSold: Number(m.itemsSold),
+      ordersCount: Number(m.ordersCount),
+    }));
+
+    // ───────────────────────────────────────────────────────────────────────────
+    // 4. TOP SELLING PRODUCTS (top 5)
+    // ───────────────────────────────────────────────────────────────────────────
+    const topProducts = await this.orderItemRepository
+      .createQueryBuilder('oi')
+      .innerJoin('oi.order', 'o')
+      .innerJoin('oi.product', 'p')
+      .select([
+        'p.id AS "productId"',
+        'p.name AS "productName"',
+        'p.heroImageUrl AS "imageUrl"', // 👈 use this instead
+        'COALESCE(COUNT(oi.id), 0) AS "totalSold"',
+        'COALESCE(SUM(oi.sellerAmount), 0) AS "revenue"',
+      ])
+      .where('oi.sellerId = :sellerId', { sellerId: seller.id })
+      .andWhere('o.status = :status', { status: 'PAID' })
+      .groupBy('p.id')
+      .addGroupBy('p.name')
+      .addGroupBy('p.heroImageUrl') // ⚠ important because of group by
+      .orderBy('COUNT(oi.id)', 'DESC')
+      .limit(5)
+      .getRawMany();
+
+
+    const topSellingProducts: TopSellingProductDto[] = topProducts.map((p) => ({
+      productId: Number(p.productId),
+      productName: p.productName,
+      imageUrl: p.imageUrl,
+      totalSold: Number(p.totalSold),
+      revenue: Number(p.revenue),
+    }));
+
+    // ───────────────────────────────────────────────────────────────────────────
+    // RETURN DASHBOARD DATA
+    // ───────────────────────────────────────────────────────────────────────────
+    return {
+      totalRevenue: Number(totals.totalRevenue),
+      totalItemsSold: Number(totals.totalItemsSold),
+      monthlyPerformance,
+      topSellingProducts,
     };
   }
 
