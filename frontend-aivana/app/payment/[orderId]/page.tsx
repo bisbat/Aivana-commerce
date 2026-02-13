@@ -8,7 +8,7 @@ import { cancelPayment } from "@/lib/actions/payment.actions";
 
 const PAYMENT_TIMEOUT = 2 * 60; // 15 นาที (วินาที)
 
-export default function PaymentPage() {
+export default function PromptpayPage() {
   const router = useRouter();
 
   const { orderId } = useParams();
@@ -29,7 +29,6 @@ export default function PaymentPage() {
         const data = await fetchQrPromptpay(Number(orderId));
         setLoading(false);
 
-        // 🔁 backend คุม flow
         if (data.action === 'REDIRECT') {
           stopped = true;
           router.push(data.redirect);
@@ -100,11 +99,11 @@ export default function PaymentPage() {
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+        <div className="text-center mb-2">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-2">
             <svg
               className="w-8 h-8 text-blue-600"
               fill="none"
@@ -119,12 +118,12 @@ export default function PaymentPage() {
               />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">ชำระเงิน</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">ชำระเงิน</h1>
           <p className="text-gray-600">สแกน QR Code เพื่อชำระเงิน</p>
         </div>
 
         {/* Timer */}
-        <div className="mb-6 text-center">
+        <div className="mb-2 text-center">
           <div
             className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${isExpired
               ? "bg-red-100"
@@ -197,7 +196,7 @@ export default function PaymentPage() {
           )}
 
           {qrPromptpay ? (
-            <div className="bg-white border-4 border-blue-500 rounded-xl p-4 shadow-lg">
+            <div className="bg-white border-4 border-blue-500 rounded-xl p-3 shadow-lg max-w-xs mx-auto">
               <img
                 src={qrPromptpay}
                 alt="PromptPay QR"
@@ -205,9 +204,9 @@ export default function PaymentPage() {
               />
             </div>
           ) : (
-            <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl p-12 text-center">
+            <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center max-w-xs mx-auto">
               <svg
-                className="w-16 h-16 text-gray-400 mx-auto mb-3"
+                className="w-12 h-12 text-gray-400 mx-auto mb-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -219,7 +218,7 @@ export default function PaymentPage() {
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                 />
               </svg>
-              <p className="text-gray-500 font-medium">
+              <p className="text-gray-500 font-medium text-sm">
                 QR Code ไม่พร้อมใช้งาน
               </p>
             </div>
@@ -227,9 +226,9 @@ export default function PaymentPage() {
         </div>
 
         {/* Amount Section */}
-        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-6 text-center">
+        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-2 text-center">
           <p className="text-blue-100 text-sm font-medium mb-1">ยอดชำระ</p>
-          <p className="text-white text-4xl font-bold">
+          <p className="text-white text-2xl font-bold">
             ฿{amount?.toLocaleString("th-TH") || "0"}
           </p>
         </div>

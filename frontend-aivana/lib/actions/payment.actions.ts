@@ -1,5 +1,6 @@
 "use server";
 import { getAccessToken } from "../auth";
+import { PaymentStatus } from "../constants/paymentStatus";
 import { PromptpayQrResponse } from "../types/payment";
 
 const API_BASE_URL =
@@ -69,4 +70,33 @@ export async function cancelPayment(orderId: number) {
     const err = await response.text();
     throw new Error(err);
   }
+}
+
+export async function createCreditCardPayment(
+  omiseToken: string,
+  orderId: number,
+) {
+  const token = await getAccessToken();
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/payment/charge/card`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      omiseToken,
+      orderId,
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(err);
+  }
+
+  return response.json();
 }
