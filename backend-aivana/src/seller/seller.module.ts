@@ -8,10 +8,11 @@ import { ProductModule } from '../product/product.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JWT_SECRET } from 'src/auth/config/jwt-secret';
 import { PayoutEntity } from 'src/payout/entities/payout.entity';
+import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SellerEntity, UserEntity, PayoutEntity]),
+    TypeOrmModule.forFeature([SellerEntity, UserEntity, PayoutEntity, OrderItemEntity]),
     ProductModule,
     JwtModule.register({
       global: true,

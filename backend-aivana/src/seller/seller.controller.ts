@@ -16,7 +16,11 @@ import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('seller')
 export class SellerController {
-  constructor(private readonly sellerService: SellerService) { }
+  constructor(private readonly sellerService: SellerService) {}
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ⚠️ CRITICAL: Specific routes MUST come BEFORE :param routes!
+  // ═══════════════════════════════════════════════════════════════════════════
 
   @Post('upgrade/:userId')
   @Roles(Role.CUSTOMER)
@@ -27,16 +31,36 @@ export class SellerController {
     return this.sellerService.upgradeToSeller(userId, createSellerDto);
   }
 
-  @Get()
-  @Roles(Role.ADMIN)
-  getAllSellers() {
-    return this.sellerService.getAllSellers();
+  // ──────────────────────────────────────────────────────────────────────────
+  // SECTION 1: SPECIFIC ROUTES (no :param at this level)
+  // ──────────────────────────────────────────────────────────────────────────
+
+  @Get('dashboard')
+  @Roles(Role.SELLER)
+  getDashboard(@Req() req) {
+    const userId = req.user.userId;
+    return this.sellerService.getSellerDashboard(userId);
   }
 
-  @Get(':sellerId')
-  @Roles(Role.SELLER, Role.ADMIN)
-  getSellerById(@Param('sellerId') sellerId: string) {
-    return this.sellerService.getSellerById(sellerId);
+  @Get('earnings/summary')
+  @Roles(Role.SELLER)
+  getMyEarningsSummary(@Req() req) {
+    const userId = req.user.userId;
+    return this.sellerService.getSellerEarningsSummaryByUserId(userId);
+  }
+
+  @Get('earnings/round')
+  @Roles(Role.SELLER)
+  getMyEarningsRound(@Req() req) {
+    const userId = req.user.userId;
+    return this.sellerService.getSellerEarningsRoundByUserId(userId);
+  }
+
+  @Get('earnings/round/payout/:payoutId')
+  @Roles(Role.SELLER)
+  getRoundDetail(@Req() req, @Param('payoutId') payoutId: string) {
+    const userId = req.user.userId;
+    return this.sellerService.getSellerRoundDetailByPayoutId(userId, payoutId);
   }
 
   @Get('username/:username')
@@ -45,8 +69,28 @@ export class SellerController {
     return this.sellerService.getSellerByUsername(username);
   }
 
-  @Public()
+  // ──────────────────────────────────────────────────────────────────────────
+  // SECTION 2: COLLECTION ROUTES (no params)
+  // ──────────────────────────────────────────────────────────────────────────
+
+  @Get()
+  @Roles(Role.ADMIN)
+  getAllSellers() {
+    return this.sellerService.getAllSellers();
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // SECTION 3: PARAMETERIZED ROUTES (MUST BE LAST!)
+  // ──────────────────────────────────────────────────────────────────────────
+
+  @Get(':sellerId')
+  @Roles(Role.SELLER, Role.ADMIN)
+  getSellerById(@Param('sellerId') sellerId: string) {
+    return this.sellerService.getSellerById(sellerId);
+  }
+
   @Get(':sellerId/products')
+  @Public()
   getProductsBySellerId(@Param('sellerId') sellerId: string) {
     return this.sellerService.getProductsBySellerId(sellerId);
   }
@@ -60,45 +104,19 @@ export class SellerController {
     return this.sellerService.updateSellerProfile(sellerId, updateSellerDto);
   }
 
-  @Roles(Role.SELLER)
+  // ──────────────────────────────────────────────────────────────────────────
+  // DEPRECATED (kept for backward compatibility)
+  // ──────────────────────────────────────────────────────────────────────────
+
   @Get('earnings/summary/:sellerId')
-  getSellerEarningsSummary(@Param('sellerId') sellerId: string
-  ) {
+  @Roles(Role.SELLER)
+  getSellerEarningsSummary(@Param('sellerId') sellerId: string) {
     return this.sellerService.getSellerEarningsSummary(sellerId);
   }
 
-
-  @Roles(Role.SELLER)
   @Get('earnings/round/:sellerId')
-  getSellerEarningsRound(@Param('sellerId') sellerId: string
-  ) {
+  @Roles(Role.SELLER)
+  getSellerEarningsRound(@Param('sellerId') sellerId: string) {
     return this.sellerService.getSellerEarningsRound(sellerId);
   }
-
-  @Get('earnings/summary')
-  getMyEarningsSummary(@Req() req) {
-    const userId = req.user.userId;
-    return this.sellerService.getSellerEarningsSummaryByUserId(userId);
-  }
-
-  @Get('earnings/round')
-  getMyEarningsRound(@Req() req) {
-    const userId = req.user.userId;
-    return this.sellerService.getSellerEarningsRoundByUserId(userId);
-  }
-
-  @Get('earnings/round/payout/:payoutId')
-  getRoundDetail(
-    @Req() req,
-    @Param('payoutId') payoutId: string,
-  ) {
-    const userId = req.user.userId;
-
-    return this.sellerService.getSellerRoundDetailByPayoutId(
-      userId,
-      payoutId,
-    );
-  }
-
-
 }
