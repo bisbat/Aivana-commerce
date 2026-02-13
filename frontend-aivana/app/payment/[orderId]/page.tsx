@@ -6,8 +6,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cancelPayment } from "@/lib/actions/payment.actions";
 
-const PAYMENT_TIMEOUT = 2 * 60; // 15 นาที (วินาที)
-
 export default function PromptpayPage() {
   const router = useRouter();
 
@@ -15,8 +13,9 @@ export default function PromptpayPage() {
   const [qrPromptpay, setQrPromptpay] = useState<string | null>(null);
   const [amount, setAmount] = useState<number>();
   const [loading, setLoading] = useState(true);
-  const [timeLeft, setTimeLeft] = useState(PAYMENT_TIMEOUT);
+  const [timeLeft, setTimeLeft] = useState(0);
   const [isExpired, setIsExpired] = useState(false);
+  const [expiresAt, setExpiresAt] = useState<Date | null>(null);
 
   // Fetch QR Code
   useEffect(() => {
@@ -38,6 +37,18 @@ export default function PromptpayPage() {
         if (data.action === 'SHOW_QR') {
           setQrPromptpay(data.qrImageUrl);
           setAmount(data.amount);
+          const expiry = new Date(data.expiredAt);
+          setExpiresAt(expiry);
+          const now = new Date();
+          const remainingSeconds = Math.floor(
+            (expiry.getTime() - now.getTime()) / 1000
+          );
+          if (remainingSeconds > 0) {
+            setTimeLeft(remainingSeconds);
+          } else {
+            setIsExpired(true);
+            setTimeLeft(0);
+          }
         }
       } catch (err) {
         console.error(err);
@@ -59,18 +70,30 @@ export default function PromptpayPage() {
   useEffect(() => {
     if (loading) return; // รอให้โหลด QR เสร็จก่อน
 
-    if (timeLeft <= 0) {
-      setIsExpired(true);
-      return;
-    }
+    const checkExpiry = () => {
+      if (!expiresAt) return;
+      const now = new Date();
+      const remainingSeconds = Math.floor(
+        (expiresAt.getTime() - now.getTime()) / 1000
+      );
+      if (remainingSeconds <= 0) {
+        setIsExpired(true);
+        setTimeLeft(0);
+      } else{
+        setTimeLeft(remainingSeconds);
+
+      }
+    };
+    checkExpiry();
 
     const timer = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
+      checkExpiry();
     }, 1000);
 
     return () => clearInterval(timer);
   }, [timeLeft, loading]);
 
+  // ----------------------------------------
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;

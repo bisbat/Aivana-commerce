@@ -2,11 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, Package, DollarSign, Store } from "lucide-react";
+import {
+  LayoutDashboard,
+  Package,
+  DollarSign,
+  Store,
+  FileText,
+} from "lucide-react";
 import CommonSidebar, { SidebarNavItem } from "@/components/common/Sidebar";
 import { SellerProfile } from "@/lib/types/user/sellerProfile";
 import { getSellerById } from "@/lib/actions/seller.actions";
 import { getCurrentUser } from "@/lib/auth";
+import { getSellerReportsAction } from "@/lib/actions/report.actions";
 
 interface SidebarProps {
   currentPath?: string;
@@ -16,6 +23,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = "/" }) => {
   const router = useRouter();
   const [sellerId, setSellerId] = useState<string | null>(null);
   const [seller, setSeller] = useState<SellerProfile | null>(null);
+  const [unviewedCount, setUnviewedCount] = useState(0);
 
   useEffect(() => {
     getCurrentUser().then((user) => setSellerId(user?.sellerId ?? null));
@@ -41,6 +49,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = "/" }) => {
       label: "Earning",
       icon: <DollarSign size={20} />,
       href: "/stores/earnings",
+    },
+    {
+      label: "Report",
+      icon: <FileText size={20} />,
+      href: "/stores/reports",
+      badge: unviewedCount,
     },
     { label: "Marketplace", icon: <Store size={20} />, href: "/" },
   ];

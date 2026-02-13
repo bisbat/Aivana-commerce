@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Report, ReportStatus } from "@/lib/types/report";
-import { User, Clock } from "lucide-react";
+import { User, Clock, CheckCircle2, MessageSquare } from "lucide-react";
 
 // ─── Status Badge Component ─────────────────────────────────────────────────
 function ReportStatusBadge({ status }: { status: ReportStatus }) {
@@ -65,7 +65,7 @@ function ViewDetailButton({ reportId }: { reportId: number }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={() => router.push(`/admin/reports/${reportId}`)}
-      className={`px-4 py-2 rounded-lg border border-[#8a57fb]/40 text-[#8a57fb] text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
+      className={`px-3 py-1.5 rounded-lg border border-[#8a57fb]/40 text-[#8a57fb] text-xs font-semibold transition-all duration-200 flex items-center gap-2 min-h-[34px] ${
         hovered ? "bg-[#8a57fb]/10" : "bg-transparent"
       }`}
     >
@@ -128,12 +128,9 @@ function ReportRow({ report, index }: { report: Report; index: number }) {
 
       {/* Reason */}
       <td className="px-6 py-4">
-        <div className="text-sm text-slate-300">{report.reason}</div>
-        {report.message && (
-          <div className="text-xs text-slate-500 mt-1 line-clamp-2">
-            {report.message}
-          </div>
-        )}
+        <div className="text-sm text-slate-300 font-medium mb-1">
+          {report.reason}
+        </div>
       </td>
 
       {/* Status */}
@@ -143,14 +140,36 @@ function ReportRow({ report, index }: { report: Report; index: number }) {
 
       {/* Created Date */}
       <td className="px-6 py-4">
-        <div className="flex items-center gap-2 text-sm text-slate-400">
-          <span>{formatDate(report.createdAt)}</span>
+        <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium whitespace-nowrap">
+          <Clock size={12} className="shrink-0" />
+          {formatDate(report.createdAt)}
         </div>
       </td>
 
       {/* Action */}
       <td className="px-6 py-4">
         <ViewDetailButton reportId={report.id} />
+      </td>
+
+      {/* Seller Response */}
+      <td className="px-6 py-4">
+        {report.sellerRespondedAt ? (
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#8a57fb]/10 rounded-lg border border-[#8a57fb]/20 w-fit min-h-[34px]">
+            <CheckCircle2 size={12} className="text-[#8a57fb] shrink-0" />
+            <div className="flex flex-col leading-tight">
+              <span className="text-[11px] font-bold text-[#8a57fb]">
+                ผู้ขายแจ้งแก้ไขแล้ว
+              </span>
+              <span className="text-[9px] text-slate-500">
+                {formatDate(report.sellerRespondedAt)}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <span className="text-xs text-slate-500 italic">
+            ยังไม่มีการตอบกลับ
+          </span>
+        )}
       </td>
     </tr>
   );
@@ -162,6 +181,16 @@ export default function ProductReportsTable({
 }: {
   reports: Report[];
 }) {
+  const tableHeaders = [
+    { label: "ID", className: "w-[70px]" },
+    { label: "ผู้รายงาน", className: "w-[200px]" },
+    { label: "เหตุผล", className: "w-[30%]" },
+    { label: "สถานะ", className: "w-[150px]" },
+    { label: "วันที่รายงาน", className: "w-[160px]" },
+    { label: "การดำเนินการ", className: "w-[120px]" },
+    { label: "การตอบกลับ", className: "w-auto" },
+  ];
+
   return (
     <div className="bg-slate-800/40 border border-white/5 rounded-2xl overflow-hidden">
       {/* Table title */}
@@ -183,19 +212,12 @@ export default function ProductReportsTable({
         <table className="w-full">
           <thead>
             <tr className="border-b border-white/5">
-              {[
-                "ID",
-                "ผู้รายงาน",
-                "เหตุผล",
-                "สถานะ",
-                "วันที่รายงาน",
-                "การดำเนินการ",
-              ].map((col) => (
+              {tableHeaders.map((header) => (
                 <th
-                  key={col}
-                  className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider"
+                  key={header.label}
+                  className={`px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider ${header.className}`}
                 >
-                  {col}
+                  {header.label}
                 </th>
               ))}
             </tr>

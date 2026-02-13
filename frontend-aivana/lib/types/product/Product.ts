@@ -32,4 +32,6 @@ export interface Product {
   totalReviews?: number;
   isDeleted: boolean;
   deletedAt?: string;
+  deletionReason?: string;
+  deletedBy?: string;
 }

@@ -7,6 +7,7 @@ export interface SidebarNavItem {
   label: string;
   href: string;
   icon: React.ReactNode;
+  badge?: number;
 }
 
 export interface SidebarProps {
@@ -33,7 +34,7 @@ export default function Sidebar({
 
   return (
     <nav
-      className={`${width} min-h-screen border-r border-white/5 px-5 py-9 flex flex-col gap-2 shrink-0`}
+      className={`${width} min-h-screen border-r border-white/5 px-5 py-9 flex flex-col gap-2 shrink-0  z-20`}
       style={{ backgroundColor: bgColor }}
     >
       {/* Brand */}
@@ -56,7 +57,7 @@ export default function Sidebar({
           <Link
             key={item.href}
             href={item.href}
-            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-180 ${
+            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-180 relative ${
               isActive
                 ? "bg-violet-500/10 border border-violet-500/20 text-violet-300 font-semibold"
                 : "border border-transparent text-white/45 font-medium hover:text-white/60 hover:bg-white/5"
@@ -65,7 +66,7 @@ export default function Sidebar({
             <span className={isActive ? "text-violet-300" : "text-white/60"}>
               {item.icon}
             </span>
-            <span className="text-sm">{item.label}</span>
+            <span className="text-sm flex-1">{item.label}</span>
           </Link>
         );
       })}

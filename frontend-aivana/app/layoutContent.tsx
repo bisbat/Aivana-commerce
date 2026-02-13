@@ -7,7 +7,6 @@ const ROUTES_WITHOUT_NAVBAR = [
   "/login",
   "/register",
   "/stores",
-  "/seller",
   "/payment",
   "/admin",
 ];

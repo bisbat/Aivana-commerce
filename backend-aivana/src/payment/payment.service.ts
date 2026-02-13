@@ -96,6 +96,7 @@ export class PaymentService {
       amount: payment.amount,
       status: payment.status,
       qrImageUrl: payment.qrImageUrl,
+      expiredAt: payment.expiredAt,
     };
   }
 

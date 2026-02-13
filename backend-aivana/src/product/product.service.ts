@@ -195,11 +195,17 @@ export class ProductService {
     return updatedProduct;
   }
 
-  async deleteProduct(id: number): Promise<void> {
-    // Soft delete - just mark as deleted
+  async deleteProduct(
+    id: number,
+    reason: string,
+    deletedBy: string,
+  ): Promise<void> {
+    // Soft delete - mark as deleted with reason
     await this.productsRepository.update(id, {
       isDeleted: true,
       deletedAt: new Date(),
+      deletionReason: reason,
+      deletedBy: deletedBy,
     });
   }
 

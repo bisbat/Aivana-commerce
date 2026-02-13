@@ -3,49 +3,41 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { PayoutRound } from "@/lib/types/admin/payout";
-import { formatDate, toDateParam, formatBaht } from "@/lib/utils/formatPayout";
+import { formatDate, formatBaht } from "@/lib/utils/formatPayout";
 import StatusBadge from "./StatusBagde";
 
-
 // ─── Single "View Round" button with hover state ────────────────────────────
-function ViewRoundButton({ periodStart, periodEnd }: { periodStart: string; periodEnd: string }) {
+function ViewRoundButton({
+  periodStart,
+  periodEnd,
+}: {
+  periodStart: string;
+  periodEnd: string;
+}) {
   const router = useRouter();
-  const [hovered, setHovered] = useState(false);
 
   const handleClick = () => {
     const start = new Date(periodStart);
     const end = new Date(periodEnd);
 
     // 🔥 normalize to Asia/Bangkok date
-    const startDate = start.toLocaleDateString("en-CA", { timeZone: "Asia/Bangkok" });
-    const endDate = end.toLocaleDateString("en-CA", { timeZone: "Asia/Bangkok" });
+    const startDate = start.toLocaleDateString("en-CA", {
+      timeZone: "Asia/Bangkok",
+    });
+    const endDate = end.toLocaleDateString("en-CA", {
+      timeZone: "Asia/Bangkok",
+    });
 
     router.push(`/admin/payouts/${startDate}/${endDate}`);
   };
 
-
   return (
     <button
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       onClick={handleClick}
-      style={{
-        padding: "7px 18px",
-        borderRadius: 8,
-        border: "1px solid rgba(139,92,246,0.4)",
-        backgroundColor: hovered ? "rgba(139,92,246,0.18)" : "transparent",
-        color: "#a78bfa",
-        fontSize: 13,
-        fontWeight: 600,
-        cursor: "pointer",
-        transition: "all 0.2s ease",
-        display: "flex",
-        alignItems: "center",
-        gap: 6,
-      }}
+      className="flex items-center gap-1.5 px-4.5 py-1.75 text-xs font-semibold text-violet-400 border border-violet-400/40 rounded-lg bg-transparent hover:bg-violet-500/18 transition-all duration-200"
     >
       ตรวจสอบรอบ
-      <span style={{ fontSize: 14, transition: "transform 0.2s", transform: hovered ? "translateX(2px)" : "translateX(0)" }}>
+      <span className="text-sm transition-transform hover:translate-x-0.5">
         →
       </span>
     </button>
@@ -54,72 +46,48 @@ function ViewRoundButton({ periodStart, periodEnd }: { periodStart: string; peri
 
 // ─── Main exported component ─────────────────────────────────────────────────
 export default function PayoutRoundsTable({
-  rounds
+  rounds,
 }: {
   rounds: PayoutRound[];
 }) {
   return (
-    <>
+    <div className="bg-white/2.5 border border-white/7 rounded-2xl overflow-hidden">
+      {/* Table title */}
+      <div className="px-5 py-4 border-b border-white/6">
+        <h3 className="text-lg font-semibold text-white">
+          ตารางรอบโอนเงินของระบบ
+        </h3>
+      </div>
 
-      {/* Table card */}
-      <div
-        style={{
-          background: "rgba(255,255,255,0.025)",
-          border: "1px solid rgba(255,255,255,0.07)",
-          borderRadius: 14,
-          overflow: "hidden",
-        }}
-      >
-        {/* Table title */}
-        <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-          <h3 style={{ fontSize: 15, fontWeight: 600, color: "#fff" }}>
-            ตารางรอบโอนเงินของระบบ
-          </h3>
-        </div>
-
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-              {["Period", "Sellers", "Total Amount", "Status", "Action"].map((col) => (
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="border-b border-white/6">
+            {["Period", "Sellers", "Total Amount", "Status", "Action"].map(
+              (col) => (
                 <th
                   key={col}
-                  style={{
-                    padding: "12px 20px",
-                    textAlign: "left",
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: "rgba(255,255,255,0.3)",
-                    textTransform: "uppercase",
-                    letterSpacing: 0.8,
-                  }}
+                  className="px-5 py-3 text-left text-xs font-semibold text-white/30 uppercase tracking-wide"
                 >
                   {col}
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rounds.map((round, idx) => (
-              <RoundRow key={idx} round={round} index={idx} />
-            ))}
-          </tbody>
-        </table>
+              ),
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          {rounds.map((round, idx) => (
+            <RoundRow key={idx} round={round} index={idx} />
+          ))}
+        </tbody>
+      </table>
 
-        {/* Empty state */}
-        {rounds.length === 0 && (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "48px 20px",
-              color: "rgba(255,255,255,0.3)",
-              fontSize: 14,
-            }}
-          >
-            No payout rounds found.
-          </div>
-        )}
-      </div>
-    </>
+      {/* Empty state */}
+      {rounds.length === 0 && (
+        <div className="text-center py-12 px-5 text-white/30 text-sm">
+          ไม่มีรอบโอนเงินในขณะนี้
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -131,39 +99,41 @@ function RoundRow({ round, index }: { round: PayoutRound; index: number }) {
     <tr
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      className={`border-b border-white/5 transition-colors duration-150 ${
+        hovered ? "bg-white/3" : "bg-transparent"
+      }`}
       style={{
-        borderBottom: "1px solid rgba(255,255,255,0.05)",
-        background: hovered ? "rgba(255,255,255,0.03)" : "transparent",
-        transition: "background 0.15s ease",
         animation: `fadeSlideIn 0.35s ease ${index * 0.07}s both`,
       }}
     >
       {/* Period */}
-      <td style={{ padding: "16px 20px", fontSize: 13, color: "#cbd5e1" }}>
+      <td className="px-5 py-4 text-sm text-slate-400">
         {formatDate(round.periodStart)}
-        <span style={{ color: "rgba(255,255,255,0.2)", margin: "0 6px" }}>–</span>
+        <span className="text-white/20 mx-1.5">–</span>
         {formatDate(round.periodEnd)}
       </td>
 
       {/* Seller count */}
-      <td style={{ padding: "16px 20px", fontSize: 13, color: "rgba(255,255,255,0.55)" }}>
-        {round.sellerCount}{" "}
-        <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11 }}>ร้าน</span>
+      <td className="px-5 py-4 text-sm text-white/55">
+        {round.sellerCount} <span className="text-white/25 text-xs">ร้าน</span>
       </td>
 
       {/* Total amount */}
-      <td style={{ padding: "16px 20px", fontSize: 13, fontWeight: 600, color: "#e2e8f0" }}>
+      <td className="px-5 py-4 text-sm font-semibold text-slate-200">
         {formatBaht(round.totalAmount)}
       </td>
 
       {/* Status */}
-      <td style={{ padding: "16px 20px" }}>
+      <td className="px-5 py-4">
         <StatusBadge status={round.roundStatus} />
       </td>
 
       {/* Action */}
-      <td style={{ padding: "16px 20px" }}>
-        <ViewRoundButton periodStart={round.periodStart} periodEnd={round.periodEnd} />
+      <td className="px-5 py-4">
+        <ViewRoundButton
+          periodStart={round.periodStart}
+          periodEnd={round.periodEnd}
+        />
       </td>
     </tr>
   );

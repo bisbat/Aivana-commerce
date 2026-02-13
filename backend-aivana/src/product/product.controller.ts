@@ -160,8 +160,13 @@ export class ProductController {
 
   @Delete(':id')
   @Roles(Role.SELLER, Role.ADMIN)
-  async deleteProduct(@Param('id') id: number) {
-    await this.productService.deleteProduct(id);
+  async deleteProduct(
+    @Req() req: any,
+    @Param('id') id: number,
+    @Body() body: { reason?: string },
+  ) {
+    const reason = body?.reason || 'ไม่ระบุเหตุผล';
+    await this.productService.deleteProduct(id, reason, req.user.userId);
     return { message: 'Product deleted successfully' };
   }
 

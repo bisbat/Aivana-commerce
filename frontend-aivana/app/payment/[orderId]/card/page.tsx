@@ -2,18 +2,15 @@
 import Script from "next/script";
 import { useState, useEffect, FormEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { createCreditCardToken, initOmise } from '@/lib/omise';
-import { createCreditCardPayment, createPayment } from '@/lib/actions/payment.actions';
-import { CreditCardData } from '@/lib/types/omise';
+import { createCreditCardToken } from '@/lib/omise';
+import { createCreditCardPayment } from '@/lib/actions/payment.actions';
 
 export default function CreditCardPage() {
     const { orderId } = useParams();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [omiseReady, setOmiseReady] = useState(false); // ✅ เพิ่ม state
-
-    console.log('Omise ready:', omiseReady);
+    const [omiseReady, setOmiseReady] = useState(false); 
 
     useEffect(() => {
         handleOmiseLoad();
@@ -64,8 +61,6 @@ export default function CreditCardPage() {
                 expiryYear: fullYear,
                 cvc,
             });
-
-            console.log('Token created:', token.id);
 
             // สร้าง payment
             const res = await createCreditCardPayment(token.id, Number(orderId));

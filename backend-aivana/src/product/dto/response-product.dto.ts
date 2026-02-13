@@ -49,6 +49,10 @@ export class ResponseProductDto {
   @Expose()
   deletedAt?: Date;
   @Expose()
+  deletionReason?: string;
+  @Expose()
+  deletedBy?: string;
+  @Expose()
   hasReviewed: boolean;
 
   @Expose()

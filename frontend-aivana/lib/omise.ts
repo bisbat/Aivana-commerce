@@ -1,15 +1,6 @@
 import { CreditCardData } from "./types/omise";
 
 export const initOmise = (): void => {
-    // if (typeof window === 'undefined') {
-    //     console.warn('Omise can only be initialized in browser');
-    //     return;
-    // }
-
-    // if (!(window as any).Omise) {
-    //     console.error('Omise.js not loaded. Make sure to include the script in your HTML.');
-    //     return;
-    // }
 
     const publicKey = process.env.NEXT_PUBLIC_OMISE_PUBLIC_KEY;
 
@@ -54,10 +45,6 @@ export const createCreditCardToken = (cardData: CreditCardData): Promise<any> =>
             return;
         }
 
-        console.log('🏦 Creating credit card token...');
-
-        console.log('data:', cardData);
-
         (window as any).Omise.createToken(
             'card',
             {
@@ -68,13 +55,10 @@ export const createCreditCardToken = (cardData: CreditCardData): Promise<any> =>
                 security_code: cardData.cvc,
             },
             (statusCode: number, response: any) => {
-                console.log('📥 Omise response:', { statusCode, response });
 
                 if (statusCode !== 200) {
-                    console.error('❌ Omise error:', response);
                     reject(response);
                 } else {
-                    console.log('✅ Token created successfully:', response.id);
                     resolve(response);
                 }
             }

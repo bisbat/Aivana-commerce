@@ -14,9 +14,16 @@ import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 import { PayoutEntity } from 'src/payout/entities/payout.entity';
 import { SellerEarningsSummaryDto } from './dto/seller-earnings-summary.dto';
 import { SellerEarningsRoundDto } from './dto/seller-earnings-round.dto';
-import { SellerRoundDetailDto, SellerRoundItemDto } from './dto/seller-round-detail.dto';
+import {
+  SellerRoundDetailDto,
+  SellerRoundItemDto,
+} from './dto/seller-round-detail.dto';
 import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
-import { MonthlyPerformanceDto, SellerDashboardDto, TopSellingProductDto } from './dto/seller-dashboard.dto';
+import {
+  MonthlyPerformanceDto,
+  SellerDashboardDto,
+  TopSellingProductDto,
+} from './dto/seller-dashboard.dto';
 @Injectable()
 export class SellerService {
   constructor(
@@ -30,7 +37,7 @@ export class SellerService {
     private readonly payoutRepository: Repository<PayoutEntity>,
     @InjectRepository(OrderItemEntity)
     private readonly orderItemRepository: Repository<OrderItemEntity>,
-  ) { }
+  ) {}
 
   async upgradeToSeller(
     userId: string,
@@ -134,10 +141,8 @@ export class SellerService {
 
     if (!seller) return [];
 
-    // Filter out deleted products
-    const activeProducts = seller.products.filter((p) => !p.isDeleted);
-
-    return this.productMapper.toResponseList(activeProducts);
+    // Return all products including deleted ones (seller needs to see deletion notices)
+    return this.productMapper.toResponseList(seller.products);
   }
 
   async getSellerByUsername(username: string): Promise<ResponseSellerDto> {
@@ -186,8 +191,8 @@ export class SellerService {
         'p.status AS "status"',
         'p.slipUrl AS "slipUrl"',
         'COALESCE(SUM(oi.price), 0) AS "grossSales"',
-        'COALESCE(SUM(oi.commissionAmount), 0) AS "commission"',  // ← Fixed: use commissionAmount
-        'COALESCE(SUM(oi.sellerAmount), 0) AS "netAmount"',       // ← Fixed: calculate from items
+        'COALESCE(SUM(oi.commissionAmount), 0) AS "commission"', // ← Fixed: use commissionAmount
+        'COALESCE(SUM(oi.sellerAmount), 0) AS "netAmount"', // ← Fixed: calculate from items
       ])
       .where('p.sellerId = :sellerId', { sellerId })
       .groupBy('p.id')
@@ -199,7 +204,7 @@ export class SellerService {
       .getRawMany();
 
     return rows.map((r) => ({
-      payoutId: Number(r.payoutId),  // ← Also convert to number
+      payoutId: Number(r.payoutId), // ← Also convert to number
       periodStart: r.periodStart,
       periodEnd: r.periodEnd,
       grossSales: Number(r.grossSales),
@@ -213,7 +218,6 @@ export class SellerService {
   async getSellerEarningsSummaryByUserId(
     userId: string,
   ): Promise<SellerEarningsSummaryDto> {
-
     const seller = await this.sellerRepository.findOne({
       where: { user: { id: userId } },
     });
@@ -279,8 +283,14 @@ export class SellerService {
     }));
 
     const totalGrossSales = items.reduce((sum, item) => sum + item.price, 0);
-    const totalCommission = items.reduce((sum, item) => sum + item.commission, 0);
-    const totalNetAmount = items.reduce((sum, item) => sum + item.sellerEarning, 0);
+    const totalCommission = items.reduce(
+      (sum, item) => sum + item.commission,
+      0,
+    );
+    const totalNetAmount = items.reduce(
+      (sum, item) => sum + item.sellerEarning,
+      0,
+    );
 
     return {
       payoutId: payoutIdNumber,
@@ -296,7 +306,6 @@ export class SellerService {
   // Add this method to your SellerService class
 
   async getSellerDashboard(userId: string): Promise<SellerDashboardDto> {
-
     // 1. Find seller by userId
     const seller = await this.sellerRepository.findOne({
       where: { user: { id: userId } },
@@ -334,17 +343,19 @@ export class SellerService {
       ])
       .where('oi.sellerId = :sellerId', { sellerId: seller.id })
       .andWhere('o.status = :status', { status: 'PAID' })
-      .andWhere('oi.createdAt >= NOW() - INTERVAL \'12 months\'')
+      .andWhere("oi.createdAt >= NOW() - INTERVAL '12 months'")
       .groupBy(`TO_CHAR(oi.createdAt, 'YYYY-MM')`)
       .orderBy(`TO_CHAR(oi.createdAt, 'YYYY-MM')`, 'ASC')
       .getRawMany();
 
-    const monthlyPerformance: MonthlyPerformanceDto[] = monthlyData.map((m) => ({
-      month: m.month,
-      revenue: Number(m.revenue),
-      itemsSold: Number(m.itemsSold),
-      ordersCount: Number(m.ordersCount),
-    }));
+    const monthlyPerformance: MonthlyPerformanceDto[] = monthlyData.map(
+      (m) => ({
+        month: m.month,
+        revenue: Number(m.revenue),
+        itemsSold: Number(m.itemsSold),
+        ordersCount: Number(m.ordersCount),
+      }),
+    );
 
     // ───────────────────────────────────────────────────────────────────────────
     // 4. TOP SELLING PRODUCTS (top 5)
@@ -369,7 +380,6 @@ export class SellerService {
       .limit(5)
       .getRawMany();
 
-
     const topSellingProducts: TopSellingProductDto[] = topProducts.map((p) => ({
       productId: Number(p.productId),
       productName: p.productName,
@@ -388,5 +398,4 @@ export class SellerService {
       topSellingProducts,
     };
   }
-
 }

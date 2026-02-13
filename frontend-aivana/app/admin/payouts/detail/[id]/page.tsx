@@ -1,6 +1,7 @@
 import { fetchSellerPayoutDetail } from "@/lib/actions/payout.actions";
 import BackButton from "@/app/admin/components/BackButton";
 import SellerPayoutDetail from "@/app/admin/components/SellerPayoutDetail";
+import BackgroundAivana from "@/components/common/BackgroundAivana";
 
 // ─── Server Component (Next.js 15 — params is a Promise) ────────────────────
 export default async function PayoutDetailPage({
@@ -20,32 +21,42 @@ export default async function PayoutDetailPage({
   }
 
   return (
-    <div style={{ maxWidth: 960 }}>
-      <BackButton />
+    <div className="relative mx-auto">
+      <BackgroundAivana />
+      <div className="relative z-10 max-w-[1400px]">
+        <BackButton />
 
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 24 }}>
-        ข้อมูลผู้ขาย
-      </h2>
-
-      {/* Error state */}
-      {error && (
-        <div
+        <h2
           style={{
-            background: "rgba(239,68,68,0.1)",
-            border: "1px solid rgba(239,68,68,0.3)",
-            borderRadius: 12,
-            padding: "16px 20px",
-            color: "#f87171",
-            fontSize: 13,
+            fontSize: 20,
+            fontWeight: 700,
+            color: "#fff",
             marginBottom: 24,
           }}
         >
-          Failed to load payout detail: {error}
-        </div>
-      )}
+          ข้อมูลผู้ขาย
+        </h2>
 
-      {/* Pass data to client component */}
-      {data && <SellerPayoutDetail data={data} />}
+        {/* Error state */}
+        {error && (
+          <div
+            style={{
+              background: "rgba(239,68,68,0.1)",
+              border: "1px solid rgba(239,68,68,0.3)",
+              borderRadius: 12,
+              padding: "16px 20px",
+              color: "#f87171",
+              fontSize: 13,
+              marginBottom: 24,
+            }}
+          >
+            Failed to load payout detail: {error}
+          </div>
+        )}
+
+        {/* Pass data to client component */}
+        {data && <SellerPayoutDetail data={data} />}
+      </div>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { Loader, AlertCircle, Package } from "lucide-react";
 import { getProductsBySellerId } from "@/lib/actions/seller.actions";
 import { UserProfile } from "@/lib/types/user/user";
 import { getCurrentUser } from "@/lib/auth";
+import DeletedProductAlert from "@/components/products/DeletedProductAlert";
 
 export default function StorePage() {
   const router = useRouter();
@@ -40,6 +41,11 @@ export default function StorePage() {
     try {
       if (!sellerId) return;
       const data = await getProductsBySellerId(sellerId);
+      console.log("Fetched products:", data);
+      console.log(
+        "Deleted products:",
+        data.filter((p) => p.isDeleted),
+      );
       setProducts(data);
     } catch (err) {
       const errorMessage =
@@ -119,30 +125,36 @@ export default function StorePage() {
         )}
 
         {/* Empty State */}
-        {!isLoading && !error && products.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Package className="text-slate-400 mb-4" size={64} />
-            <h3 className="text-slate-700 font-bold text-xl mb-2">
-              No Products Yet
-            </h3>
-            <p className="text-slate-500 text-sm mb-6">
-              Start by adding your first product
-            </p>
-          </div>
-        )}
+        {!isLoading &&
+          !error &&
+          products.filter((p) => !p.isDeleted).length === 0 && (
+            <div className="flex flex-col items-center justify-center py-20">
+              <Package className="text-slate-400 mb-4" size={64} />
+              <h3 className="text-slate-700 font-bold text-xl mb-2">
+                No Products Yet
+              </h3>
+              <p className="text-slate-500 text-sm mb-6">
+                Start by adding your first product
+              </p>
+            </div>
+          )}
 
-        {/* Products Grid */}
-        {!isLoading && !error && products.length > 0 && (
-          <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {products.map((product) => (
-              <ProductCardSeller
-                key={product.id}
-                product={product}
-                onEdit={handleEditProduct}
-              />
-            ))}
-          </section>
-        )}
+        {/* Products Grid - แสดงเฉพาะสินค้าที่ไม่ถูกลบ */}
+        {!isLoading &&
+          !error &&
+          products.filter((p) => !p.isDeleted).length > 0 && (
+            <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {products
+                .filter((product) => !product.isDeleted)
+                .map((product) => (
+                  <ProductCardSeller
+                    key={product.id}
+                    product={product}
+                    onEdit={handleEditProduct}
+                  />
+                ))}
+            </section>
+          )}
       </main>
     </div>
   );
