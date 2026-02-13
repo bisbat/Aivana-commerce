@@ -112,8 +112,6 @@ export async function getSellerByUsername(
   username: string,
 ): Promise<SellerProfile> {
   try {
-    console.log("Fetching seller by username:", username);
-    console.log("API URL:", `${API_BASE_URL}/seller/username/${username}`);
 
     const response = await fetch(
       `${API_BASE_URL}/seller/username/${username}`,
@@ -137,4 +135,6 @@ export async function getSellerByUsername(
     console.error("Error fetching seller by username:", error);
     throw error;
   }
+
+  
 }

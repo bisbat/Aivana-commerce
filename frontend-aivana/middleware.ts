@@ -28,9 +28,9 @@ export function middleware(request: NextRequest) {
   }
 
   // seller พยายามเข้า admin zone
-  // if (role === 'seller' && pathname.startsWith('/admin')) {
-  //   return NextResponse.redirect(new URL('/', request.url));
-  // }
+  if (role === 'seller' && pathname.startsWith('/admin')) {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
 
   // เฉพาะ admin เท่านั้นที่เข้า admin zone ได้
   if (pathname.startsWith("/admin") && role !== "admin") {
