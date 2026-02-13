@@ -48,7 +48,9 @@ export default function DeleteProductButton({
       router.push("/admin/reports");
       router.refresh();
     } catch (error: any) {
-      showErrorToast("เกิดข้อผิดพลาดในการยกเลิกการขายสินค้า กรุณาลองใหม่อีกครั้ง");
+      showErrorToast(
+        "เกิดข้อผิดพลาดในการยกเลิกการขายสินค้า กรุณาลองใหม่อีกครั้ง",
+      );
     } finally {
       setIsDeleting(false);
       setShowModal(false);
@@ -66,7 +68,7 @@ export default function DeleteProductButton({
         }`}
       >
         <Trash2 size={14} />
-        ลบสินค้า
+        ยกเลิกการขายสินค้า
       </button>
 
       {/* Confirmation Modal */}
@@ -145,12 +147,12 @@ export default function DeleteProductButton({
                 {isDeleting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    กำลังลบ...
+                    กำลังยกเลิกการขาย...
                   </>
                 ) : (
                   <>
                     <Trash2 size={16} />
-                    ลบสินค้า
+                    ยกเลิกการขายสินค้า
                   </>
                 )}
               </button>
