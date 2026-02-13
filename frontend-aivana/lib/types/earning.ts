@@ -6,6 +6,7 @@ export interface SellerEarningsSummary {
 
 // ─── Single round (table row) ───────────────────────────────────────────────
 export interface SellerEarningsRound {
+  payoutId: number; // Added payoutId to link to detail
   periodStart: string;
   periodEnd: string;
   grossSales: number;

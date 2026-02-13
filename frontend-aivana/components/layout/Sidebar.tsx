@@ -31,14 +31,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = "/" }) => {
   }, [sellerId]);
 
   const navItems: SidebarNavItem[] = [
-    { label: "Market Place", icon: <Store size={20} />, href: "/" },
+    { label: "Product", icon: <Package size={20} />, href: "/stores" },
     {
       label: "Dashboard",
       icon: <LayoutDashboard size={20} />,
       href: "/dashboard",
     },
-    { label: "Product", icon: <Package size={20} />, href: "/stores" },
-    { label: "Earning", icon: <DollarSign size={20} />, href: "/earning" },
+    {
+      label: "Earning",
+      icon: <DollarSign size={20} />,
+      href: "/stores/earnings",
+    },
+    { label: "Marketplace", icon: <Store size={20} />, href: "/" },
   ];
 
   const handleAddProduct = () => {

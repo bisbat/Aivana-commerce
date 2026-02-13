@@ -39,7 +39,8 @@ export default function ProductDetailPage() {
     (collection) => collection.product.id === product?.id,
   );
 
-  const isPurchaseDisabled = prohibitedRolesForPurchase || isUserProduct;
+  const isPurchaseDisabled =
+    prohibitedRolesForPurchase || isUserProduct || product?.isDeleted;
 
   const allImages = product
     ? [
@@ -85,6 +86,12 @@ export default function ProductDetailPage() {
     const fetchProduct = async () => {
       try {
         const data = await getProductByIdAction(productId);
+
+        if (!data) {
+          // ถ้าไม่พบสินค้าหรือไม่มีสิทธิ์เข้าถึง ให้ redirect กลับหน้า home
+          router.push("/");
+          return;
+        }
 
         setProduct(data);
       } catch (err) {
@@ -431,6 +438,39 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
+                {/* Deleted Product Warning */}
+                {product.isDeleted && (
+                  <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="text-red-400 text-xl">⚠️</div>
+                      <div className="flex-1">
+                        <h3 className="text-red-400 font-semibold mb-1">
+                          ยกเลิกการขายแล้ว
+                        </h3>
+                        <p className="text-red-300/80 text-sm">
+                          ยกเลิกการขายโดยผู้ขายแล้ว
+                          คุณยังสามารถดูรายละเอียดและดาวน์โหลดไฟล์ที่ซื้อไว้แล้วได้
+                        </p>
+                        {product.deletedAt && (
+                          <p className="text-red-300/60 text-xs mt-2">
+                            ลบเมื่อ:{" "}
+                            {new Date(product.deletedAt).toLocaleDateString(
+                              "th-TH",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              },
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-center gap-3">
                   <p className="text-white text-base font-light drop-shadow-sm leading-relaxed">
                     {product.blurb}
@@ -452,13 +492,15 @@ export default function ProductDetailPage() {
                   >
                     {addingToCart
                       ? "กำลังเพิ่ม..."
-                      : isUserProduct
-                        ? "คุณมีสินค้านี้แล้ว"
-                        : prohibitedRolesForPurchase
-                          ? "ไม่สามารถซื้อได้"
-                          : `เพิ่มลงตะกร้า ${formatPriceWithCurrency(
-                              product.price,
-                            )}`}
+                      : product.isDeleted
+                        ? "สินค้าถูกลบแล้ว"
+                        : isUserProduct
+                          ? "คุณมีสินค้านี้แล้ว"
+                          : prohibitedRolesForPurchase
+                            ? "ไม่สามารถซื้อได้"
+                            : `เพิ่มลงตะกร้า ${formatPriceWithCurrency(
+                                product.price,
+                              )}`}
                   </button>
                 </div>
               </div>

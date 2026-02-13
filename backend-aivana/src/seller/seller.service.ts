@@ -14,7 +14,7 @@ import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 import { PayoutEntity } from 'src/payout/entities/payout.entity';
 import { SellerEarningsSummaryDto } from './dto/seller-earnings-summary.dto';
 import { SellerEarningsRoundDto } from './dto/seller-earnings-round.dto';
-
+import { SellerRoundDetailDto, SellerRoundItemDto } from './dto/seller-round-detail.dto';
 @Injectable()
 export class SellerService {
   constructor(
@@ -26,7 +26,7 @@ export class SellerService {
     private readonly jwtService: JwtService,
     @InjectRepository(PayoutEntity)
     private readonly payoutRepository: Repository<PayoutEntity>,
-  ) { }
+  ) {}
 
   async upgradeToSeller(
     userId: string,
@@ -130,7 +130,10 @@ export class SellerService {
 
     if (!seller) return [];
 
-    return this.productMapper.toResponseList(seller.products);
+    // Filter out deleted products
+    const activeProducts = seller.products.filter((p) => !p.isDeleted);
+
+    return this.productMapper.toResponseList(activeProducts);
   }
 
   async getSellerByUsername(username: string): Promise<ResponseSellerDto> {
@@ -165,43 +168,48 @@ export class SellerService {
     };
   }
 
-
   async getSellerEarningsRound(
-    sellerId: string,
-  ): Promise<SellerEarningsRoundDto[]> {
-    const rows = await this.payoutRepository
-      .createQueryBuilder('p')
-      .leftJoin('p.payoutItem', 'pi')
-      .leftJoin('pi.orderItem', 'oi')
-      .select([
-        'p.periodStart AS "periodStart"',
-        'p.periodEnd AS "periodEnd"',
-        'p.totalAmount AS "netAmount"',
-        'p.status AS "status"',
-        'p.slipUrl AS "slipUrl"',
-        'COALESCE(SUM(oi.price), 0) AS "grossSales"',
-        'COALESCE(SUM(oi.price - oi.sellerAmount), 0) AS "commission"',
-      ])
-      .where('p.sellerId = :sellerId', { sellerId })
-      .groupBy('p.id')
-      .orderBy('p.periodStart', 'DESC')
-      .getRawMany();
+  sellerId: string,
+): Promise<SellerEarningsRoundDto[]> {
+  const rows = await this.payoutRepository
+    .createQueryBuilder('p')
+    .leftJoin('p.payoutItem', 'pi')
+    .leftJoin('pi.orderItem', 'oi')
+    .select([
+      'p.id AS "payoutId"',
+      'p.periodStart AS "periodStart"',
+      'p.periodEnd AS "periodEnd"',
+      'p.status AS "status"',
+      'p.slipUrl AS "slipUrl"',
+      'COALESCE(SUM(oi.price), 0) AS "grossSales"',
+      'COALESCE(SUM(oi.commissionAmount), 0) AS "commission"',  // ← Fixed: use commissionAmount
+      'COALESCE(SUM(oi.sellerAmount), 0) AS "netAmount"',       // ← Fixed: calculate from items
+    ])
+    .where('p.sellerId = :sellerId', { sellerId })
+    .groupBy('p.id')
+    .addGroupBy('p.periodStart')
+    .addGroupBy('p.periodEnd')
+    .addGroupBy('p.status')
+    .addGroupBy('p.slipUrl')
+    .orderBy('p.periodStart', 'DESC')
+    .getRawMany();
 
-    return rows.map((r) => ({
-      periodStart: r.periodStart,
-      periodEnd: r.periodEnd,
-      grossSales: Number(r.grossSales),
-      commission: Number(r.commission),
-      netAmount: Number(r.netAmount),
-      status: r.status,
-      slipUrl: r.slipUrl,
-    }));
-  }
+  return rows.map((r) => ({
+    payoutId: Number(r.payoutId),  // ← Also convert to number
+    periodStart: r.periodStart,
+    periodEnd: r.periodEnd,
+    grossSales: Number(r.grossSales),
+    commission: Number(r.commission),
+    netAmount: Number(r.netAmount),
+    status: r.status,
+    slipUrl: r.slipUrl,
+  }));
+}
 
   async getSellerEarningsSummaryByUserId(
     userId: string,
   ): Promise<SellerEarningsSummaryDto> {
-    
+
     const seller = await this.sellerRepository.findOne({
       where: { user: { id: userId } },
     });
@@ -212,7 +220,6 @@ export class SellerService {
 
     return this.getSellerEarningsSummary(seller.id);
   }
-
 
   async getSellerEarningsRoundByUserId(
     userId: string,
@@ -228,6 +235,58 @@ export class SellerService {
     return this.getSellerEarningsRound(seller.id);
   }
 
+  async getSellerRoundDetailByPayoutId(
+    userId: string,
+    payoutId: string,
+  ): Promise<SellerRoundDetailDto> {
+    const payoutIdNumber = Number(payoutId);
+
+    const seller = await this.sellerRepository.findOne({
+      where: { user: { id: userId } },
+    });
+
+    if (!seller) {
+      throw new NotFoundException('Seller not found');
+    }
+
+    const payout = await this.payoutRepository.findOne({
+      where: {
+        id: payoutIdNumber,
+        seller: { id: seller.id },
+      },
+      relations: {
+        payoutItem: {
+          orderItem: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    if (!payout) {
+      throw new NotFoundException('Payout not found');
+    }
+
+    const items: SellerRoundItemDto[] = payout.payoutItem.map((pi) => ({
+      productName: pi.orderItem.product.name,
+      price: Number(pi.orderItem.price),
+      commission: Number(pi.orderItem.commissionAmount),
+      sellerEarning: Number(pi.orderItem.sellerAmount),
+    }));
+
+    const totalGrossSales = items.reduce((sum, item) => sum + item.price, 0);
+    const totalCommission = items.reduce((sum, item) => sum + item.commission, 0);
+    const totalNetAmount = items.reduce((sum, item) => sum + item.sellerEarning, 0);
+
+    return {
+      payoutId: payoutIdNumber,
+      periodStart: payout.periodStart.toISOString(),
+      periodEnd: payout.periodEnd.toISOString(),
+      totalGrossSales,
+      totalCommission,
+      totalNetAmount,
+      items,
+    };
+  }
+
 }
-
-

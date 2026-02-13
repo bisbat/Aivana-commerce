@@ -51,8 +51,14 @@ export class ReportController {
   @Roles(Role.ADMIN)
   @Get()
   async findAll() {
-    console.log('Fetching all reports');
     return await this.reportService.findAll();
+  }
+
+  // ดู report ตาม productId (สำหรับ admin)
+  @Roles(Role.ADMIN)
+  @Get('product/:productId')
+  async getByProduct(@Param('productId') productId: string) {
+    return await this.reportService.findByProduct(+productId);
   }
 
   // ดู report by id (สำหรับ admin)

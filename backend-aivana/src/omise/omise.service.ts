@@ -1,16 +1,17 @@
-
+import { InjectRepository } from '@nestjs/typeorm';
+import { CreateOmiseDto } from './dto/create-omise.dto';
+import { UpdateOmiseDto } from './dto/update-omise.dto';
+import { OmiseEntity } from './entities/omise.entity';
 import { Injectable } from '@nestjs/common';
 import Omise from 'omise';
-
 
 @Injectable()
 export class OmiseService {
   private omise;
-  constructor(
-  ){
-    this.omise=Omise({
+  constructor() {
+    this.omise = Omise({
       secretKey: process.env.OMISE_SECRET_KEY,
-    })
+    });
   }
 
   // promtpay
@@ -21,7 +22,7 @@ export class OmiseService {
       currency: 'thb',
       source: sourceId,
       expires_at: expiresAt,
-    })
+    });
   }
 
   // credit card

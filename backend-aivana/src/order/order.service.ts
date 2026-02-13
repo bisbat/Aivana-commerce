@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -55,8 +59,13 @@ export class OrderService {
             createdAt: new Date(),
         });
 
-        const orderItems = await this.orderItemService.createOrderItem({ orderId: order.id, cartItems: cart.items });
-        order.totalAmount = orderItems.map((o) => Number(o.price)).reduce((a: number, b: number) => a + b, 0);
+        const orderItems = await this.orderItemService.createOrderItem({
+            orderId: order.id,
+            cartItems: cart.items,
+        });
+        order.totalAmount = orderItems
+            .map((o) => Number(o.price))
+            .reduce((a: number, b: number) => a + b, 0);
         await this.orderRepository.save(order);
 
         return order;
@@ -65,21 +74,20 @@ export class OrderService {
     async getOrdersByUserId(userId: string) {
         return this.orderRepository.find({
             where: { userId: userId },
-            relations: ['items'],
+            relations: ['items', 'items.product'],
         });
     }
 
     async getOrderById(orderId: number) {
-        console.log('order id : ' + orderId)
+        console.log('order id : ' + orderId);
         const order = await this.orderRepository.findOne({
             where: { id: orderId },
-            relations: ['items', 'items.product']
-        })
+            relations: ['items', 'items.product'],
+        });
         if (!order) {
-            throw new NotFoundException('Not found order!')
+            throw new NotFoundException('Not found order!');
         }
-
-        return order
+        return order;
     }
 
     async hasUserPurchasedProduct(
@@ -96,7 +104,6 @@ export class OrderService {
     }
 
     async markAsPaid(orderId: number) {
-        console.log('mark as paid called for orderId:', orderId);
         const order = await this.orderRepository.findOne({
             where: { id: orderId },
         });
@@ -107,23 +114,19 @@ export class OrderService {
 
         const payment = await this.paymentRepository.findOne({
             where: { orderId: orderId },
-        })
+        });
 
         if (!payment) {
             throw new NotFoundException('Payment not found');
         }
 
-        console.log('payment', payment)
-
         const cart = await this.cartRepository.findOne({
-            where: { userId: order.userId }
+            where: { userId: order.userId },
         });
-
-        console.log('Cart:', cart);
 
         if (cart) {
             const cartItems = await this.cartItemRepository.find({
-                where: { cartId: cart.cartId }
+                where: { cartId: cart.cartId },
             });
 
             for (const item of cartItems) {
@@ -132,7 +135,6 @@ export class OrderService {
 
             await this.cartRepository.remove(cart);
         }
-
 
         if (payment.status === PaymentStatusEnum.SUCCESS) {
             return order;
@@ -221,7 +223,6 @@ export class OrderService {
         await this.paymentRepository.save(payment);
         return this.orderRepository.save(order);
     }
-
 
     async markAsPaidCard(orderId: number) {
         const order = await this.orderRepository.findOne({
@@ -331,6 +332,4 @@ export class OrderService {
         await this.paymentRepository.save(payment);
         return this.orderRepository.save(order);
     }
-
-
 }

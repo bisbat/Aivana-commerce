@@ -91,6 +91,17 @@ export class ReportService {
   async findAll(): Promise<ReportEntity[]> {
     return await this.reportRepository.find({
       relations: ['reportedBy', 'orderItem', 'orderItem.product'],
+      where: {
+        orderItem: { product: { isDeleted: false } },
+      },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async findByProduct(productId: number): Promise<ReportEntity[]> {
+    return await this.reportRepository.find({
+      where: { orderItem: { product: { id: productId } } },
+      relations: ['reportedBy', 'orderItem', 'orderItem.product'],
       order: { createdAt: 'DESC' },
     });
   }

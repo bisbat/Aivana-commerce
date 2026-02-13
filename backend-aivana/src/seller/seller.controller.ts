@@ -87,6 +87,18 @@ export class SellerController {
     return this.sellerService.getSellerEarningsRoundByUserId(userId);
   }
 
+  @Get('earnings/round/payout/:payoutId')
+  getRoundDetail(
+    @Req() req,
+    @Param('payoutId') payoutId: string,
+  ) {
+    const userId = req.user.userId;
+
+    return this.sellerService.getSellerRoundDetailByPayoutId(
+      userId,
+      payoutId,
+    );
+  }
 
 
 }

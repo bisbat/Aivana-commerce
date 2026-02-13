@@ -45,6 +45,10 @@ export class ResponseProductDto {
   @Expose()
   updatedAt: Date;
   @Expose()
+  isDeleted: boolean;
+  @Expose()
+  deletedAt?: Date;
+  @Expose()
   hasReviewed: boolean;
 
   @Expose()

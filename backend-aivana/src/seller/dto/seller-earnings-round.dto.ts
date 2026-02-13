@@ -1,4 +1,5 @@
 export class SellerEarningsRoundDto {
+  payoutId: number;
   periodStart: Date;
   periodEnd: Date;
   grossSales: number;

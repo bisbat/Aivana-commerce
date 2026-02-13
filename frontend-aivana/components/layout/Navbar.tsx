@@ -60,7 +60,6 @@ export const Navbar: React.FC = () => {
     };
   }, [pathname]);
 
-  // Handle click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
