@@ -71,6 +71,12 @@ export class ProductEntity {
   @Column({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
+  @Column({ type: 'text', nullable: true })
+  deletionReason: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  deletedBy: string;
+
   @OneToMany(() => ProductImage, (image) => image.product)
   productImages: ProductImage[];
 

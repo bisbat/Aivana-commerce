@@ -48,6 +48,10 @@ export class ReportEntity {
   @Column({ type: 'text', nullable: true })
   message?: string;
 
+  // Seller Response (เก็บเฉพาะเวลาที่ตอบกลับ)
+  @Column({ type: 'timestamp', nullable: true })
+  sellerRespondedAt?: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 

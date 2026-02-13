@@ -2,8 +2,14 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import type { Report, ReportStatus } from "@/lib/types/report";
-import { AlertCircle, Package, ShieldAlert, ShieldCheck } from "lucide-react";
+import type { Report } from "@/lib/types/report";
+import {
+  AlertCircle,
+  Package,
+  ShieldAlert,
+  ShieldCheck,
+  AlertTriangle,
+} from "lucide-react";
 import { calculateSeverity } from "@/lib/utils/reportSeverity";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -18,6 +24,9 @@ interface GroupedReport {
   resolved: number;
   rejected: number;
   latestReportDate: string;
+  isDeleted: boolean;
+  deletedAt?: string;
+  deletionReason?: string;
 }
 
 // ─── Helper Functions ──────────────────────────────────────────────────────
@@ -42,6 +51,9 @@ function groupReportsByProduct(reports: Report[]): GroupedReport[] {
         resolved: 0,
         rejected: 0,
         latestReportDate: report.createdAt,
+        isDeleted: report.orderItem.product.isDeleted,
+        deletedAt: report.orderItem.product.deletedAt,
+        deletionReason: report.orderItem.product.deletionReason,
       });
     }
 
@@ -99,31 +111,6 @@ function SeverityBadge({ reportCount }: { reportCount: number }) {
   );
 }
 
-// ─── Status Badge Component ─────────────────────────────────────────────────
-function StatusCount({
-  count,
-  label,
-  color,
-}: {
-  count: number;
-  label: string;
-  color: string;
-}) {
-  if (count === 0) return null;
-
-  return (
-    <div className="flex items-center gap-1.5">
-      <div
-        className="w-2 h-2 rounded-full"
-        style={{ backgroundColor: color }}
-      />
-      <span className="text-xs text-slate-400">
-        {label}: <span className="text-slate-200 font-semibold">{count}</span>
-      </span>
-    </div>
-  );
-}
-
 // ─── View Detail Button ─────────────────────────────────────────────────────
 function ViewDetailButton({ productId }: { productId: number }) {
   const router = useRouter();
@@ -133,7 +120,7 @@ function ViewDetailButton({ productId }: { productId: number }) {
     <button
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={() => router.push(`/admin/reports/product/${productId}`)}
+      onClick={() => router.push(`/stores/reports/product/${productId}`)}
       className={`px-4 py-2 rounded-lg border border-[#8a57fb]/40 text-[#8a57fb] text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
         hovered ? "bg-[#8a57fb]/10" : "bg-transparent"
       }`}
@@ -180,50 +167,45 @@ function GroupedReportRow({
       style={{ animation: `fadeSlideIn 0.35s ease ${index * 0.05}s both` }}
     >
       {/* Product Info */}
-      <td className="px-6 py-4">
-        <div className="flex items-center gap-3">
-          <div>
-            <div className="text-sm font-medium text-slate-200">
+      <td className="px-6 py-5">
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-3">
+            {/* Badge วางไว้หน้าชื่อ */}
+            {group.isDeleted && (
+              <span className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded border border-red-500/40 bg-red-500/10 text-red-500 text-[10px] font-black ">
+                <AlertTriangle size={11} className="stroke-[3px]" /> ถูกลบ
+              </span>
+            )}
+
+            <h4
+              className={`font-semibold text-[15px] line-clamp-1 tracking-tight transition-colors ${
+                group.isDeleted ? "text-slate-400" : "text-white"
+              }`}
+            >
               {group.productName}
-            </div>
-            <div className="text-xs text-slate-500">
-              Product ID: #{group.productId}
-            </div>
+            </h4>
           </div>
         </div>
       </td>
 
-      {/* Total Reports */}
+      {/* จำนวนรายงาน */}
       <td className="px-6 py-4">
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-bold text-[#8a57fb]">
+        <div className="flex items-baseline gap-1">
+          <span className="text-lg font-bold text-[#a881fc]">
             {group.totalReports}
           </span>
-          <span className="text-xs text-slate-400">รายงาน</span>
+          <span className="text-[11px] text-slate-500 font-medium">ครั้ง</span>
         </div>
       </td>
 
-      {/* Severity */}
+      {/* ... ส่วนอื่น (Severity, Status, Date, Action) คงเดิมตามโค้ดคุณ ... */}
       <td className="px-6 py-4">
         <SeverityBadge reportCount={group.totalReports} />
       </td>
 
-      {/* Status Breakdown */}
-      <td className="px-6 py-4">
-        <div className="flex flex-wrap gap-3">
-          <StatusCount count={group.pending} label="รอ" color="#fbbf24" />
-          <StatusCount count={group.underReview} label="ตรวจ" color="#60a5fa" />
-          <StatusCount count={group.resolved} label="แก้ไข" color="#4ade80" />
-          <StatusCount count={group.rejected} label="ปฏิเสธ" color="#f87171" />
-        </div>
-      </td>
-
-      {/* Latest Report Date */}
-      <td className="px-6 py-4 text-sm text-slate-400">
+      <td className="px-6 py-4 text-sm text-slate-400 font-medium">
         {formatDate(group.latestReportDate)}
       </td>
-
-      {/* Action */}
       <td className="px-6 py-4">
         <ViewDetailButton productId={group.productId} />
       </td>
@@ -232,20 +214,25 @@ function GroupedReportRow({
 }
 
 // ─── Main Table Component ───────────────────────────────────────────────────
-export default function ReportsTable({ reports }: { reports: Report[] }) {
+export default function SellerReportsTable({ reports }: { reports: Report[] }) {
   const groupedReports = useMemo(
     () => groupReportsByProduct(reports),
     [reports],
   );
 
   return (
-    <div className="bg-slate-800/40 border border-white/5 rounded-2xl overflow-hidden">
-      {/* Table title */}
-      <div className="px-6 py-4 border-b border-white/5">
+    <div className="bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden shadow-xl">
+      {/* Header Section */}
+      <div className="px-6 py-5 border-b border-white/5 bg-gradient-to-r from-transparent to-white/[0.02]">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white">
-            รายงานปัญหาแบบจัดกลุ่มตามสินค้า
-          </h3>
+          <div className="space-y-1">
+            <h3 className="text-lg font-bold text-white tracking-tight">
+              รายงานปัญหาสินค้าของคุณ
+            </h3>
+            <p className="text-xs text-slate-500">
+              ตรวจสอบและจัดการข้อร้องเรียนจากลูกค้า
+            </p>
+          </div>
           <div className="text-sm text-slate-400">
             พบ{" "}
             <span className="text-[#8a57fb] font-semibold">
@@ -257,32 +244,47 @@ export default function ReportsTable({ reports }: { reports: Report[] }) {
       </div>
 
       {groupedReports.length === 0 ? (
-        <div className="px-6 py-12 text-center text-slate-400">
-          <p>ไม่มีรายงานปัญหา</p>
+        <div className="px-6 py-20 text-center">
+          <div className="mb-4 inline-flex p-4 rounded-full bg-slate-800/50 text-slate-600">
+            {/* Icon Placeholder */}
+            <svg
+              className="w-8 h-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <p className="text-slate-400 font-medium">ไม่มีรายงานปัญหาในขณะนี้</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full border-separate border-spacing-0">
             <thead>
-              <tr className="border-b border-white/5">
+              <tr className="bg-white/[0.02]">
                 {[
                   "สินค้า",
                   "จำนวนรายงาน",
                   "ระดับความรุนแรง",
-                  "สถานะ",
                   "รายงานล่าสุด",
                   "การดำเนินการ",
                 ].map((col) => (
                   <th
                     key={col}
-                    className="text-left px-6 py-4 text-sm text-slate-400 font-medium"
+                    className="text-left px-6 py-4 text-[13px] text-slate-400 font-semibold uppercase tracking-wider"
                   >
                     {col}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-white/5">
               {groupedReports.map((group, idx) => (
                 <GroupedReportRow
                   key={group.productId}

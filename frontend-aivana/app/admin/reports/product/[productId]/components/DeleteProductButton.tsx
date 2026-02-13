@@ -24,6 +24,7 @@ export default function DeleteProductButton({
   const [showModal, setShowModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [reason, setReason] = useState("");
   const router = useRouter();
 
   const severity = calculateSeverity(reportCount);
@@ -34,9 +35,14 @@ export default function DeleteProductButton({
   }
 
   const handleDelete = async () => {
+    if (!reason.trim()) {
+      showErrorToast("กรุณาระบุเหตุผลในการลบสินค้า");
+      return;
+    }
+
     setIsDeleting(true);
     try {
-      await deleteProductAction(productId.toString());
+      await deleteProductAction(productId.toString(), reason);
       showSuccessToast("ลบสินค้าสำเร็จ");
 
       router.push("/admin/reports");
@@ -55,11 +61,11 @@ export default function DeleteProductButton({
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         onClick={() => setShowModal(true)}
-        className={`px-5 py-2.5 rounded-lg border-2 border-red-500/50 text-red-500 font-semibold transition-all duration-200 flex items-center gap-2 ${
+        className={`px-3 py-1.5 rounded-lg border border-red-500/50 text-red-500 text-xs font-semibold transition-all duration-200 flex items-center gap-2 min-h-[34px] ${
           hovered ? "bg-red-500/10 border-red-500" : "bg-transparent"
         }`}
       >
-        <Trash2 size={18} />
+        <Trash2 size={14} />
         ลบสินค้า
       </button>
 
@@ -101,6 +107,26 @@ export default function DeleteProductButton({
                 ⚠️ การลบสินค้าจะไม่สามารถย้อนกลับได้
                 และจะส่งผลต่อข้อมูลในระบบที่เกี่ยวข้องทั้งหมด
               </p>
+            </div>
+
+            {/* Reason Textarea */}
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                เหตุผลในการลบสินค้า <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="ระบุเหตุผลที่ลบสินค้านี้ (เช่น มีรายงานปัญหามากเกินไป, ละเมิดนโยบายของเว็บไซต์)"
+                rows={4}
+                className="w-full px-4 py-3 bg-[#262549] border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-[#8a57fb] focus:ring-2 focus:ring-[#8a57fb]/20 transition-all"
+                disabled={isDeleting}
+              />
+              {!reason.trim() && (
+                <p className="text-xs text-slate-500 mt-1">
+                  เหตุผลนี้จะถูกส่งไปยัง seller เพื่อให้ทราบว่าทำไมโดนลบ
+                </p>
+              )}
             </div>
 
             <div className="flex gap-3">

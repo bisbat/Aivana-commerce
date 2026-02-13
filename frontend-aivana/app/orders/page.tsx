@@ -169,8 +169,8 @@ export default function OrderHistoryPage() {
 
       {/* Orders List */}
       {orders.length === 0 ? (
-        <div className="bg-gradient-to-br from-[#1e1b3d] to-[#1a1733] rounded-xl border border-purple-500/20 p-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
+        <div className="bg-linear-to-br from-[#1e1b3d] to-[#1a1733] rounded-xl border border-purple-500/20 p-12 text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-linear-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
             <Package className="w-8 h-8 text-purple-400" />
           </div>
           <p className="text-slate-300 text-lg mb-2">ยังไม่มีประวัติการซื้อ</p>
@@ -179,7 +179,7 @@ export default function OrderHistoryPage() {
           </p>
           <Link
             href="/"
-            className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg transition-all shadow-lg shadow-purple-500/20"
+            className="inline-block px-6 py-3 bg-linear-to-r from-purple-500/90 to-pink-500/90 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-colors shadow-lg shadow-purple-500/20"
           >
             เริ่มช้อปปิ้ง
           </Link>

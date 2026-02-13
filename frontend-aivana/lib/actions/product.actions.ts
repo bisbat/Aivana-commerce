@@ -97,7 +97,7 @@ export async function deleteProductImageAction(imageId: number) {
   throw new Error("Failed to delete image");
 }
 
-export async function deleteProductAction(productId: string) {
+export async function deleteProductAction(productId: string, reason?: string) {
   const token = await getAccessToken();
 
   if (!token) {
@@ -110,6 +110,7 @@ export async function deleteProductAction(productId: string) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+    body: JSON.stringify({ reason }),
   });
 
   if (!res.ok) {

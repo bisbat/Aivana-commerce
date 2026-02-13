@@ -74,6 +74,8 @@ export class ProductMapper {
         totalReviews, // ✅ จำนวนรีวิว
         isDeleted: product.isDeleted,
         deletedAt: product.deletedAt,
+        deletionReason: product.deletionReason,
+        deletedBy: product.deletedBy,
       },
       { excludeExtraneousValues: true },
     );

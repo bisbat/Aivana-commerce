@@ -1,6 +1,8 @@
 import { fetchPayoutRounds } from "@/lib/actions/payout.actions";
 import type { PayoutRound } from "@/lib/types/admin/payout";
 import PayoutRoundsTable from "../components/PayoutRoundsTable";
+import { AlertCircle } from "lucide-react";
+import BackgroundAivana from "@/components/common/BackgroundAivana";
 
 // ─── Server Component — runs on the server, no "use client" ─────────────────
 // This is where we fetch data. Next.js App Router lets us await directly here.
@@ -39,26 +41,28 @@ export default async function PayoutRoundsPage() {
       : null;
 
   return (
-    <div className="max-w-6xl">
-      {/* Page title */}
-      <div className="mb-7">
-        <h2 className="text-2xl font-bold text-white tracking-tight">
-          รอบโอนเงิน
-        </h2>
-        <p className="text-sm text-white/35 mt-1">
-          Payout Rounds — manage seller payment cycles
-        </p>
-      </div>
-
-      {/* Error state */}
-      {error && (
-        <div className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 px-5 py-4 text-sm text-red-300">
-          Failed to load rounds: {error}
+    <div className="relative mx-auto">
+      <BackgroundAivana />
+      <div className="relative z-10 max-w-[1400px]">
+        {/* Page title */}
+        <div className="mb-6">
+          <h2 className="text-3xl font-bold text-white mb-2">รอบโอนเงิน</h2>
+          <p className="text-slate-400">
+            Payout Rounds — manage seller payment cycles
+          </p>
         </div>
-      )}
 
-      {/* Summary stats + table — client component for interactivity */}
-      <PayoutRoundsTable rounds={rounds} />
+        {/* Error state */}
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-2xl px-5 py-4 text-red-400 text-sm mb-6 flex items-center gap-3">
+            <AlertCircle size={20} />
+            <span>Failed to load rounds: {error}</span>
+          </div>
+        )}
+
+        {/* Summary stats + table — client component for interactivity */}
+        <PayoutRoundsTable rounds={rounds} />
+      </div>
     </div>
   );
 }

@@ -19,10 +19,15 @@ export interface Report {
       name: string;
       price: number;
       imageUrl?: string;
+      isDeleted: boolean;
+      deletedAt?: string;
+      deletionReason?: string;
+      deletedBy?: string;
     };
   };
   reason: string;
   message?: string;
+  sellerRespondedAt?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -58,6 +58,31 @@ export async function getMyReportsAction() {
   return await res.json();
 }
 
+export async function getSellerReportsAction(): Promise<Report[]> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
+  const res = await fetch(`${API_BASE_URL}/reports/received`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  console.log("Seller reports fetched successfully");
+  console.log(res);
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || "Failed to fetch seller reports");
+  }
+
+  return await res.json();
+}
+
 export async function getReportByOrderItemAction(orderItemId: number) {
   const token = await getAccessToken();
 
@@ -196,6 +221,37 @@ export async function updateReportStatusAction(
   if (!res.ok) {
     const error = await res.json();
     throw new Error(error.message || "Failed to update report status");
+  }
+
+  return await res.json();
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Seller Actions
+// ────────────────────────────────────────────────────────────────────────────
+
+export async function addSellerResponseAction(
+  reportId: number,
+): Promise<Report> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
+  const res = await fetch(
+    `${API_BASE_URL}/reports/${reportId}/seller-response`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || "Failed to add seller response");
   }
 
   return await res.json();
