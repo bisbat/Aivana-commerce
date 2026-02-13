@@ -43,7 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = "/" }) => {
     {
       label: "Dashboard",
       icon: <LayoutDashboard size={20} />,
-      href: "/dashboard",
+      href: "/stores/dashboard",
     },
     {
       label: "Earning",
