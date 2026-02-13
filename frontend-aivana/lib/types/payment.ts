@@ -6,5 +6,6 @@ export interface PromptpayQrResponse {
   qrImageUrl: string;
   redirect: string;
   action: 'SHOW_QR' | 'REDIRECT';
+  expiredAt: string;
 }
  
