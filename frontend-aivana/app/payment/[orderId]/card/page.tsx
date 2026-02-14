@@ -4,13 +4,15 @@ import { useState, useEffect, FormEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { createCreditCardToken } from '@/lib/omise';
 import { createCreditCardPayment } from '@/lib/actions/payment.actions';
+import { formatCardNumber, formatExpiry } from '@/lib/utils/card-format';
+import { validateCardForm } from '@/lib/utils/card-validation';
 
 export default function CreditCardPage() {
     const { orderId } = useParams();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [omiseReady, setOmiseReady] = useState(false); 
+    const [omiseReady, setOmiseReady] = useState(false);
 
     useEffect(() => {
         handleOmiseLoad();
@@ -53,6 +55,19 @@ export default function CreditCardPage() {
                 expiryYear: fullYear,
             });
 
+            // Validate form data
+            const validationError = validateCardForm({
+                cardNumber,
+                expiry,
+                cvc,
+            });
+
+            if (!validationError.valid) {
+                setError(validationError.message);
+                setLoading(false);
+                return;
+            }
+
             // สร้าง token
             const token = await createCreditCardToken({
                 name,
@@ -74,37 +89,15 @@ export default function CreditCardPage() {
             }
 
 
-        } catch (err: any) {
-            console.error('Payment failed:', err);
-            setError(err.message || 'การชำระเงินล้มเหลว กรุณาตรวจสอบข้อมูลบัตร');
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError('การชำระเงินล้มเหลว กรุณาตรวจสอบข้อมูลบัตร');
+            }
         } finally {
             setLoading(false);
         }
-    };
-
-    const formatCardNumber = (value: string) => {
-        const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-        const matches = v.match(/\d{4,16}/g);
-        const match = (matches && matches[0]) || '';
-        const parts = [];
-
-        for (let i = 0, len = match.length; i < len; i += 4) {
-            parts.push(match.substring(i, i + 4));
-        }
-
-        if (parts.length) {
-            return parts.join(' ');
-        } else {
-            return value;
-        }
-    };
-
-    const formatExpiry = (value: string) => {
-        const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-        if (v.length >= 2) {
-            return `${v.substring(0, 2)}/${v.substring(2, 4)}`;
-        }
-        return v;
     };
 
     const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
