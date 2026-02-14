@@ -293,7 +293,7 @@ export default function MyCollectionPage() {
                       <div
                         className={`text-white backdrop-blur-sm px-2 py-1 rounded-full 
                         flex items-center gap-1 text-[10px] font-bold w-fit shadow-md transition-all duration-150
-                        ${item.product.hasReviewed ? "bg-slate-700" : "bg-amber-500/90 animate-pulse"}`}
+                        ${item.product.hasReviewed ? "bg-slate-700" : "bg-amber-500 animate-pulse"}`}
                       >
                         <Star
                           size={10}
@@ -397,7 +397,7 @@ export default function MyCollectionPage() {
                       className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 ${
                         item.product.isDeleted || item.product.hasReviewed
                           ? "bg-slate-700 cursor-not-allowed opacity-60 text-slate-400"
-                          : "bg-amber-500/90 text-white shadow-lg hover:bg-amber-500"
+                          : "bg-amber-500 text-white shadow-lg hover:bg-amber-600"
                       }`}
                     >
                       <Star
@@ -464,14 +464,12 @@ export default function MyCollectionPage() {
                               ? "bg-slate-700 cursor-not-allowed opacity-60 text-slate-400"
                               : item.product.hasReported
                                 ? "bg-orange-500 text-white shadow-lg hover:bg-orange-600"
-                                : "bg-slate-700/50 hover:bg-red-500/20 hover:text-red-400 text-slate-400 border border-slate-600"
+                                : "bg-orange-500 text-white shadow-lg hover:bg-orange-600"
                           }`}
                         >
                           <Flag
                             className="w-4 h-4"
-                            fill={
-                              item.product.hasReported ? "currentColor" : "none"
-                            }
+                            fill={item.product.hasReported ? "white" : "none"}
                           />
                         </button>
                       );

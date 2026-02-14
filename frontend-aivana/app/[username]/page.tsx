@@ -108,7 +108,6 @@ const ProfilePage = () => {
           <h1 className="text-2xl font-bold text-white mb-1">
             {user.username}
           </h1>
-          {/* FIXME: สร้างเพิ่ม field bio ในฐานข้อมูล user */}
           <p className="text-slate-400 mb-3">
             {user.bio || "ฉันยังไม่ได้เพิ่มประวัติส่วนตัว"}
           </p>

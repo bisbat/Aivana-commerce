@@ -18,7 +18,7 @@ export interface SeverityInfo {
  * - 10+ reports: Critical (🔴)
  */
 export function calculateSeverity(reportCount: number): SeverityInfo {
-  if (reportCount >= 1) {
+  if (reportCount >= 10) {
     return {
       level: "critical",
       label: "วิกฤต",
