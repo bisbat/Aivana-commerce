@@ -108,6 +108,7 @@ export class MinioService implements OnModuleInit {
     try {
       // Return permanent public URL for e-commerce
       const endpoint = this.configService.get<string>('MINIO_ENDPOINT');
+      const url = this.configService.get<string>('HOST_URL') || endpoint;
       const port = this.configService.get<string>('MINIO_PORT');
       const useSSL =
         (this.configService.get<string>('MINIO_USE_SSL') ?? 'false') === 'true';
@@ -117,7 +118,7 @@ export class MinioService implements OnModuleInit {
         port && port !== '80' && port !== '443' ? `:${port}` : '';
 
       // Public URL format: http://localhost:9000/bucket-name/file-path
-      const publicUrl = `${protocol}://${endpoint}${portSuffix}/${this.bucketName}/${fileName}`;
+      const publicUrl = `${protocol}://${url}/${this.bucketName}/${fileName}`;
 
       
       return publicUrl;
