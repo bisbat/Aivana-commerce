@@ -44,14 +44,65 @@ export default async function SellerEarningsPage() {
         </div>
       )}
 
+
+
       {/* Summary cards */}
-      {summary && <EarningsSummaryCards summary={summary} />}
+      {summary ? (
+        <EarningsSummaryCards summary={summary} />
+      ) : (
+        !error && (
+          <div
+            style={{
+              background: "#111827",
+              border: "1px solid #1f2937",
+              borderRadius: 16,
+              padding: "24px",
+              textAlign: "center",
+              color: "#9ca3af",
+              marginBottom: 24,
+            }}
+          >
+            ยังไม่มีข้อมูลรายได้
+          </div>
+        )
+      )}
+
 
       {/* Rounds table */}
-      <h2 style={{ fontSize: 18, fontWeight: 600, color: "#fff", marginTop: 40, marginBottom: 18 }}>
+      <h2
+        style={{
+          fontSize: 18,
+          fontWeight: 600,
+          color: "#fff",
+          marginTop: 40,
+          marginBottom: 18,
+        }}
+      >
         การจ่ายเงินแต่ละรอบ
       </h2>
-      <EarningsRoundsTable rounds={rounds} />
+
+      {rounds.length === 0 ? (
+        <div
+          style={{
+            background: "#111827",
+            border: "1px solid #1f2937",
+            borderRadius: 16,
+            padding: "32px",
+            textAlign: "center",
+            color: "#9ca3af",
+          }}
+        >
+          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
+            ยังไม่มีรอบการจ่ายเงิน
+          </div>
+          <div style={{ fontSize: 13 }}>
+            ระบบจะสร้างรอบการจ่ายเงินทุกวันที่ 1 และ 16 ของเดือน
+          </div>
+        </div>
+      ) : (
+        <EarningsRoundsTable rounds={rounds} />
+      )}
+
     </div>
   );
 }

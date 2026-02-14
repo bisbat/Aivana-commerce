@@ -26,9 +26,23 @@ export class PayoutService {
     private readonly minioService: MinioService,
   ) { }
 
-  async generatePayout(periodStart: string, periodEnd: string) {
+  async generatePayout(periodStart: Date, periodEnd: Date) {
+
     const start = new Date(periodStart);
     const end = new Date(periodEnd);
+
+    // Normalize to UTC explicitly (safety)
+    start.setUTCHours(0, 0, 0, 0);
+    end.setUTCHours(0, 0, 0, 0);
+
+    const now = new Date();
+
+    // if (now < end) {
+    //   throw new BadRequestException(
+    //     'Cannot generate payout before period ends',
+    //   );
+    // }
+
 
     const existingPayout = await this.payoutRepo.findOne({
       where: {
