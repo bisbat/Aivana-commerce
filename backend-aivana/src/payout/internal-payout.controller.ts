@@ -4,11 +4,14 @@ import { GeneratePayoutDto } from './dto/generate-payout.dto';
 
 @Controller('internal/payouts')
 export class InternalPayoutController {
-  constructor(private readonly payoutService: PayoutService) {}
+  constructor(private readonly payoutService: PayoutService) { }
 
   @Post('generate')
   generate(@Body() dto: GeneratePayoutDto) {
-    return this.payoutService.generatePayout(dto.periodStart, dto.periodEnd);
+    const start = new Date(`${dto.periodStart}T00:00:00Z`);
+    const end = new Date(`${dto.periodEnd}T23:59:59Z`);
+
+    return this.payoutService.generatePayout(start, end);
   }
 
 }

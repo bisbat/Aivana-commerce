@@ -5,7 +5,7 @@ import { getAccessToken } from "../auth";
 import { SellerRoundDetail } from "../types/sellerRoundDetail";
 
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 async function parseResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
