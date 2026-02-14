@@ -41,7 +41,7 @@ export default function EarningsSummaryCards({ summary }: { summary: SellerEarni
           เงินค้างจ่าย
         </p>
         <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 12 }}>
-          เงินที่รอรับจ่ายจากทักษัดไป
+          เงินที่รอการโอนในรอบถัดไป
         </p>
         <p style={{ fontSize: 32, fontWeight: 800, color: "#a78bfa" }}>
           {formatBaht(summary.pendingAmount)} บาท

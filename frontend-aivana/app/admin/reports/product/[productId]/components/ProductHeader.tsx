@@ -89,17 +89,19 @@ export default function ProductHeader({
           </div>
 
           {/* Delete Button - Show when critical */}
-          <div className="flex items-center gap-3 pt-3 border-t border-white/5">
-            <div className="flex-1 text-sm text-red-400">
-              ⚠️ สินค้านี้มีรายงานเกินเกณฑ์ ({reportCount} รายงาน) -
-              พิจารณายกเลิกการขายสินค้า
+          {severity.level === "critical" && (
+            <div className="flex items-center gap-3 pt-3 border-t border-white/5">
+              <div className="flex-1 text-sm text-red-400">
+                ⚠️ สินค้านี้มีรายงานเกินเกณฑ์ ({reportCount} รายงาน) -
+                พิจารณายกเลิกการขายสินค้า
+              </div>
+              <DeleteProductButton
+                productId={product.id}
+                productName={product.name}
+                reportCount={reportCount}
+              />
             </div>
-            <DeleteProductButton
-              productId={product.id}
-              productName={product.name}
-              reportCount={reportCount}
-            />
-          </div>
+          )}
         </div>
       </div>
     </div>

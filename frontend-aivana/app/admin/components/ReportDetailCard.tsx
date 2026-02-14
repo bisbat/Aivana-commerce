@@ -34,7 +34,7 @@ function StatusBadge({ status }: { status: ReportStatus }) {
       border: "rgba(248,113,113,0.3)",
       color: "#f87171",
     },
-    product_deleted: {
+    cancel_sale: {
       label: "ยกเลิกการขายสินค้า",
       bg: "rgba(139,92,246,0.12)",
       border: "rgba(139,92,246,0.3)",
@@ -216,7 +216,10 @@ export default function ReportDetailCard({ report }: { report: Report }) {
             { value: "under_review" as ReportStatus, label: "กำลังตรวจสอบ" },
             { value: "resolved" as ReportStatus, label: "แก้ไขแล้ว" },
             { value: "rejected" as ReportStatus, label: "ไม่ผ่าน" },
-            { value: "product_deleted" as ReportStatus, label: "ยกเลิกการขายสินค้า" },
+            {
+              value: "cancel_sale" as ReportStatus,
+              label: "ยกเลิกการขายสินค้า",
+            },
           ].map((option) => (
             <button
               key={option.value}

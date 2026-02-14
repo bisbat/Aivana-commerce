@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ReviewEntity } from './entities/review.entity';
 import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { BadRequestException } from '@nestjs/common/exceptions/bad-request.exception';
+import { ConflictException } from '@nestjs/common/exceptions/conflict.exception';
 import { OrderService } from 'src/order/order.service';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
 
@@ -39,7 +39,7 @@ export class ReviewService {
     );
 
     if (hasReviewed) {
-      throw new BadRequestException('You have already reviewed this product.');
+      throw new ConflictException('You have already reviewed this product.');
     }
 
     // 3. สร้าง review (ใช้ currentUserId เป็น buyerId)

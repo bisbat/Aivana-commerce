@@ -245,7 +245,9 @@ export class ReportService {
     return await this.reportRepository.save(report);
   }
 
-  async updateAllReportsByProductToDeleted(productId: number): Promise<number> {
+  async updateAllReportsByProductToCancelSale(
+    productId: number,
+  ): Promise<number> {
     const subQuery = this.reportRepository
       .createQueryBuilder('oi')
       .select('oi.id')
@@ -256,7 +258,7 @@ export class ReportService {
     const result = await this.reportRepository
       .createQueryBuilder()
       .update(ReportEntity)
-      .set({ status: ReportStatus.PRODUCT_DELETED })
+      .set({ status: ReportStatus.CANCEL_SALE })
       .where('orderItemId IN ' + subQuery)
       .setParameter('productId', productId)
       .execute();

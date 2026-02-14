@@ -13,7 +13,12 @@ import {
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
 import type { UploadedFileType } from './interfaces/uploaded-file.interface';
-import { BadRequestException } from '@nestjs/common/exceptions';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common/exceptions';
 import { plainToInstance } from 'class-transformer';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -95,16 +100,16 @@ export class ProductController {
     const product = await this.productService.getProductById(id);
 
     if (!product) {
-      return null;
+      throw new NotFoundException('Product not found');
     }
 
     // ถ้าสินค้าถูกลบ และ user ไม่ได้ login หรือไม่เคยซื้อ -> ซ่อน
     if (product.isDeleted) {
       const userId = req.user?.userId;
 
-      // ถ้าไม่ได้ login -> return null
+      // ถ้าไม่ได้ login
       if (!userId) {
-        return null;
+        throw new UnauthorizedException('User not logged in');
       }
 
       // เช็คว่า user เคยซื้อสินค้านี้หรือไม่
@@ -113,9 +118,9 @@ export class ProductController {
         id,
       );
 
-      // ถ้าไม่เคยซื้อ -> return null
+      // login แล้ว แต่ไม่เคยซื้อ
       if (!hasPurchased) {
-        return null;
+        throw new NotFoundException('Product not found');
       }
     }
 

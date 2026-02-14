@@ -7,6 +7,11 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export async function getUserCollections(): Promise<UserCollection[]> {
   const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
   const response = await fetch(`${API_BASE_URL}/user-collections`, {
     method: "GET",
     headers: {

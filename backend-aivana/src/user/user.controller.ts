@@ -7,6 +7,7 @@ import {
   Put,
   Param,
   NotFoundException,
+  ForbiddenException,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -65,9 +66,11 @@ export class UserController {
     @Param('userId') userId: string,
     @Body() updateUserDto: UpdateUserDto,
     @UploadedFile() avatar?: UploadedFileType,
+    @Request() req?: any,
   ) {
-    console.log('Update user data:', updateUserDto);
-    console.log('Avatar file:', avatar ? avatar.originalname : 'No file');
+    if (req.user.userId !== userId) {
+      throw new ForbiddenException('You can only edit your own profile');
+    }
 
     const updatedUser = await this.userService.updateUser(
       userId,

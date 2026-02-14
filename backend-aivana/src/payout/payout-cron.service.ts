@@ -12,10 +12,8 @@ export class PayoutCronService {
         console.log('[CRON] Half-month payout triggered');
         const { start, end } = getHalfMonthRange(new Date());
 
-        await this.payoutService.generatePayout(
-            start.toISOString(),
-            end.toISOString(),
-        );
+        await this.payoutService.generatePayout(start, end);
+
     }
 
 }
