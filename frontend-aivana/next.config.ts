@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     },
   },
   // basePath: '/capstone25/cp25ssi3',
-  // assetPrefix: '/capstone25/cp25ssi3/',
+  // assetPrefix: '/capstone25/cp25ssi3',
   // trailingSlash: true,
 };
 
