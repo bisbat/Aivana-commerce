@@ -326,7 +326,7 @@ export default function MyCollectionPage() {
                                 <span>รีพอร์ตไม่ผ่านการตรวจสอบ</span>
                               </div>
                             );
-                          } else if (reportStatus === "product_deleted") {
+                          } else if (reportStatus === "cancel_sale") {
                             return (
                               <div className="bg-purple-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-[10px] font-bold w-fit shadow-md text-white">
                                 <CheckCircle size={10} />

@@ -32,7 +32,7 @@ function ReportStatusBadge({ status }: { status: ReportStatus }) {
       border: "rgba(248,113,113,0.3)",
       color: "#f87171",
     },
-    product_deleted: {
+    cancel_sale: {
       label: "ยกเลิกการขายสินค้า",
       bg: "rgba(107,114,128,0.12)",
       border: "rgba(107,114,128,0.3)",

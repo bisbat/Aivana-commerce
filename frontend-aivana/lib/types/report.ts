@@ -3,7 +3,7 @@ export type ReportStatus =
   | "under_review"
   | "resolved"
   | "rejected"
-  | "product_deleted";
+  | "cancel_sale";
 
 export interface Report {
   id: number;
