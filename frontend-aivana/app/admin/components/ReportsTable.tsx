@@ -214,7 +214,7 @@ function GroupedReportRow({
           <StatusCount count={group.pending} label="รอ" color="#fbbf24" />
           <StatusCount count={group.underReview} label="ตรวจ" color="#60a5fa" />
           <StatusCount count={group.resolved} label="แก้ไข" color="#4ade80" />
-          <StatusCount count={group.rejected} label="ปฏิเสธ" color="#f87171" />
+          <StatusCount count={group.rejected} label="ไม่ผ่าน" color="#f87171" />
         </div>
       </td>
 

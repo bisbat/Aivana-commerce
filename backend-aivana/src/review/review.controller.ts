@@ -19,7 +19,6 @@ export class ReviewController {
     @Req() req,
   ) {
     const currentUserId = req.user.userId;
-
     return this.reviewService.create(currentUserId, productId, createReviewDto);
   }
 }

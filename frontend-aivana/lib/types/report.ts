@@ -1,4 +1,9 @@
-export type ReportStatus = "pending" | "under_review" | "resolved" | "rejected";
+export type ReportStatus =
+  | "pending"
+  | "under_review"
+  | "resolved"
+  | "rejected"
+  | "cancel_sale";
 
 export interface Report {
   id: number;

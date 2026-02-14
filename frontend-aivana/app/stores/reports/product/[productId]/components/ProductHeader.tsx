@@ -140,7 +140,7 @@ export default function ProductHeader({
                 </div>
               </div>
               <div className="bg-red-500/10 rounded-lg p-3 border border-red-500/20">
-                <div className="text-xs text-red-400 mb-1">ปฏิเสธแล้ว</div>
+                <div className="text-xs text-red-400 mb-1">ไม่ผ่าน</div>
                 <div className="text-2xl font-bold text-red-400">
                   {rejectedCount}
                 </div>
