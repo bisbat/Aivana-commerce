@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
 /* @tailwind base;
@@ -29,5 +28,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Noto Sans Thai", "Raleway", sans-serif;
+  font-family: var(--font-noto-sans-thai), var(--font-raleway), sans-serif;
 }
