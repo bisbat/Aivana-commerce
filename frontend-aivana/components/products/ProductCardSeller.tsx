@@ -1,5 +1,5 @@
 import React from "react";
-import { Edit2 } from "lucide-react";
+import { Edit } from "lucide-react";
 import Link from "next/link";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { Product } from "@/lib/types/product/product";
@@ -51,7 +51,7 @@ const ProductCardSeller: React.FC<ProductCardSellerProps> = ({
               onClick={() => onEdit?.(Number(product.id))}
               className="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-150 bg-[var(--linne-purple-hover)] hover:bg-[var(--linne-purple-hover-2)] cursor-pointer"
             >
-              <img src="/icon/edit.svg" alt="" className="w-4 h-4" />
+              <Edit size={16} />
             </button>
           </div>
         </div>
