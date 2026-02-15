@@ -27,7 +27,7 @@ function ReportStatusBadge({ status }: { status: ReportStatus }) {
       color: "#4ade80",
     },
     rejected: {
-      label: "ไม่ผ่านการตรวจสอบ",
+      label: "ถูกปฏิเสธ",
       bg: "rgba(248,113,113,0.12)",
       border: "rgba(248,113,113,0.3)",
       color: "#f87171",

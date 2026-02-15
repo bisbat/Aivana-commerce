@@ -215,7 +215,7 @@ export default function ReportDetailCard({ report }: { report: Report }) {
             { value: "pending" as ReportStatus, label: "รอดำเนินการ" },
             { value: "under_review" as ReportStatus, label: "กำลังตรวจสอบ" },
             { value: "resolved" as ReportStatus, label: "แก้ไขแล้ว" },
-            { value: "rejected" as ReportStatus, label: "ไม่ผ่าน" },
+            { value: "rejected" as ReportStatus, label: "ถูกปฏิเสธ" },
             {
               value: "cancel_sale" as ReportStatus,
               label: "ยกเลิกการขายสินค้า",
