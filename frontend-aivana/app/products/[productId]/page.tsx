@@ -16,10 +16,14 @@ import { showSuccessToast, showErrorToast } from "@/lib/toast";
 import { UserProfile } from "@/lib/types/user/user";
 import { getUserCollections } from "@/lib/actions/user-collection.actions";
 import { UserCollection } from "@/lib/types/userCollection";
+import { use } from "react";
 
-export default function ProductDetailPage() {
-  const params = useParams();
-  const productId = params.productId as string;
+interface Props {
+  productId: string;
+}
+
+export default function ProductDetailPage({params,}: {params: Promise<Props>;}) {
+  const { productId } = use(params);
   const router = useRouter();
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -44,11 +48,11 @@ export default function ProductDetailPage() {
 
   const allImages = product
     ? [
-        product.heroImageUrl,
-        ...(product.detailImages?.map((img) =>
-          Array.isArray(img.url) ? img.url[0] : img.url,
-        ) || []),
-      ].filter(Boolean)
+      product.heroImageUrl,
+      ...(product.detailImages?.map((img) =>
+        Array.isArray(img.url) ? img.url[0] : img.url,
+      ) || []),
+    ].filter(Boolean)
     : [];
 
   const handleAddToCart = async () => {
@@ -499,8 +503,8 @@ export default function ProductDetailPage() {
                           : prohibitedRolesForPurchase
                             ? "ไม่สามารถซื้อได้"
                             : `เพิ่มลงตะกร้า ${formatPriceWithCurrency(
-                                product.price,
-                              )}`}
+                              product.price,
+                            )}`}
                   </button>
                 </div>
               </div>

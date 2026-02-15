@@ -19,32 +19,33 @@ const SOCIAL_PLATFORMS = [
 const MAX_SKILLS = 10;
 const MAX_TOOLS = 15;
 const MAX_SOCIAL_LINKS = 5;
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 const BANKS = [
   {
     code: "kbank",
     name: "ธนาคารกสิกรไทย",
-    logo: "/become-seller/logo-bank/kbank.jpg",
+    logo: `${basePath}/become-seller/logo-bank/kbank.jpg`,
   },
   {
     code: "scb",
     name: "ธนาคารไทยพาณิชย์",
-    logo: "/become-seller/logo-bank/scb.png",
+    logo: `${basePath}/become-seller/logo-bank/scb.png`,
   },
   {
     code: "ktb",
     name: "ธนาคารกรุงไทย",
-    logo: "/become-seller/logo-bank/ktb.png",
+    logo: `${basePath}/become-seller/logo-bank/ktb.png`,
   },
   {
     code: "bbl",
     name: "ธนาคารกรุงเทพ",
-    logo: "/become-seller/logo-bank/bbl.jpg",
+    logo: `${basePath}/become-seller/logo-bank/bbl.jpg`,
   },
   {
     code: "bay",
     name: "ธนาคารกรุงศรีอยุธยา",
-    logo: "/become-seller/logo-bank/bay.jpg",
+    logo: `${basePath}/become-seller/logo-bank/bay.jpg`,
   },
 ];
 

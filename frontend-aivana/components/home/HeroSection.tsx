@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef } from "react";
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 export const HeroSection: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -29,7 +31,7 @@ export const HeroSection: React.FC = () => {
         }}
       >
         <source
-          src="/Purple_Gradient_Grain_Hero_Section.mp4"
+          src={`${basePath}/Purple_Gradient_Grain_Hero_Section.mp4`}
           type="video/mp4"
         />
       </video>

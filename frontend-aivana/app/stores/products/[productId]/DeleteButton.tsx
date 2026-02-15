@@ -4,9 +4,10 @@ import ConfirmModal from '@/components/common/ConfirmModal';
 import { useConfirmModal } from '@/hooks/useConfirmModal';
 import { deleteProductAction } from '@/lib/actions/product.actions';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 export default function DeleteButton({ productId }: { productId: string }) {
-
+    const router = useRouter();
 
     const { isOpen, open, close, callback } = useConfirmModal();
 
@@ -14,7 +15,7 @@ export default function DeleteButton({ productId }: { productId: string }) {
         await deleteProductAction(productId);
 
         toast.success("Product deleted successfully.");
-        window.location.href = '/stores';
+        router.push('/stores');
     };
 
     return (

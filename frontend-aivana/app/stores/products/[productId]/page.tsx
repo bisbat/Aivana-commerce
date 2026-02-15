@@ -13,11 +13,13 @@ async function getProductData(productId: string): Promise<Product | null> {
   return productData || null;
 }
 
+type PageProps = {
+  params: Promise<{ productId: string }>;
+};
+
 export default async function ProductStoreDetailPage({
   params,
-}: {
-  params: { productId: string };
-}) {
+}: PageProps) {
   const productId = (await params).productId;
 
   const initialProductData = await getProductData(productId);
