@@ -12,6 +12,7 @@ import { createOrder } from "@/lib/actions/order.actions";
 import { PaymentMethod } from "@/lib/constants/paymentMethod";
 import { number } from "framer-motion";
 import { createCreditCardToken, createPromptpaySource, initOmise } from "@/lib/omise";
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 interface CartModalProps {
   isOpen: boolean;
@@ -397,7 +398,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
     `}
                           >
                             <img
-                              src="/icon/promptpay.svg"
+                              src={`${basePath}/icon/promptpay.svg`}
                               alt="promptpay-icon"
                               className="w-6"
                             />
