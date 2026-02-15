@@ -323,7 +323,7 @@ export default function MyCollectionPage() {
                             return (
                               <div className="bg-red-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-[10px] font-bold w-fit shadow-md text-white">
                                 <XCircle size={10} />
-                                <span>รีพอร์ตไม่ผ่านการตรวจสอบ</span>
+                                <span>รีพอร์ตถูกปฏิเสธ</span>
                               </div>
                             );
                           } else if (reportStatus === "cancel_sale") {
@@ -437,7 +437,7 @@ export default function MyCollectionPage() {
                             disabled={true}
                             onClick={(e) => e.stopPropagation()}
                             className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-500 text-white shadow-lg cursor-not-allowed opacity-75"
-                            title="รายงานไม่ผ่านการตรวจสอบ"
+                            title="รายงานถูกปฏิเสธ"
                           >
                             <XCircle className="w-5 h-5" />
                           </button>
