@@ -43,7 +43,7 @@ export class ReportController {
   async getByOrderItem(@Param('orderItemId') orderItemId: string) {
     const report = await this.reportService.findByOrderItem(+orderItemId);
     if (!report) {
-      throw new NotFoundException('ไม่พบรายงานสำหรับรายการสั่งซื้อนี้');
+      throw new NotFoundException('Report not found for this order item');
     }
     return report;
   }
@@ -100,6 +100,6 @@ export class ReportController {
   @Delete(':id')
   async remove(@Req() req: any, @Param('id') id: string) {
     await this.reportService.remove(+id, req.user.userId);
-    return { message: 'ลบรายงานเรียบร้อยแล้ว' };
+    return { message: 'Deleted successfully' };
   }
 }

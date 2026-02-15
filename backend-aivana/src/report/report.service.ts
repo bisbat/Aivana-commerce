@@ -36,28 +36,32 @@ export class ReportService {
     });
 
     if (!orderItem) {
-      throw new NotFoundException('ไม่พบรายการสั่งซื้อนี้');
+      throw new NotFoundException('Order item not found');
     }
 
-    // ตรวจสอบว่า user เป็นเจ้าของ order นี้หรือไม่
+    // Check if user owns this order
     if (!orderItem.order) {
-      throw new NotFoundException('ไม่พบข้อมูลคำสั่งซื้อ');
+      throw new NotFoundException('Order information not found');
     }
 
     if (String(orderItem.order.userId) !== String(userId)) {
-      throw new ForbiddenException('คุณไม่มีสิทธิ์รายงานสินค้านี้');
+      throw new ForbiddenException(
+        'You do not have permission to report this item',
+      );
     }
 
-    // ค้นหา report ที่มีอยู่แล้ว
+    // Find existing report
     let existingReport = await this.reportRepository.findOne({
       where: { orderItem: { id: orderItemId } },
       relations: ['reportedBy', 'orderItem', 'orderItem.product'],
     });
 
     if (existingReport) {
-      // ตรวจสอบว่าเป็น user คนเดิมหรือไม่
+      // Check if it's the same user
       if (String(existingReport.reportedBy.id) !== String(userId)) {
-        throw new ForbiddenException('คุณไม่มีสิทธิ์แก้ไขรายงานนี้');
+        throw new ForbiddenException(
+          'You do not have permission to edit this report',
+        );
       }
 
       // อัพเดท report เดิม
@@ -116,7 +120,7 @@ export class ReportService {
       });
 
       if (!user || !user.sellerProfile) {
-        throw new ForbiddenException('คุณไม่มีสิทธิ์ดูรายงานสินค้านี้');
+        throw new ForbiddenException('You do not have permission to view reports for this product');
       }
 
       // เช็คว่าสินค้าเป็นของ seller นี้จริงหรือไม่
@@ -149,7 +153,7 @@ export class ReportService {
     });
 
     if (!report) {
-      throw new NotFoundException('ไม่พบรายงานนี้');
+      throw new NotFoundException('Report not found');
     }
 
     return report;
@@ -175,7 +179,7 @@ export class ReportService {
 
     if (!user || !user.sellerProfile) {
       throw new NotFoundException(
-        'คุณไม่ได้เป็น seller หรือยังไม่ได้สมัครเป็น seller',
+        'You are not a seller or have not registered as a seller',
       );
     }
 
@@ -195,7 +199,7 @@ export class ReportService {
     const report = await this.findOne(id);
 
     if (report.reportedBy.id !== userId) {
-      throw new ForbiddenException('คุณไม่มีสิทธิ์ลบรายงานนี้');
+      throw new ForbiddenException('You do not have permission to delete this report');
     }
 
     await this.reportRepository.remove(report);
@@ -227,13 +231,13 @@ export class ReportService {
     });
 
     if (!report) {
-      throw new NotFoundException('ไม่พบรายงานนี้');
+      throw new NotFoundException('Report not found');
     }
 
     // ตรวจสอบว่า user เป็นเจ้าของสินค้าที่ถูกรายงานหรือไม่
     const sellerUserId = report.orderItem.product.seller?.user?.id;
     if (!sellerUserId || sellerUserId !== userId) {
-      throw new ForbiddenException('คุณไม่มีสิทธิ์ตอบกลับรายงานนี้');
+      throw new ForbiddenException('You do not have permission to respond to this report');
     }
 
     // บันทึกเวลาที่ตอบกลับและเปลี่ยนสถานะเป็น under_review
