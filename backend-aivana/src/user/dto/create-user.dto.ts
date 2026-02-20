@@ -33,4 +33,5 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   avatarUrl?: string | null;
+  
 }
