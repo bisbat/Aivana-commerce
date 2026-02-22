@@ -1,16 +1,29 @@
 export function getHalfMonthRange(now: Date) {
-  const day = now.getDate();
+  const bangkokOffset = 7 * 60; // minutes
 
-  let start: Date;
-  let end: Date;
+  // Convert now to Bangkok time manually
+  const bangkokNow = new Date(now.getTime() + bangkokOffset * 60 * 1000);
+
+  const year = bangkokNow.getUTCFullYear();
+  const month = bangkokNow.getUTCMonth();
+  const day = bangkokNow.getUTCDate();
+
+  let startBangkok: Date;
+  let endBangkok: Date;
 
   if (day === 1) {
-    start = new Date(now.getFullYear(), now.getMonth() - 1, 16);
-    end = new Date(now.getFullYear(), now.getMonth(), 0);
+    // 16 → End of previous month
+    startBangkok = new Date(Date.UTC(year, month - 1, 16, 0, 0, 0));
+    endBangkok = new Date(Date.UTC(year, month, 1, 0, 0, 0)); // exclusive
   } else {
-    start = new Date(now.getFullYear(), now.getMonth(), 1);
-    end = new Date(now.getFullYear(), now.getMonth(), 15);
+    // 1 → 16
+    startBangkok = new Date(Date.UTC(year, month, 1, 0, 0, 0));
+    endBangkok = new Date(Date.UTC(year, month, 16, 0, 0, 0)); // exclusive
   }
 
-  return { start, end };
+  // Convert Bangkok midnight to UTC by subtracting 7 hours
+  const startUTC = new Date(startBangkok.getTime() - bangkokOffset * 60 * 1000);
+  const endUTC = new Date(endBangkok.getTime() - bangkokOffset * 60 * 1000);
+
+  return { start: startUTC, end: endUTC };
 }
