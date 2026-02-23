@@ -8,11 +8,11 @@ export class InternalPayoutController {
 
   @Post('generate')
   generate(@Body() dto: GeneratePayoutDto) {
-  return this.payoutService.generateManualPayout(
-    dto.periodStart,
-    dto.periodEnd,
-  );
-}
+    return this.payoutService.generateManualPayout(
+      dto.periodStart,
+      dto.periodEnd,
+    );
+  }
 
 
 }

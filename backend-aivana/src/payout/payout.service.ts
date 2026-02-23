@@ -27,18 +27,15 @@ export class PayoutService {
   ) { }
 
   async generatePayout(periodStart: Date, periodEnd: Date) {
-
     const start = new Date(periodStart);
     const end = new Date(periodEnd);
-
-    const now = new Date();
+    // const now = new Date();
 
     // if (now < end) {
     //   throw new BadRequestException(
     //     'Cannot generate payout before period ends',
     //   );
     // }
-
 
     const existingPayout = await this.payoutRepo.findOne({
       where: {
@@ -60,14 +57,13 @@ export class PayoutService {
       .innerJoin('oi.order', 'o')
       .where('pi.id IS NULL')
       .andWhere('o.status = :status', { status: 'PAID' })
-      .andWhere('oi.createdAt >= :start', { start })
-      .andWhere('oi.createdAt < :end', { end })
+      .andWhere('o.paidAt IS NOT NULL')
+      .andWhere('o.paidAt >= :start', { start })
+      .andWhere('o.paidAt < :end', { end })
       .getMany();
 
-
-
     if (orderItems.length === 0) {
-      return { message: 'No order items to payout' };
+      throw new NotFoundException('No order items found for payout');
     }
 
     // 2. group ตาม seller
