@@ -23,6 +23,7 @@ export class EmailService {
   });
 
     async sendSuccessEmail(payload: SendSuccessEmailPayload) {
+      console.log('payload:', payload);
     const { customerEmail, customerName, orderId, amount, paymentMethod, paidAt } = payload;
 
     await this.transporter.sendMail({

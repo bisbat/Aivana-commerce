@@ -122,6 +122,8 @@ export class PaymentService {
 
     if (charge.status === 'successful') {
       await this.orderService.markAsPaid(orderId);
+      console.log('emailllll')
+      console.log('email:',order);
       await this.emailService.sendSuccessEmail({
         customerEmail: order.user.email,
         customerName: order.user.firstName,
