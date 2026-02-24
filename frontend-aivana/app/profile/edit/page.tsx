@@ -72,19 +72,16 @@ const ProfileSettingsPage = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Check file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       showErrorToast("ไฟล์ต้องมีขนาดไม่เกิน 5MB");
       return;
     }
 
-    // Check file type
     if (!file.type.startsWith("image/")) {
       showErrorToast("กรุณาเลือกไฟล์รูปภาพเท่านั้น");
       return;
     }
 
-    // Set file and create preview
     setSelectedFile(file);
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
@@ -97,7 +94,15 @@ const ProfileSettingsPage = () => {
 
     setSaving(true);
     try {
-      await updateUserProfile(userData.id, formData, selectedFile || undefined);
+      const dataToSave = {
+        ...formData,
+        bio: formData.bio.trim() || "ฉันยังไม่มีข้อมูลเกี่ยวกับตัวเอง",
+      };
+      await updateUserProfile(
+        userData.id,
+        dataToSave,
+        selectedFile || undefined,
+      );
       showSuccessToast("บันทึกข้อมูลเรียบร้อยแล้ว");
       router.push(`/${formData.username}`);
     } catch (error: any) {

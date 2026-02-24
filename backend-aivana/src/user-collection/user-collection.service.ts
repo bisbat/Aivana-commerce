@@ -22,6 +22,16 @@ export class UserCollectionService {
       relations: ['product', 'orderItem'],
     });
 
+    collections.sort((a, b) => {
+      const aDate = a.orderItem?.createdAt
+        ? new Date(a.orderItem.createdAt)
+        : new Date(a.createdAt);
+      const bDate = b.orderItem?.createdAt
+        ? new Date(b.orderItem.createdAt)
+        : new Date(b.createdAt);
+      return bDate.getTime() - aDate.getTime();
+    });
+
     const collectionsWithReview = await Promise.all(
       collections.map(async (collection) => {
         const hasReviewed = await this.reviewService.hasUserReviewedProduct(

@@ -27,22 +27,15 @@ export class PayoutService {
   ) { }
 
   async generatePayout(periodStart: Date, periodEnd: Date) {
-
     const start = new Date(periodStart);
     const end = new Date(periodEnd);
-
-    // Normalize to UTC explicitly (safety)
-    start.setUTCHours(0, 0, 0, 0);
-    end.setUTCHours(0, 0, 0, 0);
-
-    const now = new Date();
+    // const now = new Date();
 
     // if (now < end) {
     //   throw new BadRequestException(
     //     'Cannot generate payout before period ends',
     //   );
     // }
-
 
     const existingPayout = await this.payoutRepo.findOne({
       where: {
@@ -64,13 +57,13 @@ export class PayoutService {
       .innerJoin('oi.order', 'o')
       .where('pi.id IS NULL')
       .andWhere('o.status = :status', { status: 'PAID' })
-      .andWhere('oi.createdAt BETWEEN :start AND :end', { start, end })
+      .andWhere('o.paidAt IS NOT NULL')
+      .andWhere('o.paidAt >= :start', { start })
+      .andWhere('o.paidAt < :end', { end })
       .getMany();
 
-
-
     if (orderItems.length === 0) {
-      return { message: 'No order items to payout' };
+      throw new NotFoundException('No order items found for payout');
     }
 
     // 2. group ตาม seller
@@ -345,6 +338,33 @@ export class PayoutService {
       },
     };
   }
+
+  async generateManualPayout(
+    periodStart: string,
+    periodEnd: string,
+  ) {
+    const bangkokOffset = 7 * 60;
+
+    // Thailand start midnight
+    const startBangkok = new Date(`${periodStart}T00:00:00`);
+    const endBangkok = new Date(`${periodEnd}T00:00:00`);
+
+    // Convert to UTC
+    const startUTC = new Date(
+      startBangkok.getTime() - bangkokOffset * 60 * 1000,
+    );
+
+    // End is exclusive → add 1 day
+    const endUTC = new Date(
+      endBangkok.getTime() +
+      24 * 60 * 60 * 1000 -
+      bangkokOffset * 60 * 1000,
+    );
+
+    return this.generatePayout(startUTC, endUTC);
+  }
+
+
 
 
 }
