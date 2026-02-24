@@ -14,7 +14,7 @@ export class RolesGuard implements CanActivate {
     );
 
     if (!requiredRoles || requiredRoles.length === 0) {
-      return true; // route นี้ไม่จำกัด role
+      return true; 
     }
 
     const request = context.switchToHttp().getRequest();
