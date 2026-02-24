@@ -13,8 +13,8 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  basePath: '/capstone25/cp25ssi3',
-  assetPrefix: '/capstone25/cp25ssi3/',
+  // basePath: '/capstone25/cp25ssi3',
+  // assetPrefix: '/capstone25/cp25ssi3/',
   trailingSlash: true,
 };
 
