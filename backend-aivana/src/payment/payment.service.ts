@@ -118,16 +118,16 @@ export class PaymentService {
     const orderId = payment.orderId;
 
     const order = await this.orderService.getOrderById(orderId);
+    console.log('order in webhook', order);
     if (!order) return;
 
     if (charge.status === 'successful') {
       await this.orderService.markAsPaid(orderId);
-      console.log('emailllll')
-      console.log('email:',order);
       await this.emailService.sendSuccessEmail({
         customerEmail: order.user.email,
         customerName: order.user.firstName,
         orderId: payment.orderId.toString(),
+        items: order.items,
         amount: payment.amount,
         paymentMethod: payment.paymentMethod,
         paidAt: new Date(),
