@@ -36,6 +36,7 @@ export class ProductMapper {
           lastName: product.seller.user?.lastName,
           username: product.seller.user?.username,
           avatarUrl: product.seller.user?.avatarUrl,
+          userId: product.seller.user?.id, // ✅ เพิ่มตรงนี้
         }
       : null;
 
@@ -73,9 +74,10 @@ export class ProductMapper {
         averageRating: Math.round(averageRating * 10) / 10, // ✅ rating เฉลี่ย
         totalReviews, // ✅ จำนวนรีวิว
         isDeleted: product.isDeleted,
+        isHidden: product.isHidden,
         deletedAt: product.deletedAt,
+        hiddenAt: product.hiddenAt,
         deletionReason: product.deletionReason,
-        deletedBy: product.deletedBy,
       },
       { excludeExtraneousValues: true },
     );

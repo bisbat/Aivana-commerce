@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductEntity } from './entities/product.entity';
@@ -19,8 +20,8 @@ import { plainToInstance } from 'class-transformer';
 import { ResponseProductDto } from './dto/response-product.dto';
 import { ProductImage } from 'src/product-image/entities/product-image.entity';
 import { ProductMapper } from './product.mapper';
-import { ReviewService } from 'src/review/review.service';
 import { ReviewEntity } from 'src/review/entities/review.entity';
+import { Brackets } from 'typeorm';
 
 @Injectable()
 export class ProductService {
@@ -44,7 +45,7 @@ export class ProductService {
 
   async getAllProducts(): Promise<ResponseProductDto[]> {
     const products = await this.productsRepository.find({
-      where: { isDeleted: false },
+      where: { isDeleted: false, isHidden: false },
       relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
     });
 
@@ -53,7 +54,7 @@ export class ProductService {
 
   async findOne(productId: number): Promise<ResponseProductDto | null> {
     const product = await this.productsRepository.findOne({
-      where: { id: productId, isDeleted: false },
+      where: { id: productId, isDeleted: false, isHidden: false },
       relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
     });
 
@@ -90,7 +91,7 @@ export class ProductService {
     });
 
     if (existingProduct) {
-      throw new Error(
+      throw new BadRequestException(
         `You already have a product named "${productData.name}". Please use a different name.`,
       );
     }
@@ -144,7 +145,7 @@ export class ProductService {
     });
 
     if (!product) {
-      throw new Error(`Product with ID ${productId} not found`);
+      throw new NotFoundException(`Product with ID ${productId} not found`);
     }
 
     product.heroImageUrl = heroImageUrl;
@@ -169,7 +170,7 @@ export class ProductService {
     if (tagIds) {
       const tags = await this.tagRepository.findBy({ id: In(tagIds) });
       if (tags.length !== tagIds.length) {
-        throw new Error('One or more tags not found');
+        throw new NotFoundException('One or more tags not found');
       }
       product.tags = tags;
     }
@@ -195,17 +196,13 @@ export class ProductService {
     return updatedProduct;
   }
 
-  async deleteProduct(
-    id: number,
-    reason: string,
-    deletedBy: string,
-  ): Promise<void> {
-    // Soft delete - mark as deleted with reason
+  async deleteProduct(id: number, reason: string): Promise<void> {
     await this.productsRepository.update(id, {
       isDeleted: true,
+      isHidden: true,
       deletedAt: new Date(),
+      hiddenAt: new Date(),
       deletionReason: reason,
-      deletedBy: deletedBy,
     });
   }
 
@@ -219,7 +216,7 @@ export class ProductService {
     });
 
     if (!product) {
-      throw new Error(`Product with ID ${productId} not found`);
+      throw new NotFoundException(`Product with ID ${productId} not found`);
     }
 
     product.uploadedFilePath = uploadedFilePath;
@@ -228,10 +225,13 @@ export class ProductService {
     return product;
   }
 
-  // product.service.ts
-  async getProductById(id: number) {
+  async getProductById(id: number, options?: { includeHidden?: boolean }) {
     const product = await this.productsRepository.findOne({
-      where: { id },
+      where: {
+        id,
+        isDeleted: false,
+        ...(options?.includeHidden ? {} : { isHidden: false }),
+      },
       relations: [
         'category',
         'seller',
@@ -496,33 +496,30 @@ export class ProductService {
       .leftJoinAndSelect('product.seller', 'seller')
       .leftJoinAndSelect('seller.user', 'user')
       .leftJoinAndSelect('product.tags', 'tag')
-      .where('product.isDeleted = :isDeleted', { isDeleted: false });
+      .where(
+        'product.isDeleted = :isDeleted AND product.isHidden = :isHidden',
+        {
+          isDeleted: false,
+          isHidden: false,
+        },
+      )
 
-    // ✅ name ต้อง search เสมอ
-    qb.andWhere('product.name ILIKE :q', { q });
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('product.name ILIKE :q', { q }).orWhere(
+            'category.name ILIKE :q',
+            { q },
+          );
 
-    // ✅ cate / compatibility ช่วยกรอง
-    qb.orWhere('(category.name ILIKE :q AND product.isDeleted = false)', {
-      q,
-    }).orWhere(
-      '(:q ILIKE ANY(product.compatibility) AND product.isDeleted = false)',
-      { q },
-    );
+          qb.orWhere(':q ILIKE ANY(product.compatibility)', { q });
 
-    // ✅ คำยาว ค่อยเปิด field กว้าง
-    if (!isShortKeyword) {
-      qb.orWhere('(product.blurb ILIKE :q AND product.isDeleted = false)', {
-        q,
-      })
-        .orWhere(
-          '(product.description ILIKE :q AND product.isDeleted = false)',
-          { q },
-        )
-        .orWhere(
-          '(:q ILIKE ANY(product.features) AND product.isDeleted = false)',
-          { q },
-        );
-    }
+          if (!isShortKeyword) {
+            qb.orWhere('product.blurb ILIKE :q', { q })
+              .orWhere('product.description ILIKE :q', { q })
+              .orWhere(':q ILIKE ANY(product.features)', { q });
+          }
+        }),
+      );
 
     const products = await qb
       .orderBy('product.createdAt', 'DESC')
@@ -541,6 +538,7 @@ export class ProductService {
       where: {
         tags: { name: normalized },
         isDeleted: false,
+        isHidden: false,
       },
       relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
     });
@@ -578,5 +576,39 @@ export class ProductService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  async hideProduct(id: number): Promise<void> {
+    const product = await this.productsRepository.findOne({
+      where: { id, isDeleted: false },
+    });
+
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+
+    if (product.isHidden) return; // ซ่อนอยู่แล้ว ไม่ต้องทำอะไร
+
+    await this.productsRepository.update(id, {
+      isHidden: true,
+      hiddenAt: new Date(),
+    });
+  }
+
+  async unhideProduct(id: number): Promise<void> {
+    const product = await this.productsRepository.findOne({
+      where: { id, isDeleted: false },
+    });
+
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+
+    if (!product.isHidden) return; // ไม่ได้ซ่อนอยู่ ไม่ต้องทำอะไร
+
+    await this.productsRepository.update(id, {
+      isHidden: false,
+      hiddenAt: null,
+    });
   }
 }

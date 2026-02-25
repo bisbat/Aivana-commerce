@@ -47,11 +47,13 @@ export class ResponseProductDto {
   @Expose()
   isDeleted: boolean;
   @Expose()
+  isHidden: boolean;
+  @Expose()
   deletedAt?: Date;
   @Expose()
-  deletionReason?: string;
+  hiddenAt?: Date;
   @Expose()
-  deletedBy?: string;
+  deletionReason?: string;
   @Expose()
   hasReviewed: boolean;
 

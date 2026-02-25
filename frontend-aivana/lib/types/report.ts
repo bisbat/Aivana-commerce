@@ -25,9 +25,10 @@ export interface Report {
       price: number;
       imageUrl?: string;
       isDeleted: boolean;
+      isHidden: boolean;
+      hiddenAt?: string;
       deletedAt?: string;
       deletionReason?: string;
-      deletedBy?: string;
     };
   };
   reason: string;

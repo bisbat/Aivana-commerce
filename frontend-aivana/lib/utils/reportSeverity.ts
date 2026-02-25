@@ -1,6 +1,6 @@
 // Helper functions for report severity calculation
 
-export type SeverityLevel = "safe" | "warning" | "critical";
+export type SeverityLevel = "safe" | "low" | "warning" | "critical";
 
 export interface SeverityInfo {
   level: SeverityLevel;
@@ -12,13 +12,14 @@ export interface SeverityInfo {
 
 /**
  * Calculate severity level based on number of reports
- * Simple rule:
- * - 1-4 reports: Safe (🟢)
- * - 5-9 reports: Warning (🟡)
- * - 10+ reports: Critical (🔴)
+ * ตรงกับ ReasonAutoHide threshold:
+ * - 1-4   : ปกติ   🟢
+ * - 5-9   : ต่ำ    🔵
+ * - 10-14 : เตือน  🟡
+ * - 15+   : วิกฤต  🔴
  */
 export function calculateSeverity(reportCount: number): SeverityInfo {
-  if (reportCount >= 10) {
+  if (reportCount >= 15) {
     return {
       level: "critical",
       label: "วิกฤต",
@@ -28,13 +29,23 @@ export function calculateSeverity(reportCount: number): SeverityInfo {
     };
   }
 
-  if (reportCount >= 5) {
+  if (reportCount >= 10) {
     return {
       level: "warning",
       label: "เตือน",
       color: "#f59e0b",
       bgColor: "rgba(245, 158, 11, 0.12)",
       borderColor: "rgba(245, 158, 11, 0.3)",
+    };
+  }
+
+  if (reportCount >= 5) {
+    return {
+      level: "low",
+      label: "ต่ำ",
+      color: "#60a5fa",
+      bgColor: "rgba(96, 165, 250, 0.12)",
+      borderColor: "rgba(96, 165, 250, 0.3)",
     };
   }
 
@@ -49,7 +60,8 @@ export function calculateSeverity(reportCount: number): SeverityInfo {
 
 /**
  * Check if product should show delete button
+ * ปรับให้ตรงกับ threshold สูงสุด (อื่นๆ = 20)
  */
 export function shouldShowDeleteButton(reportCount: number): boolean {
-  return reportCount >= 10;
+  return reportCount >= 20;
 }

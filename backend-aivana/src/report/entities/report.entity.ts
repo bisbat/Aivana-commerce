@@ -14,7 +14,7 @@ import {
 } from 'typeorm';
 
 @Entity('report')
-@Unique(['orderItem']) // 1 orderItem = 1 report
+@Unique(['orderItem'])
 export class ReportEntity {
   @PrimaryGeneratedColumn()
   id: number;

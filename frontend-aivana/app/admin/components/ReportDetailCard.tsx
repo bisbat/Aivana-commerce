@@ -4,8 +4,132 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Report, ReportStatus } from "@/lib/types/report";
 import { updateReportStatusAction } from "@/lib/actions/report.actions";
-import { User, Package, FileText, MessageSquare } from "lucide-react";
+import {
+  User,
+  Package,
+  FileText,
+  MessageSquare,
+  ShieldAlert,
+  AlertCircle,
+  Info,
+  AlertTriangle,
+  EyeOff,
+} from "lucide-react";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
+
+// ─── Reason Severity Config ─────────────────────────────────────────────────
+const REASON_CONFIG: Record<
+  string,
+  {
+    level: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+    label: string;
+    color: string;
+    bg: string;
+    border: string;
+    icon: "shield" | "alert" | "info";
+  }
+> = {
+  มีเนื้อหาที่ไม่เหมาะสม: {
+    level: "CRITICAL",
+    label: "วิกฤต",
+    color: "#ef4444",
+    bg: "rgba(239,68,68,0.12)",
+    border: "rgba(239,68,68,0.35)",
+    icon: "shield",
+  },
+  ละเมิดลิขสิทธิ์: {
+    level: "CRITICAL",
+    label: "วิกฤต",
+    color: "#ef4444",
+    bg: "rgba(239,68,68,0.12)",
+    border: "rgba(239,68,68,0.35)",
+    icon: "shield",
+  },
+  "ไฟล์เสียหาย หรือไม่สามารถเปิดได้": {
+    level: "HIGH",
+    label: "สูง",
+    color: "#f97316",
+    bg: "rgba(249,115,22,0.12)",
+    border: "rgba(249,115,22,0.35)",
+    icon: "alert",
+  },
+  เนื้อหาไม่ตรงตามที่โฆษณา: {
+    level: "MEDIUM",
+    label: "ปานกลาง",
+    color: "#eab308",
+    bg: "rgba(234,179,8,0.12)",
+    border: "rgba(234,179,8,0.35)",
+    icon: "alert",
+  },
+  อื่นๆ: {
+    level: "LOW",
+    label: "ต่ำ",
+    color: "#94a3b8",
+    bg: "rgba(148,163,184,0.10)",
+    border: "rgba(148,163,184,0.25)",
+    icon: "info",
+  },
+};
+
+// ─── Reason Severity Badge ───────────────────────────────────────────────────
+function ReasonSeverityBadge({ reason }: { reason: string }) {
+  const config = REASON_CONFIG[reason];
+  if (!config) return null;
+
+  const Icon =
+    config.icon === "shield"
+      ? ShieldAlert
+      : config.icon === "alert"
+        ? AlertCircle
+        : Info;
+
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 5,
+        padding: "3px 10px",
+        borderRadius: 6,
+        background: config.bg,
+        border: `1px solid ${config.border}`,
+        color: config.color,
+        fontSize: 11,
+        fontWeight: 700,
+      }}
+    >
+      <Icon size={11} strokeWidth={2.5} />
+      {config.label}
+    </span>
+  );
+}
+
+// ─── Product Status Banner ───────────────────────────────────────────────────
+function ProductStatusBanner({
+  isDeleted,
+  isHidden,
+}: {
+  isDeleted: boolean;
+  isHidden: boolean;
+}) {
+  if (isDeleted) {
+    return (
+      <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400 text-sm font-semibold mb-4">
+        <AlertTriangle size={16} />
+        สินค้านี้ถูกลบออกจากระบบแล้ว
+      </div>
+    );
+  }
+  if (isHidden) {
+    return (
+      <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-orange-500/10 border border-orange-500/25 text-orange-400 text-sm font-semibold mb-4">
+        <EyeOff size={16} />
+        สินค้านี้ถูกซ่อนออกจาก Marketplace อยู่
+      </div>
+    );
+  }
+  return null;
+}
 
 // ─── Status Badge ───────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: ReportStatus }) {
@@ -63,10 +187,9 @@ function StatusBadge({ status }: { status: ReportStatus }) {
   );
 }
 
-// ─── Format Date ────────────────────────────────────────────────────────────
+// ─── Format Helpers ──────────────────────────────────────────────────────────
 function formatDate(dateString: string) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("th-TH", {
+  return new Date(dateString).toLocaleDateString("th-TH", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -75,9 +198,11 @@ function formatDate(dateString: string) {
   });
 }
 
-// ─── Format Price ───────────────────────────────────────────────────────────
 function formatPrice(price: number) {
-  return `฿${price.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return `฿${price.toLocaleString("th-TH", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 }
 
 // ─── Main Component ─────────────────────────────────────────────────────────
@@ -88,14 +213,16 @@ export default function ReportDetailCard({ report }: { report: Report }) {
   );
   const [isUpdating, setIsUpdating] = useState(false);
 
+  const product = report.orderItem.product;
+  const isProductDeleted = product?.isDeleted ?? false;
+  const isProductHidden = product?.isHidden ?? false;
+
   const handleUpdateStatus = async () => {
     if (selectedStatus === report.status) return;
-
     try {
       setIsUpdating(true);
       await updateReportStatusAction(report.id, selectedStatus);
       showSuccessToast("อัปเดตสถานะรายงานเรียบร้อยแล้ว");
-
       router.refresh();
     } catch (error) {
       console.error("Failed to update status:", error);
@@ -104,6 +231,10 @@ export default function ReportDetailCard({ report }: { report: Report }) {
       setIsUpdating(false);
     }
   };
+
+  // cancel_sale ไม่ควรกดได้ถ้าสินค้าถูกลบไปแล้ว
+  const isOptionDisabled = (value: ReportStatus) =>
+    value === "cancel_sale" && isProductDeleted;
 
   return (
     <div className="space-y-6">
@@ -148,32 +279,29 @@ export default function ReportDetailCard({ report }: { report: Report }) {
           ข้อมูลสินค้าที่รายงาน
         </h4>
 
+        {/* Product Status Banner */}
+        <ProductStatusBanner
+          isDeleted={isProductDeleted}
+          isHidden={isProductHidden}
+        />
+
         <div className="flex gap-4 items-start">
-          {/* Product Image */}
-          {report.orderItem.product.imageUrl && (
+          {product?.imageUrl && (
             <div className="w-24 h-24 rounded-xl overflow-hidden border border-white/10 flex-shrink-0">
               <img
-                src={report.orderItem.product.imageUrl}
-                alt={report.orderItem.product.name}
+                src={product.imageUrl}
+                alt={product.name}
                 className="w-full h-full object-cover"
               />
             </div>
           )}
-
-          {/* Product Details */}
           <div className="flex-1">
             <p className="text-lg font-semibold text-white mb-3">
-              {report.orderItem.product.name}
+              {product?.name}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <InfoRow
-                label="ID สินค้า"
-                value={`#${report.orderItem.product.id}`}
-              />
-              <InfoRow
-                label="ราคา"
-                value={formatPrice(report.orderItem.product.price)}
-              />
+              <InfoRow label="ID สินค้า" value={`#${product?.id}`} />
+              <InfoRow label="ราคา" value={formatPrice(product?.price ?? 0)} />
             </div>
           </div>
         </div>
@@ -188,9 +316,12 @@ export default function ReportDetailCard({ report }: { report: Report }) {
 
         <div className="mb-4">
           <p className="text-sm text-slate-400 mb-2">เหตุผล</p>
-          <p className="text-base text-white leading-relaxed">
-            {report.reason}
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-base text-white leading-relaxed">
+              {report.reason}
+            </p>
+            <ReasonSeverityBadge reason={report.reason} />
+          </div>
         </div>
 
         {report.message && (
@@ -220,20 +351,23 @@ export default function ReportDetailCard({ report }: { report: Report }) {
               value: "cancel_sale" as ReportStatus,
               label: "ยกเลิกการขายสินค้า",
             },
-          ].map((option) => (
-            <button
-              key={option.value}
-              onClick={() => setSelectedStatus(option.value)}
-              disabled={isUpdating}
-              className={`p-3 rounded-xl border-2 font-semibold text-sm transition-all duration-200 ${
-                selectedStatus === option.value
-                  ? "border-[#8a57fb] bg-[#8a57fb]/15 text-[#8a57fb]"
-                  : "border-white/10 bg-white/[0.02] text-slate-400 hover:border-white/20"
-              } ${isUpdating ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-            >
-              {option.label}
-            </button>
-          ))}
+          ].map((option) => {
+            const disabled = isUpdating || isOptionDisabled(option.value);
+            return (
+              <button
+                key={option.value}
+                onClick={() => !disabled && setSelectedStatus(option.value)}
+                disabled={disabled}
+                className={`p-3 rounded-xl border-2 font-semibold text-sm transition-all duration-200 ${
+                  selectedStatus === option.value
+                    ? "border-[#8a57fb] bg-[#8a57fb]/15 text-[#8a57fb]"
+                    : "border-white/10 bg-white/[0.02] text-slate-400 hover:border-white/20"
+                } ${disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
+              >
+                {option.label}
+              </button>
+            );
+          })}
         </div>
 
         <button
@@ -252,7 +386,7 @@ export default function ReportDetailCard({ report }: { report: Report }) {
   );
 }
 
-// ─── Info Row Component ─────────────────────────────────────────────────────
+// ─── Info Row ────────────────────────────────────────────────────────────────
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div>

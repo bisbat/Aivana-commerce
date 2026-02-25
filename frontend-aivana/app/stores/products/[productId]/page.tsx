@@ -17,9 +17,7 @@ type PageProps = {
   params: Promise<{ productId: string }>;
 };
 
-export default async function ProductStoreDetailPage({
-  params,
-}: PageProps) {
+export default async function ProductStoreDetailPage({ params }: PageProps) {
   const productId = (await params).productId;
 
   const initialProductData = await getProductData(productId);
@@ -33,8 +31,11 @@ export default async function ProductStoreDetailPage({
       {/* Buttons */}
       <div className="flex gap-4 mb-6 space-x-4 justify-between">
         <BackButton />
-        <div>
-          <DeleteButton productId={productId} />
+        <div className="flex gap-4">
+          <DeleteButton
+            productId={productId}
+            productName={initialProductData.name}
+          />
           <EditButton productId={productId} />
         </div>
       </div>

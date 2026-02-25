@@ -7,7 +7,7 @@ import {
   updateProductAction,
   deleteProductImageAction,
 } from "@/lib/actions/product.actions";
-import { Product } from "@/lib/types/product/product";
+import { Product } from "@/lib/types/product/Product";
 import { ProductImages } from "@/lib/types/product/product_images";
 import { getAllTagsAction } from "@/lib/actions/tag.actions";
 import { Input } from "@/components/ui/Input";

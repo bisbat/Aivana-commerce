@@ -42,13 +42,6 @@ export class ProductController {
     if (tag) {
       return this.productService.getProductsByTag(tag);
     }
-
-    return this.productService.getAllProducts();
-  }
-
-  @Public()
-  @Get()
-  async getAllProducts(): Promise<ResponseProductDto[]> {
     return this.productService.getAllProducts();
   }
 
@@ -71,7 +64,6 @@ export class ProductController {
     },
   ) {
     const validatedFiles = this.validateAndTypeFiles(files);
-
     const createProductDto = plainToInstance(CreateProductDto, body);
 
     const result = await this.productService.createProductWithFiles(
@@ -97,31 +89,50 @@ export class ProductController {
     @Param('id') id: number,
     @Req() req: any,
   ): Promise<ResponseProductDto | null> {
-    const product = await this.productService.getProductById(id);
+    const userRole = req.user?.role;
+    const userId = req.user?.userId;
 
-    if (!product) {
-      throw new NotFoundException('Product not found');
+    // admin เห็นทุกอย่าง
+    if (userRole === Role.ADMIN) {
+      const product = await this.productService.getProductById(id, {
+        includeHidden: true,
+      });
+
+      if (!product) throw new NotFoundException('Product not found');
+      return product;
     }
 
-    // ถ้าสินค้าถูกลบ และ user ไม่ได้ login หรือไม่เคยซื้อ -> ซ่อน
-    if (product.isDeleted) {
-      const userId = req.user?.userId;
+    // seller เห็นสินค้าของตัวเองแม้ถูกซ่อน
+    if (userRole === Role.SELLER) {
+      const product = await this.productService.getProductById(id, {
+        includeHidden: true,
+      });
+      if (!product) throw new NotFoundException('Product not found');
 
-      // ถ้าไม่ได้ login
-      if (!userId) {
-        throw new UnauthorizedException('User not logged in');
+      if (product.isHidden || product.isDeleted) {
+        const isOwner = product?.seller?.userId === userId;
+        if (!isOwner) throw new NotFoundException('Product not found');
       }
 
-      // เช็คว่า user เคยซื้อสินค้านี้หรือไม่
+      return product;
+    }
+
+    const product = await this.productService.getProductById(id, {
+      includeHidden: true,
+    });
+
+    if (!product) throw new NotFoundException('Product not found');
+
+    // ถ้าสินค้าถูกซ่อน/ลบ → ต้องเคยซื้อเท่านั้นถึงจะดูได้
+    if (product.isHidden || product.isDeleted) {
+      if (!userId) throw new NotFoundException('Product not found');
+
       const hasPurchased = await this.orderService.hasUserPurchasedProduct(
         userId,
         id,
       );
 
-      // login แล้ว แต่ไม่เคยซื้อ
-      if (!hasPurchased) {
-        throw new NotFoundException('Product not found');
-      }
+      if (!hasPurchased) throw new NotFoundException('Product not found');
     }
 
     return product;
@@ -163,6 +174,7 @@ export class ProductController {
     };
   }
 
+  // ✅ แก้ deleteProduct ให้ส่ง deletedBy ด้วย
   @Delete(':id')
   @Roles(Role.SELLER, Role.ADMIN)
   async deleteProduct(
@@ -170,8 +182,24 @@ export class ProductController {
     @Param('id') id: number,
     @Body() body: { reason?: string },
   ) {
+    const userId = req.user?.userId;
+    const userRole = req.user?.role;
     const reason = body?.reason || 'ไม่ระบุเหตุผล';
-    await this.productService.deleteProduct(id, reason, req.user.userId);
+
+    // seller ลบได้เฉพาะสินค้าตัวเอง
+    if (userRole === Role.SELLER) {
+      const product = await this.productService.getProductById(id, {
+        includeHidden: true,
+      });
+
+      if (!product) throw new NotFoundException('Product not found');
+
+      const isOwner = product?.seller?.userId === userId;
+      if (!isOwner)
+        throw new ForbiddenException('You cannot delete this product');
+    }
+
+    await this.productService.deleteProduct(id, reason);
     return { message: 'Product deleted successfully' };
   }
 

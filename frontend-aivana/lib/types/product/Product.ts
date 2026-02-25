@@ -21,6 +21,7 @@ export interface Product {
     lastName: string;
     username: string;
     avatarUrl?: string;
+    userId: string;
   } | null;
   category: Category;
   createdAt: string;
@@ -31,7 +32,8 @@ export interface Product {
   averageRating?: number;
   totalReviews?: number;
   isDeleted: boolean;
+  isHidden: boolean;
   deletedAt?: string;
+  hiddenAt?: string;
   deletionReason?: string;
-  deletedBy?: string;
 }

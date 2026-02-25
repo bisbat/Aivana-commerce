@@ -15,4 +15,7 @@ export class MinimalSellerDto {
 
   @Expose()
   avatarUrl?: string;
+
+  @Expose()
+  userId: string;
 }
