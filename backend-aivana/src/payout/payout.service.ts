@@ -9,6 +9,7 @@ import { MINIO_FOLDERS } from 'src/constants/minio-folders.constant';
 import { MinioService } from 'src/minio/minio.service';
 import { BadRequestException } from '@nestjs/common/exceptions';
 import { UploadedFileType } from 'src/product/interfaces/uploaded-file.interface';
+import { SlipVerificationService } from './slip-verification.service';
 
 
 @Injectable()
@@ -24,6 +25,8 @@ export class PayoutService {
     private readonly payoutItemRepo: Repository<PayoutItemEntity>,
 
     private readonly minioService: MinioService,
+
+    private readonly slipVerificationService: SlipVerificationService
   ) { }
 
   async generatePayout(periodStart: Date, periodEnd: Date) {
@@ -138,7 +141,10 @@ export class PayoutService {
   }
 
   async markPaid(payoutId: number, slip: UploadedFileType) {
-    const payout = await this.payoutRepo.findOne({ where: { id: payoutId } });
+    const payout = await this.payoutRepo.findOne({
+      where: { id: payoutId },
+      relations: { seller: true },
+    });
 
     if (!payout) throw new NotFoundException('Payout not found');
 
@@ -146,11 +152,63 @@ export class PayoutService {
       throw new BadRequestException('Payout already marked as paid');
     }
 
-    const folder = MINIO_FOLDERS.PAYOUT.SLIP(payoutId);
+    // 🔥 1️⃣ Call Thunder API
+    const thunderResponse =
+      await this.slipVerificationService.verifyByImage(
+        slip as any,
+        Number(payout.totalAmount),
+      );
 
+    if (!thunderResponse.success) {
+      throw new BadRequestException('Slip verification failed');
+    }
+
+    const data = thunderResponse.data;
+
+    // 🔥 2️⃣ Validate amount
+    if (!data.isAmountMatched) {
+      throw new BadRequestException('Amount does not match payout');
+    }
+
+    // 🔥 3️⃣ Validate duplicate
+    if (data.isDuplicate) {
+      throw new BadRequestException('Duplicate slip detected');
+    }
+
+    const receiverName =
+      data.rawSlip.receiver.account.name.th?.trim().toLowerCase();
+
+    const receiverBank =
+      data.rawSlip.receiver.bank.name?.trim().toLowerCase();
+
+    const expectedName =
+      payout.seller.bankInfo?.accountName?.trim().toLowerCase();
+
+    const expectedBank =
+      payout.seller.bankInfo?.bankName?.trim().toLowerCase();
+
+    console.log('Receiver normalized:', this.normalizeThaiName(receiverName));
+    console.log('Expected normalized:', this.normalizeThaiName(expectedName));
+
+    if (!this.isThaiNameMatched(receiverName, expectedName)) {
+      throw new BadRequestException('Receiver name mismatch');
+    }
+
+    if (receiverBank && expectedBank) {
+  if (receiverBank.trim().toLowerCase() !== expectedBank.trim().toLowerCase()) {
+    throw new BadRequestException('Bank mismatch');
+  }
+}
+
+    // 🔥 4️⃣ If everything valid → upload to MinIO
+    const folder = MINIO_FOLDERS.PAYOUT.SLIP(payoutId);
     const fileName = `slip-${Date.now()}-${slip.originalname}`;
 
-    const path = await this.minioService.uploadFile(slip, fileName, folder);
+    const path = await this.minioService.uploadFile(
+      slip,
+      fileName,
+      folder,
+    );
 
     const url = this.minioService.getFileUrl(path);
 
@@ -163,6 +221,7 @@ export class PayoutService {
 
     return payout;
   }
+
 
   async getPayoutRounds() {
     const raw = await this.payoutRepo
@@ -365,6 +424,28 @@ export class PayoutService {
   }
 
 
+  private normalizeThaiName(name?: string): string {
+    if (!name) return '';
+
+    return name
+      .replace(/^นาย\s?|^นางสาว\s?|^นาง\s?/, '') // remove Thai title
+      .replace(/\s+/g, '') // remove spaces
+      .toLowerCase()
+      .trim();
+  }
+
+  private isThaiNameMatched(receiver?: string, expected?: string): boolean {
+    const normalizedReceiver = this.normalizeThaiName(receiver);
+    const normalizedExpected = this.normalizeThaiName(expected);
+
+    if (!normalizedReceiver || !normalizedExpected) return false;
+
+    // allow partial matching (Thunder may shorten surname)
+    return (
+      normalizedExpected.includes(normalizedReceiver) ||
+      normalizedReceiver.includes(normalizedExpected)
+    );
+  }
 
 
 }

@@ -8,6 +8,8 @@ import { InternalPayoutController } from './internal-payout.controller';
 import { AdminPayoutController } from './admin-payout.controller';
 import { MinioModule } from 'src/minio/minio.module';
 import { PayoutCronService } from './payout-cron.service';
+import { SlipVerificationService } from './slip-verification.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -17,11 +19,12 @@ import { PayoutCronService } from './payout-cron.service';
       OrderItemEntity,
     ]),
     MinioModule,
+    HttpModule,
   ],
   controllers: [
     InternalPayoutController,
     AdminPayoutController
   ],
-  providers: [PayoutService, PayoutCronService],
+  providers: [PayoutService, PayoutCronService, SlipVerificationService],
 })
 export class PayoutModule {}
