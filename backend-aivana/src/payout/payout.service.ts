@@ -141,86 +141,73 @@ export class PayoutService {
   }
 
   async markPaid(payoutId: number, slip: UploadedFileType) {
-    const payout = await this.payoutRepo.findOne({
-      where: { id: payoutId },
-      relations: { seller: true },
-    });
 
-    if (!payout) throw new NotFoundException('Payout not found');
+  const payout = await this.payoutRepo.findOne({
+    where: { id: payoutId },
+    relations: { seller: true },
+  });
 
-    if (payout.status === PayoutStatus.PAID) {
-      throw new BadRequestException('Payout already marked as paid');
-    }
-
-    // 🔥 1️⃣ Call Thunder API
-    const thunderResponse =
-      await this.slipVerificationService.verifyByImage(
-        slip as any,
-        Number(payout.totalAmount),
-      );
-
-    if (!thunderResponse.success) {
-      throw new BadRequestException('Slip verification failed');
-    }
-
-    const data = thunderResponse.data;
-
-    // 🔥 2️⃣ Validate amount
-    if (!data.isAmountMatched) {
-      throw new BadRequestException('Amount does not match payout');
-    }
-
-    // 🔥 3️⃣ Validate duplicate
-    if (data.isDuplicate) {
-      throw new BadRequestException('Duplicate slip detected');
-    }
-
-    const receiverName =
-      data.rawSlip.receiver.account.name.th?.trim().toLowerCase();
-
-    const receiverBank =
-      data.rawSlip.receiver.bank.name?.trim().toLowerCase();
-
-    const expectedName =
-      payout.seller.bankInfo?.accountName?.trim().toLowerCase();
-
-    const expectedBank =
-      payout.seller.bankInfo?.bankName?.trim().toLowerCase();
-
-    console.log('Receiver normalized:', this.normalizeThaiName(receiverName));
-    console.log('Expected normalized:', this.normalizeThaiName(expectedName));
-
-    if (!this.isThaiNameMatched(receiverName, expectedName)) {
-      throw new BadRequestException('Receiver name mismatch');
-    }
-
-    if (receiverBank && expectedBank) {
-  if (receiverBank.trim().toLowerCase() !== expectedBank.trim().toLowerCase()) {
-    throw new BadRequestException('Bank mismatch');
+  if (!payout) {
+    throw new NotFoundException('Payout not found');
   }
-}
 
-    // 🔥 4️⃣ If everything valid → upload to MinIO
-    const folder = MINIO_FOLDERS.PAYOUT.SLIP(payoutId);
-    const fileName = `slip-${Date.now()}-${slip.originalname}`;
+  if (payout.status === PayoutStatus.PAID) {
+    throw new BadRequestException('Payout already marked as paid');
+  }
 
-    const path = await this.minioService.uploadFile(
+  if (!payout.seller?.bankInfo) {
+    throw new BadRequestException('Seller bank information not found');
+  }
+
+  const thunderResponse =
+    await this.slipVerificationService.verifyByImage(
       slip,
-      fileName,
-      folder,
+      Number(payout.totalAmount),
     );
 
-    const url = this.minioService.getFileUrl(path);
-
-    payout.slipPath = path;
-    payout.slipUrl = url;
-    payout.paidAt = new Date();
-    payout.status = PayoutStatus.PAID;
-
-    await this.payoutRepo.save(payout);
-
-    return payout;
+  if (!thunderResponse?.success) {
+    throw new BadRequestException('Slip verification failed');
   }
+
+  const data = thunderResponse.data;
+
+  if (!data.isAmountMatched) {
+    throw new BadRequestException('Amount does not match payout');
+  }
+
+  if (data.isDuplicate) {
+    throw new BadRequestException('Duplicate slip detected');
+  }
+
+  if (!data.rawSlip?.receiver?.account?.bank) {
+    throw new BadRequestException('Invalid transfer type');
+  }
+
+  const folder = MINIO_FOLDERS.PAYOUT.SLIP(payoutId);
+  const fileName = `slip-${Date.now()}-${slip.originalname}`;
+
+  const path = await this.minioService.uploadFile(
+    slip,
+    fileName,
+    folder,
+  );
+
+  const url = this.minioService.getFileUrl(path);
+
+  // ─────────────────────────────────────────────
+  // 4️⃣ Mark payout as PAID
+  // ─────────────────────────────────────────────
+  payout.slipPath = path;
+  payout.slipUrl = url;
+  payout.paidAt = new Date();
+  payout.status = PayoutStatus.PAID;
+
+  await this.payoutRepo.save(payout);
+
+  return payout;
+}
+
+
 
 
   async getPayoutRounds() {
