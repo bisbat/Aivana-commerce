@@ -142,70 +142,72 @@ export class PayoutService {
 
   async markPaid(payoutId: number, slip: UploadedFileType) {
 
-  const payout = await this.payoutRepo.findOne({
-    where: { id: payoutId },
-    relations: { seller: true },
-  });
+    const payout = await this.payoutRepo.findOne({
+      where: { id: payoutId },
+      relations: { seller: true },
+    });
 
-  if (!payout) {
-    throw new NotFoundException('Payout not found');
-  }
+    if (!payout) {
+      throw new NotFoundException('Payout not found');
+    }
 
-  if (payout.status === PayoutStatus.PAID) {
-    throw new BadRequestException('Payout already marked as paid');
-  }
+    if (payout.status === PayoutStatus.PAID) {
+      throw new BadRequestException('Payout already marked as paid');
+    }
 
-  if (!payout.seller?.bankInfo) {
-    throw new BadRequestException('Seller bank information not found');
-  }
+    if (!payout.seller?.bankInfo) {
+      throw new BadRequestException('Seller bank information not found');
+    }
 
-  const thunderResponse =
-    await this.slipVerificationService.verifyByImage(
+    const thunderResponse =
+      await this.slipVerificationService.verifyByImage(
+        slip,
+        Number(payout.totalAmount),
+      );
+
+    if (!thunderResponse?.success) {
+      throw new BadRequestException('Slip verification failed');
+    }
+
+    const data = thunderResponse.data;
+
+
+    if (data.isDuplicate) {
+      throw new BadRequestException('Duplicate slip detected');
+    }
+
+    if (!data.isAmountMatched) {
+      throw new BadRequestException('Amount does not match payout');
+    }
+
+
+    if (!data.rawSlip?.receiver?.account?.bank) {
+      throw new BadRequestException('Invalid transfer type');
+    }
+
+    const folder = MINIO_FOLDERS.PAYOUT.SLIP(payoutId);
+    const fileName = `slip-${Date.now()}-${slip.originalname}`;
+
+    const path = await this.minioService.uploadFile(
       slip,
-      Number(payout.totalAmount),
+      fileName,
+      folder,
     );
 
-  if (!thunderResponse?.success) {
-    throw new BadRequestException('Slip verification failed');
+    const url = this.minioService.getFileUrl(path);
+
+    // ─────────────────────────────────────────────
+    // 4️⃣ Mark payout as PAID
+    // ─────────────────────────────────────────────
+    payout.slipPath = path;
+    payout.slipUrl = url;
+    payout.paidAt = new Date();
+    payout.status = PayoutStatus.PAID;
+
+    await this.payoutRepo.save(payout);
+
+    return payout;
   }
-
-  const data = thunderResponse.data;
-
-  if (!data.isAmountMatched) {
-    throw new BadRequestException('Amount does not match payout');
-  }
-
-  if (data.isDuplicate) {
-    throw new BadRequestException('Duplicate slip detected');
-  }
-
-  if (!data.rawSlip?.receiver?.account?.bank) {
-    throw new BadRequestException('Invalid transfer type');
-  }
-
-  const folder = MINIO_FOLDERS.PAYOUT.SLIP(payoutId);
-  const fileName = `slip-${Date.now()}-${slip.originalname}`;
-
-  const path = await this.minioService.uploadFile(
-    slip,
-    fileName,
-    folder,
-  );
-
-  const url = this.minioService.getFileUrl(path);
-
-  // ─────────────────────────────────────────────
-  // 4️⃣ Mark payout as PAID
-  // ─────────────────────────────────────────────
-  payout.slipPath = path;
-  payout.slipUrl = url;
-  payout.paidAt = new Date();
-  payout.status = PayoutStatus.PAID;
-
-  await this.payoutRepo.save(payout);
-
-  return payout;
-}
 
 
 
