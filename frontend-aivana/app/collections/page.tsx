@@ -264,10 +264,11 @@ export default function MyCollectionPage() {
               onClick={() => router.push(`/products/${item.product.id}`)}
               className="group cursor-pointer rounded-lg p-0 shadow hover:shadow-xl transition-all duration-300 h-auto w-full overflow-hidden bg-slate-800/60 relative flex flex-col" // เพิ่ม flex flex-col ที่ container หลัก
             >
-              {/* Overlay for deleted products */}
-              {item.product.isDeleted && (
-                <div className="absolute inset-0 bg-black/30 z-[1] pointer-events-none"></div>
-              )}
+              {/* Overlay for deleted or temporarily suspended products */}
+              {item.product.isDeleted ||
+                (item.product.isHidden && (
+                  <div className="absolute inset-0 bg-black/30 z-[1] pointer-events-none"></div>
+                ))}
 
               {/* Thumbnail */}
               <div className="relative h-48 overflow-hidden shrink-0">
@@ -280,13 +281,19 @@ export default function MyCollectionPage() {
                   }
                   alt={item.product.name}
                   className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${
-                    item.product.isDeleted ? "grayscale opacity-60" : ""
+                    item.product.isDeleted || item.product.isHidden
+                      ? "grayscale opacity-60"
+                      : ""
                   }`}
                 />
                 <div className="absolute top-2 right-2 flex flex-col gap-1.5 items-end z-20">
                   {item.product.isDeleted ? (
                     <div className="bg-red-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-[10px] font-bold w-fit shadow-xl text-white">
                       <span>⚠️ ยกเลิกการขาย</span>
+                    </div>
+                  ) : item.product.isHidden ? (
+                    <div className="bg-orange-500/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 text-[10px] font-bold w-fit shadow-xl text-white">
+                      <span>🔒 พักการขายชั่วคราว</span>
                     </div>
                   ) : (
                     <>
@@ -387,15 +394,19 @@ export default function MyCollectionPage() {
                     <button
                       type="button"
                       disabled={
-                        item.product.hasReviewed || item.product.isDeleted
+                        item.product.hasReviewed ||
+                        item.product.isDeleted ||
+                        item.product.isHidden
                       }
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (!item.product.isDeleted)
+                        if (!item.product.isDeleted && !item.product.isHidden)
                           handleReview(item.product.id, item.product.name);
                       }}
                       className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 ${
-                        item.product.isDeleted || item.product.hasReviewed
+                        item.product.isDeleted ||
+                        item.product.isHidden ||
+                        item.product.hasReviewed
                           ? "bg-slate-700 cursor-not-allowed opacity-60 text-slate-400"
                           : "bg-amber-500 text-white shadow-lg hover:bg-amber-600"
                       }`}
@@ -448,10 +459,15 @@ export default function MyCollectionPage() {
                       return (
                         <button
                           type="button"
-                          disabled={item.product.isDeleted}
+                          disabled={
+                            item.product.isDeleted || item.product.isHidden
+                          }
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (!item.product.isDeleted) {
+                            if (
+                              !item.product.isDeleted &&
+                              !item.product.isHidden
+                            ) {
                               handleReport(
                                 item.product.id,
                                 item.product.name,
@@ -460,7 +476,7 @@ export default function MyCollectionPage() {
                             }
                           }}
                           className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 ${
-                            item.product.isDeleted
+                            item.product.isDeleted || item.product.isHidden
                               ? "bg-slate-700 cursor-not-allowed opacity-60 text-slate-400"
                               : item.product.hasReported
                                 ? "bg-orange-500 text-white shadow-lg hover:bg-orange-600"

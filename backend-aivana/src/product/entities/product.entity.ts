@@ -68,14 +68,17 @@ export class ProductEntity {
   @Column({ type: 'boolean', default: false })
   isDeleted: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  isHidden: boolean;
+
   @Column({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
+  @Column({ type: 'timestamp', nullable: true })
+  hiddenAt: Date | null;
+
   @Column({ type: 'text', nullable: true })
   deletionReason: string;
-
-  @Column({ type: 'varchar', nullable: true })
-  deletedBy: string;
 
   @OneToMany(() => ProductImage, (image) => image.product)
   productImages: ProductImage[];

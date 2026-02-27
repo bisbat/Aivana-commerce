@@ -5,13 +5,15 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportStatusDto } from './dto/update-report-status.dto';
 import { ReportEntity } from './entities/report.entity';
 import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { ReportStatus } from 'src/constants/report-status.enum';
+import { ReasonAutoHide } from './constants/reason-auto-hide';
+import { ProductService } from 'src/product/product.service';
 
 @Injectable()
 export class ReportService {
@@ -22,6 +24,7 @@ export class ReportService {
     private orderItemRepository: Repository<OrderItemEntity>,
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    private productService: ProductService,
   ) {}
 
   async createOrUpdate(
@@ -55,22 +58,20 @@ export class ReportService {
       where: { orderItem: { id: orderItemId } },
       relations: ['reportedBy', 'orderItem', 'orderItem.product'],
     });
-
     if (existingReport) {
-      // Check if it's the same user
-      if (String(existingReport.reportedBy.id) !== String(userId)) {
-        throw new ForbiddenException(
-          'You do not have permission to edit this report',
-        );
-      }
-
-      // อัพเดท report เดิม
       existingReport.reason = reason;
       existingReport.message = message;
-      return await this.reportRepository.save(existingReport);
+      const saved = await this.reportRepository.save(existingReport);
+
+      this.checkAutoHide(orderItem.product.id, reason).catch((error) => {
+        throw new BadRequestException(
+          'Error checking auto-hide: ' + error.message,
+        );
+      });
+
+      return saved;
     }
 
-    // สร้าง report ใหม่
     const newReport = this.reportRepository.create({
       reportedBy: { id: userId } as any,
       orderItem: orderItem,
@@ -78,7 +79,31 @@ export class ReportService {
       message,
     });
 
-    return await this.reportRepository.save(newReport);
+    const saved = await this.reportRepository.save(newReport);
+    this.checkAutoHide(orderItem.product.id, reason).catch((error) => {
+      throw new BadRequestException(
+        'Error checking auto-hide: ' + error.message,
+      );
+    });
+    return saved;
+  }
+
+  async checkAutoHide(productId: number, reason: string): Promise<void> {
+    const threshold = ReasonAutoHide[reason];
+    if (!threshold) return;
+
+    // นับเฉพาะ report ที่ reason เดียวกัน และยังไม่ถูก reject
+    const count = await this.reportRepository.count({
+      where: {
+        reason,
+        orderItem: { product: { id: productId } },
+        status: Not(ReportStatus.REJECTED), // import Not from typeorm
+      },
+    });
+
+    if (count >= threshold) {
+      await this.productService.hideProduct(productId);
+    }
   }
 
   async findByUser(userId: string): Promise<ReportEntity[]> {
@@ -100,7 +125,7 @@ export class ReportService {
     return await this.reportRepository.find({
       relations: ['reportedBy', 'orderItem', 'orderItem.product'],
       where: {
-        orderItem: { product: { isDeleted: false } },
+        orderItem: { product: { isDeleted: false, isHidden: false } },
       },
       order: { createdAt: 'DESC' },
     });
@@ -120,7 +145,9 @@ export class ReportService {
       });
 
       if (!user || !user.sellerProfile) {
-        throw new ForbiddenException('You do not have permission to view reports for this product');
+        throw new ForbiddenException(
+          'You do not have permission to view reports for this product',
+        );
       }
 
       // เช็คว่าสินค้าเป็นของ seller นี้จริงหรือไม่
@@ -140,7 +167,11 @@ export class ReportService {
 
     // สำหรับ admin ดูได้ทั้งหมด
     return await this.reportRepository.find({
-      where: { orderItem: { product: { id: productId } } },
+      where: {
+        orderItem: {
+          product: { id: productId, isDeleted: false, isHidden: false },
+        },
+      },
       relations: ['reportedBy', 'orderItem', 'orderItem.product'],
       order: { createdAt: 'DESC' },
     });
@@ -199,53 +230,41 @@ export class ReportService {
     const report = await this.findOne(id);
 
     if (report.reportedBy.id !== userId) {
-      throw new ForbiddenException('You do not have permission to delete this report');
+      throw new ForbiddenException(
+        'You do not have permission to delete this report',
+      );
     }
 
     await this.reportRepository.remove(report);
   }
-
   async updateStatus(
     id: number,
     updateReportStatusDto: UpdateReportStatusDto,
   ): Promise<ReportEntity> {
     const report = await this.findOne(id);
+    const { status } = updateReportStatusDto;
 
-    report.status = updateReportStatusDto.status;
-    return await this.reportRepository.save(report);
-  }
+    const productId = report.orderItem?.product?.id;
 
-  async addSellerResponse(
-    reportId: number,
-    userId: string,
-  ): Promise<ReportEntity> {
-    const report = await this.reportRepository.findOne({
-      where: { id: reportId },
-      relations: [
-        'reportedBy',
-        'orderItem',
-        'orderItem.product',
-        'orderItem.product.seller',
-        'orderItem.product.seller.user',
-      ],
-    });
-
-    if (!report) {
-      throw new NotFoundException('Report not found');
+    // cancel_sale → soft delete สินค้า
+    if (status === ReportStatus.CANCEL_SALE && productId) {
+      await this.productService.deleteProduct(
+        productId,
+        `Deleted by admin via report #${id}`,
+      );
+      await this.updateAllReportsByProductToCancelSale(productId);
+      return report;
     }
 
-    // ตรวจสอบว่า user เป็นเจ้าของสินค้าที่ถูกรายงานหรือไม่
-    const sellerUserId = report.orderItem.product.seller?.user?.id;
-    if (!sellerUserId || sellerUserId !== userId) {
-      throw new ForbiddenException('You do not have permission to respond to this report');
+    // resolved / rejected → unhide สินค้า (ถ้าถูกซ่อนอยู่)
+    if (
+      (status === ReportStatus.RESOLVED || status === ReportStatus.REJECTED) &&
+      productId
+    ) {
+      await this.productService.unhideProduct(productId);
     }
 
-    // บันทึกเวลาที่ตอบกลับและเปลี่ยนสถานะเป็น under_review
-    report.sellerRespondedAt = new Date();
-    if (report.status === ReportStatus.PENDING) {
-      report.status = ReportStatus.UNDER_REVIEW;
-    }
-
+    report.status = status;
     return await this.reportRepository.save(report);
   }
 
@@ -268,5 +287,39 @@ export class ReportService {
       .execute();
 
     return result.affected || 0;
+  }
+
+  async addSellerResponse(
+    reportId: number,
+    userId: string,
+  ): Promise<ReportEntity> {
+    const report = await this.reportRepository.findOne({
+      where: { id: reportId },
+      relations: [
+        'reportedBy',
+        'orderItem',
+        'orderItem.product',
+        'orderItem.product.seller',
+        'orderItem.product.seller.user',
+      ],
+    });
+
+    if (!report) {
+      throw new NotFoundException('Report not found');
+    }
+
+    const sellerUserId = report.orderItem.product.seller?.user?.id;
+    if (!sellerUserId || sellerUserId !== userId) {
+      throw new ForbiddenException(
+        'You do not have permission to respond to this report',
+      );
+    }
+
+    report.sellerRespondedAt = new Date();
+    if (report.status === ReportStatus.PENDING) {
+      report.status = ReportStatus.UNDER_REVIEW;
+    }
+
+    return await this.reportRepository.save(report);
   }
 }

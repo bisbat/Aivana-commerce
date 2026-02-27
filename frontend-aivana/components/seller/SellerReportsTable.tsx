@@ -9,6 +9,7 @@ import {
   ShieldAlert,
   ShieldCheck,
   AlertTriangle,
+  EyeOff,
 } from "lucide-react";
 import { calculateSeverity } from "@/lib/utils/reportSeverity";
 
@@ -25,6 +26,7 @@ interface GroupedReport {
   rejected: number;
   latestReportDate: string;
   isDeleted: boolean;
+  isHidden: boolean; // ✅ เพิ่ม
   deletedAt?: string;
   deletionReason?: string;
 }
@@ -34,7 +36,6 @@ function groupReportsByProduct(reports: Report[]): GroupedReport[] {
   const grouped = new Map<number, GroupedReport>();
 
   reports.forEach((report) => {
-    // Skip if product is missing (defensive)
     if (!report.orderItem.product) return;
 
     const productId = report.orderItem.product.id;
@@ -52,6 +53,7 @@ function groupReportsByProduct(reports: Report[]): GroupedReport[] {
         rejected: 0,
         latestReportDate: report.createdAt,
         isDeleted: report.orderItem.product.isDeleted,
+        isHidden: report.orderItem.product.isHidden ?? false, // ✅ เพิ่ม
         deletedAt: report.orderItem.product.deletedAt,
         deletionReason: report.orderItem.product.deletionReason,
       });
@@ -61,13 +63,11 @@ function groupReportsByProduct(reports: Report[]): GroupedReport[] {
     group.reports.push(report);
     group.totalReports++;
 
-    // Count by status
     if (report.status === "pending") group.pending++;
     else if (report.status === "under_review") group.underReview++;
     else if (report.status === "resolved") group.resolved++;
     else if (report.status === "rejected") group.rejected++;
 
-    // Update latest date
     if (new Date(report.createdAt) > new Date(group.latestReportDate)) {
       group.latestReportDate = report.createdAt;
     }
@@ -80,7 +80,7 @@ function groupReportsByProduct(reports: Report[]): GroupedReport[] {
   );
 }
 
-// ─── Severity Badge Component ─────────────────────────────────────────────────
+// ─── Severity Badge ─────────────────────────────────────────────────────────
 function SeverityBadge({ reportCount }: { reportCount: number }) {
   const severity = calculateSeverity(reportCount);
   const Icon =
@@ -136,6 +136,33 @@ function ViewDetailButton({ productId }: { productId: number }) {
   );
 }
 
+// ─── Product Status Badge ────────────────────────────────────────────────────
+function ProductStatusBadge({
+  isDeleted,
+  isHidden,
+}: {
+  isDeleted: boolean;
+  isHidden: boolean;
+}) {
+  if (isDeleted) {
+    return (
+      <span className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded border border-red-500/40 bg-red-500/10 text-red-400 text-[10px] font-black">
+        <AlertTriangle size={11} className="stroke-[3px]" /> ถูกลบ
+      </span>
+    );
+  }
+
+  if (isHidden) {
+    return (
+      <span className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded border border-orange-500/40 bg-orange-500/10 text-orange-400 text-[10px] font-black">
+        <EyeOff size={11} className="stroke-[3px]" /> ถูกซ่อน
+      </span>
+    );
+  }
+
+  return null;
+}
+
 // ─── Grouped Report Row ──────────────────────────────────────────────────────
 function GroupedReportRow({
   group,
@@ -169,17 +196,18 @@ function GroupedReportRow({
       {/* Product Info */}
       <td className="px-6 py-5">
         <div className="flex flex-col gap-1.5">
-          <div className="flex items-center gap-3">
-            {/* Badge วางไว้หน้าชื่อ */}
-            {group.isDeleted && (
-              <span className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded border border-red-500/40 bg-red-500/10 text-red-500 text-[10px] font-black ">
-                <AlertTriangle size={11} className="stroke-[3px]" /> ถูกลบ
-              </span>
-            )}
-
+          <div className="flex items-center gap-2 flex-wrap">
+            <ProductStatusBadge
+              isDeleted={group.isDeleted}
+              isHidden={group.isHidden}
+            />
             <h4
               className={`font-semibold text-[15px] line-clamp-1 tracking-tight transition-colors ${
-                group.isDeleted ? "text-slate-400" : "text-white"
+                group.isDeleted
+                  ? "text-slate-500"
+                  : group.isHidden
+                    ? "text-slate-400"
+                    : "text-white"
               }`}
             >
               {group.productName}
@@ -198,14 +226,17 @@ function GroupedReportRow({
         </div>
       </td>
 
-      {/* ... ส่วนอื่น (Severity, Status, Date, Action) คงเดิมตามโค้ดคุณ ... */}
+      {/* Severity */}
       <td className="px-6 py-4">
         <SeverityBadge reportCount={group.totalReports} />
       </td>
 
+      {/* Date */}
       <td className="px-6 py-4 text-sm text-slate-400 font-medium">
         {formatDate(group.latestReportDate)}
       </td>
+
+      {/* Action */}
       <td className="px-6 py-4">
         <ViewDetailButton productId={group.productId} />
       </td>
@@ -222,7 +253,7 @@ export default function SellerReportsTable({ reports }: { reports: Report[] }) {
 
   return (
     <div className="bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden shadow-xl">
-      {/* Header Section */}
+      {/* Header */}
       <div className="px-6 py-5 border-b border-white/5 bg-gradient-to-r from-transparent to-white/[0.02]">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
@@ -246,7 +277,6 @@ export default function SellerReportsTable({ reports }: { reports: Report[] }) {
       {groupedReports.length === 0 ? (
         <div className="px-6 py-20 text-center">
           <div className="mb-4 inline-flex p-4 rounded-full bg-slate-800/50 text-slate-600">
-            {/* Icon Placeholder */}
             <svg
               className="w-8 h-8"
               fill="none"

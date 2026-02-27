@@ -14,10 +14,10 @@ interface ReportModalProps {
 }
 
 const reportReasons = [
-  "เนื้อหาไม่ตรงตามที่โฆษณา",
-  "ไฟล์เสียหาย หรือไม่สามารถเปิดได้",
   "มีเนื้อหาที่ไม่เหมาะสม",
   "ละเมิดลิขสิทธิ์",
+  "ไฟล์เสียหาย หรือไม่สามารถเปิดได้",
+  "เนื้อหาไม่ตรงตามที่โฆษณา",
   "อื่นๆ",
 ];
 
@@ -110,11 +110,33 @@ export default function ReportModal({
                   key={reason}
                   type="button"
                   onClick={() => setSelectedReason(reason)}
-                  className={`w-full p-2.5 rounded-lg text-left text-sm transition-all ${
+                  className={`w-full p-2.5 rounded-lg text-left text-sm transition-all border-2 ${selectedReason === reason ? "font-semibold text-white" : "text-slate-300"}`}
+                  style={
                     selectedReason === reason
-                      ? "bg-orange-500/20 border-2 border-orange-500 text-white font-medium"
-                      : "bg-[#262549] border-2 border-transparent hover:bg-[#2d2a52] text-slate-300"
-                  }`}
+                      ? reason === "มีเนื้อหาที่ไม่เหมาะสม" ||
+                        reason === "ละเมิดลิขสิทธิ์"
+                        ? {
+                            background: "rgba(239,68,68,0.12)",
+                            borderColor: "#ef4444",
+                          }
+                        : reason === "ไฟล์เสียหาย หรือไม่สามารถเปิดได้"
+                          ? {
+                              background: "rgba(249,115,22,0.12)",
+                              borderColor: "#f97316",
+                            }
+                          : reason === "เนื้อหาไม่ตรงตามที่โฆษณา"
+                            ? {
+                                background: "rgba(234,179,8,0.12)",
+                                borderColor: "#eab308",
+                              }
+                            : reason === "อื่นๆ"
+                              ? {
+                                  background: "rgba(100,116,139,0.15)", // สีเทาอ่อน
+                                  borderColor: "#64748b",
+                                }
+                              : {}
+                      : { background: "#262549", borderColor: "transparent" }
+                  }
                 >
                   {reason}
                 </button>

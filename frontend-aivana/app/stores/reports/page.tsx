@@ -22,16 +22,6 @@ export default async function SellerReportsPage() {
   );
   const productCount = uniqueProducts.size;
 
-  // Count deleted products
-  const deletedProductIds = Array.from(
-    new Set(
-      reports
-        .filter((r) => r.orderItem.product?.isDeleted)
-        .map((r) => r.orderItem.product?.id)
-        .filter((id): id is number => id !== undefined && id !== null),
-    ),
-  );
-
   return (
     <div
       className="relative mx-auto"
