@@ -31,6 +31,6 @@ import { OrderModule } from 'src/order/order.module';
   ],
   controllers: [ProductController],
   providers: [ProductService, ProductMapper],
-  exports: [ProductService, ProductMapper],
+  exports: [ProductService, ProductMapper, ProductService],
 })
 export class ProductModule {}

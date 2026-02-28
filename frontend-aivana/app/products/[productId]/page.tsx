@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Product } from "@/lib/types/product/product";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
-import { Loader } from "lucide-react";
+import { Loader, EyeOff, AlertTriangle } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
 import { addToCart } from "@/lib/actions/cart.actions";
 import { getCurrentUser } from "@/lib/auth";
@@ -22,7 +22,11 @@ interface Props {
   productId: string;
 }
 
-export default function ProductDetailPage({params,}: {params: Promise<Props>;}) {
+export default function ProductDetailPage({
+  params,
+}: {
+  params: Promise<Props>;
+}) {
   const { productId } = use(params);
   const router = useRouter();
 
@@ -42,44 +46,41 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
   const isUserProduct = collections.some(
     (collection) => collection.product.id === product?.id,
   );
+  const isAdmin = currentUser?.role === "admin";
+  const isSeller = currentUser?.role === "seller";
+  const isOwner = isSeller && product?.seller?.userId === currentUser?.id;
 
   const isPurchaseDisabled =
-    prohibitedRolesForPurchase || isUserProduct || product?.isDeleted;
+    prohibitedRolesForPurchase ||
+    isUserProduct ||
+    product?.isDeleted ||
+    product?.isHidden; // ✅ ซ่อนอยู่ก็ซื้อไม่ได้
 
   const allImages = product
     ? [
-      product.heroImageUrl,
-      ...(product.detailImages?.map((img) =>
-        Array.isArray(img.url) ? img.url[0] : img.url,
-      ) || []),
-    ].filter(Boolean)
+        product.heroImageUrl,
+        ...(product.detailImages?.map((img) =>
+          Array.isArray(img.url) ? img.url[0] : img.url,
+        ) || []),
+      ].filter(Boolean)
     : [];
 
   const handleAddToCart = async () => {
     try {
       setAddingToCart(true);
-
       const user = await getCurrentUser();
-
       if (!user) {
         showErrorToast("กรุณาเข้าสู่ระบบก่อนเพิ่มสินค้าลงตะกร้า");
         return;
       }
-
       setCurrentUser(user);
-
-      await addToCart({
-        userId: user.id,
-        productId: parseInt(productId),
-      });
-
+      await addToCart({ userId: user.id, productId: parseInt(productId) });
       showSuccessToast("เพิ่มสินค้าเข้าตะกร้าสำเร็จ!");
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error && err.message === "PRODUCT_ALREADY_IN_CART"
           ? "สินค้านี้มีอยู่ในตะกร้าแล้ว"
           : "ไม่สามารถเพิ่มสินค้าเข้าตะกร้าได้ กรุณาลองใหม่อีกครั้ง";
-
       showErrorToast(errorMessage);
     } finally {
       setAddingToCart(false);
@@ -90,16 +91,13 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
     const fetchProduct = async () => {
       try {
         const data = await getProductByIdAction(productId);
-
         if (!data) {
-          // ถ้าไม่พบสินค้าหรือไม่มีสิทธิ์เข้าถึง ให้ redirect กลับหน้า home
           router.push("/");
           return;
         }
-
         setProduct(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+        router.push("/");
       } finally {
         setLoading(false);
       }
@@ -118,8 +116,6 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
       try {
         const user = await getCurrentUser();
         setCurrentUser(user);
-
-        // Fetch user collections if user exists
         if (user) {
           const userCollections = await getUserCollections();
           setCollections(userCollections);
@@ -140,7 +136,6 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
     } else {
       document.body.style.overflow = "unset";
     }
-
     return () => {
       document.body.style.overflow = "unset";
     };
@@ -148,8 +143,6 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
 
   if (loading) {
     return (
-      /* Loading State */
-      // FIXME: เอามาไว้ตรงกลาง
       <div className="flex justify-center items-center py-20">
         <Loader className="animate-spin text-purple-500" size={48} />
       </div>
@@ -161,31 +154,24 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
     allProducts: Product[],
   ) => {
     if (!currentProduct) return [];
-
     const scoredProducts = allProducts
       .filter((p) => p.id !== currentProduct.id)
       .map((product) => {
         let score = 0;
-
         if (product.category === currentProduct.category) score += 3;
-
         const commonTags =
           product.tags?.filter((tag) => currentProduct.tags?.includes(tag))
             .length || 0;
         score += commonTags;
-
         if (product.seller?.id === currentProduct.seller?.id) score += 2;
-
         const priceDiff = Math.abs(product.price - currentProduct.price);
         if (priceDiff < currentProduct.price * 0.3) score += 1;
-
         return { product, score };
       })
       .filter((item) => item.score > 0)
       .sort((a, b) => b.score - a.score)
       .slice(0, 4)
       .map((item) => item.product);
-
     return scoredProducts;
   };
 
@@ -193,27 +179,19 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
     setCurrentImageIndex(index);
     setIsPreviewOpen(true);
   };
-
   const goToNext = () => {
     setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
   };
-
   const goToPrev = () => {
     setCurrentImageIndex(
       (prev) => (prev - 1 + allImages.length) % allImages.length,
     );
   };
-
   const handlePreview = (previewUrl: string) => {
-    if (previewUrl) {
-      window.open(previewUrl, "_blank");
-    }
+    if (previewUrl) window.open(previewUrl, "_blank");
   };
-
   const handleTagClick = (tagName?: string) => {
-    if (tagName) {
-      router.push(`/products?tag=${encodeURIComponent(tagName)}`);
-    }
+    if (tagName) router.push(`/products?tag=${encodeURIComponent(tagName)}`);
   };
 
   if (error || !product) {
@@ -229,19 +207,12 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
   return (
     <div className="min-h-screen">
       <div className="max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-3 py-10">
-        {/* Header Product Name */}
-        <div className="space-y-4">
-          {/* <h1 className="text-2xl md:text-3xl font-bold text-white">
-            {product.name}
-          </h1> */}
-        </div>
+        <div className="space-y-4" />
 
-        {/* Main Product */}
         <div className="grid grid-cols-1 lg:grid-cols-8 gap-8 mt-10">
-          {/* Left Side - Hero Image */}
+          {/* Left Side */}
           <div className="lg:col-span-5">
             <div className="space-y-6">
-              {/* Hero Image - คลิกเพื่อดูรูปที่ 0 */}
               <div
                 className="aspect-[17/11] rounded-xl overflow-hidden bg-slate-800 cursor-pointer hover:opacity-95 transition-opacity"
                 onClick={() => openPreview(0)}
@@ -259,14 +230,13 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
                 )}
               </div>
 
-              {/* Thumbnails - คลิกเพื่อดูรูปตาม index */}
               {product.detailImages && product.detailImages.length > 0 && (
                 <div className="grid grid-cols-2 gap-2">
                   {product.detailImages.slice(0, 6).map((img, index) => (
                     <div
                       key={img.imageId}
                       className="h-72 rounded-lg overflow-hidden bg-slate-800 border-2 border-slate-700 hover:border-purple-500 transition-colors cursor-pointer"
-                      onClick={() => openPreview(index + 1)} // +1 เพราะ hero image อยู่ index 0
+                      onClick={() => openPreview(index + 1)}
                     >
                       <img
                         src={Array.isArray(img.url) ? img.url[0] : img.url}
@@ -278,10 +248,7 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
                 </div>
               )}
 
-              {/* Left Side - Description */}
-              <div className=" mt-10">
-                {/* Left Side - Description */}
-
+              <div className="mt-10">
                 <div className="space-y-8">
                   <div>
                     <h2 className="text-xl font-bold text-white mb-4">
@@ -291,7 +258,6 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
                       {product.description}
                     </div>
                   </div>
-
                   {product.installationGuide && (
                     <div>
                       <h2 className="text-xl font-bold text-white mb-4">
@@ -300,7 +266,6 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
                       <MarkdownRenderer content={product.installationGuide} />
                     </div>
                   )}
-
                   {product.features && product.features.length > 0 && (
                     <div>
                       <h2 className="text-xl font-bold text-white mb-4">
@@ -314,17 +279,13 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
                     </div>
                   )}
                 </div>
-
-                {/* Right Side - Compatibility */}
               </div>
 
-              {/* Lightbox with Navigation */}
               {isPreviewOpen && (
                 <div
                   className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-0"
                   onClick={() => setIsPreviewOpen(false)}
                 >
-                  {/* Close Button */}
                   <button
                     className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors z-10"
                     onClick={() => setIsPreviewOpen(false)}
@@ -343,8 +304,6 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
                       />
                     </svg>
                   </button>
-
-                  {/* Previous Button */}
                   {allImages.length > 1 && (
                     <button
                       className="absolute left-4 text-white/80 hover:text-white transition-colors z-10"
@@ -368,8 +327,6 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
                       </svg>
                     </button>
                   )}
-
-                  {/* Image - ลบ padding ออก */}
                   <div className="w-full h-full flex items-center justify-center">
                     <img
                       src={allImages[currentImageIndex] || ""}
@@ -377,14 +334,10 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
                       className="w-full h-full object-contain"
                       onClick={(e) => e.stopPropagation()}
                     />
-
-                    {/* Image Counter */}
                     <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/60 text-white px-4 py-2 rounded-full text-sm">
                       {currentImageIndex + 1} / {allImages.length}
                     </div>
                   </div>
-
-                  {/* Next Button */}
                   {allImages.length > 1 && (
                     <button
                       className="absolute right-4 text-white/80 hover:text-white transition-colors z-10"
@@ -413,9 +366,8 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
             </div>
           </div>
 
-          {/* Right Side - Product Details */}
+          {/* Right Side */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Product Details */}
             <div className="bg-purple-900/5 backdrop-blur-sm rounded-lg p-6 space-y-4 border border-purple-500/5">
               <div className="bg-gradient-to-r from-purple-700/60 via-purple-900/50 to-[#141332]/60 rounded-xl p-5 shadow-lg flex flex-col gap-4 overflow-hidden">
                 {/* Product Name */}
@@ -442,16 +394,62 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
                   </div>
                 </div>
 
-                {/* Deleted Product Warning */}
+                {/* Hidden Banner */}
+                {product.isHidden && !product.isDeleted && (
+                  <div className="bg-orange-500/15 border border-orange-500/40 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <EyeOff
+                        size={18}
+                        className="text-orange-400 mt-0.5 flex-shrink-0"
+                      />
+                      <div className="flex-1">
+                        <h3 className="text-orange-400 font-semibold mb-1 text-sm">
+                          {isAdmin
+                            ? "พักการขายชั่วคราวโดยระบบ"
+                            : isOwner
+                              ? "สินค้าของคุณถูกพักการขายชั่วคราว"
+                              : "สินค้านี้ถูกพักการขายชั่วคราว"}
+                        </h3>
+                        <p className="text-orange-300/70 text-xs leading-relaxed">
+                          {isAdmin
+                            ? "สินค้านี้ถูกพักการขายชั่วคราวโดยระบบ ไม่แสดงในหน้าร้านค้า admin เท่านั้นที่เห็นหน้านี้ได้"
+                            : isOwner
+                              ? "สินค้าของคุณถูกพักการขายชั่วคราว กรุณาตรวจสอบและแก้ไข"
+                              : "สินค้านี้ถูกพักการขายชั่วคราว แต่คุณยังสามารถดูรายละเอียดและดาวน์โหลดไฟล์ที่ซื้อไว้แล้วได้"}
+                        </p>
+                        {product.hiddenAt && (isAdmin || isOwner) && (
+                          <p className="text-orange-300/50 text-xs mt-2">
+                            ซ่อนเมื่อ:{" "}
+                            {new Date(product.hiddenAt).toLocaleDateString(
+                              "th-TH",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              },
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* ✅ Deleted Banner */}
                 {product.isDeleted && (
                   <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4">
                     <div className="flex items-start gap-3">
-                      <div className="text-red-400 text-xl">⚠️</div>
+                      <AlertTriangle
+                        size={18}
+                        className="text-red-400 mt-0.5 flex-shrink-0"
+                      />
                       <div className="flex-1">
-                        <h3 className="text-red-400 font-semibold mb-1">
+                        <h3 className="text-red-400 font-semibold mb-1 text-sm">
                           ยกเลิกการขายแล้ว
                         </h3>
-                        <p className="text-red-300/80 text-sm">
+                        <p className="text-red-300/80 text-xs leading-relaxed">
                           ยกเลิกการขายโดยผู้ขายแล้ว
                           คุณยังสามารถดูรายละเอียดและดาวน์โหลดไฟล์ที่ซื้อไว้แล้วได้
                         </p>
@@ -498,13 +496,13 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
                       ? "กำลังเพิ่ม..."
                       : product.isDeleted
                         ? "ยกเลิกการขายแล้ว"
-                        : isUserProduct
-                          ? "คุณมีสินค้านี้แล้ว"
-                          : prohibitedRolesForPurchase
-                            ? "ไม่สามารถซื้อได้"
-                            : `เพิ่มลงตะกร้า ${formatPriceWithCurrency(
-                              product.price,
-                            )}`}
+                        : product.isHidden
+                          ? "พักการขายชั่วคราว"
+                          : isUserProduct
+                            ? "คุณมีสินค้านี้แล้ว"
+                            : prohibitedRolesForPurchase
+                              ? "ไม่สามารถซื้อได้"
+                              : `เพิ่มลงตะกร้า ${formatPriceWithCurrency(product.price)}`}
                   </button>
                 </div>
               </div>
@@ -531,7 +529,7 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
                   {product.compatibility.map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-3 p-3 bg-white/5 rounded-lg "
+                      className="flex items-center gap-3 p-3 bg-white/5 rounded-lg"
                     >
                       <div className="shrink-0">
                         <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />
@@ -544,9 +542,8 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
                 </div>
               )}
 
-              {/* Tags */}
               {product.tags && product.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 ">
+                <div className="flex flex-wrap gap-2">
                   {product.tags.map((tag) => (
                     <span
                       key={tag.id}
@@ -562,15 +559,11 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
           </div>
         </div>
 
-        {/* FIXME: ทำ component ของ comment ด้วย */}
-        {/* FIXME: ทำ likeCounted */}
-        {/* Comments Section */}
+        {/* Reviews */}
         <div className="mt-16">
           <h2 className="text-2xl font-bold text-white mb-8">
             ความคิดเห็น ({product.reviews.length})
           </h2>
-
-          {/* Comment List */}
           <div className="space-y-6">
             {product.reviews?.map((review) => (
               <div
@@ -578,7 +571,6 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
                 className="bg-(--linne-purple)/50 rounded-xl p-6 transition-all"
               >
                 <div className="flex items-start gap-4">
-                  {/* Avatar */}
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white shrink-0 shadow-lg ring-2 ring-purple-500/20">
                     {review.user?.avatarUrl ? (
                       <img
@@ -606,19 +598,15 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
                       </span>
                     )}
                   </div>
-
-                  {/* Content */}
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-3">
                       <h3 className="text-(--primary) font-bold text-base">
                         @{review.user?.username}
                       </h3>
-
                       <div className="flex items-center text-xs text-slate-400 bg-black/20 px-2 py-0.5 rounded-full">
                         <span>⭐ {review.rating}</span>
                       </div>
                     </div>
-
                     <p className="text-slate-300 leading-relaxed text-[15px]">
                       {review.comment || "ไม่มีความคิดเห็นเพิ่มเติม"}
                     </p>
@@ -629,9 +617,9 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
           </div>
         </div>
 
+        {/* Related Products */}
         <div className="mt-16">
           <h2 className="text-2xl font-bold text-white mb-8">แนะนำสำหรับคุณ</h2>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {getRelatedProducts(product, allProducts).map((relatedProduct) => (
               <div
@@ -648,7 +636,7 @@ export default function ProductDetailPage({params,}: {params: Promise<Props>;}) 
                     alt={relatedProduct.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
                 <div className="p-4">
                   <h3 className="text-white font-bold text-base mb-1 truncate group-hover:text-purple-400 transition-colors">

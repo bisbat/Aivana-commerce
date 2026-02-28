@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { PayoutDetailResponse } from "@/lib/types/admin/payout";
 import { formatDate, formatBaht } from "@/lib/utils/formatPayout";
@@ -12,6 +12,8 @@ const cardStyle: React.CSSProperties = {
   borderRadius: 14,
   padding: "22px 24px",
 };
+
+
 
 // ─── Seller info card (left side) ───────────────────────────────────────────
 function SellerInfoCard({ data }: { data: PayoutDetailResponse }) {
@@ -183,8 +185,18 @@ function Row({ label, value, bold = false }: any) {
 
 
 // ─── Upload zone (right) ────────────────────────────────────────────────────
-function UploadZone({ file, preview, onFileSelect }: any) {
+function UploadZone({ file, preview, onFileSelect, onRemove }: any) {
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleRemoveClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (fileRef.current) {
+      fileRef.current.value = ""; // ✅ reset input จริง ๆ
+    }
+
+    onRemove();
+  };
 
   return (
     <div style={cardStyle}>
@@ -193,18 +205,40 @@ function UploadZone({ file, preview, onFileSelect }: any) {
       </h4>
 
       <div
-        onClick={() => fileRef.current?.click()}
+        onClick={() => !preview && fileRef.current?.click()}
         style={{
           border: "2px dashed rgba(255,255,255,0.15)",
           borderRadius: 12,
           padding: preview ? 10 : "30px 20px",
           textAlign: "center",
-          cursor: "pointer",
+          cursor: preview ? "default" : "pointer",
           background: "rgba(255,255,255,0.02)",
+          position: "relative",
         }}
       >
         {preview ? (
-          <img src={preview} style={{ maxHeight: 100, borderRadius: 8 }} />
+          <>
+            <img src={preview} style={{ maxHeight: 120, borderRadius: 8 }} />
+
+            <button
+              type="button"
+              onClick={handleRemoveClick}
+              style={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                background: "rgba(239,68,68,0.9)",
+                border: "none",
+                borderRadius: 6,
+                padding: "4px 8px",
+                color: "#fff",
+                fontSize: 11,
+                cursor: "pointer",
+              }}
+            >
+              ลบ
+            </button>
+          </>
         ) : (
           <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>
             คลิกเพื่ออัพโหลดสลิป
@@ -217,11 +251,16 @@ function UploadZone({ file, preview, onFileSelect }: any) {
         type="file"
         hidden
         accept="image/*,.pdf"
-        onChange={(e) => onFileSelect(e.target.files?.[0])}
+        onChange={(e) => {
+          const selected = e.target.files?.[0];
+          if (selected) onFileSelect(selected);
+        }}
       />
     </div>
   );
 }
+
+
 
 
 // ─── Main component ─────────────────────────────────────────────────────────
@@ -232,6 +271,15 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
+
 
   const isPending = data.payout.status === "รอโอน";
 
@@ -240,6 +288,15 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
     setError(null);
     setPreview(URL.createObjectURL(f));
   }, []);
+
+  const handleRemoveFile = () => {
+    if (preview) {
+      URL.revokeObjectURL(preview);
+    }
+
+    setFile(null);
+    setPreview(null);
+  };
 
   const handleMarkPaid = async () => {
     if (!file) {
@@ -254,9 +311,20 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
       setSuccess(true);
       // Optionally refresh after 2s
       setTimeout(() => router.refresh(), 2000);
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
+    } catch (e: any) {
+      const message = e?.message || "เกิดข้อผิดพลาดบางอย่าง";
+
+      if (message.includes("Duplicate slip")) {
+        setError("❌ สลิปนี้ถูกใช้ไปแล้ว");
+      } else if (message.includes("Amount does not match")) {
+        setError("❌ จำนวนเงินในสลิปไม่ตรงกับยอดที่ต้องจ่าย");
+      } else if (message.includes("Slip verification failed")) {
+        setError("❌ ไม่สามารถตรวจสอบสลิปได้");
+      } else {
+        setError(message);
+      }
+    }
+    finally {
       setLoading(false);
     }
   };
@@ -305,7 +373,12 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
             <SummaryBox data={data} />
           </div>
           <div style={{ flex: "1 1 55%" }}>
-            <UploadZone file={file} preview={preview} onFileSelect={handleFileSelect} />
+            <UploadZone
+              file={file}
+              preview={preview}
+              onFileSelect={handleFileSelect}
+              onRemove={handleRemoveFile}
+            />
           </div>
         </div>
       )}
