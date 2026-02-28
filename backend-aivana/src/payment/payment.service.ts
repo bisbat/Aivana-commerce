@@ -8,6 +8,7 @@ import { mapOmiseStatusToPaymentStatus } from 'src/common/mapper';
 import { PaymentMethodEnum } from 'src/order/enum/payment.enum';
 import { PaymentStatusEnum } from './enum/payment-status.enum';
 import { Cron } from '@nestjs/schedule/dist/decorators/cron.decorator';
+import { EmailService } from 'src/email/email.service';
 
 
 @Injectable()
@@ -16,7 +17,8 @@ export class PaymentService {
     private readonly omiseService: OmiseService,
     private readonly orderService: OrderService,
     @InjectRepository(PaymentEntity)
-    private readonly paymentRepository: Repository<PaymentEntity>
+    private readonly paymentRepository: Repository<PaymentEntity>,
+    private readonly emailService: EmailService,
   ) { }
 
   async chargeWithSource(sourceId: string, orderId: number) {
@@ -115,12 +117,30 @@ export class PaymentService {
     if (!payment) return;
     const orderId = payment.orderId;
 
+    const order = await this.orderService.getOrderById(orderId);
+    console.log('order in webhook', order);
+    if (!order) return;
+
     if (charge.status === 'successful') {
       await this.orderService.markAsPaid(orderId);
+      await this.emailService.sendSuccessEmail({
+        customerEmail: order.user.email,
+        customerName: order.user.firstName,
+        orderId: payment.orderId.toString(),
+        items: order.items,
+        amount: payment.amount,
+        paymentMethod: payment.paymentMethod,
+        paidAt: new Date(),
+      });
     }
 
     if (charge.status === 'failed' || charge.status === 'expired') {
       await this.orderService.markAsFailed(orderId);
+      await this.emailService.sendFailureEmail({
+        customerEmail: order.user.email,
+        customerName: order.user.firstName,
+        orderId: payment.orderId.toString(),
+      });
     }
   }
 
@@ -162,11 +182,21 @@ export class PaymentService {
   async chargeWithToken(token: string, orderId: number) {
     const order = await this.orderService.getOrderById(orderId)
     if (!order) {
-      throw new BadRequestException('Order not found!')
+      throw new NotFoundException('Order not found!')
     }
     const amount = Math.round(Number(order.totalAmount) * 100);
 
     const charge = await this.omiseService.createChargeWithToken(token, amount)
+
+    const payment = await this.paymentRepository.findOne({
+      where: {
+        chargeId: charge.id,
+      }
+    });
+
+    if (!payment) {
+      throw new NotFoundException('Payment not found');
+    }
 
     const paymentStatus = mapOmiseStatusToPaymentStatus(
       charge.status,
@@ -186,10 +216,24 @@ export class PaymentService {
 
     if (charge.status === 'successful') {
       await this.orderService.markAsPaidCard(orderId);
+      await this.emailService.sendSuccessEmail({
+        customerEmail: order.user.email,
+        customerName: order.user.firstName,
+        orderId: payment.orderId.toString(),
+        items: order.items,
+        amount: payment.amount,
+        paymentMethod: payment.paymentMethod,
+        paidAt: new Date(),
+      });
     }
 
     if (charge.status === 'failed' || charge.status === 'expired') {
       await this.orderService.markAsFailedCard(orderId);
+      await this.emailService.sendFailureEmail({
+        customerEmail: order.user.email,
+        customerName: order.user.firstName,
+        orderId: payment.orderId.toString(),
+      });
     }
 
     return {

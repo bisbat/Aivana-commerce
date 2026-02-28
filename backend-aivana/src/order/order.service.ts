@@ -83,7 +83,7 @@ export class OrderService {
     console.log('order id : ' + orderId);
     const order = await this.orderRepository.findOne({
       where: { id: orderId },
-      relations: ['items', 'items.product'],
+      relations: ['items', 'items.product', 'user'],
     });
     if (!order) {
       throw new NotFoundException('Not found order!');

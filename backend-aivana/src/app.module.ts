@@ -25,6 +25,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
 import { OmiseModule } from './omise/omise.module';
 import { PaymentModule } from './payment/payment.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -52,7 +53,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     ReportModule,
     OmiseModule,
     PaymentModule,
-    ScheduleModule.forRoot()
+    ScheduleModule.forRoot(),
+    EmailModule
   ],
   controllers: [],
   providers: [
