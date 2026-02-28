@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import { CreateEmailSuccessDto } from './dto/create-email.dto';
+import { CreateEmailSuccessDto } from './dto/create-success-email.dto';
+import { CreateEmailFailureDto } from './dto/create-failure-email.dto';
 
 @Injectable()
 export class EmailService {
@@ -124,6 +125,51 @@ export class EmailService {
           </table>
         </body>
         </html>
+      `,
+    });
+  }
+
+  async sendFailureEmail(payload: CreateEmailFailureDto) {
+    await this.transporter.sendMail({
+      from: `"Aivana Commerce" <${process.env.MAIL_USER}>`,
+      to: payload.customerEmail,
+      subject: `การชำระเงินล้มเหลว #${payload.orderId} – Aivana Commerce`,
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <h2 style="color: #e53935;">การชำระเงินไม่สำเร็จ</h2>
+          <p>สวัสดีคุณ ${payload.customerName},</p>
+
+          <p>
+            ขออภัยค่ะ การชำระเงินสำหรับคำสั่งซื้อ <strong>#${payload.orderId}</strong> ของคุณไม่สำเร็จ
+          </p>
+
+          <p>
+            สาเหตุที่เป็นไปได้ เช่น ยอดเงินไม่เพียงพอ ข้อมูลการชำระเงินไม่ถูกต้อง
+            หรือมีการยกเลิกการทำรายการระหว่างขั้นตอนการชำระเงิน
+          </p>
+
+          <hr />
+
+          <h3>🧾 รายละเอียดอ้างอิงคำสั่งซื้อ</h3>
+          <p><strong>เลขที่คำสั่งซื้อ:</strong> ${payload.orderId}</p>
+
+          <hr />
+
+          <p>
+            คุณสามารถลองทำรายการชำระเงินใหม่ได้อีกครั้งจากหน้าคำสั่งซื้อของคุณ
+            หรือเลือกวิธีการชำระเงินอื่น
+          </p>
+
+          <p>
+            หากต้องการความช่วยเหลือเพิ่มเติม สามารถติดต่อทีมงานของเราได้ตลอดเวลา
+          </p>
+
+          <br />
+          <p>
+            ขอแสดงความนับถือ,<br/>
+            ทีมงาน Aivana Commerce
+          </p>
+        </div>
       `,
     });
   }

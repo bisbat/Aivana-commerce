@@ -136,6 +136,11 @@ export class PaymentService {
 
     if (charge.status === 'failed' || charge.status === 'expired') {
       await this.orderService.markAsFailed(orderId);
+      await this.emailService.sendFailureEmail({
+        customerEmail: order.user.email,
+        customerName: order.user.firstName,
+        orderId: payment.orderId.toString(),
+      });
     }
   }
 
@@ -183,6 +188,16 @@ export class PaymentService {
 
     const charge = await this.omiseService.createChargeWithToken(token, amount)
 
+    const payment = await this.paymentRepository.findOne({
+      where: {
+        chargeId: charge.id,
+      }
+    });
+
+    if (!payment) {
+      throw new NotFoundException('Payment not found');
+    }
+
     const paymentStatus = mapOmiseStatusToPaymentStatus(
       charge.status,
     );
@@ -201,10 +216,24 @@ export class PaymentService {
 
     if (charge.status === 'successful') {
       await this.orderService.markAsPaidCard(orderId);
+      await this.emailService.sendSuccessEmail({
+        customerEmail: order.user.email,
+        customerName: order.user.firstName,
+        orderId: payment.orderId.toString(),
+        items: order.items,
+        amount: payment.amount,
+        paymentMethod: payment.paymentMethod,
+        paidAt: new Date(),
+      });
     }
 
     if (charge.status === 'failed' || charge.status === 'expired') {
       await this.orderService.markAsFailedCard(orderId);
+      await this.emailService.sendFailureEmail({
+        customerEmail: order.user.email,
+        customerName: order.user.firstName,
+        orderId: payment.orderId.toString(),
+      });
     }
 
     return {
