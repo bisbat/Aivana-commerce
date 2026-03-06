@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GeminiService } from './gemini.service';
 
 const VALID_CATEGORIES = [
   'ui-kits',
@@ -10,20 +11,7 @@ const VALID_CATEGORIES = [
 
 @Injectable()
 export class IntentExtractionService {
-  private model;
-
-  constructor() {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new BadRequestException('GEMINI_API_KEY is not set');
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    this.model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
-      generationConfig: {
-        responseMimeType: 'application/json',
-      },
-    });
-  }
+  constructor(private readonly gemini: GeminiService) {} // ← inject แทน
 
   async extractIntent(userInput: string) {
     const prompt = `
@@ -48,8 +36,7 @@ User input: "${userInput}"
     `;
 
     try {
-      const result = await this.model.generateContent(prompt);
-      const text = result.response.text();
+      const text = await this.gemini.generate(prompt);
       const parsed = JSON.parse(text);
 
       return {
