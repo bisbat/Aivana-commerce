@@ -1,5 +1,5 @@
 export interface UploadFileFormData {
-    productType: 'UI Kit' | 'Coded Template';
+    productType: 'UI Kit' | 'frontend-template' | 'backend-template';
     file: File | null;
     keywords: string;
   }

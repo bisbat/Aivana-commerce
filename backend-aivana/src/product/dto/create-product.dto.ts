@@ -37,7 +37,11 @@ export class CreateProductDto {
   @IsString()
   @IsOptional()
   heroImageUrl?: string;
-  
+
+  @IsString()
+  @IsOptional()
+  apiDocUrl?: string;
+
   @Transform(({ value }) => JSON.parse(value as string) as string[])
   @IsArray()
   @IsString({ each: true })
@@ -48,10 +52,20 @@ export class CreateProductDto {
   @IsString({ each: true })
   compatibility: Array<string>;
 
+  @Transform(({ value }) => JSON.parse(value as string) as string[])
+  @IsArray()
+  @IsString({ each: true })
+  requirement: Array<string>;
+
+  @Transform(({ value }) => JSON.parse(value as string) as string[])
+  @IsArray()
+  @IsString({ each: true })
+  techstack: Array<string>;
+
   @Transform(({ value }) => parseInt(value as string, 10))
   @IsNumber()
   categoryId: number;
-  
+
   @IsNotEmpty()
   @IsString()
   sellerId: string;

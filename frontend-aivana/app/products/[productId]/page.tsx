@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { Product } from "@/lib/types/product/product";
+import { Product } from "@/lib/types/product/Product";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 import { Loader, EyeOff, AlertTriangle } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
@@ -58,11 +58,11 @@ export default function ProductDetailPage({
 
   const allImages = product
     ? [
-        product.heroImageUrl,
-        ...(product.detailImages?.map((img) =>
-          Array.isArray(img.url) ? img.url[0] : img.url,
-        ) || []),
-      ].filter(Boolean)
+      product.heroImageUrl,
+      ...(product.detailImages?.map((img) =>
+        Array.isArray(img.url) ? img.url[0] : img.url,
+      ) || []),
+    ].filter(Boolean)
     : [];
 
   const handleAddToCart = async () => {
@@ -507,6 +507,20 @@ export default function ProductDetailPage({
                 </div>
               </div>
 
+              {product.tags && product.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {product.tags.map((tag) => (
+                    <span
+                      key={tag.id}
+                      className="px-3 py-1 bg-purple-600/20 border border-purple-500/30 text-purple-300 rounded-full text-sm hover:bg-purple-600/30 hover:border-purple-400/50 hover:text-white transition-colors cursor-pointer"
+                      onClick={() => handleTagClick(tag.name)}
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               <h3 className="text-lg font-semibold text-white/90 flex items-center gap-2">
                 <svg
                   className="w-5 h-5 text-purple-400/70"
@@ -521,7 +535,7 @@ export default function ProductDetailPage({
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                รองรับการใช้งาน
+                รองรับการใช้งาน - Compatibility
               </h3>
 
               {product.compatibility && product.compatibility.length > 0 && (
@@ -542,19 +556,76 @@ export default function ProductDetailPage({
                 </div>
               )}
 
-              {product.tags && product.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {product.tags.map((tag) => (
-                    <span
-                      key={tag.id}
-                      className="px-3 py-1 bg-purple-600/20 border border-purple-500/30 text-purple-300 rounded-full text-sm hover:bg-purple-600/30 hover:border-purple-400/50 hover:text-white transition-colors cursor-pointer"
-                      onClick={() => handleTagClick(tag.name)}
+              <h3 className="text-lg font-semibold text-white/90 flex items-center gap-2">
+                <svg
+                  className="w-5 h-5 text-purple-400/70"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                ชุดเทคโนโลยีที่ใช้ - Tech stack
+              </h3>
+
+              {product.techstack && product.techstack.length > 0 && (
+                <div className="space-y-2">
+                  {product.techstack.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-3 p-3 bg-white/5 rounded-lg"
                     >
-                      {tag.name}
-                    </span>
+                      <div className="shrink-0">
+                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                      </div>
+                      <span className="text-white/90 font-medium text-sm leading-relaxed">
+                        {item}
+                      </span>
+                    </div>
                   ))}
                 </div>
               )}
+
+              <h3 className="text-lg font-semibold text-white/90 flex items-center gap-2">
+                <svg
+                  className="w-5 h-5 text-purple-400/70"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                ข้อกำหนด สภาพแวดล้อม - Requirements
+              </h3>
+
+              {product.requirement && product.requirement.length > 0 && (
+                <div className="space-y-2">
+                  {product.requirement.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-3 p-3 bg-white/5 rounded-lg"
+                    >
+                      <div className="shrink-0">
+                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                      </div>
+                      <span className="text-white/90 font-medium text-sm leading-relaxed">
+                        {item}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
             </div>
           </div>
         </div>

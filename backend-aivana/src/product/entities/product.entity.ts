@@ -47,7 +47,16 @@ export class ProductEntity {
   features: Array<string>;
 
   @Column({ type: 'text', array: true, nullable: true })
+  requirement: Array<string>;
+
+  @Column({ type: 'text', array: true, nullable: true })
+  techstack: Array<string>;
+
+  @Column({ type: 'text', array: true, nullable: true })
   compatibility: Array<string>;
+
+  @Column({ type: 'text', nullable: true })
+  apiDocUrl: string;
 
   @ManyToOne(() => CategoryEntity, (category) => category.products, {
     nullable: false,

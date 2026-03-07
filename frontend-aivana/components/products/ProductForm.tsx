@@ -50,6 +50,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const [compatibility, setCompatibility] = useState<string[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [categoryId, setCategoryId] = useState("");
+  const [requirement, setRequirement] = useState<string[]>([]);
+  const [techstack, setTechstack] = useState<string[]>([]);
+  const [apiDocUrl, setApiDocUrl] = useState("");
 
   const [categories, setCategories] = useState<
     Array<{ id: string; name: string; description: string | null }>
@@ -115,6 +118,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       uploadedFilePath: null,
       heroImageUrl: null,
       tagIds: selectedTagIds,
+      techstack,
+      requirement,
+      apiDocUrl
     };
 
     saveFormStep(PRODUCT_FORM_STEP.PRODUCT_INFO, data);
@@ -174,6 +180,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       uploadedFilePath: null,
       heroImageUrl: null,
       tagIds: selectedTagIds,
+      techstack,
+      requirement,
+      apiDocUrl
     };
     console.log("Product Information Form Data:", formData);
 
@@ -311,10 +320,26 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
 
       <DynamicTextListInput
+        label="Techstack"
+        value={techstack}
+        onChange={setTechstack}
+        placeholder="เช่น React, Vue, Java"
+        maxItems={6}
+      />
+
+      <DynamicTextListInput
         label="Compatibility"
         value={compatibility}
         onChange={setCompatibility}
         placeholder="เช่น Windows, macOS, Chrome"
+        maxItems={6}
+      />
+
+      <DynamicTextListInput
+        label="Requirement"
+        value={requirement}
+        onChange={setRequirement}
+        placeholder="เช่น Node.js 18+, PostgreSQL 14+"
         maxItems={6}
       />
 
@@ -342,6 +367,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           type="url"
         />
       </div>
+      {uploadData.productType === 'backend-template' && (
+        <Input
+          label="API Documentation"
+          value={apiDocUrl}
+          onChange={setApiDocUrl}
+          placeholder="https://example.com"
+          type="url"
+        />
+      )}
 
       {/* Continue Button - No longer submits to backend */}
       <div className="flex justify-end pt-4">

@@ -34,6 +34,16 @@ export class UpdateProductDto {
   compatibility?: string[];
 
   @IsOptional()
+  @Transform(({ value }) => JSON.parse(value as string) as string[])
+  @IsArray()
+  requirement: Array<string>;
+
+  @IsOptional()
+  @Transform(({ value }) => JSON.parse(value as string) as string[])
+  @IsArray()
+  techstack: Array<string>;
+
+  @IsOptional()
   @Transform(({ value }) => parseInt(value as string, 10))
   @IsNumber()
   categoryId?: number;
@@ -51,4 +61,8 @@ export class UpdateProductDto {
   @IsOptional()
   @IsString()
   previewUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  apiDocUrl?: string;
 }
