@@ -57,32 +57,32 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialD
   };
 
   // Handle form submission
-  const handleSubmit = () => {
-    setError(null);
+  const handleSubmit = (useAI: boolean) => {
+  setError(null);
 
-    // Validate required fields
-    if (!productType) {
-      setError('กรุณาเลือกประเภทโพสต์');
-      return;
-    }
+  if (!productType) {
+    setError('กรุณาเลือกประเภทโพสต์');
+    return;
+  }
 
-    if (!file) {
-      setError('กรุณาอัปโหลดไฟล์');
-      return;
-    }
+  if (!file) {
+    setError('กรุณาอัปโหลดไฟล์');
+    return;
+  }
 
-    if (!keywords.trim()) {
-      setError('กรุณาระบุหัวข้อ');
-      return;
-    }
+  if (!keywords.trim()) {
+    setError('กรุณาระบุหัวข้อ');
+    return;
+  }
 
-    // Pass data to parent
-    onNext({
-      productType: productType as 'UI Kit' | 'frontend-template',
-      file,
-      keywords
-    });
-  };
+  // pass flag to parent
+  onNext({
+    productType: productType as 'UI Kit' | 'frontend-template' | 'backend-template',
+    file,
+    keywords,
+    useAI
+  });
+};
 
   return (
     <div className="space-y-8">
@@ -196,12 +196,33 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialD
         </p>
       </div>
 
-      {/* Next Button */}
+      {/* Upload Warning */}
+      <div className="bg-yellow-900/20 border border-yellow-600 rounded-lg p-4 text-sm">
+        <p className="text-yellow-400 font-medium mb-1">
+          ⚠️ คำแนะนำก่อนอัปโหลด
+        </p>
+        <p className="text-yellow-300">
+          กรุณาลบ <span className="font-mono text-yellow-200">node_modules</span>
+            ออกจากโปรเจกต์ก่อน zip ไฟล์ เพื่อให้การอัปโหลดเร็วขึ้นและช่วยให้ AI วิเคราะห์ไฟล์ได้แม่นยำขึ้น
+        </p>
+      </div>
+
+
+      {/* AI Generate Button */}
       <button
-        onClick={handleSubmit}
+        onClick={() => handleSubmit(true)}
         className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
       >
-        ถัดไป →
+        ⚡ วิเคราะห์ไฟล์ด้วย AI (แนะนำ)
+      </button>
+
+
+      {/* Skip AI Button */}
+      <button
+        onClick={() => handleSubmit(false)}
+        className="w-full bg-slate-700 hover:bg-slate-600 text-white py-4 rounded-lg font-medium transition-colors"
+      >
+        ดำเนินการต่อโดยไม่ใช้ AI
       </button>
     </div>
   );
