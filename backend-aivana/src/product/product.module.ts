@@ -13,6 +13,8 @@ import { ProductMapper } from './product.mapper';
 import { ReviewModule } from 'src/review/review.module';
 import { ReviewEntity } from '../review/entities/review.entity';
 import { OrderModule } from 'src/order/order.module';
+import { MetadataExtractionController } from './metadata-extraction.controller';
+import { MetadataExtractionService } from './metadata-extraction.service';
 
 @Module({
   imports: [
@@ -29,8 +31,8 @@ import { OrderModule } from 'src/order/order.module';
     forwardRef(() => ProductImageModule),
     forwardRef(() => OrderModule),
   ],
-  controllers: [ProductController],
-  providers: [ProductService, ProductMapper],
-  exports: [ProductService, ProductMapper, ProductService],
+  controllers: [ProductController, MetadataExtractionController],
+  providers: [ProductService, ProductMapper, MetadataExtractionService],
+  exports: [ProductService, ProductMapper, MetadataExtractionService],
 })
 export class ProductModule {}

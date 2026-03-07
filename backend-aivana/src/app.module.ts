@@ -26,6 +26,8 @@ import { OmiseModule } from './omise/omise.module';
 import { PaymentModule } from './payment/payment.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EmailModule } from './email/email.module';
+import { AiModule } from './ai/ai.module';
+import { ProductEnrichmentModule } from './product-enrichment/product-enrichment.module';
 
 @Module({
   imports: [
@@ -54,7 +56,9 @@ import { EmailModule } from './email/email.module';
     OmiseModule,
     PaymentModule,
     ScheduleModule.forRoot(),
-    EmailModule
+    EmailModule,
+    AiModule,
+    ProductEnrichmentModule,
   ],
   controllers: [],
   providers: [
