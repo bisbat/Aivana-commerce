@@ -2,7 +2,8 @@ import React from "react";
 import { Edit, EyeOff, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
-import { Product } from "@/lib/types/product/product";
+import { Product } from "@/lib/types/product/Product";
+import { useRouter } from "next/navigation";
 
 interface ProductCardSellerProps {
   product: Product;
@@ -15,6 +16,8 @@ const ProductCardSeller: React.FC<ProductCardSellerProps> = ({
 }) => {
   const isDeleted = product.isDeleted;
   const isHidden = product.isHidden;
+
+  const router = useRouter();
 
   return (
     <Link href={`/stores/products/${product.id}`}>
@@ -82,8 +85,7 @@ const ProductCardSeller: React.FC<ProductCardSellerProps> = ({
                 aria-label="Edit product"
                 title="Edit"
                 onClick={(e) => {
-                  e.preventDefault();
-                  onEdit?.(Number(product.id));
+                  router.push(`/stores/products/${product.id}/edit`)
                 }}
                 className="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-150 bg-[var(--linne-purple-hover)] hover:bg-[var(--linne-purple-hover-2)] cursor-pointer"
               >

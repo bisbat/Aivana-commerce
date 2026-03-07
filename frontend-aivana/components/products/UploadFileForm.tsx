@@ -9,14 +9,14 @@ import { saveFormStep } from "@/lib/utils/formStorage";
 interface UploadFileFormProps {
   onNext: (data: UploadFileFormData) => void;
   initialData?: {
-    productType: 'UI Kit' | 'Coded Template';
+    productType: 'UI Kit' | 'frontend-template' | 'backend-template';
     keywords: string;
   };
 }
 
 export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialData }) => {
   // State for form fields
-  const [productType, setProductType] = useState<'UI Kit' | 'Coded Template' | ''>('');
+  const [productType, setProductType] = useState<'UI Kit' | 'frontend-template' | 'backend-template' | ''>('');
   const [file, setFile] = useState<File | null>(null);
   const [keywords, setKeywords] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -32,14 +32,14 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialD
   }, [initialData]);
 
   useEffect(() => {
-  if (!productType && !file && !keywords) return;
+    if (!productType && !file && !keywords) return;
 
-  saveFormStep(1, {
-    productType,
-    file,
-    keywords,
-  });
-}, [productType, file, keywords]);
+    saveFormStep(1, {
+      productType,
+      file,
+      keywords,
+    });
+  }, [productType, file, keywords]);
 
 
   // Handle file selection
@@ -78,7 +78,7 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialD
 
     // Pass data to parent
     onNext({
-      productType: productType as 'UI Kit' | 'Coded Template',
+      productType: productType as 'UI Kit' | 'frontend-template',
       file,
       keywords
     });
@@ -105,26 +105,36 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialD
         <label className="block text-white font-medium">
           โพสต์นี้เกี่ยวกับหัวข้อใด?
         </label>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <button
             type="button"
             onClick={() => setProductType('UI Kit')}
             className={`px-6 py-4 rounded-lg font-medium transition-all ${productType === 'UI Kit'
-                ? 'bg-purple-600 text-white'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+              ? 'bg-purple-600 text-white'
+              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
               }`}
           >
             UI kits
           </button>
           <button
             type="button"
-            onClick={() => setProductType('Coded Template')}
-            className={`px-6 py-4 rounded-lg font-medium transition-all ${productType === 'Coded Template'
-                ? 'bg-purple-600 text-white'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+            onClick={() => setProductType('frontend-template')}
+            className={`px-6 py-4 rounded-lg font-medium transition-all ${productType === 'frontend-template'
+              ? 'bg-purple-600 text-white'
+              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
               }`}
           >
-            Coded Template
+            Frontend Template
+          </button>
+          <button
+            type="button"
+            onClick={() => setProductType('backend-template')}
+            className={`px-6 py-4 rounded-lg font-medium transition-all ${productType === 'backend-template'
+              ? 'bg-purple-600 text-white'
+              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+              }`}
+          >
+            Backend Template
           </button>
         </div>
       </div>

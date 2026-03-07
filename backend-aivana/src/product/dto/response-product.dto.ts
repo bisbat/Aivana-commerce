@@ -23,11 +23,17 @@ export class ResponseProductDto {
   @Expose()
   previewUrl?: string;
   @Expose()
+  apiDocUrl?: string;
+  @Expose()
   heroImageUrl?: string;
   @Expose()
   features: Array<string>;
   @Expose()
   compatibility: Array<string>;
+  @Expose()
+  techstack: Array<string>;
+  @Expose()
+  requirement: Array<string>;
   @Expose()
   @Type(() => MinimalSellerDto)
   seller: MinimalSellerDto;

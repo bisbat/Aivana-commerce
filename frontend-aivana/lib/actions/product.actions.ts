@@ -199,6 +199,9 @@ export async function createCompleteProduct(
       "compatibility",
       JSON.stringify(productInfoData.compatibility),
     );
+    formData.append("techstack", JSON.stringify(productInfoData.techstack));
+    formData.append("requirement", JSON.stringify(productInfoData.requirement));
+    formData.append("apiDocUrl", productInfoData.apiDocUrl || "");
     formData.append("tagIds", JSON.stringify(productInfoData.tagIds));
 
     // Step 1: Product File (.zip, .fig, etc.)

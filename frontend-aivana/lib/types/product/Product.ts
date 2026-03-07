@@ -12,8 +12,11 @@ export interface Product {
   blurb: string;
   installationGuide: string;
   previewUrl: string | null;
+  apiDocUrl: string | null;
   heroImageUrl: string | null;
   features: string[];
+  techstack: string[];
+  requirement: string[];
   compatibility: string[];
   seller: {
     id: string;

@@ -33,9 +33,12 @@ export interface UpdatedProductData {
   features: string; // JSON string of string[]
   installationGuide: string;
   compatibility: string; // JSON string of string[]
+  techstack: string; // JSON string of string[]
+  requirement: string; // JSON string of string[]
   tagIds: string; // JSON string of number[]
   price: string;
   previewUrl: string;
+  apiDocUrl: string;
   files?: {
     heroImage?: File | null;
     productFile?: File | null;
@@ -60,8 +63,11 @@ export default function EditProductPage() {
   const [features, setFeatures] = useState<string[]>([]);
   const [installationGuide, setInstallationGuide] = useState("");
   const [compatibility, setCompatibility] = useState<string[]>([]);
+  const [techstack, setTechstack] = useState<string[]>([]);
+  const [requirement, setRequirement] = useState<string[]>([]);
   const [price, setPrice] = useState("");
   const [previewUrl, setpreviewUrl] = useState("");
+  const [apiDocUrl, setApiDocUrl] = useState("");
 
   const [currentHeroImage, setCurrentHeroImage] = useState<string | null>(null);
   const [newHeroImageFile, setNewHeroImageFile] = useState<File | null>(null);
@@ -92,9 +98,12 @@ export default function EditProductPage() {
       setFeatures(product.features || []);
       setInstallationGuide(product.installationGuide);
       setCompatibility(product.compatibility || []);
+      setRequirement(product.requirement || [])
+      setTechstack(product.techstack || [])
       setSelectedTagIds(product.tags.map((tag) => parseInt(tag.id)));
       setPrice(product.price.toString());
       setpreviewUrl(product.previewUrl || "");
+      setApiDocUrl(product.apiDocUrl || "")
       setCurrentHeroImage(product.heroImageUrl || null);
       setCurrentProductFile(product.uploadedFilePath || null);
       setDetailImages(product.detailImages || []);
@@ -154,6 +163,8 @@ export default function EditProductPage() {
       features: JSON.stringify(features),
       installationGuide,
       compatibility: JSON.stringify(compatibility),
+      techstack: JSON.stringify(compatibility),
+      requirement: JSON.stringify(compatibility),
       tagIds: JSON.stringify(selectedTagIds),
       price: price,
       previewUrl,
@@ -162,6 +173,7 @@ export default function EditProductPage() {
         productFile: newProductFile,
         detailImages: newImageFiles,
       },
+      apiDocUrl,
     };
     await updateProductAction(productId, updatedProductData);
     router.push(`/stores/products/${productId}`);
@@ -222,6 +234,22 @@ export default function EditProductPage() {
         />
 
         <DynamicTextListInput
+          label="Techstack"
+          value={techstack}
+          onChange={setTechstack}
+          placeholder="เช่น React, Vue, Java"
+          maxItems={6}
+        />
+
+        <DynamicTextListInput
+          label="Requirement"
+          value={requirement}
+          onChange={setRequirement}
+          placeholder="เช่น Node.js 18+, PostgreSQL 14+"
+          maxItems={6}
+        />
+
+        <DynamicTextListInput
           label="Compatibility"
           value={compatibility}
           onChange={setCompatibility}
@@ -248,6 +276,14 @@ export default function EditProductPage() {
           label="Live Preview"
           value={previewUrl}
           onChange={setpreviewUrl}
+          placeholder="https://example.com"
+          type="url"
+        />
+
+        <Input
+          label="API Documentation"
+          value={apiDocUrl}
+          onChange={setApiDocUrl}
           placeholder="https://example.com"
           type="url"
         />
