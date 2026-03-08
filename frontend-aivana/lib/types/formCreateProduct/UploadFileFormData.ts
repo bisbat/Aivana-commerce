@@ -1,7 +1,10 @@
-export interface UploadFileFormData {
-    productType: 'UI Kit' | 'frontend-template' | 'backend-template';
-    file: File | null;
-    keywords: string;
+import type { ExtractedMetadata } from "../extracted-metadata";
 
-    useAI?: boolean;
-  }
+export interface UploadFileFormData {
+  productType: 'UI Kit' | 'frontend-template' | 'backend-template';
+  file: File | null;
+  keywords: string;
+
+  useAI?: boolean;
+  metadata?: ExtractedMetadata;
+}

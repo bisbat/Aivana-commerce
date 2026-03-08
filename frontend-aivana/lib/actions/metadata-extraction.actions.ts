@@ -27,6 +27,7 @@ export async function extractMetadataFromUpload(
   category: Category,
   zipFile: File
 ): Promise<ExtractedMetadata> {
+
   const token = await getAccessToken();
 
   const formData = new FormData();
@@ -41,7 +42,13 @@ export async function extractMetadataFromUpload(
     body: formData,
   });
 
-  return parseResponse<ExtractedMetadata>(res);
+  const text = await res.text();
+
+  if (!res.ok) {
+    throw new Error(text || `API error ${res.status}`);
+  }
+
+  return JSON.parse(text) as ExtractedMetadata;
 }
 
 

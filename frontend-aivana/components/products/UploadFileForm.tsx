@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Upload } from 'lucide-react';
 import { UploadFileFormData } from '@/lib/types/formCreateProduct/UploadFileFormData';
 import { saveFormStep } from "@/lib/utils/formStorage";
+import { extractMetadataFromUpload } from "@/lib/actions/metadata-extraction.actions";
+import type { ExtractedMetadata } from "@/lib/types/extracted-metadata";
 
 
 interface UploadFileFormProps {
@@ -21,8 +23,19 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialD
   const [keywords, setKeywords] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   // Reference to file input for triggering click
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const mapProductTypeToCategory = (
+    type: 'UI Kit' | 'frontend-template' | 'backend-template'
+  ): "ui-kit" | "frontend-template" | "backend-template" => {
+
+    if (type === "UI Kit") return "ui-kit";
+    if (type === "frontend-template") return "frontend-template";
+    return "backend-template";
+  };
 
   useEffect(() => {
     if (!initialData) return;
@@ -57,32 +70,58 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialD
   };
 
   // Handle form submission
-  const handleSubmit = (useAI: boolean) => {
-  setError(null);
+  const handleSubmit = async (useAI: boolean) => {
+    setError(null);
 
-  if (!productType) {
-    setError('กรุณาเลือกประเภทโพสต์');
-    return;
-  }
+    if (!productType) {
+      setError("กรุณาเลือกประเภทโพสต์");
+      return;
+    }
 
-  if (!file) {
-    setError('กรุณาอัปโหลดไฟล์');
-    return;
-  }
+    if (!file) {
+      setError("กรุณาอัปโหลดไฟล์");
+      return;
+    }
 
-  if (!keywords.trim()) {
-    setError('กรุณาระบุหัวข้อ');
-    return;
-  }
+    if (!keywords.trim()) {
+      setError("กรุณาระบุหัวข้อ");
+      return;
+    }
 
-  // pass flag to parent
-  onNext({
-    productType: productType as 'UI Kit' | 'frontend-template' | 'backend-template',
-    file,
-    keywords,
-    useAI
-  });
-};
+    try {
+      let metadata: ExtractedMetadata | undefined = undefined;
+
+      // 🔥 only call AI if user choose it
+      if (useAI) {
+        setIsAnalyzing(true);
+
+        const category = mapProductTypeToCategory(
+          productType as 'UI Kit' | 'frontend-template' | 'backend-template'
+        );
+
+        metadata = await extractMetadataFromUpload(
+          category,
+          file
+        );
+
+        console.log("🤖 AI metadata:", metadata);
+      }
+
+      onNext({
+        productType: productType as 'UI Kit' | 'frontend-template' | 'backend-template',
+        file,
+        keywords,
+        metadata,
+        useAI
+      });
+
+    } catch (err) {
+      console.error(err);
+      setError("AI analysis failed");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -203,17 +242,18 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialD
         </p>
         <p className="text-yellow-300">
           กรุณาลบ <span className="font-mono text-yellow-200">node_modules</span>
-            ออกจากโปรเจกต์ก่อน zip ไฟล์ เพื่อให้การอัปโหลดเร็วขึ้นและช่วยให้ AI วิเคราะห์ไฟล์ได้แม่นยำขึ้น
+          ออกจากโปรเจกต์ก่อน zip ไฟล์ เพื่อให้การอัปโหลดเร็วขึ้นและช่วยให้ AI วิเคราะห์ไฟล์ได้แม่นยำขึ้น
         </p>
       </div>
 
 
       {/* AI Generate Button */}
       <button
+        disabled={isAnalyzing}
         onClick={() => handleSubmit(true)}
-        className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+        className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
       >
-        ⚡ วิเคราะห์ไฟล์ด้วย AI (แนะนำ)
+        {isAnalyzing ? "กำลังวิเคราะห์ไฟล์..." : "⚡ วิเคราะห์ไฟล์ด้วย AI (แนะนำ)"}
       </button>
 
 
