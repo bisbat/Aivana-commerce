@@ -43,67 +43,147 @@ interface FolderStats {
 
 const DEP_GROUPS = {
   ui: [
-    'shadcn', '@radix-ui', 'antd', '@ant-design', 'chakra-ui', '@chakra-ui',
-    'material-ui', '@mui', 'mantine', '@mantine', 'flowbite', 'headlessui',
-    '@headlessui', 'daisyui', 'react-bootstrap', 'primereact', 'naive-ui',
-    'element-plus', 'vuetify',
+    'shadcn',
+    '@radix-ui',
+    'antd',
+    '@ant-design',
+    'chakra-ui',
+    '@chakra-ui',
+    'material-ui',
+    '@mui',
+    'mantine',
+    '@mantine',
+    'flowbite',
+    'headlessui',
+    '@headlessui',
+    'daisyui',
+    'react-bootstrap',
+    'primereact',
+    'naive-ui',
+    'element-plus',
+    'vuetify',
   ],
   state: [
-    'redux', '@reduxjs/toolkit', 'zustand', 'jotai', 'recoil', 'mobx',
-    'mobx-react', 'pinia', 'vuex', 'xstate', 'nanostores',
+    'redux',
+    '@reduxjs/toolkit',
+    'zustand',
+    'jotai',
+    'recoil',
+    'mobx',
+    'mobx-react',
+    'pinia',
+    'vuex',
+    'xstate',
+    'nanostores',
   ],
   styling: [
-    'tailwindcss', 'styled-components', '@emotion/react', '@emotion/styled',
-    'sass', 'less', 'postcss', 'unocss', 'stitches', '@stitches/react',
-    'vanilla-extract', 'linaria',
+    'tailwindcss',
+    'styled-components',
+    '@emotion/react',
+    '@emotion/styled',
+    'sass',
+    'less',
+    'postcss',
+    'unocss',
+    'stitches',
+    '@stitches/react',
+    'vanilla-extract',
+    'linaria',
   ],
   database: [
-    'prisma', '@prisma/client', 'typeorm', 'sequelize', 'mongoose',
-    'drizzle-orm', 'knex', 'pg', 'mysql2', 'better-sqlite3', 'mongodb',
-    'redis', 'ioredis', '@vercel/postgres', '@supabase/supabase-js',
+    'prisma',
+    '@prisma/client',
+    'typeorm',
+    'sequelize',
+    'mongoose',
+    'drizzle-orm',
+    'knex',
+    'pg',
+    'mysql2',
+    'better-sqlite3',
+    'mongodb',
+    'redis',
+    'ioredis',
+    '@vercel/postgres',
+    '@supabase/supabase-js',
     '@planetscale/database',
   ],
   auth: [
-    'next-auth', '@auth/core', 'passport', 'passport-local', 'passport-jwt',
-    '@nestjs/passport', '@nestjs/jwt', 'jsonwebtoken', 'bcrypt', 'bcryptjs',
-    'clerk', '@clerk/nextjs', '@clerk/clerk-sdk-node', 'firebase',
-    'firebase-admin', 'lucia',
+    'next-auth',
+    '@auth/core',
+    'passport',
+    'passport-local',
+    'passport-jwt',
+    '@nestjs/passport',
+    '@nestjs/jwt',
+    'jsonwebtoken',
+    'bcrypt',
+    'bcryptjs',
+    'clerk',
+    '@clerk/nextjs',
+    '@clerk/clerk-sdk-node',
+    'firebase',
+    'firebase-admin',
+    'lucia',
   ],
 } as const;
 
 const FRAMEWORK_MAP: Record<string, string> = {
-  next: 'Next.js',         'next.js': 'Next.js',
-  react: 'React',          'react-dom': 'React',
-  vue: 'Vue',              nuxt: 'Nuxt',
-  svelte: 'Svelte',        '@sveltejs/kit': 'SvelteKit',
-  astro: 'Astro',          '@nestjs/core': 'NestJS',
-  express: 'Express',      fastify: 'Fastify',
-  hono: 'Hono',            koa: 'Koa',
-  remix: 'Remix',          '@remix-run/node': 'Remix',
-  'solid-js': 'SolidJS',   '@solidjs/start': 'SolidStart',
-  gatsby: 'Gatsby',        angular: 'Angular',
+  next: 'Next.js',
+  'next.js': 'Next.js',
+  react: 'React',
+  'react-dom': 'React',
+  vue: 'Vue',
+  nuxt: 'Nuxt',
+  svelte: 'Svelte',
+  '@sveltejs/kit': 'SvelteKit',
+  astro: 'Astro',
+  '@nestjs/core': 'NestJS',
+  express: 'Express',
+  fastify: 'Fastify',
+  hono: 'Hono',
+  koa: 'Koa',
+  remix: 'Remix',
+  '@remix-run/node': 'Remix',
+  'solid-js': 'SolidJS',
+  '@solidjs/start': 'SolidStart',
+  gatsby: 'Gatsby',
+  angular: 'Angular',
   '@angular/core': 'Angular',
 };
 
 const BUILD_TOOL_MAP: Record<string, string> = {
-  vite: 'Vite',        webpack: 'Webpack',   turbo: 'Turborepo',
-  turbopack: 'Turbopack', esbuild: 'esbuild', rollup: 'Rollup',
-  parcel: 'Parcel',    '@swc/core': 'SWC',
+  vite: 'Vite',
+  webpack: 'Webpack',
+  turbo: 'Turborepo',
+  turbopack: 'Turbopack',
+  esbuild: 'esbuild',
+  rollup: 'Rollup',
+  parcel: 'Parcel',
+  '@swc/core': 'SWC',
 };
 
 const ORM_MAP: Record<string, string> = {
-  prisma: 'Prisma',        '@prisma/client': 'Prisma',
-  typeorm: 'TypeORM',      sequelize: 'Sequelize',
-  mongoose: 'Mongoose',    'drizzle-orm': 'Drizzle',
+  prisma: 'Prisma',
+  '@prisma/client': 'Prisma',
+  typeorm: 'TypeORM',
+  sequelize: 'Sequelize',
+  mongoose: 'Mongoose',
+  'drizzle-orm': 'Drizzle',
   knex: 'Knex',
 };
 
 const DB_MAP: Record<string, string> = {
-  pg: 'PostgreSQL',          mysql2: 'MySQL',
-  'better-sqlite3': 'SQLite', mongodb: 'MongoDB',
-  mongoose: 'MongoDB',        redis: 'Redis',
-  ioredis: 'Redis',           '@vercel/postgres': 'PostgreSQL',
-  '@supabase/supabase-js': 'Supabase', 'firebase-admin': 'Firebase',
+  pg: 'PostgreSQL',
+  mysql2: 'MySQL',
+  'better-sqlite3': 'SQLite',
+  mongodb: 'MongoDB',
+  mongoose: 'MongoDB',
+  redis: 'Redis',
+  ioredis: 'Redis',
+  '@vercel/postgres': 'PostgreSQL',
+  '@supabase/supabase-js': 'Supabase',
+  'firebase-admin': 'Firebase',
   '@planetscale/database': 'PlanetScale',
 };
 
@@ -210,30 +290,34 @@ export class MetadataExtractionService {
 
       const file = fs.createWriteStream(destPath);
 
-      protocol.get(url, (response: any) => {
-        // Follow redirects — MinIO signed URLs may redirect
-        if (
-          response.statusCode >= 300 &&
-          response.statusCode < 400 &&
-          response.headers.location
-        ) {
-          file.close();
-          return this.downloadToFile(response.headers.location, destPath)
-            .then(resolve)
-            .catch(reject);
-        }
+      protocol
+        .get(url, (response: any) => {
+          // Follow redirects — MinIO signed URLs may redirect
+          if (
+            response.statusCode >= 300 &&
+            response.statusCode < 400 &&
+            response.headers.location
+          ) {
+            file.close();
+            return this.downloadToFile(response.headers.location, destPath)
+              .then(resolve)
+              .catch(reject);
+          }
 
-        if (response.statusCode !== 200) {
-          reject(new Error(`Failed to download ZIP: HTTP ${response.statusCode}`));
-          return;
-        }
+          if (response.statusCode !== 200) {
+            reject(
+              new Error(`Failed to download ZIP: HTTP ${response.statusCode}`),
+            );
+            return;
+          }
 
-        response.pipe(file);
-        file.on('finish', () => file.close(() => resolve()));
-      }).on('error', (err: Error) => {
-        fs.unlink(destPath, () => {});
-        reject(err);
-      });
+          response.pipe(file);
+          file.on('finish', () => file.close(() => resolve()));
+        })
+        .on('error', (err: Error) => {
+          fs.unlink(destPath, () => {});
+          reject(err);
+        });
     });
   }
 
@@ -287,7 +371,9 @@ export class MetadataExtractionService {
       hasReadme: allFiles.some((f) =>
         /^readme(\.(md|txt|rst))?$/i.test(path.basename(f)),
       ),
-      hasTypeScript: allFiles.some((f) => f.endsWith('.ts') || f.endsWith('.tsx')),
+      hasTypeScript: allFiles.some(
+        (f) => f.endsWith('.ts') || f.endsWith('.tsx'),
+      ),
       hasTsConfig: allFiles.some((f) => path.basename(f) === 'tsconfig.json'),
       packageJson: this.readPackageJson(dir, allFiles),
       lockFile: this.detectLockFile(allFiles),
@@ -320,7 +406,10 @@ export class MetadataExtractionService {
     return results;
   }
 
-  private readPackageJson(baseDir: string, allFiles: string[]): ParsedPackageJson | null {
+  private readPackageJson(
+    baseDir: string,
+    allFiles: string[],
+  ): ParsedPackageJson | null {
     // Sort by depth → prefer root-level package.json
     const candidates = allFiles
       .filter((f) => path.basename(f) === 'package.json')
@@ -338,7 +427,12 @@ export class MetadataExtractionService {
 
   private detectLockFile(files: string[]): string | null {
     // Order matters — bun first (most specific)
-    const priority = ['bun.lockb', 'pnpm-lock.yaml', 'yarn.lock', 'package-lock.json'];
+    const priority = [
+      'bun.lockb',
+      'pnpm-lock.yaml',
+      'yarn.lock',
+      'package-lock.json',
+    ];
     for (const lock of priority) {
       if (files.some((f) => path.basename(f) === lock)) return lock;
     }
@@ -347,11 +441,17 @@ export class MetadataExtractionService {
 
   // ── Step 4: Route to category builder ──────────────────────────────────
 
-  private buildMetadata(category: Category, stats: FolderStats): ExtractedMetadata {
+  private buildMetadata(
+    category: Category,
+    stats: FolderStats,
+  ): ExtractedMetadata {
     switch (category) {
-      case 'ui-kit':            return this.buildUIKitMetadata(stats);
-      case 'frontend-template': return this.buildFrontendMetadata(stats);
-      case 'backend-template':  return this.buildBackendMetadata(stats);
+      case 'ui-kit':
+        return this.buildUIKitMetadata(stats);
+      case 'frontend-template':
+        return this.buildFrontendMetadata(stats);
+      case 'backend-template':
+        return this.buildBackendMetadata(stats);
     }
   }
 
@@ -361,11 +461,17 @@ export class MetadataExtractionService {
     return { ...(pkg?.dependencies ?? {}), ...(pkg?.devDependencies ?? {}) };
   }
 
-  private detectFramework(deps: Record<string, string>): { framework?: string; version?: string } {
+  private detectFramework(deps: Record<string, string>): {
+    framework?: string;
+    version?: string;
+  } {
     for (const [dep, version] of Object.entries(deps)) {
       const label = FRAMEWORK_MAP[dep];
       if (label) {
-        return { framework: label, version: version.replace(/^[\^~>=<]+/, '').trim() };
+        return {
+          framework: label,
+          version: version.replace(/^[\^~>=<]+/, '').trim(),
+        };
       }
     }
     return {};
@@ -373,12 +479,20 @@ export class MetadataExtractionService {
 
   private classifyDependencies(deps: Record<string, string>) {
     const result: Record<string, string[]> = {
-      main: [], ui: [], state: [], styling: [], database: [], auth: [],
+      main: [],
+      ui: [],
+      state: [],
+      styling: [],
+      database: [],
+      auth: [],
     };
     const frameworkKeys = new Set(Object.keys(FRAMEWORK_MAP));
 
     for (const dep of Object.keys(deps)) {
-      if (frameworkKeys.has(dep)) { result.main.push(dep); continue; }
+      if (frameworkKeys.has(dep)) {
+        result.main.push(dep);
+        continue;
+      }
       for (const [group, keywords] of Object.entries(DEP_GROUPS)) {
         if ((keywords as readonly string[]).some((kw) => dep.includes(kw))) {
           result[group].push(dep);
@@ -388,20 +502,25 @@ export class MetadataExtractionService {
     }
 
     // Strip empty buckets — keeps JSON clean
-    return Object.fromEntries(Object.entries(result).filter(([, v]) => v.length > 0));
+    return Object.fromEntries(
+      Object.entries(result).filter(([, v]) => v.length > 0),
+    );
   }
 
-  private detectPackageManager(lockFile: string | null): PackageManager | undefined {
-    if (lockFile === 'bun.lockb')         return 'bun';
-    if (lockFile === 'pnpm-lock.yaml')    return 'pnpm';
-    if (lockFile === 'yarn.lock')         return 'yarn';
+  private detectPackageManager(
+    lockFile: string | null,
+  ): PackageManager | undefined {
+    if (lockFile === 'bun.lockb') return 'bun';
+    if (lockFile === 'pnpm-lock.yaml') return 'pnpm';
+    if (lockFile === 'yarn.lock') return 'yarn';
     if (lockFile === 'package-lock.json') return 'npm';
     return undefined;
   }
 
   private detectLanguage(stats: FolderStats): string | undefined {
     if (stats.hasTypeScript || stats.hasTsConfig) return 'TypeScript';
-    if (stats.allFiles.some((f) => f.endsWith('.js') || f.endsWith('.jsx'))) return 'JavaScript';
+    if (stats.allFiles.some((f) => f.endsWith('.js') || f.endsWith('.jsx')))
+      return 'JavaScript';
     return undefined;
   }
 
@@ -409,7 +528,9 @@ export class MetadataExtractionService {
     return { exists: stats.hasReadme };
   }
 
-  private detectPrimaryStyling(deps: Record<string, string>): string | undefined {
+  private detectPrimaryStyling(
+    deps: Record<string, string>,
+  ): string | undefined {
     for (const kw of DEP_GROUPS.styling) {
       if (deps[kw]) return kw;
     }
@@ -417,7 +538,9 @@ export class MetadataExtractionService {
   }
 
   private detectHasDarkMode(stats: FolderStats): boolean | undefined {
-    return stats.allFiles.some((f) => /dark/i.test(path.basename(f))) || undefined;
+    return (
+      stats.allFiles.some((f) => /dark/i.test(path.basename(f))) || undefined
+    );
   }
 
   private detectBuildTool(deps: Record<string, string>): string | undefined {
@@ -458,7 +581,9 @@ export class MetadataExtractionService {
     return {
       category: 'ui-kit',
       design: {
-        ...(stats.allFiles.some((f) => f.endsWith('.fig')) && { tool: 'figma' as const }),
+        ...(stats.allFiles.some((f) => f.endsWith('.fig')) && {
+          tool: 'figma' as const,
+        }),
         ...(componentCount > 0 && { componentCount }),
         ...(pageCount > 0 && { pageCount }),
       },
@@ -600,7 +725,13 @@ export class MetadataExtractionService {
 
   private async cleanupDir(dir: string): Promise<void> {
     try {
-      fs.rmSync(dir, { recursive: true, force: true });
+      // Use async fs.promises.rm with maxRetries to handle Windows ENOTEMPTY race conditions
+      await fs.promises.rm(dir, {
+        recursive: true,
+        force: true,
+        maxRetries: 5,
+        retryDelay: 150,
+      });
     } catch (err) {
       this.logger.error(`Cleanup failed for ${dir}`, err);
     }

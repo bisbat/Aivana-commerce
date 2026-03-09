@@ -3,5 +3,7 @@ import type { ExtractedMetadata } from '../../shared/types/extracted-metadata.ty
 export interface EnrichmentContext {
   metadata: ExtractedMetadata;
   sellerKeywords: string[];
-  category: ExtractedMetadata['category']; // 'ui-kit' | 'frontend-template' | 'backend-template'
+  category: ExtractedMetadata['category'];
+  availableTags?: string[];
+  availableCategories?: { id: number; name: string }[];
 }

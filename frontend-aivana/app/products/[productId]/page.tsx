@@ -535,7 +535,7 @@ export default function ProductDetailPage({
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                รองรับการใช้งาน - Compatibility
+                รองรับการใช้งาน
               </h3>
 
               {product.compatibility && product.compatibility.length > 0 && (
@@ -570,7 +570,7 @@ export default function ProductDetailPage({
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                ชุดเทคโนโลยีที่ใช้ - Tech stack
+                เทคโนโลยีที่ใช้พัฒนา
               </h3>
 
               {product.techstack && product.techstack.length > 0 && (
@@ -605,7 +605,7 @@ export default function ProductDetailPage({
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                ข้อกำหนด สภาพแวดล้อม - Requirements
+                การติดตั้งที่จำเป็นก่อนใช้งาน
               </h3>
 
               {product.requirement && product.requirement.length > 0 && (
@@ -625,7 +625,6 @@ export default function ProductDetailPage({
                   ))}
                 </div>
               )}
-
             </div>
           </div>
         </div>

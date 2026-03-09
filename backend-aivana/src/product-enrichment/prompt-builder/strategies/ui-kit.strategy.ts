@@ -4,8 +4,17 @@ import { UIKitMetadata } from 'src/shared/types/extracted-metadata.types';
 
 export class UIKitStrategy implements PromptStrategy {
   buildPrompt(context: EnrichmentContext): string {
-    const { metadata, sellerKeywords } = context;
+    const { metadata, sellerKeywords, availableTags, availableCategories } =
+      context;
     const meta = metadata as UIKitMetadata;
+
+    const tagLine = availableTags?.length
+      ? `Pick 5-10 tags ONLY from this list (exact spelling):\n${availableTags.join(', ')}`
+      : 'Generate 8-12 relevant SEO tags.';
+
+    const catLine = availableCategories?.length
+      ? `Pick EXACTLY ONE from this list (exact spelling):\n${availableCategories.map((c) => c.name).join(', ')}`
+      : 'Suggest a category name.';
 
     return `
 You are a product listing expert for a design asset marketplace.
@@ -23,6 +32,12 @@ README SECTIONS: ${meta.readme.sections?.join(', ') ?? 'none'}
 
 SELLER KEYWORDS: ${sellerKeywords.join(', ')}
 
+AVAILABLE TAGS:
+${tagLine}
+
+AVAILABLE CATEGORIES:
+${catLine}
+
 INSTRUCTIONS:
 - productName: catchy, SEO-friendly, under 60 chars
 - blurb: one-liner tagline under 100 chars
@@ -31,8 +46,9 @@ INSTRUCTIONS:
 - techStack: design tools and versions only (e.g. "Figma 2024")
 - compatibility: what versions/tools needed to open this file
 - requirements: what buyer needs before using
-- tags: 8-12 relevant SEO tags
-- installationGuide: null if pure design file, or short markdown string if seller included setup steps (e.g. font installation, plugin requirements)
+- tags: select from the AVAILABLE TAGS list above only
+- suggestedCategoryName: select from the AVAILABLE CATEGORIES list above only
+- installationGuide: null if pure design file, or short markdown string if seller included setup steps
 
 IMPORTANT: Respond ONLY in valid JSON matching this exact structure:
 {
@@ -44,7 +60,8 @@ IMPORTANT: Respond ONLY in valid JSON matching this exact structure:
   "compatibility": [],
   "requirements": [],
   "tags": [],
-  "installationGuide": null or "markdown string"
+  "suggestedCategoryName": "",
+  "installationGuide": null
 }`;
   }
 }
