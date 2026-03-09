@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Product } from "@/lib/types/product/product";
+import { Product } from "@/lib/types/product/Product";
 import EditButton from "./EditButton";
 import BackButton from "./BackButton";
 import ProductImages from "./ProductImages";
@@ -82,6 +82,24 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
             </ul>
           </div>
 
+          <div>
+            <h3 className="font-semibold text-lg">Tech Stack</h3>
+            <ul className="list-disc list-inside text-gray-200">
+              {initialProductData.techstack.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-lg">Requirement</h3>
+            <ul className="list-disc list-inside text-gray-200">
+              {initialProductData.requirement.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+
           <p>
             Category:{" "}
             <span className="text-primary">
@@ -103,6 +121,21 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
               </a>
             ) : (
               <span className="text-gray-400">No preview available</span>
+            )}
+          </p>
+
+          <p>
+            API Documentation:{" "}
+            {initialProductData.apiDocUrl ? (
+              <a
+                href={initialProductData.apiDocUrl}
+                className="text-primary hover:underline"
+                target="_blank"
+              >
+                {initialProductData.apiDocUrl}
+              </a>
+            ) : (
+              <span className="text-gray-400">No API documentation available</span>
             )}
           </p>
 
