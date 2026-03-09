@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Upload } from 'lucide-react';
 import { UploadFileFormData } from '@/lib/types/formCreateProduct/UploadFileFormData';
 import { saveFormStep } from "@/lib/utils/formStorage";
+import { extractMetadataFromUpload } from "@/lib/actions/metadata-extraction.actions";
+import type { ExtractedMetadata } from "@/lib/types/extracted-metadata";
 
 
 interface UploadFileFormProps {
@@ -21,8 +23,19 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialD
   const [keywords, setKeywords] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   // Reference to file input for triggering click
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const mapProductTypeToCategory = (
+    type: 'UI Kit' | 'frontend-template' | 'backend-template'
+  ): "ui-kit" | "frontend-template" | "backend-template" => {
+
+    if (type === "UI Kit") return "ui-kit";
+    if (type === "frontend-template") return "frontend-template";
+    return "backend-template";
+  };
 
   useEffect(() => {
     if (!initialData) return;
@@ -57,31 +70,57 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialD
   };
 
   // Handle form submission
-  const handleSubmit = () => {
+  const handleSubmit = async (useAI: boolean) => {
     setError(null);
 
-    // Validate required fields
     if (!productType) {
-      setError('กรุณาเลือกประเภทโพสต์');
+      setError("กรุณาเลือกประเภทโพสต์");
       return;
     }
 
     if (!file) {
-      setError('กรุณาอัปโหลดไฟล์');
+      setError("กรุณาอัปโหลดไฟล์");
       return;
     }
 
     if (!keywords.trim()) {
-      setError('กรุณาระบุหัวข้อ');
+      setError("กรุณาระบุหัวข้อ");
       return;
     }
 
-    // Pass data to parent
-    onNext({
-      productType: productType as 'UI Kit' | 'frontend-template',
-      file,
-      keywords
-    });
+    try {
+      let metadata: ExtractedMetadata | undefined = undefined;
+
+      // 🔥 only call AI if user choose it
+      if (useAI) {
+        setIsAnalyzing(true);
+
+        const category = mapProductTypeToCategory(
+          productType as 'UI Kit' | 'frontend-template' | 'backend-template'
+        );
+
+        metadata = await extractMetadataFromUpload(
+          category,
+          file
+        );
+
+        console.log("🤖 AI metadata:", metadata);
+      }
+
+      onNext({
+        productType: productType as 'UI Kit' | 'frontend-template' | 'backend-template',
+        file,
+        keywords,
+        metadata,
+        useAI
+      });
+
+    } catch (err) {
+      console.error(err);
+      setError("AI analysis failed");
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (
@@ -196,12 +235,34 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialD
         </p>
       </div>
 
-      {/* Next Button */}
+      {/* Upload Warning */}
+      <div className="bg-yellow-900/20 border border-yellow-600 rounded-lg p-4 text-sm">
+        <p className="text-yellow-400 font-medium mb-1">
+          ⚠️ คำแนะนำก่อนอัปโหลด
+        </p>
+        <p className="text-yellow-300">
+          กรุณาลบ <span className="font-mono text-yellow-200">node_modules</span>
+          ออกจากโปรเจกต์ก่อน zip ไฟล์ เพื่อให้การอัปโหลดเร็วขึ้นและช่วยให้ AI วิเคราะห์ไฟล์ได้แม่นยำขึ้น
+        </p>
+      </div>
+
+
+      {/* AI Generate Button */}
       <button
-        onClick={handleSubmit}
-        className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+        disabled={isAnalyzing}
+        onClick={() => handleSubmit(true)}
+        className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
       >
-        ถัดไป →
+        {isAnalyzing ? "กำลังวิเคราะห์ไฟล์..." : "⚡ วิเคราะห์ไฟล์ด้วย AI (แนะนำ)"}
+      </button>
+
+
+      {/* Skip AI Button */}
+      <button
+        onClick={() => handleSubmit(false)}
+        className="w-full bg-slate-700 hover:bg-slate-600 text-white py-4 rounded-lg font-medium transition-colors"
+      >
+        ดำเนินการต่อโดยไม่ใช้ AI
       </button>
     </div>
   );
