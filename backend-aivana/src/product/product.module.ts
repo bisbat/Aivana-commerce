@@ -15,6 +15,7 @@ import { ReviewEntity } from '../review/entities/review.entity';
 import { OrderModule } from 'src/order/order.module';
 import { MetadataExtractionController } from './metadata-extraction.controller';
 import { MetadataExtractionService } from './metadata-extraction.service';
+import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { MetadataExtractionService } from './metadata-extraction.service';
       CategoryEntity,
       ProductImage,
       ReviewEntity,
+      OrderItemEntity,
     ]),
     ReviewModule,
     MinioModule,

@@ -22,6 +22,7 @@ import { ProductImage } from 'src/product-image/entities/product-image.entity';
 import { ProductMapper } from './product.mapper';
 import { ReviewEntity } from 'src/review/entities/review.entity';
 import { Brackets } from 'typeorm';
+import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
 
 @Injectable()
 export class ProductService {
@@ -41,6 +42,8 @@ export class ProductService {
     private productMapper: ProductMapper,
     @InjectRepository(ReviewEntity)
     private reviewRepository: Repository<ReviewEntity>,
+    @InjectRepository(OrderItemEntity)
+    private orderItemRepository: Repository<OrderItemEntity>,
   ) {}
 
   async getAllProducts(): Promise<ResponseProductDto[]> {
@@ -194,6 +197,23 @@ export class ProductService {
       );
     }
     return updatedProduct;
+  }
+
+  async hasProductOrders(productId: number): Promise<boolean> {
+    const count = await this.orderItemRepository.count({
+      where: { productId },
+    });
+    return count > 0;
+  }
+
+  async hardDeleteProduct(id: number): Promise<void> {
+    // Delete all MinIO assets for the product
+    try {
+      await this.minioService.deleteFolder(MINIO_FOLDERS.PRODUCTS.ROOT(id));
+    } catch {
+      // ignore MinIO errors — proceed with DB delete
+    }
+    await this.productsRepository.delete(id);
   }
 
   async deleteProduct(id: number, reason: string): Promise<void> {

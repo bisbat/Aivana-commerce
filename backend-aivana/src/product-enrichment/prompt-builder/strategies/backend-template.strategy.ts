@@ -56,7 +56,7 @@ ${catLine}
 INSTRUCTIONS:
 - productName: catchy, SEO-friendly, under 60 chars
 - blurb: one-liner tagline under 100 chars
-- description: 2 paragraphs max, 50-80 words per paragraph, marketing tone
+- description: 1 punchy paragraph, 30-50 words max. Lead with what it does, who it's for, and why it matters. No fluff, no filler. Think product-hunt style.
 - features: 5-8 bullet points of key features
 - techStack: frameworks, libraries, tools with versions (e.g. "NestJS 10", "Prisma 5")
 - compatibility: database/runtime versions (e.g. "PostgreSQL 14+", "Node.js 18+")

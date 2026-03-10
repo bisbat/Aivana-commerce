@@ -5,7 +5,10 @@ import BackButton from "./BackButton";
 import ProductImages from "./ProductImages";
 import DeleteButton from "./DeleteButton";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
-import { getProductByIdAction } from "@/lib/actions/product.actions";
+import {
+  getProductByIdAction,
+  getProductHasOrdersAction,
+} from "@/lib/actions/product.actions";
 import MarkdownRenderer from "@/components/common/MarkdownRenderer";
 
 async function getProductData(productId: string): Promise<Product | null> {
@@ -20,7 +23,10 @@ type PageProps = {
 export default async function ProductStoreDetailPage({ params }: PageProps) {
   const productId = (await params).productId;
 
-  const initialProductData = await getProductData(productId);
+  const [initialProductData, hasOrders] = await Promise.all([
+    getProductData(productId),
+    getProductHasOrdersAction(productId),
+  ]);
 
   if (!initialProductData) {
     notFound();
@@ -35,6 +41,7 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
           <DeleteButton
             productId={productId}
             productName={initialProductData.name}
+            hasOrders={hasOrders}
           />
           <EditButton productId={productId} />
         </div>
