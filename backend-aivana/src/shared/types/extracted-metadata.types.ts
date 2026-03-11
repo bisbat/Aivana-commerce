@@ -33,6 +33,11 @@ export interface UIKitMetadata {
     hasPrototype?: boolean;
   };
 
+    structure?: {
+    iconCount?: number;
+    assetCount?: number;
+  };
+
   styling?: {
     primaryStyling?: string;
     hasDarkMode?: boolean;

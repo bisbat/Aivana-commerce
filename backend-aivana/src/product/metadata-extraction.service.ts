@@ -315,7 +315,7 @@ export class MetadataExtractionService {
           file.on('finish', () => file.close(() => resolve()));
         })
         .on('error', (err: Error) => {
-          fs.unlink(destPath, () => {});
+          fs.unlink(destPath, () => { });
           reject(err);
         });
     });
@@ -571,11 +571,19 @@ export class MetadataExtractionService {
     const classified = this.classifyDependencies(deps);
 
     const componentCount = stats.allFiles.filter(
-      (f) => /components?\//i.test(f) && /\.(tsx|jsx)$/.test(f),
+      (f) => /components?\//i.test(f) && /\.(tsx|jsx|vue|svelte)$/.test(f),
     ).length;
 
     const pageCount = stats.allFiles.filter(
-      (f) => /\/(pages?|app)\//i.test(f) && /\.(tsx|jsx|ts|js)$/.test(f),
+      (f) => /\/(pages?|app)\//i.test(f) && /\.(tsx|jsx|ts|js|vue|svelte)$/.test(f),
+    ).length;
+
+    const iconCount = stats.allFiles.filter((f) =>
+      /(icons?|svg-icons?)\//i.test(f) && /\.(svg|tsx|jsx|vue|svelte)$/i.test(f),
+    ).length;
+
+    const assetCount = stats.allFiles.filter((f) =>
+      /\.(png|jpg|jpeg|webp|gif)$/i.test(f),
     ).length;
 
     return {
@@ -586,6 +594,10 @@ export class MetadataExtractionService {
         }),
         ...(componentCount > 0 && { componentCount }),
         ...(pageCount > 0 && { pageCount }),
+      },
+      structure: {
+        ...(iconCount > 0 && { iconCount }),
+        ...(assetCount > 0 && { assetCount }),
       },
       styling: {
         primaryStyling: this.detectPrimaryStyling(deps),
