@@ -6,6 +6,7 @@ import { UploadFileFormData } from '@/lib/types/formCreateProduct/UploadFileForm
 import { saveFormStep } from "@/lib/utils/formStorage";
 import { extractMetadataFromUpload } from "@/lib/actions/metadata-extraction.actions";
 import type { ExtractedMetadata } from "@/lib/types/extracted-metadata";
+import { LayoutGrid, Monitor, Server } from "lucide-react";
 
 
 interface UploadFileFormProps {
@@ -142,39 +143,100 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialD
       {/* Product Type Selection */}
       <div className="space-y-3">
         <label className="block text-white font-medium">
-          โพสต์นี้เกี่ยวกับหัวข้อใด?
+          สินค้าของคุณเกี่ยวกับหัวข้อใด?
         </label>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          {/* UI Kit */}
           <button
             type="button"
-            onClick={() => setProductType('UI Kit')}
-            className={`px-6 py-4 rounded-lg font-medium transition-all ${productType === 'UI Kit'
-              ? 'bg-purple-600 text-white'
-              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+            onClick={() => setProductType("UI Kit")}
+            className={`group text-left p-6 rounded-xl border transition-all duration-200 ${productType === "UI Kit"
+              ? "bg-purple-600/20 border-purple-500 ring-1 ring-purple-500"
+              : "bg-slate-800 border-slate-700 hover:border-purple-400 hover:bg-slate-700"
               }`}
           >
-            UI kits
+            <div className="flex items-start gap-3">
+              <LayoutGrid
+                size={22}
+                className={`mt-1 ${productType === "UI Kit"
+                  ? "text-purple-400"
+                  : "text-slate-400 group-hover:text-purple-400"
+                  }`}
+              />
+
+              <div>
+                <div className="font-semibold text-white text-base">
+                  UI Kit
+                </div>
+
+                <p className="text-sm text-slate-400 mt-1 leading-relaxed">
+                  Reusable UI components or design systems
+                </p>
+              </div>
+            </div>
           </button>
+
+          {/* Frontend Template */}
           <button
             type="button"
-            onClick={() => setProductType('frontend-template')}
-            className={`px-6 py-4 rounded-lg font-medium transition-all ${productType === 'frontend-template'
-              ? 'bg-purple-600 text-white'
-              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+            onClick={() => setProductType("frontend-template")}
+            className={`group text-left p-6 rounded-xl border transition-all duration-200 ${productType === "frontend-template"
+              ? "bg-purple-600/20 border-purple-500 ring-1 ring-purple-500"
+              : "bg-slate-800 border-slate-700 hover:border-purple-400 hover:bg-slate-700"
               }`}
           >
-            Frontend Template
+            <div className="flex items-start gap-3">
+              <Monitor
+                size={22}
+                className={`mt-1 ${productType === "frontend-template"
+                  ? "text-purple-400"
+                  : "text-slate-400 group-hover:text-purple-400"
+                  }`}
+              />
+
+              <div>
+                <div className="font-semibold text-white text-base">
+                  Frontend Template
+                </div>
+
+                <p className="text-sm text-slate-400 mt-1 leading-relaxed">
+                  Complete frontend apps with pages and routing
+                </p>
+              </div>
+            </div>
           </button>
+
+          {/* Backend Template */}
           <button
             type="button"
-            onClick={() => setProductType('backend-template')}
-            className={`px-6 py-4 rounded-lg font-medium transition-all ${productType === 'backend-template'
-              ? 'bg-purple-600 text-white'
-              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+            onClick={() => setProductType("backend-template")}
+            className={`group text-left p-6 rounded-xl border transition-all duration-200 ${productType === "backend-template"
+              ? "bg-purple-600/20 border-purple-500 ring-1 ring-purple-500"
+              : "bg-slate-800 border-slate-700 hover:border-purple-400 hover:bg-slate-700"
               }`}
           >
-            Backend Template
+            <div className="flex items-start gap-3">
+              <Server
+                size={22}
+                className={`mt-1 ${productType === "backend-template"
+                  ? "text-purple-400"
+                  : "text-slate-400 group-hover:text-purple-400"
+                  }`}
+              />
+
+              <div>
+                <div className="font-semibold text-white text-base">
+                  Backend Template
+                </div>
+
+                <p className="text-sm text-slate-400 mt-1 leading-relaxed">
+                  API or backend starter projects
+                </p>
+              </div>
+            </div>
           </button>
+
         </div>
       </div>
 

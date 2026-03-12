@@ -315,7 +315,7 @@ export class MetadataExtractionService {
           file.on('finish', () => file.close(() => resolve()));
         })
         .on('error', (err: Error) => {
-          fs.unlink(destPath, () => {});
+          fs.unlink(destPath, () => { });
           reject(err);
         });
     });
@@ -568,24 +568,49 @@ export class MetadataExtractionService {
 
   private buildUIKitMetadata(stats: FolderStats): UIKitMetadata {
     const deps = this.allDeps(stats.packageJson);
+    const { framework, version } = this.detectFramework(deps);
     const classified = this.classifyDependencies(deps);
+    const language = this.detectLanguage(stats);
+    const hasTech = framework || version || language;
+
 
     const componentCount = stats.allFiles.filter(
-      (f) => /components?\//i.test(f) && /\.(tsx|jsx)$/.test(f),
+      (f) => /components?\//i.test(f) && /\.(tsx|jsx|vue|svelte)$/.test(f),
     ).length;
 
     const pageCount = stats.allFiles.filter(
-      (f) => /\/(pages?|app)\//i.test(f) && /\.(tsx|jsx|ts|js)$/.test(f),
+      (f) => /\/(pages?|app)\//i.test(f) && /\.(tsx|jsx|ts|js|vue|svelte)$/.test(f),
     ).length;
+
+    const iconCount = stats.allFiles.filter((f) =>
+      /(icons?|svg-icons?)\//i.test(f) && /\.(svg|tsx|jsx|vue|svelte)$/i.test(f),
+    ).length;
+
+    const assetCount = stats.allFiles.filter((f) =>
+      /\.(png|jpg|jpeg|webp|gif|woff|woff2|ttf)$/i.test(f),
+    ).length;
+    
+    const tech = hasTech
+    ? {
+        ...(framework && { framework }),
+        ...(version && { frameworkVersion: version }),
+        ...(language && { language }),
+      }
+    : undefined;
 
     return {
       category: 'ui-kit',
+      ...(tech && { tech }),
       design: {
         ...(stats.allFiles.some((f) => f.endsWith('.fig')) && {
           tool: 'figma' as const,
         }),
         ...(componentCount > 0 && { componentCount }),
         ...(pageCount > 0 && { pageCount }),
+      },
+      structure: {
+        ...(iconCount > 0 && { iconCount }),
+        ...(assetCount > 0 && { assetCount }),
       },
       styling: {
         primaryStyling: this.detectPrimaryStyling(deps),
