@@ -568,7 +568,11 @@ export class MetadataExtractionService {
 
   private buildUIKitMetadata(stats: FolderStats): UIKitMetadata {
     const deps = this.allDeps(stats.packageJson);
+    const { framework, version } = this.detectFramework(deps);
     const classified = this.classifyDependencies(deps);
+    const language = this.detectLanguage(stats);
+    const hasTech = framework || version || language;
+
 
     const componentCount = stats.allFiles.filter(
       (f) => /components?\//i.test(f) && /\.(tsx|jsx|vue|svelte)$/.test(f),
@@ -583,11 +587,20 @@ export class MetadataExtractionService {
     ).length;
 
     const assetCount = stats.allFiles.filter((f) =>
-      /\.(png|jpg|jpeg|webp|gif)$/i.test(f),
+      /\.(png|jpg|jpeg|webp|gif|woff|woff2|ttf)$/i.test(f),
     ).length;
+    
+    const tech = hasTech
+    ? {
+        ...(framework && { framework }),
+        ...(version && { frameworkVersion: version }),
+        ...(language && { language }),
+      }
+    : undefined;
 
     return {
       category: 'ui-kit',
+      ...(tech && { tech }),
       design: {
         ...(stats.allFiles.some((f) => f.endsWith('.fig')) && {
           tool: 'figma' as const,
