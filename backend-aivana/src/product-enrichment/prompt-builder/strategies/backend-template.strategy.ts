@@ -64,6 +64,7 @@ INSTRUCTIONS:
 - tags: select from the AVAILABLE TAGS list above only
 - suggestedCategoryName: select from the AVAILABLE CATEGORIES list above only
 - installationGuide: markdown string with setup steps, null if no readme
+- apiDocUrl: if the project has OpenAPI/Swagger docs, return the likely local URL (e.g. "http://localhost:3000/api"), otherwise null
 
 IMPORTANT: Respond ONLY in valid JSON matching this exact structure:
 {
@@ -76,7 +77,8 @@ IMPORTANT: Respond ONLY in valid JSON matching this exact structure:
   "requirements": [],
   "tags": [],
   "suggestedCategoryName": "",
-  "installationGuide": null
+  "installationGuide": null,
+  "apiDocUrl": null
 }`;
   }
 }

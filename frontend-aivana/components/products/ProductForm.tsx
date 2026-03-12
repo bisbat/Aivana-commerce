@@ -132,6 +132,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         setCompatibility(ai.compatibility ?? []);
         setRequirement(ai.requirements ?? []);
         setInstallationGuide(ai.installationGuide ?? "");
+        if (ai.apiDocUrl) setApiDocUrl(ai.apiDocUrl);
 
         // Map AI tag names → real tag IDs (case-insensitive)
         if (ai.tags?.length) {
@@ -474,21 +475,25 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         maxItems={6}
       />
 
-      <DynamicTextListInput
-        label="ความเข้ากันได้"
-        value={compatibility}
-        onChange={setCompatibility}
-        placeholder="เช่น Windows, macOS, Chrome"
-        maxItems={6}
-      />
+      {uploadData.productType !== "UI Kit" && (
+        <>
+          <DynamicTextListInput
+            label="Compatibility"
+            value={compatibility}
+            onChange={setCompatibility}
+            placeholder="เช่น Windows, macOS, Chrome"
+            maxItems={6}
+          />
 
-      <DynamicTextListInput
-        label="ความต้องการของระบบ"
-        value={requirement}
-        onChange={setRequirement}
-        placeholder="เช่น Node.js 18+, PostgreSQL 14+"
-        maxItems={6}
-      />
+          <DynamicTextListInput
+            label="Requirements"
+            value={requirement}
+            onChange={setRequirement}
+            placeholder="เช่น Node.js 18+, PostgreSQL 14+"
+            maxItems={6}
+          />
+        </>
+      )}
 
       <MultiSelectTag
         label="แท็ก"

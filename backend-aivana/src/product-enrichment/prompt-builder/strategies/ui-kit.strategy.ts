@@ -42,13 +42,13 @@ INSTRUCTIONS:
 - productName: catchy, SEO-friendly, under 60 chars
 - blurb: one-liner tagline under 100 chars
 - description: 1 punchy paragraph, 30-50 words max. Lead with what it does, who it's for, and why it matters. No fluff, no filler. Think product-hunt style.
-- features: 5-8 bullet points of key features
-- techStack: design tools and versions only (e.g. "Figma 2024")
-- compatibility: what versions/tools needed to open this file
-- requirements: what buyer needs before using
+- features: 5-8 bullet points of key features (visual richness, component variety, dark mode, etc.)
+- techStack: design tools only (e.g. "Figma 2024", "Sketch 99")
+- compatibility: return empty array [] — not applicable for design files
+- requirements: return empty array [] — not applicable for design files
 - tags: select from the AVAILABLE TAGS list above only
 - suggestedCategoryName: select from the AVAILABLE CATEGORIES list above only
-- installationGuide: null if pure design file, or short markdown string if seller included setup steps
+- installationGuide: null — design files need no installation
 
 IMPORTANT: Respond ONLY in valid JSON matching this exact structure:
 {
