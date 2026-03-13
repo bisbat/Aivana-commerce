@@ -315,7 +315,7 @@ export class MetadataExtractionService {
           file.on('finish', () => file.close(() => resolve()));
         })
         .on('error', (err: Error) => {
-          fs.unlink(destPath, () => { });
+          fs.unlink(destPath, () => {});
           reject(err);
         });
     });
@@ -580,6 +580,26 @@ export class MetadataExtractionService {
 
   // ── Step 5a: UI Kit ─────────────────────────────────────────────────────
 
+  // Priority order: figma > sketch > xd > photoshop > illustrator > other
+  private detectDesignTool(
+    files: string[],
+  ):
+    | 'figma'
+    | 'sketch'
+    | 'xd'
+    | 'illustrator'
+    | 'photoshop'
+    | 'other'
+    | undefined {
+    const exts = files.map((f) => path.extname(f).toLowerCase());
+    if (exts.includes('.fig')) return 'figma';
+    if (exts.includes('.sketch')) return 'sketch';
+    if (exts.includes('.xd')) return 'xd';
+    if (exts.includes('.psd')) return 'photoshop';
+    if (exts.includes('.ai') || exts.includes('.eps')) return 'illustrator';
+    return undefined;
+  }
+
   private detectDesignFiles(files: string[]) {
     const designTools = new Set<string>();
     const assetTypes = new Set<string>();
@@ -650,29 +670,33 @@ export class MetadataExtractionService {
       ...(fileExtensions && { fileExtensions }),
     };
 
-
     const componentCount = stats.allFiles.filter(
       (f) => /components?\//i.test(f) && /\.(tsx|jsx|vue|svelte)$/.test(f),
     ).length;
 
     const pageCount = stats.allFiles.filter(
-      (f) => /\/(pages?|app)\//i.test(f) && /\.(tsx|jsx|ts|js|vue|svelte)$/.test(f),
+      (f) =>
+        /\/(pages?|app)\//i.test(f) && /\.(tsx|jsx|ts|js|vue|svelte)$/.test(f),
     ).length;
 
-    const iconCount = stats.allFiles.filter((f) =>
-      /(icons?|svg-icons?)\//i.test(f) && /\.(svg|tsx|jsx|vue|svelte)$/i.test(f),
+    const iconCount = stats.allFiles.filter(
+      (f) =>
+        /(icons?|svg-icons?)\//i.test(f) &&
+        /\.(svg|tsx|jsx|vue|svelte)$/i.test(f),
     ).length;
 
     const assetCount = stats.allFiles.filter((f) =>
-      /\.(png|jpg|jpeg|webp|gif|woff|woff2|ttf)$/i.test(f),
+      /\.(ai|eps|psd|xd|fig|sketch|svg|png|jpg|jpeg|webp|gif|woff|woff2|ttf)$/i.test(
+        f,
+      ),
     ).length;
 
     const tech = hasTech
       ? {
-        ...(framework && { framework }),
-        ...(version && { frameworkVersion: version }),
-        ...(language && { language }),
-      }
+          ...(framework && { framework }),
+          ...(version && { frameworkVersion: version }),
+          ...(language && { language }),
+        }
       : undefined;
 
     return {
@@ -682,8 +706,8 @@ export class MetadataExtractionService {
         : {}),
       ...(tech && { tech }),
       design: {
-        ...(stats.allFiles.some((f) => f.endsWith('.fig')) && {
-          tool: 'figma' as const,
+        ...(this.detectDesignTool(stats.allFiles) && {
+          tool: this.detectDesignTool(stats.allFiles),
         }),
         ...(componentCount > 0 && { componentCount }),
         ...(pageCount > 0 && { pageCount }),

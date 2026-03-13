@@ -78,8 +78,8 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    // TODO: Implement Google OAuth
-    console.log("Google login clicked");
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    window.location.href = `${apiUrl}/auth/google`;
   };
 
   return (

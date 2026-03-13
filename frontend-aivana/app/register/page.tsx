@@ -170,8 +170,8 @@ export default function RegisterPage() {
   };
 
   const handleGoogleSignup = () => {
-    // TODO: Implement Google OAuth
-    console.log("Google signup clicked");
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    window.location.href = `${apiUrl}/auth/google`;
   };
 
   return (

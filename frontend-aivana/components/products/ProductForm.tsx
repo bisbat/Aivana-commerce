@@ -156,7 +156,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       })
       .catch((err) => {
         console.error("Enrichment failed:", err);
-        setError("AI เติมข้อมูลล้มเหลว — กรุณากรอกเองได้เลย");
+        const isRateLimit =
+          err?.status === 429 ||
+          err?.message?.toLowerCase().includes("quota") ||
+          err?.message?.toLowerCase().includes("429");
+        setError(
+          isRateLimit
+            ? "AI quota เต็มแล้ว — กรุณารอสักครู่แล้วลองใหม่อีกครั้ง"
+            : "AI เติมข้อมูลล้มเหลว — กรุณากรอกเองได้เลย",
+        );
       })
       .finally(() => setIsEnriching(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -401,7 +409,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       </div>
 
       {/* AI auto-filled badge */}
-      {uploadData.useAI && uploadData.metadata && !isEnriching && (
+      {uploadData.useAI && uploadData.metadata && !isEnriching && !error && (
         <div className="bg-purple-900/30 border border-purple-500 rounded-lg p-3 flex items-center gap-2">
           <span className="text-purple-300 text-sm">
             ⚡ AI เติมข้อมูลให้อัตโนมัติแล้ว — ตรวจสอบและแก้ไขได้ตามต้องการ

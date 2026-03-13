@@ -25,7 +25,11 @@ export async function enrichProduct(body: {
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(text || `API error ${res.status}`);
+    const error = new Error(text || `API error ${res.status}`) as Error & {
+      status?: number;
+    };
+    error.status = res.status;
+    throw error;
   }
 
   return res.json() as Promise<AiGeneratedProduct>;

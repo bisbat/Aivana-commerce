@@ -3,7 +3,13 @@
 // ==============================
 
 type PackageManager = 'npm' | 'yarn' | 'pnpm' | 'bun';
-type DesignTool = 'figma' | 'sketch' | 'xd' | 'other';
+type DesignTool =
+  | 'figma'
+  | 'sketch'
+  | 'xd'
+  | 'illustrator'
+  | 'photoshop'
+  | 'other';
 
 interface DependencyGroups {
   main?: string[]; // core framework libs
