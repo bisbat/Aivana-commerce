@@ -32,6 +32,11 @@ export interface UIKitMetadata {
     language?: string;
   };
 
+  files?: {
+    designTools?: string[];
+    assetTypes?: string[];
+  };
+
   design?: {
     tool?: DesignTool;
     componentCount?: number;

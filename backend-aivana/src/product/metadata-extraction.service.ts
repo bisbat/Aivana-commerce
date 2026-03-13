@@ -566,12 +566,69 @@ export class MetadataExtractionService {
 
   // ── Step 5a: UI Kit ─────────────────────────────────────────────────────
 
+  private detectDesignFiles(files: string[]) {
+    const designTools = new Set<string>();
+    const assetTypes = new Set<string>();
+
+    for (const file of files) {
+      const ext = path.extname(file).toLowerCase();
+
+      switch (ext) {
+        case '.fig':
+          designTools.add('figma');
+          break;
+
+        case '.sketch':
+          designTools.add('sketch');
+          break;
+
+        case '.xd':
+          designTools.add('adobe-xd');
+          break;
+
+        case '.ai':
+        case '.eps':
+          designTools.add('illustrator');
+          break;
+
+        case '.psd':
+          designTools.add('photoshop');
+          break;
+
+        case '.svg':
+          assetTypes.add('svg');
+          break;
+
+        case '.png':
+        case '.jpg':
+        case '.jpeg':
+        case '.webp':
+        case '.gif':
+          assetTypes.add('image');
+          break;
+
+        case '.woff':
+        case '.woff2':
+        case '.ttf':
+        case '.otf':
+          assetTypes.add('font');
+          break;
+      }
+    }
+
+    return {
+      designTools: designTools.size ? Array.from(designTools) : undefined,
+      assetTypes: assetTypes.size ? Array.from(assetTypes) : undefined,
+    };
+  }
+
   private buildUIKitMetadata(stats: FolderStats): UIKitMetadata {
     const deps = this.allDeps(stats.packageJson);
     const { framework, version } = this.detectFramework(deps);
     const classified = this.classifyDependencies(deps);
     const language = this.detectLanguage(stats);
     const hasTech = framework || version || language;
+    const files = this.detectDesignFiles(stats.allFiles);
 
 
     const componentCount = stats.allFiles.filter(
@@ -589,17 +646,20 @@ export class MetadataExtractionService {
     const assetCount = stats.allFiles.filter((f) =>
       /\.(png|jpg|jpeg|webp|gif|woff|woff2|ttf)$/i.test(f),
     ).length;
-    
+
     const tech = hasTech
-    ? {
+      ? {
         ...(framework && { framework }),
         ...(version && { frameworkVersion: version }),
         ...(language && { language }),
       }
-    : undefined;
+      : undefined;
 
     return {
       category: 'ui-kit',
+      ...(files.designTools || files.assetTypes
+        ? { files }
+        : {}),
       ...(tech && { tech }),
       design: {
         ...(stats.allFiles.some((f) => f.endsWith('.fig')) && {
