@@ -524,6 +524,20 @@ export class MetadataExtractionService {
     return undefined;
   }
 
+  private detectFileExtensions(files: string[]): string[] | undefined {
+    const exts = new Set<string>();
+
+    for (const file of files) {
+      const ext = path.extname(file).toLowerCase().replace('.', '');
+
+      if (!ext) continue;
+
+      exts.add(ext);
+    }
+
+    return exts.size ? Array.from(exts) : undefined;
+  }
+
   private buildReadmeInfo(stats: FolderStats): { exists: boolean } {
     return { exists: stats.hasReadme };
   }
@@ -628,7 +642,13 @@ export class MetadataExtractionService {
     const classified = this.classifyDependencies(deps);
     const language = this.detectLanguage(stats);
     const hasTech = framework || version || language;
-    const files = this.detectDesignFiles(stats.allFiles);
+    const designFiles = this.detectDesignFiles(stats.allFiles);
+    const fileExtensions = this.detectFileExtensions(stats.allFiles);
+
+    const files = {
+      ...designFiles,
+      ...(fileExtensions && { fileExtensions }),
+    };
 
 
     const componentCount = stats.allFiles.filter(
@@ -657,7 +677,7 @@ export class MetadataExtractionService {
 
     return {
       category: 'ui-kit',
-      ...(files.designTools || files.assetTypes
+      ...(files.designTools || files.assetTypes || files.fileExtensions
         ? { files }
         : {}),
       ...(tech && { tech }),

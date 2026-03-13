@@ -35,6 +35,7 @@ export interface UIKitMetadata {
   files?: {
     designTools?: string[];
     assetTypes?: string[];
+    fileExtensions?: string[];
   };
 
   design?: {
