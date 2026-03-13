@@ -273,7 +273,7 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext, initialD
             <div>
               <p className="text-white mb-2">วางไฟล์นี่หรือคลิกเพื่ออัพโหลดไฟล์</p>
               <p className="text-slate-400 text-sm">
-                รองรับไฟล์: .zip, .rar, .fig, .sketch, .xd
+                รองรับไฟล์: .zip
               </p>
             </div>
           )}
