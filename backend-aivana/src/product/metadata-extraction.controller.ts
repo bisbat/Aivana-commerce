@@ -4,6 +4,7 @@ import {
   UploadedFile,
   UseInterceptors,
   Body,
+  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MetadataExtractionService } from './metadata-extraction.service';
@@ -31,6 +32,13 @@ export class MetadataExtractionController {
     @UploadedFile() file: Express.Multer.File,
     @Body('category') category: Category,
   ): Promise<ExtractedMetadata> {
+      if (!file) {
+    throw new BadRequestException('Product file is required');
+  }
+
+  if (!category) {
+    throw new BadRequestException('Product category is required');
+  }
     return this.metadataService.extractMetadataFromBuffer(
       category,
       file.buffer,
