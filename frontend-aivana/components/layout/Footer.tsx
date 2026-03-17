@@ -34,7 +34,8 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2">
               {[
                 { label: "UI Kits", href: "/ui-kits" },
-                { label: "Code Template", href: "/code-template" },
+                { label: "Frontend Template", href: "/frontend-template" },
+                { label: "Backend Template", href: "/backend-template" },
               ].map((item, i) => (
                 <li key={i}>
                   <Link
