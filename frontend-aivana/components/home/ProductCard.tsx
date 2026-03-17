@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Product } from "@/lib/types/product/product";
+import { Product } from "@/lib/types/product/Product";
 import { formatPriceWithCurrency } from "@/lib/utils/formatPrice";
 
 interface ProductCardProps {
