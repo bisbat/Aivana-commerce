@@ -123,6 +123,26 @@ export async function deleteProductAction(productId: string, reason?: string) {
   revalidatePath(`/stores/products/${productId}`);
 }
 
+export async function getProductHasOrdersAction(
+  productId: string,
+): Promise<boolean> {
+  const token = await getAccessToken();
+  if (!token) return false;
+
+  const res = await fetch(`${API_BASE_URL}/products/${productId}/has-orders`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) return false;
+  const data = await res.json();
+  return data.hasOrders as boolean;
+}
+
 export async function getAllProductsAction() {
   const res = await fetch(`${API_BASE_URL}/products`, {
     method: "GET",

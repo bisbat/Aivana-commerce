@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Role } from './enum/role.enum';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 import { AuthInput, SignInData } from './interfaces';
 import { MinioService } from 'src/minio/minio.service';
 import { MINIO_FOLDERS } from 'src/constants/minio-folders.constant';
@@ -126,5 +127,65 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync(JwtPayload);
 
     return { accessToken };
+  }
+
+  // ── Google OAuth: find existing user by email, or create new one ──────────
+  async googleLogin(profile: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    avatarUrl: string | null;
+  }): Promise<SignInData> {
+    // 1. ถ้ามี email อยู่แล้ว → ใช้ account เดิมเลย
+    const existing = await this.userService.findUserByEmail(profile.email);
+
+    if (existing) {
+      return {
+        userId: existing.id,
+        email: existing.email,
+        username: existing.username,
+        firstName: existing.firstName,
+        lastName: existing.lastName,
+        role: existing.role,
+        avatarUrl: existing.avatarUrl,
+        sellerId: existing.sellerProfile?.id ?? null,
+      };
+    }
+
+    // 2. ถ้าไม่มี → สร้าง user ใหม่ด้วยข้อมูลจาก Google
+    // username = email prefix ถ้าซ้ำให้ต่อ random 4 digits
+    const emailPrefix = profile.email
+      .split('@')[0]
+      .replace(/[^a-zA-Z0-9_]/g, '');
+    let username =
+      emailPrefix.length >= 3 ? emailPrefix : `user_${emailPrefix}`;
+    const taken = await this.userService.findUserByName(username);
+    if (taken) {
+      username = `${username}${Math.floor(1000 + Math.random() * 9000)}`;
+    }
+
+    // password = random hash (Google users จะไม่ login ด้วย password)
+    const randomPassword = await bcrypt.hash(uuidv4(), 10);
+
+    const newUser = await this.userService.create({
+      email: profile.email,
+      username,
+      password: randomPassword,
+      firstName: profile.firstName || null,
+      lastName: profile.lastName || null,
+      role: Role.CUSTOMER,
+      avatarUrl: profile.avatarUrl ?? null,
+    });
+
+    return {
+      userId: newUser.id,
+      email: newUser.email,
+      username: newUser.username,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      role: newUser.role,
+      avatarUrl: profile.avatarUrl,
+      sellerId: null,
+    };
   }
 }

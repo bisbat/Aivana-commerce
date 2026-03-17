@@ -1,6 +1,11 @@
 // ai/gemini.service.ts
 
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 @Injectable()
@@ -21,7 +26,17 @@ export class GeminiService {
   }
 
   async generate(prompt: string): Promise<string> {
-    const result = await this.model.generateContent(prompt);
-    return result.response.text();
+    try {
+      const result = await this.model.generateContent(prompt);
+      return result.response.text();
+    } catch (err: any) {
+      if (err?.status === 429) {
+        throw new HttpException(
+          'AI quota exceeded — please try again later.',
+          HttpStatus.TOO_MANY_REQUESTS,
+        );
+      }
+      throw err;
+    }
   }
 }

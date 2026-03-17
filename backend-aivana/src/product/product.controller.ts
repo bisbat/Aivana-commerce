@@ -174,6 +174,13 @@ export class ProductController {
     };
   }
 
+  @Get(':id/has-orders')
+  @Roles(Role.SELLER, Role.ADMIN)
+  async checkProductHasOrders(@Param('id') id: number) {
+    const hasOrders = await this.productService.hasProductOrders(id);
+    return { hasOrders };
+  }
+
   // ✅ แก้ deleteProduct ให้ส่ง deletedBy ด้วย
   @Delete(':id')
   @Roles(Role.SELLER, Role.ADMIN)
@@ -199,8 +206,15 @@ export class ProductController {
         throw new ForbiddenException('You cannot delete this product');
     }
 
-    await this.productService.deleteProduct(id, reason);
-    return { message: 'Product deleted successfully' };
+    const hasOrders = await this.productService.hasProductOrders(id);
+    if (hasOrders) {
+      // Product has purchases — soft delete so existing buyers can still download
+      await this.productService.deleteProduct(id, reason);
+    } else {
+      // No orders — hard delete: remove from DB and MinIO completely
+      await this.productService.hardDeleteProduct(id);
+    }
+    return { message: 'Product deleted successfully', hardDeleted: !hasOrders };
   }
 
   private validateAndTypeFiles(files: {

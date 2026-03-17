@@ -28,11 +28,11 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 100, unique: true })
   username: string;
 
-  @Column({ type: 'varchar', length: 100 })
-  firstName: string;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  firstName: string | null;
 
-  @Column({ type: 'varchar', length: 100 })
-  lastName: string;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  lastName: string | null;
 
   @Column({ type: 'text', nullable: true })
   avatarUrl: string | null;

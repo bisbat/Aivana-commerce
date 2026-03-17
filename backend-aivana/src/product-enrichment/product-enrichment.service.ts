@@ -27,6 +27,8 @@ export class ProductEnrichmentService {
       metadata: dto.metadata,
       sellerKeywords: dto.sellerKeywords,
       category: dto.metadata.category,
+      availableTags: dto.availableTags,
+      availableCategories: dto.availableCategories,
     };
   }
 

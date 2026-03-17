@@ -26,6 +26,18 @@ interface ReadmeInfo {
 export interface UIKitMetadata {
   category: 'ui-kit';
 
+  tech?: {
+    framework?: string;
+    frameworkVersion?: string;
+    language?: string;
+  };
+
+  files?: {
+    designTools?: string[];
+    assetTypes?: string[];
+    fileExtensions?: string[];
+  };
+
   design?: {
     tool?: DesignTool;
     componentCount?: number;

@@ -3,7 +3,13 @@
 // ==============================
 
 type PackageManager = 'npm' | 'yarn' | 'pnpm' | 'bun';
-type DesignTool = 'figma' | 'sketch' | 'xd' | 'other';
+type DesignTool =
+  | 'figma'
+  | 'sketch'
+  | 'xd'
+  | 'illustrator'
+  | 'photoshop'
+  | 'other';
 
 interface DependencyGroups {
   main?: string[]; // core framework libs
@@ -26,11 +32,28 @@ interface ReadmeInfo {
 export interface UIKitMetadata {
   category: 'ui-kit';
 
+  tech?: {
+    framework?: string;
+    frameworkVersion?: string;
+    language?: string;
+  };
+
+  files?: {
+    designTools?: string[];
+    assetTypes?: string[];
+    fileExtensions?: string[];
+  };
+
   design?: {
     tool?: DesignTool;
     componentCount?: number;
     pageCount?: number;
     hasPrototype?: boolean;
+  };
+
+  structure?: {
+    iconCount?: number;
+    assetCount?: number;
   };
 
   styling?: {

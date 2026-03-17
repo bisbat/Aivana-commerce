@@ -21,11 +21,11 @@ export class CreateUserDto {
 
   @IsString()
   @MinLength(2)
-  firstName: string;
+  firstName?: string | null;
 
   @IsString()
   @MinLength(2)
-  lastName: string;
+  lastName?: string | null;
 
   @IsEnum(Role)
   role: Role;
@@ -33,5 +33,4 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   avatarUrl?: string | null;
-  
 }

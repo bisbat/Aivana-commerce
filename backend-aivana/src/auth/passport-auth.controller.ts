@@ -7,7 +7,10 @@ import {
   UseGuards,
   Request,
   Body,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { PassportLocalGuard } from './guards/passport-local.guard';
 import { PassportJwtAuthGuard } from './guards/passport-jwt.guard';
@@ -64,5 +67,32 @@ export class PassportAuthController {
   @UseGuards(PassportJwtAuthGuard)
   getUserInfo(@Request() request) {
     return request.user;
+  }
+
+  // ── Google OAuth ──────────────────────────────────────────────────────────
+
+  @Public()
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  googleLogin() {
+    // Passport redirects to Google — no body needed
+  }
+
+  @Public()
+  @Get('google/cancelled')
+  googleCancelled(@Res() res: Response) {
+    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
+    return res.redirect(`${frontendUrl}/login?error=google_cancelled`);
+  }
+
+  @Public()
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleCallback(@Request() req, @Res() res: Response) {
+    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
+    const { accessToken } = await this.authService.signIn(req.user);
+    res.redirect(
+      `${frontendUrl}/auth/google/callback?token=${encodeURIComponent(accessToken)}`,
+    );
   }
 }
