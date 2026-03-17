@@ -136,19 +136,34 @@ export const Navbar: React.FC = () => {
           {/* Search Bar - Desktop */}
           <div className="hidden md:flex flex-1 max-w-3xl mx-4">
             <div className="w-full relative">
-              <div className="relative">
+              <div className="relative flex items-center">
+
                 <Search
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="absolute left-4 text-gray-400"
                   size={20}
                 />
+
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleSearchKeyPress}
                   placeholder="ค้นหาสินค้า..."
-                  className="w-full pl-12 pr-4 py-3.5 rounded-xl text-white placeholder:text-slate-500 bg-[#1e1b3d] border border-[#262549] focus:outline-none focus:border-[#8a57fb] focus:ring-1 focus:ring-[#8a57fb] transition-all text-base"
+                  className="w-full pl-12 pr-28 py-3.5 rounded-xl text-white placeholder:text-slate-500 bg-[#1e1b3d] border border-[#262549] focus:outline-none focus:border-[#8a57fb] focus:ring-1 focus:ring-[#8a57fb] transition-all text-base"
                 />
+
+                {/* AI Search Button */}
+                <button
+                  className="absolute right-2 px-4 py-1.5 text-sm font-semibold rounded-lg 
+        bg-gradient-to-r from-purple-500 to-indigo-500 
+        hover:from-purple-600 hover:to-indigo-600
+        text-white transition-all shadow-md hover:shadow-lg"
+        
+                  onClick={() => router.push(`/ai-search`)}
+                >
+                  AI Search
+                </button>
+
               </div>
             </div>
           </div>
@@ -245,11 +260,10 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center gap-1.5 py-3 overflow-x-auto scrollbar-hide">
           {/* ALL */}
           <button
-            className={`px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-              activeTag === "all"
-                ? "bg-[#8a57fb] text-white"
-                : "bg-[#262549] text-gray-300 hover:bg-[#1e1b3d] hover:text-white"
-            }`}
+            className={`px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${activeTag === "all"
+              ? "bg-[#8a57fb] text-white"
+              : "bg-[#262549] text-gray-300 hover:bg-[#1e1b3d] hover:text-white"
+              }`}
             onClick={() => handleTagClick("all")}
           >
             ทั้งหมด
@@ -259,11 +273,10 @@ export const Navbar: React.FC = () => {
           {tagNavbar.slice(0, 10).map((tag) => (
             <button
               key={tag.id}
-              className={`px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                activeTag === tag.name
-                  ? "bg-[#8a57fb] text-white"
-                  : "bg-[#262549] text-gray-300 hover:bg-[#1e1b3d] hover:text-white"
-              }`}
+              className={`px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${activeTag === tag.name
+                ? "bg-[#8a57fb] text-white"
+                : "bg-[#262549] text-gray-300 hover:bg-[#1e1b3d] hover:text-white"
+                }`}
               onClick={() => handleTagClick(tag.name)}
             >
               {tag.name}

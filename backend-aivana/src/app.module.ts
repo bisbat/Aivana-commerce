@@ -28,6 +28,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { EmailModule } from './email/email.module';
 import { AiModule } from './ai/ai.module';
 import { ProductEnrichmentModule } from './product-enrichment/product-enrichment.module';
+import { BundleModule } from './bundle/bundle.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { ProductEnrichmentModule } from './product-enrichment/product-enrichment
     EmailModule,
     AiModule,
     ProductEnrichmentModule,
+    BundleModule,
   ],
   controllers: [],
   providers: [

@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
   console.log("Middleware activated for path:", pathname);
 
   // โซนที่ต้อง login ก่อน
-  const protectedPaths = ["/dashboard", "/stores", "/admin"];
+  const protectedPaths = ["/dashboard", "/stores", "/admin", "/ai-search"];
 
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
 
