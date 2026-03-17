@@ -54,7 +54,7 @@ export class BundleService {
     if (products.length === 0) {
       return {
         goal: input.bundleGoal,
-        reason: 'ไม่พบสินค้าที่ตรงกับความต้องการ เลยแนะนำสินค้าพื้นฐานที่คุณอาจสนใจ',
+        reason: 'ไม่พบสินค้าที่ตรงกับความต้องการ',
         items: {
           uiKits: [],
           frontendTemplates: [],
