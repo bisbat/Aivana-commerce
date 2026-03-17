@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { json, urlencoded } from 'express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -28,6 +29,8 @@ async function bootstrap() {
     // อื่นๆ ให้ผ่านไป
     next();
   });
+
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   // Enable CORS
   app.enableCors({

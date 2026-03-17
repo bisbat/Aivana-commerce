@@ -14,9 +14,7 @@ type Category = 'ui-kit' | 'frontend-template' | 'backend-template';
 
 @Controller('metadata-extraction')
 export class MetadataExtractionController {
-  constructor(
-    private readonly metadataService: MetadataExtractionService,
-  ) {}
+  constructor(private readonly metadataService: MetadataExtractionService) {}
 
   /**
    * Upload ZIP and extract metadata
@@ -32,19 +30,18 @@ export class MetadataExtractionController {
     @UploadedFile() file: Express.Multer.File,
     @Body('category') category: Category,
   ): Promise<ExtractedMetadata> {
-      if (!file) {
-    throw new BadRequestException('Product file is required');
-  }
+    if (!file) {
+      throw new BadRequestException('Product file is required');
+    }
 
-  if (!category) {
-    throw new BadRequestException('Product category is required');
-  }
+    if (!category) {
+      throw new BadRequestException('Product category is required');
+    }
     return this.metadataService.extractMetadataFromBuffer(
       category,
       file.buffer,
     );
   }
-
   /**
    * Extract metadata from file URL
    *
@@ -60,9 +57,6 @@ export class MetadataExtractionController {
     @Body('category') category: Category,
     @Body('fileUrl') fileUrl: string,
   ): Promise<ExtractedMetadata> {
-    return this.metadataService.extractMetadataFromUrl(
-      category,
-      fileUrl,
-    );
+    return this.metadataService.extractMetadataFromUrl(category, fileUrl);
   }
 }
