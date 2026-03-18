@@ -12,6 +12,7 @@ import {
 import type { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
+import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 import { PassportLocalGuard } from './guards/passport-local.guard';
 import { PassportJwtAuthGuard } from './guards/passport-jwt.guard';
 import { Public } from 'src/auth/decorators/public.decorator';
@@ -87,7 +88,7 @@ export class PassportAuthController {
 
   @Public()
   @Get('google/callback')
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(GoogleOAuthGuard)
   async googleCallback(@Request() req, @Res() res: Response) {
     const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
     const { accessToken } = await this.authService.signIn(req.user);

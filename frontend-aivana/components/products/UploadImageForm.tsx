@@ -34,7 +34,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
     });
   }, [heroImage, detailImages]);
 
-  // Handle hero image upload
   const handleHeroImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
