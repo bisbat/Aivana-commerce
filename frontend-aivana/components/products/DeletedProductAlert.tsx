@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertTriangle, X } from "lucide-react";
-import { Product } from "@/lib/types/product/product";
+import { Product } from "@/lib/types/product/Product";
 
 interface DeletedProductAlertProps {
   product: Product;
