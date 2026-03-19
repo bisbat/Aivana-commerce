@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GeminiService } from './gemini.service';
 
 const VALID_CATEGORIES = [
-  'ui-kits',
+  'ui-kit',
   'frontend-template',
   'backend-template'
 ];
@@ -27,13 +27,13 @@ CATEGORY RULES:
 You MUST always return at least one category.
 Pick one or more from EXACTLY these values based on what the user wants to build:
 
-- "ui-kits"            → reusable UI components, design systems, component libraries
+- "ui-kit"             → reusable UI components, design systems, component libraries
 - "frontend-template"  → full website or app templates (landing pages, dashboards, portfolios, SaaS frontends)
 - "backend-template"   → server-side projects, APIs, backend services, databases
 
 Example mappings:
 - "landing page" → ["frontend-template"]
-- "admin dashboard" → ["ui-kits", "frontend-template"]  
+- "admin dashboard" → ["ui-kit", "frontend-template"]  
 - "REST API with auth" → ["backend-template"]
 - "full stack SaaS" → ["frontend-template", "backend-template"]
 

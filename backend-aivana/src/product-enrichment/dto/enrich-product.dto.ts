@@ -1,4 +1,10 @@
-import { IsArray, IsObject, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsObject,
+  IsOptional,
+  IsString,
+  ArrayMinSize,
+} from 'class-validator';
 import type { ExtractedMetadata } from 'src/shared/types/extracted-metadata.types';
 
 export class EnrichProductDto {
@@ -7,6 +13,7 @@ export class EnrichProductDto {
 
   @IsArray()
   @IsString({ each: true })
+  @ArrayMinSize(1, { message: 'Product keyword is required' })
   sellerKeywords: string[];
 
   /** Tag names available in the marketplace — AI must pick from this list */

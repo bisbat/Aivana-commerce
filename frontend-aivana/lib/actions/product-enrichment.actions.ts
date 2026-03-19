@@ -24,10 +24,14 @@ export async function enrichProduct(body: {
   });
 
   if (!res.ok) {
-    const text = await res.text();
-    const error = new Error(text || `API error ${res.status}`) as Error & {
-      status?: number;
-    };
+    let message = `API error ${res.status}`;
+    try {
+      const json = await res.json();
+      message = json?.message || message;
+    } catch {
+      message = (await res.text()) || message;
+    }
+    const error = new Error(message) as Error & { status?: number };
     error.status = res.status;
     throw error;
   }

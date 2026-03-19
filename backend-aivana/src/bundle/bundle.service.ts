@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { ProductEntity } from "src/product/entities/product.entity";
-import { In, Repository, Brackets } from "typeorm";
+import { Repository, Brackets } from "typeorm";
 import { CreateBundleDto } from './dto/create-bundle.dto';
 import { CategoryEntity } from 'src/category/entities/category.entity';
 
@@ -18,33 +18,41 @@ export class BundleService {
 
     console.log(input)
 
-    const categories = await this.categoryRepository.find({
-      where: { name: In(input.category) }
-    });
+    // Use LIKE-based category lookup to handle plural/singular mismatches (e.g. 'ui-kits' → 'ui-kit')
+    const allCategories = await this.categoryRepository.find();
+    const categories = allCategories.filter(c =>
+      input.category.some(inputName => {
+        const a = inputName.toLowerCase().replace(/s$/, '');
+        const b = c.name.toLowerCase().replace(/s$/, '');
+        return a === b || c.name.toLowerCase() === inputName.toLowerCase();
+      })
+    );
 
     console.log('cate:', categories)
 
     const categoryIds = categories.map((c) => c.id);
     console.log('id na ja=', categoryIds)
 
+    const goal = `%${input.bundleGoal.toLowerCase()}%`;
+
     const products = await this.productRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category')
       .leftJoinAndSelect('product.tags', 'tag')
       .where(new Brackets(qb => {
-        qb.where('product.categoryId IN (:...categoryIds)', { categoryIds })
-          .orWhere('LOWER(product.name) LIKE :goal', {
-            goal: `%${input.bundleGoal.toLowerCase()}%`
-          })
-          .orWhere('LOWER(product.description) LIKE :goal', {
-            goal: `%${input.bundleGoal.toLowerCase()}%`
-          })
+        if (categoryIds.length > 0) {
+          qb.where('product.categoryId IN (:...categoryIds)', { categoryIds });
+        } else {
+          qb.where('1=0');
+        }
+        qb.orWhere('LOWER(product.name) LIKE :goal', { goal })
+          .orWhere('LOWER(product.description) LIKE :goal', { goal })
           .orWhere(
             `EXISTS (
           SELECT 1 FROM unnest(product.features) f
           WHERE LOWER(f) LIKE :goal
         )`,
-            { goal: `%${input.bundleGoal.toLowerCase()}%` }
+            { goal }
           )
       }))
       .getMany();
@@ -72,9 +80,9 @@ export class BundleService {
       goal: input.bundleGoal,
       reason: input.reason,
       items: {
-        uiKits: ranked.filter(p => p.category.name === 'ui-kits'),
-        frontendTemplates: ranked.filter(p => p.category.name === 'frontend-template'),
-        backendTemplates: ranked.filter(p => p.category.name === 'backend-template'),
+        uiKits: ranked.filter(p => p.category?.name === 'ui-kit'),
+        frontendTemplates: ranked.filter(p => p.category?.name === 'frontend-template'),
+        backendTemplates: ranked.filter(p => p.category?.name === 'backend-template'),
       }
     };
 

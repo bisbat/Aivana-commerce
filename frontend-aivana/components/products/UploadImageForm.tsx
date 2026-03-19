@@ -5,25 +5,23 @@ import { Upload, X, Image as ImageIcon } from "lucide-react";
 import { UploadImageFormData } from "@/lib/types/formCreateProduct/UploadImageFormData";
 import { saveFormStep } from "@/lib/utils/formStorage";
 
-
 interface UploadImageFormProps {
   onPublish: (data: UploadImageFormData) => void;
   onBack: () => void;
 }
 
-
 export const UploadImageForm: React.FC<UploadImageFormProps> = ({
   onPublish,
   onBack,
 }) => {
-
-
   // State
   const [heroImage, setHeroImage] = useState<File | null>(null);
   const [heroImagePreview, setHeroImagePreview] = useState<string | null>(null);
   const [detailImages, setDetailImages] = useState<File[]>([]);
   const [detailImagePreviews, setDetailImagePreviews] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  const [heroError, setHeroError] = useState(false);
 
   // Refs for file inputs
   const heroInputRef = useRef<HTMLInputElement>(null);
@@ -36,10 +34,7 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
     });
   }, [heroImage, detailImages]);
 
-
-  // Handle hero image upload
   const handleHeroImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-
     const file = e.target.files?.[0];
     if (file) {
       // Validate file type
@@ -114,10 +109,19 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
   // Handle publish
   const handlePublish = () => {
     setError(null);
+    setHeroError(false);
 
     // Validate hero image
     if (!heroImage) {
-      setError("Hero image is required");
+      setHeroError(true);
+      return;
+    }
+
+    // Validate minimum 2 detail images
+    if (detailImages.length < 2) {
+      setError(
+        `กรุณาอัปโหลด Detail Images อย่างน้อย 2 รูป (ตอนนี้มี ${detailImages.length} รูป)`,
+      );
       return;
     }
 
@@ -168,19 +172,17 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
         </div>
       </div>
 
-      {/* Error Message */}
-      {error && (
-        <div className="bg-red-900/20 border border-red-500 rounded-lg p-4">
-          <p className="text-red-400 text-sm">{error}</p>
-        </div>
-      )}
-
       {/* Hero Image Section */}
       <div className="space-y-3">
         <label className="block text-white font-medium">
           Hero section <span className="text-red-400">*</span>
         </label>
         <p className="text-slate-400 text-sm">Main product image (required)</p>
+        {heroError && (
+          <p className="text-red-400 text-sm">
+            ⚠ กรุณาอัปโหลด Hero Image ก่อน Publish
+          </p>
+        )}
 
         {/* Hidden file input */}
         <input
@@ -232,10 +234,34 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
 
       {/* Detail Images Section */}
       <div className="space-y-3">
-        <label className="block text-white font-medium">Detail images</label>
+        <div className="flex items-center justify-between">
+          <label className="block text-white font-medium">
+            Detail images <span className="text-red-400">*</span>
+          </label>
+          <span
+            className={`text-sm font-medium ${
+              detailImages.length >= 2 ? "text-green-400" : "text-yellow-400"
+            }`}
+          >
+            {detailImages.length} / 8{" "}
+            {detailImages.length < 2 ? "(ต้องการอย่างน้อย 2 รูป)" : "✓"}
+          </span>
+        </div>
         <p className="text-slate-400 text-sm">
-          Upload up to 10 images showing product details
+          Upload up to 8 images showing product details (minimum 2 required)
         </p>
+
+        {/* Min 2 warning bar */}
+        {detailImages.length < 2 && (
+          <div className="flex items-start gap-2 bg-yellow-900/20 border border-yellow-600/50 rounded-lg px-4 py-3">
+            <span className="text-yellow-400 text-base mt-0.5">⚠️</span>
+            <p className="text-yellow-300 text-sm">
+              ต้องอัปโหลด Detail Images อย่างน้อย{" "}
+              <span className="font-semibold">2 รูป</span>{" "}
+              เพื่อให้ผู้ซื้อเห็นรายละเอียดสินค้า
+            </p>
+          </div>
+        )}
 
         {/* Hidden file input (multiple) */}
         <input
@@ -292,7 +318,7 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
 
         {detailImages.length > 0 && (
           <p className="text-slate-400 text-sm mt-2">
-            {detailImages.length} / 10 images uploaded
+            {detailImages.length} / 8 images uploaded
           </p>
         )}
       </div>
