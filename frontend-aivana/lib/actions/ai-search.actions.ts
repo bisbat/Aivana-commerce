@@ -18,7 +18,11 @@ export async function getBundleRecommendation(query: string) {
       body: JSON.stringify({ query }),
     });
 
-    if (!response.ok) throw new Error("Failed to fetch bundle recommendation");
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: "Unknown error" }));
+      console.error("Bundle recommendation failed:", response.status, errorData);
+      throw new Error(errorData.message || `Failed to fetch bundle recommendation (${response.status})`);
+    }
 
     const data = await response.json();
     return { success: true, data };

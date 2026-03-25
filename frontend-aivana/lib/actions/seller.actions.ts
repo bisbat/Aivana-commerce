@@ -1,7 +1,7 @@
 "use server";
 import { SellerProfile } from "../types/user/sellerProfile";
 import { CreateSellerProfileDto } from "../types/user/sellerCreate";
-import { Product } from "../types/product/product";
+import { Product } from "../types/product/Product";
 import { getAccessToken } from "../auth";
 import { cookies } from "next/headers";
 
@@ -112,7 +112,6 @@ export async function getSellerByUsername(
   username: string,
 ): Promise<SellerProfile> {
   try {
-
     const response = await fetch(
       `${API_BASE_URL}/seller/username/${username}`,
       {
@@ -135,6 +134,4 @@ export async function getSellerByUsername(
     console.error("Error fetching seller by username:", error);
     throw error;
   }
-
-  
 }
