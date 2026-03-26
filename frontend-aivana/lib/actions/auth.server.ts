@@ -12,7 +12,7 @@ export async function loginAction(data: LoginRequest) {
   });
 
   if (!res.ok) {
-    throw new Error("Login failed");
+    return { success: false, message: "INVALID_CREDENTIALS" };
   }
 
   const { accessToken } = await res.json();
