@@ -45,37 +45,42 @@ export default function LoginPage() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!validate()) return;
+  if (!validate()) return;
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    try {
-      await loginAction({
-        username: formData.username,
-        password: formData.password,
-      });
+  try {
+    const result = await loginAction({
+      username: formData.username,
+      password: formData.password,
+    });
 
-      const isAdmin = await getCurrentUser().then(
-        (user) => user?.role === "admin",
-      );
-
-      if (isAdmin) {
-        router.push("/admin/payouts");
-        router.refresh();
-        return;
-      }
-
-      router.push("/");
-      router.refresh();
-    } catch (error) {
-      console.error("Login error:", error);
+    if (!result.success) {
       setErrors({ submit: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });
-    } finally {
-      setIsLoading(false);
+      return;
     }
-  };
+
+    const isAdmin = await getCurrentUser().then(
+      (user) => user?.role === "admin",
+    );
+
+    if (isAdmin) {
+      router.push("/admin/payouts");
+      router.refresh();
+      return;
+    }
+
+    router.push("/");
+    router.refresh();
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    setErrors({ submit: "เกิดข้อผิดพลาดบางอย่าง" });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleGoogleLogin = () => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
