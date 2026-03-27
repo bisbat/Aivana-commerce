@@ -70,6 +70,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = "/" }) => {
       navItems={navItems}
       bgColor="#262549"
       width="w-64"
+      editStoreHref={
+        seller?.user?.username
+          ? `/seller/${seller.user.username}/edit`
+          : undefined
+      }
     >
       <button
         onClick={handleAddProduct}

@@ -2,16 +2,12 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GeminiService } from './gemini.service';
 
-const VALID_CATEGORIES = [
-  'ui-kit',
-  'frontend-template',
-  'backend-template'
-];
+const VALID_CATEGORIES = ['ui-kit', 'frontend-template', 'backend-template'];
 
 @Injectable()
 export class IntentExtractionService {
-  constructor(private readonly gemini: GeminiService) { } // ← inject แทน
-  
+  constructor(private readonly gemini: GeminiService) {} // ← inject แทน
+
   async extractIntent(userInput: string) {
     const prompt = `
 You are a developer tool assistant that helps recommend product bundles.
@@ -67,7 +63,7 @@ User input: "${userInput}"
 `;
 
     try {
-      console.log('hi this is extracting')
+      console.log('hi this is extracting');
       const text = await this.gemini.generate(prompt);
 
       const cleaned = text
@@ -78,19 +74,19 @@ User input: "${userInput}"
       const parsed = JSON.parse(cleaned);
 
       const filteredCategories = (parsed.category || []).filter((c: string) =>
-        VALID_CATEGORIES.includes(c)
+        VALID_CATEGORIES.includes(c),
       );
 
       return {
-        category: filteredCategories.length > 0
-          ? filteredCategories
-          : ['frontend-template'],
+        category:
+          filteredCategories.length > 0
+            ? filteredCategories
+            : ['frontend-template'],
         techstack: (parsed.techstack || []).map((t: string) => t.toLowerCase()),
         tags: (parsed.tags || []).map((t: string) => t.toLowerCase()),
         bundleGoal: parsed.bundleGoal || 'starter project',
         reason: parsed.reason || '',
       };
-
     } catch (error) {
       console.error('Gemini error:', error);
 

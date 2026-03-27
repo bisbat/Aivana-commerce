@@ -22,7 +22,7 @@ export class PaymentService {
     @InjectRepository(PaymentEntity)
     private readonly paymentRepository: Repository<PaymentEntity>,
     private readonly emailService: EmailService,
-  ) {}
+  ) { }
 
   async chargeWithSource(sourceId: string, orderId: number) {
     const order = await this.orderService.getOrderById(orderId);
@@ -180,6 +180,7 @@ export class PaymentService {
 
   async chargeWithToken(token: string, orderId: number) {
     const order = await this.orderService.getOrderById(orderId);
+
     if (!order) {
       throw new NotFoundException('Order not found!');
     }
@@ -187,19 +188,9 @@ export class PaymentService {
 
     const charge = await this.omiseService.createChargeWithToken(token, amount);
 
-    const payment = await this.paymentRepository.findOne({
-      where: {
-        chargeId: charge.id,
-      },
-    });
-
-    if (!payment) {
-      throw new NotFoundException('Payment not found');
-    }
-
     const paymentStatus = mapOmiseStatusToPaymentStatus(charge.status);
 
-    await this.paymentRepository.save({
+    const payment = await this.paymentRepository.save({
       orderId: orderId,
       paymentMethod: order.paymentMethod,
       amount: amount / 100,
@@ -213,24 +204,32 @@ export class PaymentService {
 
     if (charge.status === 'successful') {
       await this.orderService.markAsPaidCard(orderId);
-      await this.emailService.sendSuccessEmail({
-        customerEmail: order.user.email,
-        customerName: order.user.firstName ?? order.user.username,
-        orderId: payment.orderId.toString(),
-        items: order.items,
-        amount: payment.amount,
-        paymentMethod: payment.paymentMethod,
-        paidAt: new Date(),
-      });
+      try {
+        await this.emailService.sendSuccessEmail({
+          customerEmail: order.user.email,
+          customerName: order.user.firstName ?? order.user.username,
+          orderId: payment.orderId.toString(),
+          items: order.items,
+          amount: payment.amount,
+          paymentMethod: payment.paymentMethod,
+          paidAt: new Date(),
+        });
+      } catch (err) {
+        console.error('Send email failed:', err);
+      }
     }
 
     if (charge.status === 'failed' || charge.status === 'expired') {
       await this.orderService.markAsFailedCard(orderId);
-      await this.emailService.sendFailureEmail({
-        customerEmail: order.user.email,
-        customerName: order.user.firstName ?? order.user.username,
-        orderId: payment.orderId.toString(),
-      });
+      try {
+        await this.emailService.sendFailureEmail({
+          customerEmail: order.user.email,
+          customerName: order.user.firstName ?? order.user.username,
+          orderId: payment.orderId.toString(),
+        });
+      } catch (err) {
+        console.error('Send email failed:', err);
+      }
     }
 
     return {
