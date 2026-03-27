@@ -7,6 +7,7 @@ import { becomeSeller } from "@/lib/actions/seller.actions";
 import { CreateSellerProfileDto } from "@/lib/types/user/sellerCreate";
 import { getCurrentUser } from "@/lib/auth";
 import { showSuccessToast, showErrorToast } from "@/lib/toast";
+import BackgroundAivana from "@/components/common/BackgroundAivana";
 
 const SOCIAL_PLATFORMS = [
   { value: "github", label: "GitHub" },
@@ -271,24 +272,12 @@ export default function BecomeSellerPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--background)] px-4 py-12 relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 pointer-events-none flex flex-col justify-center items-center gap-0 opacity-[0.01]">
-        {Array.from({ length: 10 }).map((_, index) => (
-          <span
-            key={index}
-            className="font-bold text-white whitespace-nowrap leading-none"
-            style={{ fontSize: "20rem", lineHeight: "0.9" }}
-          >
-            AIVANA
-          </span>
-        ))}
-      </div>
-
-      <div className="w-full max-w-2xl relative z-10">
+    <div className="relative min-h-screen">
+      <BackgroundAivana />
+      <div className="w-full max-w-2xl relative z-10 mx-auto px-4 py-10">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-[var(--primary)] mb-2">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-white mb-2">
             สมัครเป็นผู้ขาย
           </h1>
           <p className="text-slate-400">กรอกข้อมูลเพื่อเริ่มต้นขายสินค้า</p>
@@ -296,53 +285,56 @@ export default function BecomeSellerPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Bio */}
-          <div>
-            <label className="block text-white text-sm mb-2">
-              แนะนำตัวเอง <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              name="bio"
-              value={formData.bio}
-              onChange={handleChange}
-              placeholder="เล่าเกี่ยวกับตัวคุณ ประสบการณ์ และสิ่งที่ทำให้คุณเป็นผู้ขายที่ยอดเยี่ยม"
-              rows={3}
-              className={`w-full px-4 py-3 rounded-lg bg-slate-800/50 border ${
-                errors.bio
-                  ? "border-red-500"
-                  : "border-slate-700 focus:border-[var(--primary)]"
-              } text-white placeholder:text-slate-400 focus:outline-none transition-colors resize-none`}
-            />
-            {errors.bio && (
-              <p className="text-red-500 text-xs mt-1">{errors.bio}</p>
-            )}
-          </div>
+          {/* Basic Information */}
+          <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-6 space-y-6">
+            {/* Bio */}
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                แนะนำตัวเอง <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                name="bio"
+                value={formData.bio}
+                onChange={handleChange}
+                placeholder="เล่าเกี่ยวกับตัวคุณ ประสบการณ์ และสิ่งที่ทำให้คุณเป็นผู้ขายที่ยอดเยี่ยม"
+                rows={3}
+                className={`w-full bg-slate-900/50 border ${
+                  errors.bio
+                    ? "border-red-500"
+                    : "border-slate-700 focus:border-[#8a57fb]"
+                } rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#8a57fb]/50 focus:border-transparent transition-all resize-none`}
+              />
+              {errors.bio && (
+                <p className="text-red-500 text-xs mt-1">{errors.bio}</p>
+              )}
+            </div>
 
-          {/* Location */}
-          <div>
-            <label className="block text-white text-sm mb-2">
-              ที่อยู่ <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
-              placeholder="กรุงเทพมหานคร, ประเทศไทย"
-              className={`w-full px-4 py-3 rounded-lg bg-slate-800/50 border ${
-                errors.location
-                  ? "border-red-500"
-                  : "border-slate-700 focus:border-[var(--primary)]"
-              } text-white placeholder:text-slate-400 focus:outline-none transition-colors`}
-            />
-            {errors.location && (
-              <p className="text-red-500 text-xs mt-1">{errors.location}</p>
-            )}
+            {/* Location */}
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                ที่อยู่ <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+                placeholder="กรุงเทพมหานคร, ประเทศไทย"
+                className={`w-full bg-slate-900/50 border ${
+                  errors.location
+                    ? "border-red-500"
+                    : "border-slate-700 focus:border-[#8a57fb]"
+                } rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#8a57fb]/50 focus:border-transparent transition-all`}
+              />
+              {errors.location && (
+                <p className="text-red-500 text-xs mt-1">{errors.location}</p>
+              )}
+            </div>
           </div>
 
           {/* Skills */}
-          <div>
-            <label className="block text-white text-sm mb-2">
+          <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-6">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
               ทักษะ <span className="text-red-500">*</span>
             </label>
             <div className="space-y-2">
@@ -355,7 +347,7 @@ export default function BecomeSellerPage() {
                       handleArrayChange(index, e.target.value, "skills")
                     }
                     placeholder="เช่น การออกแบบกราฟิก, การพัฒนาเว็บ"
-                    className="flex-1 px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-[var(--primary)] text-white placeholder:text-slate-400 focus:outline-none transition-colors"
+                    className="flex-1 px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-[#8a57fb] text-white placeholder:text-slate-400 focus:outline-none transition-colors"
                   />
                   {formData.skills.length > 1 && (
                     <button
@@ -383,8 +375,8 @@ export default function BecomeSellerPage() {
           </div>
 
           {/* Social Links */}
-          <div>
-            <label className="block text-white text-sm mb-2">
+          <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-6">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
               โซเชียลมีเดีย (ไม่บังคับ)
             </label>
             <div className="space-y-3">
@@ -395,7 +387,7 @@ export default function BecomeSellerPage() {
                     onChange={(e) =>
                       handleSocialLinkChange(index, "platform", e.target.value)
                     }
-                    className="px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-[var(--primary)] text-white focus:outline-none transition-colors"
+                    className="px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-[#8a57fb] text-white focus:outline-none transition-colors"
                   >
                     <option value="" disabled>
                       เลือกแพลตฟอร์ม
@@ -413,7 +405,7 @@ export default function BecomeSellerPage() {
                       handleSocialLinkChange(index, "url", e.target.value)
                     }
                     placeholder="https://..."
-                    className="flex-1 px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-[var(--primary)] text-white placeholder:text-slate-400 focus:outline-none transition-colors"
+                    className="flex-1 px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-[#8a57fb] text-white placeholder:text-slate-400 focus:outline-none transition-colors"
                   />
                   {formData.socialLinks.length > 1 && (
                     <button
@@ -439,100 +431,98 @@ export default function BecomeSellerPage() {
           </div>
 
           {/* Bank Information */}
-          <div className="border-t border-slate-700 pt-6">
-            <h3 className="text-lg font-semibold text-white mb-4">
+          <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-6 space-y-6">
+            <h3 className="text-lg font-semibold text-white">
               ข้อมูลบัญชีธนาคาร
             </h3>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-white text-sm mb-2">
-                  เลือกธนาคาร <span className="text-red-500">*</span>
-                </label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {BANKS.map((bank) => (
-                    <button
-                      key={bank.code}
-                      type="button"
-                      onClick={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          bankCode: bank.code,
-                        }))
-                      }
-                      className={`p-4 rounded-lg border-2 transition-all hover:scale-105 ${
-                        formData.bankCode === bank.code
-                          ? "border-[var(--primary)] bg-[var(--primary)]/10"
-                          : "border-slate-700 bg-slate-800/50 hover:border-slate-600"
-                      }`}
-                    >
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center p-2">
-                          <Image
-                            src={bank.logo}
-                            alt={bank.name}
-                            width={64}
-                            height={64}
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                        <span className="text-white text-xs text-center">
-                          {bank.name}
-                        </span>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                เลือกธนาคาร <span className="text-red-500">*</span>
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {BANKS.map((bank) => (
+                  <button
+                    key={bank.code}
+                    type="button"
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        bankCode: bank.code,
+                      }))
+                    }
+                    className={`p-4 rounded-lg border-2 transition-all hover:scale-105 ${
+                      formData.bankCode === bank.code
+                        ? "border-[#8a57fb] bg-[#8a57fb]/10"
+                        : "border-slate-700 bg-slate-800/50 hover:border-slate-600"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center p-2">
+                        <Image
+                          src={bank.logo}
+                          alt={bank.name}
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-contain"
+                        />
                       </div>
-                    </button>
-                  ))}
-                </div>
-                {errors.bankCode && (
-                  <p className="text-red-500 text-xs mt-1">{errors.bankCode}</p>
-                )}
+                      <span className="text-white text-xs text-center">
+                        {bank.name}
+                      </span>
+                    </div>
+                  </button>
+                ))}
               </div>
+              {errors.bankCode && (
+                <p className="text-red-500 text-xs mt-1">{errors.bankCode}</p>
+              )}
+            </div>
 
-              <div>
-                <label className="block text-white text-sm mb-2">
-                  เลขบัญชี <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="bankAccountNumber"
-                  value={formData.bankAccountNumber}
-                  onChange={handleChange}
-                  placeholder="1234567890"
-                  className={`w-full px-4 py-3 rounded-lg bg-slate-800/50 border ${
-                    errors.bankAccountNumber
-                      ? "border-red-500"
-                      : "border-slate-700 focus:border-[var(--primary)]"
-                  } text-white placeholder:text-slate-400 focus:outline-none transition-colors`}
-                />
-                {errors.bankAccountNumber && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.bankAccountNumber}
-                  </p>
-                )}
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                เลขบัญชี <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="bankAccountNumber"
+                value={formData.bankAccountNumber}
+                onChange={handleChange}
+                placeholder="1234567890"
+                className={`w-full bg-slate-900/50 border ${
+                  errors.bankAccountNumber
+                    ? "border-red-500"
+                    : "border-slate-700 focus:border-[#8a57fb]"
+                } rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#8a57fb]/50 focus:border-transparent transition-all`}
+              />
+              {errors.bankAccountNumber && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.bankAccountNumber}
+                </p>
+              )}
+            </div>
 
-              <div>
-                <label className="block text-white text-sm mb-2">
-                  ชื่อบัญชี <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="bankAccountName"
-                  value={formData.bankAccountName}
-                  onChange={handleChange}
-                  placeholder="Jane Doe"
-                  className={`w-full px-4 py-3 rounded-lg bg-slate-800/50 border ${
-                    errors.bankAccountName
-                      ? "border-red-500"
-                      : "border-slate-700 focus:border-[var(--primary)]"
-                  } text-white placeholder:text-slate-400 focus:outline-none transition-colors`}
-                />
-                {errors.bankAccountName && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.bankAccountName}
-                  </p>
-                )}
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                ชื่อบัญชี <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="bankAccountName"
+                value={formData.bankAccountName}
+                onChange={handleChange}
+                placeholder="Jane Doe"
+                className={`w-full bg-slate-900/50 border ${
+                  errors.bankAccountName
+                    ? "border-red-500"
+                    : "border-slate-700 focus:border-[#8a57fb]"
+                } rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#8a57fb]/50 focus:border-transparent transition-all`}
+              />
+              {errors.bankAccountName && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.bankAccountName}
+                </p>
+              )}
             </div>
           </div>
 
@@ -545,7 +535,7 @@ export default function BecomeSellerPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full px-4 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-6 py-2.5 bg-[#8a57fb] hover:bg-[#732ee2] text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "กำลังส่งข้อมูล..." : "สมัครเป็นผู้ขาย"}
           </button>
