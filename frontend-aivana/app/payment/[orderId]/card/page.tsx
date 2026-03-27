@@ -6,6 +6,7 @@ import { createCreditCardToken } from '@/lib/omise';
 import { createCreditCardPayment } from '@/lib/actions/payment.actions';
 import { formatCardNumber, formatExpiry } from '@/lib/utils/card-format';
 import { validateCardForm } from '@/lib/utils/card-validation';
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 export default function CreditCardPage() {
     const { orderId } = useParams();
@@ -81,6 +82,7 @@ export default function CreditCardPage() {
             const res = await createCreditCardPayment(token.id, Number(orderId));
 
             if (res.status === 'successful') {
+                showSuccessToast("ชำระเงินสำเร็จแล้ว ระบบกำลังส่งอีเมลยืนยัน");
                 router.push(`/payment/success`);
             } else if (res.status === 'pending' && res.authorize_uri) {
                 window.location.href = res.authorize_uri; // 3D secure

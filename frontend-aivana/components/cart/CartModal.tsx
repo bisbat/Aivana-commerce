@@ -110,55 +110,9 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
 
   if (!isOpen) return null;
 
-  // const createPromptpaySource = (amount: number): Promise<any> => {
-  //   return new Promise((resolve, reject) => {
-  //     (window as any).Omise.createSource(
-  //       'promptpay',
-  //       {
-  //         amount: amount * 100,
-  //         currency: 'THB',
-  //         type: 'promptpay',
-  //       },
-  //       (statusCode: number, response: any) => {
-  //         if (statusCode !== 200) {
-  //           reject(response);
-  //         } else {
-  //           resolve(response);
-  //         }
-  //       }
-  //     );
-  //   });
-  // };
-
-  // const createCreditCardToken = (amount: number): Promise<any> => {
-  //   return new Promise((resolve, reject) => {
-  //     (window as any).Omise.createToken('card', {
-  //       name: 'Aivana Customer',
-  //       number: '4242424242424242',
-  //       expiration_month: '12',
-  //       expiration_year: '2027',
-  //       security_code: '123',
-  //     }
-  //       , (statusCode: number, response: any) => {
-  //         if (statusCode !== 200) {
-  //           reject(response);
-  //         } else {
-  //           resolve(response);
-  //         }
-  //       }
-  //     );
-  //   });
-  // }
-
-
-
   const createSource = async (amount: number, orderId: number, paymentMethod: PaymentMethod) => {
     if (paymentMethod === PaymentMethod.CREDIT_CARD) {
-      // const token = await createCreditCardToken();
-      // console.log('token:', token);
-      // console.log('id:', token.id);
       router.push(`/payment/${orderId}/card`);
-
     }
     if (paymentMethod === PaymentMethod.PROMPTPAY) {
       try {
