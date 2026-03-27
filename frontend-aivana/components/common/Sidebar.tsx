@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { Pencil } from "lucide-react";
 
 export interface SidebarNavItem {
   label: string;
@@ -17,6 +18,7 @@ export interface SidebarProps {
   bgColor?: string;
   width?: string;
   children?: React.ReactNode;
+  editStoreHref?: string;
 }
 
 export default function Sidebar({
@@ -26,6 +28,7 @@ export default function Sidebar({
   bgColor = "#262549",
   width = "w-68",
   children,
+  editStoreHref,
 }: SidebarProps) {
   const pathname = usePathname();
   const activeItem = navItems
@@ -39,9 +42,20 @@ export default function Sidebar({
     >
       {/* Brand */}
       <div className="mb-8 pl-3">
-        <h1 className="text-2xl font-bold text-white tracking-tight">
-          {brandName}
-        </h1>
+        <div className="flex items-center justify-between gap-2">
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            {brandName}
+          </h1>
+          {editStoreHref && (
+            <Link
+              href={editStoreHref}
+              className="p-2 rounded-lg text-white/40 hover:text-white hover:bg-white/5 transition-all"
+              title="Edit Store"
+            >
+              <Pencil size={18} />
+            </Link>
+          )}
+        </div>
         <span className="text-base text-white/30 font-medium tracking-widest uppercase">
           {brandSubtitle}
         </span>

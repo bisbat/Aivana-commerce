@@ -23,19 +23,18 @@ import EditProductHeroImage from "./EditProductHeroImage";
 import EditProductFile from "./EditProductFile";
 import BackButton from "./BackButton";
 import { InstallationGuideInput } from "@/components/ui/InstallationGuideInput";
-import { ProductUpdatePayload } from "@/lib/types/product/UpdateProductPayload";
 
 export interface UpdatedProductData {
   name: string;
   blurb: string;
   description: string;
   categoryId: string;
-  features: string; // JSON string of string[]
+  features: string;
   installationGuide: string;
-  compatibility: string; // JSON string of string[]
-  techstack: string; // JSON string of string[]
-  requirement: string; // JSON string of string[]
-  tagIds: string; // JSON string of number[]
+  compatibility: string;
+  techstack: string;
+  requirement: string;
+  tagIds: string;
   price: string;
   previewUrl: string;
   apiDocUrl: string;
@@ -46,13 +45,46 @@ export interface UpdatedProductData {
   };
 }
 
+function SectionCard({
+  title,
+  accent = false,
+  children,
+}: {
+  title: string;
+  accent?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={`
+        relative rounded-2xl border p-6 overflow-hidden
+        ${accent ? "border-violet-500/20" : "border-white/[0.06]"}
+      `}
+    >
+      <div
+        className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent ${
+          accent ? "via-violet-500/50" : "via-white/[0.08]"
+        }`}
+      />
+      <div className="flex items-center gap-2 mb-5">
+        <div className="h-px flex-1 bg-white/[0.06]" />
+        <h2 className="text-[11px] uppercase tracking-[0.12em] font-semibold text-white/30 whitespace-nowrap">
+          {title}
+        </h2>
+        <div className="h-px flex-1 bg-white/[0.06]" />
+      </div>
+      <div className="space-y-4">{children}</div>
+    </div>
+  );
+}
+
 export default function EditProductPage() {
   const params = useParams();
   const productId = String(params.productId);
   const router = useRouter();
+  const [isSaving, setIsSaving] = useState(false);
 
   const [productData, setProductData] = useState<Product | null>(null);
-
   const [name, setName] = useState("");
   const [blurb, setBlurb] = useState("");
   const [description, setDescription] = useState("");
@@ -71,12 +103,8 @@ export default function EditProductPage() {
 
   const [currentHeroImage, setCurrentHeroImage] = useState<string | null>(null);
   const [newHeroImageFile, setNewHeroImageFile] = useState<File | null>(null);
-
-  const [currentProductFile, setCurrentProductFile] = useState<string | null>(
-    null,
-  );
+  const [currentProductFile, setCurrentProductFile] = useState<string | null>(null);
   const [newProductFile, setNewProductFile] = useState<File | null>(null);
-
   const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
   const [deletedImageIds, setDeletedImageIds] = useState<number[]>([]);
   const [detailImages, setDetailImages] = useState<ProductImages[]>([]);
@@ -86,11 +114,12 @@ export default function EditProductPage() {
       const product: Product = await getProductByIdAction(productId);
       setProductData(product);
 
-      const tags: Tag[] = await getAllTagsAction();
-      setTags(tags);
+      const allTags: Tag[] = await getAllTagsAction();
+      setTags(allTags);
 
-      const categories: Category[] = await getAllCategories();
-      setCategories(categories);
+      const allCategories: Category[] = await getAllCategories();
+      setCategories(allCategories);
+
       setName(product.name);
       setBlurb(product.blurb || "");
       setDescription(product.description);
@@ -98,12 +127,12 @@ export default function EditProductPage() {
       setFeatures(product.features || []);
       setInstallationGuide(product.installationGuide);
       setCompatibility(product.compatibility || []);
-      setRequirement(product.requirement || [])
-      setTechstack(product.techstack || [])
+      setRequirement(product.requirement || []);
+      setTechstack(product.techstack || []);
       setSelectedTagIds(product.tags.map((tag) => parseInt(tag.id)));
       setPrice(product.price.toString());
       setpreviewUrl(product.previewUrl || "");
-      setApiDocUrl(product.apiDocUrl || "")
+      setApiDocUrl(product.apiDocUrl || "");
       setCurrentHeroImage(product.heroImageUrl || null);
       setCurrentProductFile(product.uploadedFilePath || null);
       setDetailImages(product.detailImages || []);
@@ -112,45 +141,28 @@ export default function EditProductPage() {
     fetchFormData();
   }, [productId]);
 
-  if (!productData) return <div>Loading...</div>;
+  if (!productData) {
+    return (
+      <div className="min-h-screen bg-[#0f0e1a] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative w-12 h-12">
+            <div className="absolute inset-0 rounded-full border-2 border-violet-500/20 animate-ping" />
+            <div className="absolute inset-1 rounded-full border-2 border-t-violet-500 border-violet-500/10 animate-spin" />
+          </div>
+          <p className="text-white/30 text-sm tracking-wide animate-pulse">Loading product…</p>
+        </div>
+      </div>
+    );
+  }
 
-  const handleHeroImageChange = (file: File | null) => {
-    setNewHeroImageFile(file);
-  };
-
-  const handleRemoveHeroImage = () => {
-    setCurrentHeroImage(null);
-    setNewHeroImageFile(null);
-  };
-
-  const handleProductFileChange = (file: File | null) => {
-    setNewProductFile(file);
-  };
-
-  const handleRemoveProductFile = () => {
-    setCurrentProductFile(null);
-    setNewProductFile(null);
-  };
-
-  // Handler for adding new image files
-  const handleAddImages = (files: File[]) => {
-    setNewImageFiles((prev) => [...prev, ...files]);
-  };
-
-  // Handler for removing existing image
   const handleDeleteImage = async (imageId: number) => {
     try {
       await deleteProductImageAction(imageId);
-
       setDetailImages((prev) => prev.filter((img) => img.imageId !== imageId));
       setDeletedImageIds((prev) => [...prev, imageId]);
     } catch (error) {
       console.error(error);
     }
-  };
-  // Handler for removing new image file
-  const handleRemoveNewImage = (index: number) => {
-    setNewImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -166,169 +178,208 @@ export default function EditProductPage() {
       techstack: JSON.stringify(techstack),
       requirement: JSON.stringify(requirement),
       tagIds: JSON.stringify(selectedTagIds),
-      price: price,
+      price,
       previewUrl,
+      apiDocUrl,
       files: {
         heroImage: newHeroImageFile,
         productFile: newProductFile,
         detailImages: newImageFiles,
       },
-      apiDocUrl,
     };
+
+    setIsSaving(true);
     await updateProductAction(productId, updatedProductData);
+    setIsSaving(false);
     router.push(`/stores/products/${productId}`);
   };
 
   return (
-    <div>
-      <BackButton productId={productId} />
-      <h1 className="text-3xl font-bold text-primary mb-4">Edit page</h1>
+    <div className="min-h-screen text-white">
 
-      <form onSubmit={handleSubmit}>
-        <Input
-          label="Product Name"
-          value={name}
-          onChange={setName}
-          placeholder="Enter product name"
-          required
-        />
-        <Input
-          label="Blurb"
-          value={blurb}
-          onChange={setBlurb}
-          placeholder="Short description"
-        />
+      {/* Ambient glows */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-violet-800/[0.08] blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-indigo-800/[0.06] blur-[100px]" />
+      </div>
 
-        <Select
-          label="Category"
-          value={categoryId}
-          onChange={setCategoryId}
-          options={categories.map((cat) => ({
-            value: cat.id,
-            label: cat.name,
-          }))}
-          placeholder="Select a category"
-          required
-        />
+      <div className="relative max-w-5xl mx-auto px-6 py-8">
 
-        <Textarea
-          label="Product Description"
-          value={description}
-          onChange={setDescription}
-          placeholder="Detailed description..."
-          rows={5}
-        />
-
-        <DynamicTextListInput
-          label="Features"
-          value={features}
-          onChange={setFeatures}
-          placeholder="Feature เช่น AI Chat, Image Generator"
-          maxItems={6}
-          required
-        />
-
-        <InstallationGuideInput
-          value={installationGuide}
-          onChange={setInstallationGuide}
-        />
-
-        <DynamicTextListInput
-          label="Techstack"
-          value={techstack}
-          onChange={setTechstack}
-          placeholder="เช่น React, Vue, Java"
-          maxItems={6}
-        />
-
-        <DynamicTextListInput
-          label="Requirement"
-          value={requirement}
-          onChange={setRequirement}
-          placeholder="เช่น Node.js 18+, PostgreSQL 14+"
-          maxItems={6}
-        />
-
-        <DynamicTextListInput
-          label="Compatibility"
-          value={compatibility}
-          onChange={setCompatibility}
-          placeholder="เช่น Windows, macOS, Chrome"
-          maxItems={6}
-        />
-
-        <MultiSelectTag
-          label="Tags"
-          tags={tags}
-          selectedTagIds={selectedTagIds}
-          onChange={setSelectedTagIds}
-        />
-
-        <Input
-          label="Price"
-          value={price}
-          onChange={setPrice}
-          placeholder="0.00"
-          type="number"
-          required
-        />
-        <Input
-          label="Live Preview"
-          value={previewUrl}
-          onChange={setpreviewUrl}
-          placeholder="https://example.com"
-          type="url"
-        />
-
-        <Input
-          label="API Documentation"
-          value={apiDocUrl}
-          onChange={setApiDocUrl}
-          placeholder="https://example.com"
-          type="url"
-        />
-
-        {/* Product File Management */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Product File
-          </label>
-          <EditProductFile
-            currentFile={currentProductFile}
-            newFile={newProductFile}
-            onFileChange={handleProductFileChange}
-            onRemoveFile={handleRemoveProductFile}
-          />
+        {/* Back button */}
+        <div className="mb-8">
+          <BackButton productId={productId} />
         </div>
 
-        {/* Hero Image Management */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Hero Image
-          </label>
-          <EditProductHeroImage
-            currentImage={currentHeroImage}
-            newImageFile={newHeroImageFile}
-            onImageChange={handleHeroImageChange}
-            onRemoveImage={handleRemoveHeroImage}
-          />
+        {/* Page title block */}
+        <div className="relative rounded-2xl border border-violet-500/20 bg-[#15132a]/60 backdrop-blur-sm p-8 overflow-hidden mb-8">
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent" />
+          <p className="text-[10px] uppercase tracking-[0.15em] font-semibold text-violet-400/70 mb-2">
+            Product Management
+          </p>
+          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Edit Product</h1>
+          <p className="text-white/30 text-sm">
+            Editing <span className="text-white/60 font-medium">{name || "…"}</span>
+          </p>
         </div>
 
-        {/* Detail Images Management */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Product Detail Images
-          </label>
-          <EditProductImages
-            existingImages={detailImages}
-            newImageFiles={newImageFiles}
-            onAddImages={handleAddImages}
-            onDeleteImage={handleDeleteImage}
-            onRemoveNewImage={handleRemoveNewImage}
-          />
-        </div>
-        <button type="submit">Save</button>
-      </form>
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-6">
+
+            {/* ── MEDIA — at the TOP, just like the detail page ─────────── */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <SectionCard title="Hero Image">
+                <EditProductHeroImage
+                  currentImage={currentHeroImage}
+                  newImageFile={newHeroImageFile}
+                  onImageChange={setNewHeroImageFile}
+                  onRemoveImage={() => {
+                    setCurrentHeroImage(null);
+                    setNewHeroImageFile(null);
+                  }}
+                />
+              </SectionCard>
+
+              <SectionCard title="Product File">
+                <EditProductFile
+                  currentFile={currentProductFile}
+                  newFile={newProductFile}
+                  onFileChange={setNewProductFile}
+                  onRemoveFile={() => {
+                    setCurrentProductFile(null);
+                    setNewProductFile(null);
+                  }}
+                />
+              </SectionCard>
+
+              <SectionCard title="Gallery Images">
+                <EditProductImages
+                  existingImages={detailImages}
+                  newImageFiles={newImageFiles}
+                  onAddImages={(files) => setNewImageFiles((prev) => [...prev, ...files])}
+                  onDeleteImage={handleDeleteImage}
+                  onRemoveNewImage={(index) =>
+                    setNewImageFiles((prev) => prev.filter((_, i) => i !== index))
+                  }
+                />
+              </SectionCard>
+            </div>
+
+            {/* ── FORM SECTIONS — single column below media ──────────────── */}
+            <SectionCard title="Basic Information" accent>
+              <Input label="Product Name" value={name} onChange={setName} required />
+              <Input label="Short Blurb" value={blurb} onChange={setBlurb} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Select
+                  label="Category"
+                  value={categoryId}
+                  onChange={setCategoryId}
+                  options={categories.map((cat) => ({ value: cat.id, label: cat.name }))}
+                  required
+                />
+                <MultiSelectTag
+                  label="Tags"
+                  tags={tags}
+                  selectedTagIds={selectedTagIds}
+                  onChange={setSelectedTagIds}
+                />
+              </div>
+            </SectionCard>
+
+            <SectionCard title="Description & Features">
+              <Textarea
+                label="Product Description"
+                value={description}
+                onChange={setDescription}
+                rows={5}
+              />
+              <DynamicTextListInput
+                label="Features"
+                value={features}
+                onChange={setFeatures}
+                maxItems={6}
+              />
+            </SectionCard>
+
+            <SectionCard title="Technical Details">
+              <InstallationGuideInput
+                value={installationGuide}
+                onChange={setInstallationGuide}
+              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <DynamicTextListInput label="Tech Stack" value={techstack} onChange={setTechstack} />
+                <DynamicTextListInput label="Requirements" value={requirement} onChange={setRequirement} />
+              </div>
+              <DynamicTextListInput label="Compatibility" value={compatibility} onChange={setCompatibility} />
+              <Input label="API Documentation URL" value={apiDocUrl} onChange={setApiDocUrl} />
+            </SectionCard>
+
+            <SectionCard title="Pricing & Links">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input label="Price (USD)" value={price} onChange={setPrice} type="number" required />
+                <Input label="Live Preview URL" value={previewUrl} onChange={setpreviewUrl} />
+              </div>
+            </SectionCard>
+
+          </div>
+
+          {/* ── Action bar — floating centered pill ───────────────────── */}
+          <div className="sticky bottom-4 z-50 flex justify-center mt-10">
+            <div className="w-full max-w-5xl">
+              <div className="
+                flex items-center justify-between
+                px-6 py-4
+                rounded-2xl
+                border border-white/[0.08]
+                bg-[#15132a]/80
+                backdrop-blur-xl
+                shadow-xl
+              ">
+
+                {/* Left side */}
+                <div className="flex flex-col">
+                  <p className="text-sm text-slate-300 font-medium">Unsaved changes</p>
+                  <p className="text-xs text-slate-500">Don't forget to save before leaving</p>
+                </div>
+
+                {/* Right side */}
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => router.back()}
+                    className="
+                      px-5 py-2 rounded-xl
+                      border border-white/[0.08] text-slate-300
+                      hover:bg-white/[0.06] hover:text-white
+                      transition-all
+                    "
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="
+                      px-6 py-2 rounded-xl
+                      bg-violet-600 hover:bg-violet-500
+                      text-white font-semibold
+                      shadow-lg hover:shadow-xl
+                      transition-all
+                      disabled:opacity-50 disabled:cursor-not-allowed
+                      flex items-center gap-2
+                    "
+                  >
+                    {isSaving && (
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    )}
+                    {isSaving ? "Saving..." : "Save Changes"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

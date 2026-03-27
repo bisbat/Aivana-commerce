@@ -89,8 +89,7 @@ export class MinioService implements OnModuleInit {
       const metaData = {
         'Content-Type': file.mimetype,
       };
-
-      // Add folder prefix if provided
+      
       const fullPath = folder ? `${folder}/${fileName}` : fileName;
 
       await this.minioClient.putObject(
@@ -112,12 +111,10 @@ export class MinioService implements OnModuleInit {
     try {
       let hostUrl = this.configService.get<string>('HOST_URL');
 
-      // Production: Use HOST_URL (reverse proxy)
       if (hostUrl) {
-        // Auto-detect and add protocol if missing
         if (!hostUrl.startsWith('http://') && !hostUrl.startsWith('https://')) {
           const publicSSL = this.configService.get<string>('MINIO_PUBLIC_USE_SSL')
-            ?? 'true'; // Default HTTPS for production
+            ?? 'true';
           const protocol = publicSSL === 'true' ? 'https' : 'http';
           hostUrl = `${protocol}://${hostUrl}`;
         }
@@ -126,11 +123,10 @@ export class MinioService implements OnModuleInit {
         return `${baseUrl}/${this.bucketName}/${fileName}`;
       }
 
-      // Local Development: Build URL from MinIO endpoint
       const endpoint = this.configService.get<string>('MINIO_ENDPOINT');
       const port = this.configService.get<string>('MINIO_PORT');
       const publicSSL = this.configService.get<string>('MINIO_PUBLIC_USE_SSL')
-        ?? 'false'; // Default HTTP for local
+        ?? 'false';
 
       const protocol = publicSSL === 'true' ? 'https' : 'http';
       const portSuffix = port && port !== '80' && port !== '443' ? `:${port}` : '';

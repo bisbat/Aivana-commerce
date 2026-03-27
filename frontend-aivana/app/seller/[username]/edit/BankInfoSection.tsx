@@ -43,13 +43,17 @@ export default function BankInfoSection({
 }: BankInfoSectionProps) {
   return (
     <section>
-      <h2 className="text-xl font-medium mb-4">Bank Information</h2>
+      <h2 className="text-lg font-semibold text-white mb-4">
+        ข้อมูลบัญชีธนาคาร
+      </h2>
 
       {/* BANK SELECT */}
-      <label className="block text-sm font-medium mb-1">Bank</label>
+      <label className="block text-sm font-medium text-slate-300 mb-2">
+        ธนาคาร
+      </label>
       <div className="relative mb-4">
         <select
-          className="border rounded px-3 py-2 w-full appearance-none bg-white text-black"
+          className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#8a57fb]/50 focus:border-transparent transition-all appearance-none"
           value={BANKS.find((b) => b.name === bankInfo.bankName)?.code || ""}
           onChange={(e) => {
             const selectedCode = e.target.value;
@@ -59,9 +63,11 @@ export default function BankInfoSection({
             }
           }}
         >
-          <option value="">เลือกธนาคาร</option>
+          <option value="" className="bg-slate-800">
+            เลือกธนาคาร
+          </option>
           {BANKS.map((bank) => (
-            <option key={bank.code} value={bank.code}>
+            <option key={bank.code} value={bank.code} className="bg-slate-800">
               {bank.name}
             </option>
           ))}
@@ -69,20 +75,24 @@ export default function BankInfoSection({
       </div>
 
       {/* Account Holder */}
-      <label className="block text-sm font-medium mb-1">Account Name</label>
+      <label className="block text-sm font-medium text-slate-300 mb-2">
+        ชื่อบัญชี
+      </label>
       <input
         type="text"
-        className="border rounded px-3 py-2 w-full mb-4"
+        className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#8a57fb]/50 focus:border-transparent transition-all mb-4"
         placeholder="ชื่อบัญชี"
         value={bankInfo.accountName}
         onChange={(e) => onChange({ accountName: e.target.value })}
       />
 
       {/* Account Number */}
-      <label className="block text-sm font-medium mb-1">Account Number</label>
+      <label className="block text-sm font-medium text-slate-300 mb-2">
+        เลขที่บัญชี
+      </label>
       <input
         type="text"
-        className="border rounded px-3 py-2 w-full"
+        className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#8a57fb]/50 focus:border-transparent transition-all"
         placeholder="เลขบัญชี"
         value={bankInfo.accountNumber}
         onChange={(e) => onChange({ accountNumber: e.target.value })}

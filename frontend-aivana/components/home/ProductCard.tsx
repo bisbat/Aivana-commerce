@@ -8,6 +8,15 @@ interface ProductCardProps {
   product: Product;
 }
 
+const getCategoryDisplayName = (categoryName: string): string => {
+  const categoryMap: Record<string, string> = {
+    "ui-kit": "UI Kit",
+    "frontend-template": "Frontend Template",
+    "backend-template": "Backend Template",
+  };
+  return categoryMap[categoryName] || categoryName;
+};
+
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <Link href={`/products/${product.id}`}>
@@ -42,7 +51,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               <>
                 <span>•</span>
                 <span className="px-2 py-0.5 bg-slate-800 rounded text-xs">
-                  {product.category.name}
+                  {getCategoryDisplayName(product.category.name)}
                 </span>
               </>
             )}
