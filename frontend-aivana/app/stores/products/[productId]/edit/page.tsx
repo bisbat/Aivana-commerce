@@ -276,6 +276,8 @@ export default function EditProductPage() {
                   value={compatibility}
                   onChange={setCompatibility}
                 />
+
+                <Input label="API Documentation" value={apiDocUrl} onChange={setApiDocUrl} />
               </div>
 
               {/* SECTION: PRICING */}
@@ -285,7 +287,6 @@ export default function EditProductPage() {
                 <div className="space-y-4">
                   <Input label="Price" value={price} onChange={setPrice} type="number" required />
                   <Input label="Live Preview" value={previewUrl} onChange={setpreviewUrl} />
-                  <Input label="API Documentation" value={apiDocUrl} onChange={setApiDocUrl} />
                 </div>
               </div>
             </div>
