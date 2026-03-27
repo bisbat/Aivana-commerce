@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SocialLink } from "@/lib/types/user/sellerProfile";
 
 const SOCIAL_PLATFORMS = [
@@ -20,134 +20,128 @@ interface SocialLinksProps {
   onChange: (updated: SocialLink) => void;
 }
 
+interface SocialLinkItem {
+  platform: string;
+  url: string;
+}
+
 export function SocialLinks({ socials, onChange }: SocialLinksProps) {
-  // derive used platforms (only those with a non-empty string)
-  const usedPlatforms = (Object.keys(socials) as PlatformValue[]).filter(
-    (k) => socials[k] && socials[k]!.trim() !== "",
-  );
+  // Convert socials object to array format for local state
+  const [socialLinks, setSocialLinks] = useState<SocialLinkItem[]>(() => {
+    const links = Object.entries(socials)
+      .filter(([_, url]) => url && url.trim() !== "")
+      .map(([platform, url]) => ({ platform, url: url || "" }));
 
-  const availablePlatforms = SOCIAL_PLATFORMS.filter(
-    (p) => !usedPlatforms.includes(p.value as PlatformValue),
-  );
+    // Always have at least one row
+    return links.length > 0 ? links : [{ platform: "", url: "" }];
+  });
 
-  function handleRemove(platform: PlatformValue) {
-    const updated: SocialLink = { ...socials };
-    // remove the field
-    // using delete keeps type but is fine at runtime
-    delete (updated as any)[platform];
-    onChange(updated);
+  function handleSocialChange(
+    index: number,
+    field: "platform" | "url",
+    value: string,
+  ) {
+    const newLinks = [...socialLinks];
+    newLinks[index] = { ...newLinks[index], [field]: value };
+
+    setSocialLinks(newLinks);
+
+    // Convert back to SocialLink object format
+    const newSocials: SocialLink = {};
+    newLinks.forEach((link) => {
+      if (link.platform && link.url.trim()) {
+        newSocials[link.platform as PlatformValue] = link.url;
+      }
+    });
+
+    onChange(newSocials);
   }
 
-  function handleUpdateField(platform: PlatformValue, value: string) {
-    const updated: SocialLink = { ...socials, [platform]: value };
-    onChange(updated);
+  function removeSocialLink(index: number) {
+    const newLinks = socialLinks.filter((_, i) => i !== index);
+    setSocialLinks(newLinks);
+
+    // Convert back to SocialLink object format
+    const newSocials: SocialLink = {};
+    newLinks.forEach((link) => {
+      if (link.platform && link.url.trim()) {
+        newSocials[link.platform as PlatformValue] = link.url;
+      }
+    });
+
+    onChange(newSocials);
+  }
+
+  function addSocialLink() {
+    if (socialLinks.length >= MAX_SOCIAL_LINKS) {
+      alert(`คุณสามารถเพิ่มได้สูงสุด ${MAX_SOCIAL_LINKS} ลิงก์`);
+      return;
+    }
+
+    setSocialLinks([...socialLinks, { platform: "", url: "" }]);
+  }
+
+  function getAvailablePlatforms(
+    currentIndex: number,
+  ): { value: string; label: string }[] {
+    const usedPlatforms = socialLinks
+      .map((link, idx) => (idx !== currentIndex ? link.platform : null))
+      .filter(Boolean);
+
+    return SOCIAL_PLATFORMS.filter((p) => !usedPlatforms.includes(p.value));
   }
 
   return (
     <section>
-      <h2 className="text-xl font-medium mb-4">Social Links</h2>
-
-      {/* Existing social inputs */}
-      <div className="space-y-3 mb-4">
-        {usedPlatforms.length === 0 && (
-          <p className="text-gray-400 text-sm">No social links added yet.</p>
-        )}
-
-        {usedPlatforms.map((platform) => (
-          <div key={platform} className="flex items-center gap-3">
-            <span className="w-28 font-medium capitalize">{platform}</span>
-
+      <label className="block text-white text-sm mb-2">
+        โซเชียลมีเดีย (ไม่บังคับ)
+      </label>
+      <div className="space-y-3">
+        {socialLinks.map((link, index) => (
+          <div key={index} className="flex gap-2">
+            <select
+              value={link.platform}
+              onChange={(e) =>
+                handleSocialChange(index, "platform", e.target.value)
+              }
+              className="px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-[#8a57fb] text-white focus:outline-none transition-colors"
+            >
+              <option value="" disabled>
+                เลือกแพลตฟอร์ม
+              </option>
+              {getAvailablePlatforms(index).map((platform) => (
+                <option key={platform.value} value={platform.value}>
+                  {platform.label}
+                </option>
+              ))}
+            </select>
             <input
               type="url"
-              className="border rounded px-3 py-2 flex-1"
-              value={socials[platform] ?? ""}
-              onChange={(e) => handleUpdateField(platform, e.target.value)}
+              value={link.url}
+              onChange={(e) => handleSocialChange(index, "url", e.target.value)}
+              placeholder="https://..."
+              className="flex-1 px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-[#8a57fb] text-white placeholder:text-slate-400 focus:outline-none transition-colors"
             />
-
-            <button
-              type="button"
-              onClick={() => handleRemove(platform)}
-              className="text-red-400 hover:text-red-500"
-            >
-              ✕
-            </button>
+            {socialLinks.length > 1 && (
+              <button
+                type="button"
+                onClick={() => removeSocialLink(index)}
+                className="px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
+              >
+                ลบ
+              </button>
+            )}
           </div>
         ))}
+        <button
+          type="button"
+          onClick={addSocialLink}
+          disabled={socialLinks.length >= MAX_SOCIAL_LINKS}
+          className="w-full px-4 py-2 bg-slate-800/50 hover:bg-slate-800 text-slate-400 rounded-lg border border-dashed border-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          + เพิ่มลิงก์โซเชียล ({socialLinks.length}/{MAX_SOCIAL_LINKS})
+        </button>
       </div>
-
-      {/* Add new social link */}
-      {usedPlatforms.length < MAX_SOCIAL_LINKS && (
-        <AddSocialForm
-          platforms={availablePlatforms}
-          onAdd={(platform, url) => {
-            if (!platform || !url.trim()) return;
-            if (usedPlatforms.length >= MAX_SOCIAL_LINKS) {
-              alert(`You can add up to ${MAX_SOCIAL_LINKS} social links.`);
-              return;
-            }
-            handleUpdateField(platform as PlatformValue, url.trim());
-          }}
-        />
-      )}
     </section>
-  );
-}
-
-/* AddSocialForm uses local component state */
-function AddSocialForm({
-  platforms,
-  onAdd,
-}: {
-  platforms: { value: string; label: string }[];
-  onAdd: (platform: string, url: string) => void;
-}) {
-  const [selectedPlatform, setSelectedPlatform] = useState<string>("");
-  const [urlValue, setUrlValue] = useState<string>("");
-
-  return (
-    <div className="flex gap-2">
-      <select
-        className="border rounded px-3 py-2"
-        value={selectedPlatform}
-        onChange={(e) => setSelectedPlatform(e.target.value)}
-      >
-        <option value="" disabled>
-          Select Platform
-        </option>
-        {platforms.map((p) => (
-          <option key={p.value} value={p.value}>
-            {p.label}
-          </option>
-        ))}
-      </select>
-
-      <input
-        type="url"
-        placeholder="Profile link"
-        className="border rounded px-3 py-2 flex-1"
-        value={urlValue}
-        onChange={(e) => setUrlValue(e.target.value)}
-      />
-
-      <button
-        type="button"
-        onClick={() => {
-          if (!selectedPlatform) {
-            alert("Select a platform first");
-            return;
-          }
-          if (!urlValue.trim()) {
-            alert("Enter a URL");
-            return;
-          }
-          onAdd(selectedPlatform, urlValue.trim());
-          setSelectedPlatform("");
-          setUrlValue("");
-        }}
-        className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
-      >
-        Add
-      </button>
-    </div>
   );
 }

@@ -58,11 +58,11 @@ export default function ProductDetailPage({
 
   const allImages = product
     ? [
-      product.heroImageUrl,
-      ...(product.detailImages?.map((img) =>
-        Array.isArray(img.url) ? img.url[0] : img.url,
-      ) || []),
-    ].filter(Boolean)
+        product.heroImageUrl,
+        ...(product.detailImages?.map((img) =>
+          Array.isArray(img.url) ? img.url[0] : img.url,
+        ) || []),
+      ].filter(Boolean)
     : [];
 
   const handleAddToCart = async () => {
@@ -521,41 +521,48 @@ export default function ProductDetailPage({
                 </div>
               )}
 
-              <h3 className="text-lg font-semibold text-white/90 flex items-center gap-2">
-                <svg
-                  className="w-5 h-5 text-purple-400/70"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                Compatibility
-              </h3>
-
-              {product.compatibility && product.compatibility.length > 0 && (
-                <div className="space-y-2">
-                  {product.compatibility.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-3 p-3 bg-white/5 rounded-lg"
+              {/* Compatibility - ซ่อนเมื่อเป็น UI Kit */}
+              {product.category?.name !== "ui-kit" && (
+                <>
+                  <h3 className="text-lg font-semibold text-white/90 flex items-center gap-2">
+                    <svg
+                      className="w-5 h-5 text-purple-400/70"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <div className="shrink-0">
-                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Compatibility
+                  </h3>
+
+                  {product.compatibility &&
+                    product.compatibility.length > 0 && (
+                      <div className="space-y-2">
+                        {product.compatibility.map((item, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-3 p-3 bg-white/5 rounded-lg"
+                          >
+                            <div className="shrink-0">
+                              <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                            </div>
+                            <span className="text-white/90 font-medium text-sm leading-relaxed">
+                              {item}
+                            </span>
+                          </div>
+                        ))}
                       </div>
-                      <span className="text-white/90 font-medium text-sm leading-relaxed">
-                        {item}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                    )}
+                </>
               )}
 
+              {/* Tech Stack - แสดงเสมอ */}
               <h3 className="text-lg font-semibold text-white/90 flex items-center gap-2">
                 <svg
                   className="w-5 h-5 text-purple-400/70"
@@ -591,40 +598,93 @@ export default function ProductDetailPage({
                 </div>
               )}
 
-              <h3 className="text-lg font-semibold text-white/90 flex items-center gap-2">
-                <svg
-                  className="w-5 h-5 text-purple-400/70"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                Requirements
-              </h3>
-
-              {product.requirement && product.requirement.length > 0 && (
-                <div className="space-y-2">
-                  {product.requirement.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-3 p-3 bg-white/5 rounded-lg"
+              {/* Requirements - ซ่อนเมื่อเป็น UI Kit */}
+              {product.category?.name !== "ui-kit" && (
+                <>
+                  <h3 className="text-lg font-semibold text-white/90 flex items-center gap-2">
+                    <svg
+                      className="w-5 h-5 text-purple-400/70"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <div className="shrink-0">
-                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-                      </div>
-                      <span className="text-white/90 font-medium text-sm leading-relaxed">
-                        {item}
-                      </span>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Requirements
+                  </h3>
+
+                  {product.requirement && product.requirement.length > 0 && (
+                    <div className="space-y-2">
+                      {product.requirement.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-3 p-3 bg-white/5 rounded-lg"
+                        >
+                          <div className="shrink-0">
+                            <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                          </div>
+                          <span className="text-white/90 font-medium text-sm leading-relaxed">
+                            {item}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  )}
+                </>
               )}
+
+              {/* API Documentation - แสดงเฉพาะ Backend Template ที่ user ซื้อแล้ว */}
+              {product.category?.name === "backend-template" &&
+                product.apiDocUrl &&
+                (isUserProduct || isOwner || isAdmin) && (
+                  <>
+                    <h3 className="text-lg font-semibold text-white/90 flex items-center gap-2">
+                      <svg
+                        className="w-5 h-5 text-purple-400/70"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                      API Documentation
+                    </h3>
+
+                    <div className="p-4 bg-white/5 rounded-lg border border-purple-500/20">
+                      <a
+                        href={product.apiDocUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                          />
+                        </svg>
+                        <span className="font-medium">ดูเอกสาร API</span>
+                      </a>
+                    </div>
+                  </>
+                )}
             </div>
           </div>
         </div>
