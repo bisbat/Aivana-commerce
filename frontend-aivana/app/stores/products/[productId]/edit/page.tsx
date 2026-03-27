@@ -328,23 +328,43 @@ export default function EditProductPage() {
           </div>
 
           {/* ACTION BAR */}
-          <div className="sticky bottom-0 z-50 mt-10">
-            <div className="backdrop-blur bg-slate-950/70 border-t border-slate-800 px-6 py-4">
+          <div className="sticky bottom-4 z-50 flex justify-center mt-10">
+            <div className="w-full max-w-5xl">
 
-              <div className="max-w-7xl mx-auto flex items-center justify-between">
+              <div className="
+      flex items-center justify-between
+      px-6 py-4
+      rounded-2xl
+      border border-slate-800
+      bg-slate-900/80
+      backdrop-blur-xl
+      shadow-xl
+    ">
 
-                {/* Left side (hint / status) */}
-                <p className="text-sm text-slate-400">
-                  Changes are not saved automatically
-                </p>
+                {/* Left side */}
+                <div className="flex flex-col">
+                  <p className="text-sm text-slate-300 font-medium">
+                    Unsaved changes
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    Don’t forget to save before leaving
+                  </p>
+                </div>
 
-                {/* Right side (actions) */}
+                {/* Right side */}
                 <div className="flex items-center gap-3">
 
                   <button
                     type="button"
                     onClick={() => router.back()}
-                    className="px-5 py-2 rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
+                    className="
+            px-5 py-2
+            rounded-xl
+            border border-slate-700
+            text-slate-300
+            hover:bg-slate-800 hover:text-white
+            transition-all
+          "
                   >
                     Cancel
                   </button>
@@ -352,13 +372,24 @@ export default function EditProductPage() {
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="px-6 py-2 rounded-lg bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-semibold shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="
+            px-6 py-2
+            rounded-xl
+            bg-[var(--primary)]
+            hover:bg-[var(--primary-hover)]
+            text-white font-semibold
+            shadow-lg hover:shadow-xl
+            transition-all
+            disabled:opacity-50 disabled:cursor-not-allowed
+            flex items-center gap-2
+          "
                   >
                     {isSaving && (
                       <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                     )}
                     {isSaving ? "Saving..." : "Save Changes"}
                   </button>
+
                 </div>
               </div>
             </div>
