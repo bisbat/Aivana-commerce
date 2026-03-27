@@ -50,6 +50,7 @@ export default function EditProductPage() {
   const params = useParams();
   const productId = String(params.productId);
   const router = useRouter();
+  const [isSaving, setIsSaving] = useState(false);
 
   const [productData, setProductData] = useState<Product | null>(null);
 
@@ -175,160 +176,194 @@ export default function EditProductPage() {
       },
       apiDocUrl,
     };
+    setIsSaving(true);
     await updateProductAction(productId, updatedProductData);
+    setIsSaving(false);
     router.push(`/stores/products/${productId}`);
   };
 
   return (
-    <div>
-      <BackButton productId={productId} />
-      <h1 className="text-3xl font-bold text-primary mb-4">Edit page</h1>
+    <div className="min-h-screen text-white">
+      <div className="max-w-7xl mx-auto px-6 py-8">
 
-      <form onSubmit={handleSubmit}>
-        <Input
-          label="Product Name"
-          value={name}
-          onChange={setName}
-          placeholder="Enter product name"
-          required
-        />
-        <Input
-          label="Blurb"
-          value={blurb}
-          onChange={setBlurb}
-          placeholder="Short description"
-        />
-
-        <Select
-          label="Category"
-          value={categoryId}
-          onChange={setCategoryId}
-          options={categories.map((cat) => ({
-            value: cat.id,
-            label: cat.name,
-          }))}
-          placeholder="Select a category"
-          required
-        />
-
-        <Textarea
-          label="Product Description"
-          value={description}
-          onChange={setDescription}
-          placeholder="Detailed description..."
-          rows={5}
-        />
-
-        <DynamicTextListInput
-          label="Features"
-          value={features}
-          onChange={setFeatures}
-          placeholder="Feature เช่น AI Chat, Image Generator"
-          maxItems={6}
-          required
-        />
-
-        <InstallationGuideInput
-          value={installationGuide}
-          onChange={setInstallationGuide}
-        />
-
-        <DynamicTextListInput
-          label="Techstack"
-          value={techstack}
-          onChange={setTechstack}
-          placeholder="เช่น React, Vue, Java"
-          maxItems={6}
-        />
-
-        <DynamicTextListInput
-          label="Requirement"
-          value={requirement}
-          onChange={setRequirement}
-          placeholder="เช่น Node.js 18+, PostgreSQL 14+"
-          maxItems={6}
-        />
-
-        <DynamicTextListInput
-          label="Compatibility"
-          value={compatibility}
-          onChange={setCompatibility}
-          placeholder="เช่น Windows, macOS, Chrome"
-          maxItems={6}
-        />
-
-        <MultiSelectTag
-          label="Tags"
-          tags={tags}
-          selectedTagIds={selectedTagIds}
-          onChange={setSelectedTagIds}
-        />
-
-        <Input
-          label="Price"
-          value={price}
-          onChange={setPrice}
-          placeholder="0.00"
-          type="number"
-          required
-        />
-        <Input
-          label="Live Preview"
-          value={previewUrl}
-          onChange={setpreviewUrl}
-          placeholder="https://example.com"
-          type="url"
-        />
-
-        <Input
-          label="API Documentation"
-          value={apiDocUrl}
-          onChange={setApiDocUrl}
-          placeholder="https://example.com"
-          type="url"
-        />
-
-        {/* Product File Management */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Product File
-          </label>
-          <EditProductFile
-            currentFile={currentProductFile}
-            newFile={newProductFile}
-            onFileChange={handleProductFileChange}
-            onRemoveFile={handleRemoveProductFile}
-          />
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <BackButton productId={productId} />
+            <h1 className="text-3xl font-bold mt-2">Edit Product</h1>
+            <p className="text-slate-400 text-sm">
+              Update your product details and assets
+            </p>
+          </div>
         </div>
 
-        {/* Hero Image Management */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Hero Image
-          </label>
-          <EditProductHeroImage
-            currentImage={currentHeroImage}
-            newImageFile={newHeroImageFile}
-            onImageChange={handleHeroImageChange}
-            onRemoveImage={handleRemoveHeroImage}
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        {/* Detail Images Management */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Product Detail Images
-          </label>
-          <EditProductImages
-            existingImages={detailImages}
-            newImageFiles={newImageFiles}
-            onAddImages={handleAddImages}
-            onDeleteImage={handleDeleteImage}
-            onRemoveNewImage={handleRemoveNewImage}
-          />
-        </div>
-        <button type="submit">Save</button>
-      </form>
+            {/* LEFT SIDE */}
+            <div className="lg:col-span-2 space-y-8">
+
+              {/* SECTION: BASIC INFO */}
+              <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                <h2 className="text-lg font-semibold mb-4">Basic Info</h2>
+
+                <div className="space-y-4">
+                  <Input label="Product Name" value={name} onChange={setName} required />
+                  <Input label="Blurb" value={blurb} onChange={setBlurb} />
+
+                  <Select
+                    label="Category"
+                    value={categoryId}
+                    onChange={setCategoryId}
+                    options={categories.map((cat) => ({
+                      value: cat.id,
+                      label: cat.name,
+                    }))}
+                    required
+                  />
+
+                  <MultiSelectTag
+                    label="Tags"
+                    tags={tags}
+                    selectedTagIds={selectedTagIds}
+                    onChange={setSelectedTagIds}
+                  />
+                </div>
+              </div>
+
+              {/* SECTION: DESCRIPTION */}
+              <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                <h2 className="text-lg font-semibold mb-4">Description</h2>
+
+                <Textarea
+                  label="Product Description"
+                  value={description}
+                  onChange={setDescription}
+                  rows={5}
+                />
+
+                <DynamicTextListInput
+                  label="Features"
+                  value={features}
+                  onChange={setFeatures}
+                  maxItems={6}
+                />
+              </div>
+
+              {/* SECTION: TECHNICAL */}
+              <div className="p-6 rounded-xl border border-slate-800">
+                <h2 className="text-lg font-semibold mb-4">Technical Details</h2>
+
+                <InstallationGuideInput
+                  value={installationGuide}
+                  onChange={setInstallationGuide}
+                />
+
+                <DynamicTextListInput
+                  label="Techstack"
+                  value={techstack}
+                  onChange={setTechstack}
+                />
+
+                <DynamicTextListInput
+                  label="Requirement"
+                  value={requirement}
+                  onChange={setRequirement}
+                />
+
+                <DynamicTextListInput
+                  label="Compatibility"
+                  value={compatibility}
+                  onChange={setCompatibility}
+                />
+              </div>
+
+              {/* SECTION: PRICING */}
+              <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                <h2 className="text-lg font-semibold mb-4">Pricing & Links</h2>
+
+                <div className="space-y-4">
+                  <Input label="Price" value={price} onChange={setPrice} type="number" required />
+                  <Input label="Live Preview" value={previewUrl} onChange={setpreviewUrl} />
+                  <Input label="API Documentation" value={apiDocUrl} onChange={setApiDocUrl} />
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT SIDE (STICKY MEDIA PANEL) */}
+            <div className="space-y-6 sticky top-6 h-fit">
+
+              <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                <h2 className="text-lg font-semibold mb-4">Hero Image</h2>
+                <EditProductHeroImage
+                  currentImage={currentHeroImage}
+                  newImageFile={newHeroImageFile}
+                  onImageChange={handleHeroImageChange}
+                  onRemoveImage={handleRemoveHeroImage}
+                />
+              </div>
+
+              <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                <h2 className="text-lg font-semibold mb-4">Product File</h2>
+                <EditProductFile
+                  currentFile={currentProductFile}
+                  newFile={newProductFile}
+                  onFileChange={handleProductFileChange}
+                  onRemoveFile={handleRemoveProductFile}
+                />
+              </div>
+
+              <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                <h2 className="text-lg font-semibold mb-4">Images</h2>
+                <EditProductImages
+                  existingImages={detailImages}
+                  newImageFiles={newImageFiles}
+                  onAddImages={handleAddImages}
+                  onDeleteImage={handleDeleteImage}
+                  onRemoveNewImage={handleRemoveNewImage}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ACTION BAR */}
+          <div className="sticky bottom-0 z-50 mt-10">
+            <div className="backdrop-blur bg-slate-950/70 border-t border-slate-800 px-6 py-4">
+
+              <div className="max-w-7xl mx-auto flex items-center justify-between">
+
+                {/* Left side (hint / status) */}
+                <p className="text-sm text-slate-400">
+                  Changes are not saved automatically
+                </p>
+
+                {/* Right side (actions) */}
+                <div className="flex items-center gap-3">
+
+                  <button
+                    type="button"
+                    onClick={() => router.back()}
+                    className="px-5 py-2 rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="px-6 py-2 rounded-lg bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-semibold shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {isSaving && (
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    )}
+                    {isSaving ? "Saving..." : "Save Changes"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
