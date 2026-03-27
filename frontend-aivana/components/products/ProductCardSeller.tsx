@@ -28,13 +28,12 @@ const ProductCardSeller: React.FC<ProductCardSellerProps> = ({
             <img
               src={product.heroImageUrl}
               alt={product.name}
-              className={`w-full h-full object-cover transition-all duration-300 ${
-                isDeleted
+              className={`w-full h-full object-cover transition-all duration-300 ${isDeleted
                   ? "grayscale opacity-50"
                   : isHidden
                     ? "opacity-70"
                     : ""
-              }`}
+                }`}
             />
           ) : (
             <div
@@ -62,19 +61,20 @@ const ProductCardSeller: React.FC<ProductCardSellerProps> = ({
         </div>
 
         {/* Content Section */}
-        <div className="p-3 flex flex-col gap-2">
+        <div className="p-3 flex flex-col flex-1 gap-2">
+
           <h3
-            className={`text-base font-semibold line-clamp-2 ${
-              isDeleted ? "text-slate-500" : isHidden ? "text-slate-400" : ""
-            }`}
+            className={`text-base font-semibold line-clamp-2 min-h-[3rem] ${isDeleted ? "text-slate-500" : isHidden ? "text-slate-400" : ""
+              }`}
             title={product.name}
           >
             {product.name}
           </h3>
 
-          <div className="flex items-center justify-between">
+          <div className="mt-auto flex items-center justify-between">
             <span
-              className={`text-xl font-bold ${isDeleted ? "text-slate-500" : ""}`}
+              className={`text-xl font-bold ${isDeleted ? "text-slate-500" : ""
+                }`}
             >
               {formatPriceWithCurrency(product.price)}
             </span>
@@ -82,22 +82,23 @@ const ProductCardSeller: React.FC<ProductCardSellerProps> = ({
             {!isDeleted && (
               <button
                 type="button"
-                aria-label="Edit product"
-                title="Edit"
                 onClick={(e) => {
-                  router.push(`/stores/products/${product.id}/edit`)
+                  e.preventDefault(); // IMPORTANT (prevent Link navigation)
+                  router.push(`/stores/products/${product.id}/edit`);
                 }}
-                className="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-150 bg-[var(--linne-purple-hover)] hover:bg-[var(--linne-purple-hover-2)] cursor-pointer"
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-[var(--linne-purple-hover)] hover:bg-[var(--linne-purple-hover-2)] transition"
               >
                 <Edit size={16} />
               </button>
             )}
           </div>
 
-          {isHidden && !isDeleted && (
-            <p className="text-[10px] text-orange-400/80">
+          {isHidden && !isDeleted ? (
+            <p className="text-[10px] text-orange-400/80 min-h-[1rem]">
               สินค้าถูกซ่อนจาก Marketplace ชั่วคราว
             </p>
+          ) : (
+            <div className="min-h-[1rem]" />
           )}
         </div>
       </div>
