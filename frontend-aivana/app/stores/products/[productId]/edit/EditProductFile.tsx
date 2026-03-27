@@ -14,7 +14,7 @@ export default function EditProductFile({
   onFileChange,
   onRemoveFile
 }: EditProductFileProps) {
-  
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -73,36 +73,53 @@ export default function EditProductFile({
     <div className="space-y-4">
       {/* Current/New Product File */}
       {displayFile && (
-        <div className="border-2 border-gray-200 rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <span className="text-2xl">{fileIcon}</span>
-              <div>
-                <p className="font-medium">{fileName}</p>
+        <div className="border border-slate-700 rounded-2xl p-4 bg-slate-900/60">
+          <div className="flex items-center justify-between gap-4">
+
+            {/* LEFT */}
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-2xl shrink-0">{fileIcon}</span>
+
+              <div className="min-w-0">
+                <p className="font-medium text-white truncate">
+                  {fileName}
+                </p>
+
                 {newFile && (
-                  <p className="text-sm text-green-600">
-                    ✓ New file selected (will replace current file when saved)
+                  <p className="text-xs text-green-400">
+                    ✓ New file selected (will replace on save)
                   </p>
                 )}
+
                 {currentFile && !newFile && (
-                  <a 
-                    href={currentFile} 
-                    target="_blank" 
+                  <a
+                    href={currentFile}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:text-blue-800"
+                    className="text-xs text-blue-400 hover:underline"
                   >
                     Download current file
                   </a>
                 )}
               </div>
             </div>
+
+            {/* RIGHT */}
             <button
               type="button"
               onClick={handleRemove}
-              className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
+              className="
+        shrink-0
+        px-4 py-1.5
+        rounded-lg
+        bg-red-500 hover:bg-red-600
+        text-white text-sm
+        transition-all
+      "
             >
               Remove
             </button>
+
           </div>
         </div>
       )}
