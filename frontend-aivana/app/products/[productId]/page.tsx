@@ -40,8 +40,7 @@ export default function ProductDetailPage({
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [collections, setCollections] = useState<UserCollection[]>([]);
 
-  const prohibitedRolesForPurchase =
-    currentUser?.role === "seller" || currentUser?.role === "admin";
+
 
   const isUserProduct = collections.some(
     (collection) => collection.product.id === product?.id,
@@ -50,19 +49,22 @@ export default function ProductDetailPage({
   const isSeller = currentUser?.role === "seller";
   const isOwner = isSeller && product?.seller?.userId === currentUser?.id;
 
+    const prohibitedForPurchase =
+    isAdmin || isOwner;
+
   const isPurchaseDisabled =
-    prohibitedRolesForPurchase ||
+    prohibitedForPurchase ||
     isUserProduct ||
     product?.isDeleted ||
     product?.isHidden; // ✅ ซ่อนอยู่ก็ซื้อไม่ได้
 
   const allImages = product
     ? [
-        product.heroImageUrl,
-        ...(product.detailImages?.map((img) =>
-          Array.isArray(img.url) ? img.url[0] : img.url,
-        ) || []),
-      ].filter(Boolean)
+      product.heroImageUrl,
+      ...(product.detailImages?.map((img) =>
+        Array.isArray(img.url) ? img.url[0] : img.url,
+      ) || []),
+    ].filter(Boolean)
     : [];
 
   const handleAddToCart = async () => {
@@ -500,7 +502,7 @@ export default function ProductDetailPage({
                           ? "พักการขายชั่วคราว"
                           : isUserProduct
                             ? "คุณมีสินค้านี้แล้ว"
-                            : prohibitedRolesForPurchase
+                            : prohibitedForPurchase
                               ? "ไม่สามารถซื้อได้"
                               : `เพิ่มลงตะกร้า ${formatPriceWithCurrency(product.price)}`}
                   </button>
