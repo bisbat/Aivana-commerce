@@ -283,6 +283,23 @@ export async function getProductsByTag(tag: string) {
   throw new Error("Failed to fetch products by tag");
 }
 
+export async function getProductsByCategory(category: string) {
+  const res = await fetch(
+    `${API_BASE_URL}/products?category=${encodeURIComponent(category)}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+  if (res.ok) {
+    const data = await res.json();
+    return data;
+  }
+  throw new Error("Failed to fetch products by category");
+}
+
 export async function getProductsBySearchQuery(query: string) {
   const res = await fetch(
     `${API_BASE_URL}/products/search?q=${encodeURIComponent(query)}`,
