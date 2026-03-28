@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cancelPayment } from "@/lib/actions/payment.actions";
+import { showSuccessToast } from "@/lib/toast";
 
 export default function PromptpayPage() {
   const router = useRouter();
@@ -30,6 +31,7 @@ export default function PromptpayPage() {
 
         if (data.action === 'REDIRECT') {
           stopped = true;
+          showSuccessToast("ชำระเงินสำเร็จแล้ว ระบบกำลังส่งอีเมลยืนยัน");
           router.push(data.redirect);
           return;
         }
