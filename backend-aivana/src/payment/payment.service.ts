@@ -126,24 +126,33 @@ export class PaymentService {
 
     if (charge.status === 'successful') {
       await this.orderService.markAsPaid(orderId);
-      await this.emailService.sendSuccessEmail({
-        customerEmail: order.user.email,
-        customerName: order.user.firstName ?? order.user.username,
-        orderId: payment.orderId.toString(),
-        items: order.items,
-        amount: payment.amount,
-        paymentMethod: payment.paymentMethod,
-        paidAt: new Date(),
-      });
+      try {
+        await this.emailService.sendSuccessEmail({
+          customerEmail: order.user.email,
+          customerName: order.user.firstName ?? order.user.username,
+          orderId: payment.orderId.toString(),
+          items: order.items,
+          amount: payment.amount,
+          paymentMethod: payment.paymentMethod,
+          paidAt: new Date(),
+        });
+      } catch (err) {
+        console.error('Send email failed:', err);
+      }
+
     }
 
     if (charge.status === 'failed' || charge.status === 'expired') {
       await this.orderService.markAsFailed(orderId);
-      await this.emailService.sendFailureEmail({
-        customerEmail: order.user.email,
-        customerName: order.user.firstName ?? order.user.username,
-        orderId: payment.orderId.toString(),
-      });
+      try {
+        await this.emailService.sendFailureEmail({
+          customerEmail: order.user.email,
+          customerName: order.user.firstName ?? order.user.username,
+          orderId: payment.orderId.toString(),
+        });
+      }catch (err) {
+        console.error('Send email failed:', err);
+      }
     }
   }
 
