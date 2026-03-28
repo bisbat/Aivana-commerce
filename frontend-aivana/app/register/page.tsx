@@ -170,8 +170,9 @@ export default function RegisterPage() {
   };
 
   const handleGoogleSignup = () => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-    window.location.href = `${apiUrl}/auth/google`;
+    const apiUrl =
+      process.env.NEXT_PUBLIC_GOOGLE_AUTH_URL || "http://localhost:3001";
+    router.push(`${apiUrl}/auth/google`);
   };
 
   return (
