@@ -45,47 +45,47 @@ export default function LoginPage() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!validate()) return;
+    if (!validate()) return;
 
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
-    const result = await loginAction({
-      username: formData.username,
-      password: formData.password,
-    });
+    try {
+      const result = await loginAction({
+        username: formData.username,
+        password: formData.password,
+      });
 
-    if (!result.success) {
-      setErrors({ submit: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });
-      return;
-    }
+      if (!result.success) {
+        setErrors({ submit: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });
+        return;
+      }
 
-    const isAdmin = await getCurrentUser().then(
-      (user) => user?.role === "admin",
-    );
+      const isAdmin = await getCurrentUser().then(
+        (user) => user?.role === "admin",
+      );
 
-    if (isAdmin) {
-      router.push("/admin/payouts");
+      if (isAdmin) {
+        router.push("/admin/payouts");
+        router.refresh();
+        return;
+      }
+
+      router.push("/");
       router.refresh();
-      return;
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      setErrors({ submit: "เกิดข้อผิดพลาดบางอย่าง" });
+    } finally {
+      setIsLoading(false);
     }
-
-    router.push("/");
-    router.refresh();
-  } catch (error) {
-    console.error("Unexpected error:", error);
-    setErrors({ submit: "เกิดข้อผิดพลาดบางอย่าง" });
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   const handleGoogleLogin = () => {
     const apiUrl =
       process.env.NEXT_PUBLIC_GOOGLE_AUTH_URL || "http://localhost:3001";
-    window.location.href = `${apiUrl}/auth/google`;
+    router.push(`${apiUrl}/auth/google`);
   };
 
   return (
