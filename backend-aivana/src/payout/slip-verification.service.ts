@@ -40,10 +40,13 @@ export class SlipVerificationService {
 
             return response.data;
         } catch (error) {
-            throw new BadRequestException(
-                error.response?.data?.error?.message ||
-                'Slip verification failed',
-            );
+
+            throw new BadRequestException({
+                message:
+                    error?.response?.data?.error?.message ||
+                    error?.response?.data?.message ||
+                    'Slip verification failed',
+            });
         }
     }
 
