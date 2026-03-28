@@ -38,9 +38,15 @@ export class ProductController {
 
   @Public()
   @Get()
-  async getProducts(@Query('tag') tag?: string) {
+  async getProducts(
+    @Query('tag') tag?: string,
+    @Query('category') category?: string,
+  ) {
     if (tag) {
       return this.productService.getProductsByTag(tag);
+    }
+    if (category) {
+      return this.productService.getProductsByCategory(category);
     }
     return this.productService.getAllProducts();
   }

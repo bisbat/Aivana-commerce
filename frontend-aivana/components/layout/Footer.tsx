@@ -33,9 +33,15 @@ export const Footer: React.FC = () => {
             <h4 className="text-white font-semibold mb-4">หมวดหมู่</h4>
             <ul className="space-y-2">
               {[
-                { label: "UI Kits", href: "/ui-kits" },
-                { label: "Frontend Template", href: "/frontend-template" },
-                { label: "Backend Template", href: "/backend-template" },
+                { label: "UI Kit", href: "/products?category=ui-kit" },
+                {
+                  label: "Frontend Template",
+                  href: "/products?category=frontend-template",
+                },
+                {
+                  label: "Backend Template",
+                  href: "/products?category=backend-template",
+                },
               ].map((item, i) => (
                 <li key={i}>
                   <Link

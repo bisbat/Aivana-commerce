@@ -566,6 +566,23 @@ export class ProductService {
     return this.productMapper.toResponseList(products);
   }
 
+  async getProductsByCategory(category?: string) {
+    if (!category || !category.trim()) return [];
+
+    const normalized = category.trim();
+
+    const products = await this.productsRepository.find({
+      where: {
+        category: { name: normalized },
+        isDeleted: false,
+        isHidden: false,
+      },
+      relations: ['category', 'seller', 'seller.user', 'tags', 'productImages'],
+    });
+
+    return this.productMapper.toResponseList(products);
+  }
+
   async getProductReviews(
     productId: number,
     page: number = 1,
