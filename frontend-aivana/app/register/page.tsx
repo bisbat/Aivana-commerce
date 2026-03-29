@@ -150,20 +150,24 @@ export default function RegisterPage() {
         formPayload.append("avatar", fileInputRef.current.files[0]);
       }
 
-      await registerAction(formPayload);
+      const result = await registerAction(formPayload);
 
-      router.push("/");
-      router.refresh();
+      if (result.success) {
+        router.push("/");
+        router.refresh();
+      } else {
+        // แสดง error ที่ field ที่เกี่ยวข้อง
+        if (result.field) {
+          setErrors({ [result.field]: result.message || "" });
+        } else {
+          setErrors({ submit: result.message || "เกิดข้อผิดพลาด" });
+        }
+      }
     } catch (error: any) {
       console.error("Register error:", error);
-
-      if (error.message) {
-        setErrors({ submit: error.message });
-      } else {
-        setErrors({
-          submit: "เกิดข้อผิดพลาดในการสมัครสมาชิก กรุณาลองใหม่อีกครั้ง",
-        });
-      }
+      setErrors({
+        submit: "เกิดข้อผิดพลาดในการสมัครสมาชิก กรุณาลองใหม่อีกครั้ง",
+      });
     } finally {
       setIsLoading(false);
     }

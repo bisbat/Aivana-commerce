@@ -1,4 +1,5 @@
 "use server";
+
 import { cookies } from "next/headers";
 import { LoginRequest } from "@/lib/types/auth";
 
@@ -29,29 +30,65 @@ export async function loginAction(data: LoginRequest) {
 
 // REGISTER
 export async function registerAction(data: FormData) {
-  const res = await fetch(`${API_URL}/auth/register`, {
-    method: "POST",
-    body: data instanceof FormData ? data : JSON.stringify(data),
-    headers:
-      data instanceof FormData ? {} : { "Content-Type": "application/json" },
-  });
+  try {
+    const res = await fetch(`${API_URL}/auth/register`, {
+      method: "POST",
+      body: data instanceof FormData ? data : JSON.stringify(data),
+      headers:
+        data instanceof FormData ? {} : { "Content-Type": "application/json" },
+    });
 
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.message || "Register failed");
+    if (!res.ok) {
+      const error = await res.json();
+
+      let errorMessage = "เกิดข้อผิดพลาดในการสมัครสมาชิก";
+
+      if (error.message) {
+        if (
+          error.message.includes("Email") &&
+          error.message.includes("already exists")
+        ) {
+          errorMessage = "อีเมลนี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น";
+        } else if (
+          error.message.includes("Username") &&
+          error.message.includes("already exists")
+        ) {
+          errorMessage = "ชื่อผู้ใช้นี้ถูกใช้งานแล้ว กรุณาเลือกชื่อผู้ใช้อื่น";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      return {
+        success: false,
+        message: errorMessage,
+        field: error.message?.includes("Email")
+          ? "email"
+          : error.message?.includes("Username")
+            ? "username"
+            : undefined,
+      };
+    }
+
+    const { accessToken } = await res.json();
+
+    // auto login หลัง register
+    (await cookies()).set("accessToken", accessToken, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path:
+        process.env.NODE_ENV === "production" ? "/capstone25/cp25ssi3" : "/",
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Register error:", error);
+    return {
+      success: false,
+      message: "เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์",
+    };
   }
-
-  const { accessToken } = await res.json();
-
-  // auto login หลัง register
-  (await cookies()).set("accessToken", accessToken, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: process.env.NODE_ENV === "production" ? "/capstone25/cp25ssi3" : "/",
-  });
-
-  return { success: true };
 }
 
 export async function logoutAction() {

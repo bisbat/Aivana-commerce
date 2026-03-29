@@ -19,17 +19,14 @@ export class PassportJwtAuthGuard extends AuthGuard('jwt') {
       context.getClass(),
     ]);
 
-    // For public routes, try to authenticate but don't throw error if it fails
     if (isPublic) {
       try {
         await super.canActivate(context);
       } catch (err) {
-        // Silent fail for public routes - user will just be undefined
       }
       return true;
     }
 
-    // For protected routes, throw error if authentication fails
     return super.canActivate(context) as Promise<boolean>;
   }
 
@@ -39,12 +36,10 @@ export class PassportJwtAuthGuard extends AuthGuard('jwt') {
       context.getClass(),
     ]);
 
-    // If public route and no user, allow but don't set user
     if (isPublic) {
-      return user || null; // Return user if available, null otherwise
+      return user || null; 
     }
 
-    // For protected routes, throw error if no user
     if (err || !user) {
       throw err || new UnauthorizedException('Unauthorized');
     }
