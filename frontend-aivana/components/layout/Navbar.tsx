@@ -105,6 +105,18 @@ export const Navbar: React.FC = () => {
     }
   };
 
+  const handleAiSearchClick = () => {
+    if (!isAuthenticated) {
+      if (typeof window !== "undefined") {
+        import("@/lib/toast").then(({ showErrorToast }) => {
+          showErrorToast("กรุณาเข้าสู่ระบบก่อนจึงจะใช้ฟีเจอร์ AI ค้นหาได้");
+        });
+      }
+      return;
+    }
+    router.push(`/ai-search`);
+  };
+
   const handleSearchKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       handleSearch();
@@ -137,11 +149,7 @@ export const Navbar: React.FC = () => {
           <div className="hidden md:flex flex-1 max-w-3xl mx-4">
             <div className="w-full relative">
               <div className="relative flex items-center">
-
-                <Search
-                  className="absolute left-4 text-gray-400"
-                  size={20}
-                />
+                <Search className="absolute left-4 text-gray-400" size={20} />
 
                 <input
                   type="text"
@@ -158,12 +166,12 @@ export const Navbar: React.FC = () => {
         bg-gradient-to-r from-purple-500 to-indigo-500 
         hover:from-purple-600 hover:to-indigo-600
         text-white transition-all shadow-md hover:shadow-lg"
-        
-                  onClick={() => router.push(`/ai-search`)}
+                  onClick={() => {
+                    handleAiSearchClick();
+                  }}
                 >
                   AI Search
                 </button>
-
               </div>
             </div>
           </div>
@@ -260,10 +268,11 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center gap-1.5 py-3 overflow-x-auto scrollbar-hide">
           {/* ALL */}
           <button
-            className={`px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${activeTag === "all"
-              ? "bg-[#8a57fb] text-white"
-              : "bg-[#262549] text-gray-300 hover:bg-[#1e1b3d] hover:text-white"
-              }`}
+            className={`px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+              activeTag === "all"
+                ? "bg-[#8a57fb] text-white"
+                : "bg-[#262549] text-gray-300 hover:bg-[#1e1b3d] hover:text-white"
+            }`}
             onClick={() => handleTagClick("all")}
           >
             ทั้งหมด
@@ -273,10 +282,11 @@ export const Navbar: React.FC = () => {
           {tagNavbar.slice(0, 10).map((tag) => (
             <button
               key={tag.id}
-              className={`px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${activeTag === tag.name
-                ? "bg-[#8a57fb] text-white"
-                : "bg-[#262549] text-gray-300 hover:bg-[#1e1b3d] hover:text-white"
-                }`}
+              className={`px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                activeTag === tag.name
+                  ? "bg-[#8a57fb] text-white"
+                  : "bg-[#262549] text-gray-300 hover:bg-[#1e1b3d] hover:text-white"
+              }`}
               onClick={() => handleTagClick(tag.name)}
             >
               {tag.name}
