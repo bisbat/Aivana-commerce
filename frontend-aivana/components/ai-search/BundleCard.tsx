@@ -8,7 +8,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { showSuccessToast, showErrorToast } from "@/lib/toast";
 import { addToCart } from "@/lib/actions/cart.actions";
 import { UserProfile } from "@/lib/types/user/user";
-
+import { useRouter } from "next/navigation";
 interface BundleCardProps {
   goal: string;
   reason: string;
@@ -25,6 +25,7 @@ export default function BundleCard({
   items,
   onAddAll,
 }: BundleCardProps) {
+  const router = useRouter();
   const [getUser, setCurrentUser] = useState<UserProfile | null>(null);
 
   const allProducts = [
@@ -77,7 +78,10 @@ export default function BundleCard({
         {allProducts.map((product) => (
           <div
             key={product.id}
-            className="flex items-center gap-4 bg-[#1a1735] rounded-xl p-3 hover:bg-[#221f45] transition"
+            className="flex items-center gap-4 bg-[#1a1735] rounded-xl p-3 hover:bg-[#221f45] transition cursor-pointer group"
+            onClick={(e) => {
+              router.push(`/products/${product.id}`);
+            }}
           >
             {product.heroImageUrl && (
               <img
@@ -97,8 +101,11 @@ export default function BundleCard({
             </div>
 
             <button
-              className="bg-violet-500 hover:bg-violet-600 text-white text-xs font-medium px-3 py-2 rounded-lg transition shrink-0"
-              onClick={() => handleAddToCart(Number(product.id))}
+              className="bg-violet-500 hover:bg-violet-600 text-white text-xs font-medium px-3 py-2 rounded-lg transition shrink-0 group-hover:scale-105"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddToCart(Number(product.id));
+              }}
             >
               + เพิ่ม
             </button>
