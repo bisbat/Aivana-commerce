@@ -271,7 +271,7 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   useEffect(() => {
     return () => {
       if (preview) {
@@ -303,28 +303,39 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
       setError("กรุณาอัพโหลดรูปรับงบ (slip) ก่อน");
       return;
     }
+
     setLoading(true);
     setError(null);
 
     try {
-      await markPayoutAsPaid(data.payoutId, file);
-      setSuccess(true);
-      // Optionally refresh after 2s
-      setTimeout(() => router.refresh(), 2000);
-    } catch (e: any) {
-      const message = e?.message || "เกิดข้อผิดพลาดบางอย่าง";
+      const res = await markPayoutAsPaid(data.payoutId, file);
 
-      if (message.includes("Duplicate slip")) {
-        setError("❌ สลิปนี้ถูกใช้ไปแล้ว");
-      } else if (message.includes("Amount does not match")) {
-        setError("❌ จำนวนเงินในสลิปไม่ตรงกับยอดที่ต้องจ่าย");
-      } else if (message.includes("Slip verification failed")) {
-        setError("❌ ไม่สามารถตรวจสอบสลิปได้");
-      } else {
-        setError(message);
+      // ❗ ต้องเช็ค success เอง
+      if (!res.success) {
+        const message = res.message || "เกิดข้อผิดพลาด";
+
+        if (message.includes("Duplicate slip")) {
+          setError("❌ สลิปนี้ถูกใช้ไปแล้ว");
+        } else if (message.includes("Amount does not match")) {
+          setError("❌ จำนวนเงินในสลิปไม่ตรงกับยอดที่ต้องจ่าย");
+        } else if (message.includes("Slip verification failed")) {
+          setError("❌ ไม่สามารถตรวจสอบสลิปได้");
+        } else {
+          setError(message);
+        }
+
+        return; // ❗ สำคัญมาก
       }
-    }
-    finally {
+
+      // ✅ success case
+      setSuccess(true);
+      setTimeout(() => router.refresh(), 2000);
+
+    } catch (e) {
+      // ⚠️ จะเข้าแค่กรณี network error จริง ๆ
+      console.error("Unexpected error:", e);
+      setError("เกิดข้อผิดพลาดบางอย่าง");
+    } finally {
       setLoading(false);
     }
   };

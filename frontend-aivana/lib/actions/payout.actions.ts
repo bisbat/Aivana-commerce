@@ -66,8 +66,9 @@ export async function fetchSellerPayoutDetail(
 export async function markPayoutAsPaid(
   id: number,
   slipFile: File
-): Promise<PayoutDetail> {
+): Promise<{ success: boolean; data?: PayoutDetail; message?: string }> {
   const token = await getAccessToken();
+
   const formData = new FormData();
   formData.append("slip", slipFile);
 
@@ -77,5 +78,21 @@ export async function markPayoutAsPaid(
     body: formData,
   });
 
-  return parseResponse<PayoutDetail>(res);
+  // ❗ IMPORTANT: ห้าม throw
+  if (!res.ok) {
+    let message = "เกิดข้อผิดพลาด";
+
+    try {
+      const json = await res.json();
+      message = json?.message || json?.error || message;
+    } catch {
+      const text = await res.text();
+      message = text || message;
+    }
+
+    return { success: false, message };
+  }
+
+  const data = await res.json();
+  return { success: true, data };
 }
