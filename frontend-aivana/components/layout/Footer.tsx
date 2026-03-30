@@ -54,6 +54,28 @@ export const Footer: React.FC = () => {
               ))}
             </ul>
           </div>
+
+          {/* เกี่ยวกับเรา */}
+          <div>
+            <h4 className="text-white font-semibold mb-4">เกี่ยวกับเรา</h4>
+            <ul className="space-y-2">
+              {[
+                ...(userRole === "customer"
+                  ? [{ label: "สมัครเป็นนักขาย", href: "/seller/become" }]
+                  : []),
+                { label: "เกี่ยวกับเรา", href: "/about" },
+              ].map((item, i) => (
+                <li key={i}>
+                  <Link
+                    href={item.href}
+                    className="text-slate-400 hover:text-purple-400 text-sm transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </footer>
