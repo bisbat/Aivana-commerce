@@ -4,10 +4,12 @@ services:
     container_name: nginx
     ports:
       - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      # - ./fullchain.pem:/etc/nginx/fullchain.pem:ro
-      # - ./privkey.pem:/etc/nginx/privkey.pem:ro
+      - "443:443"
+    volumes:  
+    - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    - ./fullchain.pem:/etc/nginx/ssl/fullchain.pem:ro
+    - ./privkey.pem:/etc/nginx/ssl/privkey.pem:ro
+    - ./dhparam-2048.pem:/etc/nginx/ssl/dhparam.pem:ro
     depends_on:
       - frontend
       - backend
@@ -16,13 +18,9 @@ services:
       - aivana-network
 
   backend:
-    build:
-      context: ./backend-aivana
-      dockerfile: Dockerfile
+    image: bisbat/backend:latest
     container_name: backend
     env_file: ./backend-aivana/.env
-    ports:
-      - "3001:3001"
     depends_on:
       - postgres
       - minio
@@ -31,15 +29,9 @@ services:
       - aivana-network
       
   frontend:
-    build:
-      context: ./frontend-aivana
-      dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_API_URL: http://bscit.sit.kmutt.ac.th/capstone25/cp25ssi3/api
+    image: bisbat/frontend:latest
     container_name: frontend
     env_file: ./frontend-aivana/.env
-    ports:
-      - "3000:3000" 
     depends_on:
       - backend
     restart: unless-stopped
@@ -55,8 +47,6 @@ services:
       POSTGRES_PASSWORD: mypassword
     volumes:
       - postgres_data:/var/lib/postgresql
-    ports:
-      - "5432:5432"
     restart: unless-stopped
     networks:
       - aivana-network
@@ -67,7 +57,6 @@ services:
     command: server /data --console-address ":9090"
     env_file: ./.env
     ports:
-      - "9000:9000" # s3 api
       - "9090:9090" # console
     volumes:
       - ./services/minio/data:/data
@@ -96,4 +85,3 @@ volumes:
 
 networks:
   aivana-network:
-
