@@ -22,7 +22,11 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
-            <h3 className="text-2xl font-bold text-purple-500 mb-4">AIVANA</h3>
+            <Link href="/" className="flex items-center shrink-0">
+              <span className="text-3xl font-bold bg-gradient-to-br from-[#8a57fb] to-[#a78bfa] bg-clip-text text-transparent tracking-wide">
+                AIVANA
+              </span>
+            </Link>
             <p className="text-slate-400 text-sm">
               ศูนย์รวมคอมโพแนนต์ Frontend สำหรับทุกโปรเจกต์
             </p>

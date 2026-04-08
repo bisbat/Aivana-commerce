@@ -1,5 +1,3 @@
-// Helper functions for report severity calculation
-
 export type SeverityLevel = "safe" | "low" | "warning" | "critical";
 
 export interface SeverityInfo {

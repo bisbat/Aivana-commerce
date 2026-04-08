@@ -282,7 +282,7 @@ export default function ReportsTable({ reports }: { reports: Report[] }) {
   );
 
   return (
-    <div className="bg-slate-800/40 border border-white/5 rounded-2xl overflow-hidden">
+    <div className="bg-white/2.5 border border-white/7 rounded-2xl overflow-hidden">
       <div className="px-6 py-4 border-b border-white/5">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-white">

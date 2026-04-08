@@ -1,7 +1,7 @@
 export interface GetCartResponse {
   message: string;
   cartId: number;
-  userId: string; // UUID
+  userId: string; 
   items: Array<{
     cartItemId: number;
     cartId: number;
