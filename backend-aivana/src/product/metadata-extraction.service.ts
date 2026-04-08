@@ -10,8 +10,10 @@ import {
   UIKitMetadata,
   FrontendTemplateMetadata,
   BackendTemplateMetadata,
+  ExtractionResult
 } from '../shared/types/extracted-metadata.types';
 
+import { ZipValidationService } from './zip-validation.service';
 // ─────────────────────────────────────────────
 // Internal types
 // ─────────────────────────────────────────────
@@ -194,6 +196,8 @@ const DB_MAP: Record<string, string> = {
 @Injectable()
 export class MetadataExtractionService {
   private readonly logger = new Logger(MetadataExtractionService.name);
+  constructor(private readonly validator: ZipValidationService) { }
+
 
   // ── PUBLIC: called from ProductService with multer buffer ───────────────
 
@@ -212,7 +216,7 @@ export class MetadataExtractionService {
   async extractMetadataFromBuffer(
     category: Category,
     buffer: Buffer,
-  ): Promise<ExtractedMetadata> {
+  ): Promise<ExtractionResult> {
     const tmpZipPath = path.join(os.tmpdir(), `aivana-zip-${uuidv4()}.zip`);
 
     try {
@@ -238,7 +242,7 @@ export class MetadataExtractionService {
   async extractMetadataFromUrl(
     category: Category,
     fileUrl: string,
-  ): Promise<ExtractedMetadata> {
+  ): Promise<ExtractionResult> {
     const tmpZipPath = path.join(os.tmpdir(), `aivana-zip-${uuidv4()}.zip`);
 
     try {
@@ -266,14 +270,26 @@ export class MetadataExtractionService {
   private async extractMetadata(
     category: Category,
     zipPath: string,
-  ): Promise<ExtractedMetadata> {
+  ): Promise<ExtractionResult> {
     // Each extraction gets its own UUID folder → fully isolated
     const tempDir = path.join(os.tmpdir(), `aivana-extract-${uuidv4()}`);
 
     try {
       await this.extractZip(zipPath, tempDir);
       const stats = await this.scanFolder(tempDir);
-      return this.buildMetadata(category, stats);
+
+      const { result: validation, flags } = this.validator.validate(
+        category,
+        stats.allFiles,
+      );
+
+      if (!validation.isValid) {
+        return { metadata: null, validation, flags };
+      }
+
+      const metadata = this.buildMetadata(category, stats);
+
+      return { metadata, validation, flags };
     } finally {
       await this.cleanupDir(tempDir);
     }
@@ -315,7 +331,7 @@ export class MetadataExtractionService {
           file.on('finish', () => file.close(() => resolve()));
         })
         .on('error', (err: Error) => {
-          fs.unlink(destPath, () => {});
+          fs.unlink(destPath, () => { });
           reject(err);
         });
     });
@@ -693,10 +709,10 @@ export class MetadataExtractionService {
 
     const tech = hasTech
       ? {
-          ...(framework && { framework }),
-          ...(version && { frameworkVersion: version }),
-          ...(language && { language }),
-        }
+        ...(framework && { framework }),
+        ...(version && { frameworkVersion: version }),
+        ...(language && { language }),
+      }
       : undefined;
 
     return {
