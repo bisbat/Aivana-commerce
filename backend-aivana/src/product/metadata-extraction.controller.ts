@@ -8,8 +8,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MetadataExtractionService } from './metadata-extraction.service';
-import { ExtractedMetadata } from '../shared/types/extracted-metadata.types';
-
+import { ExtractionResult } from '../shared/types/extracted-metadata.types'; 
 type Category = 'ui-kit' | 'frontend-template' | 'backend-template';
 
 @Controller('metadata-extraction')
@@ -29,7 +28,7 @@ export class MetadataExtractionController {
   async extractFromUpload(
     @UploadedFile() file: Express.Multer.File,
     @Body('category') category: Category,
-  ): Promise<ExtractedMetadata> {
+  ): Promise<ExtractionResult> {
     if (!file) {
       throw new BadRequestException('Product file is required');
     }
@@ -56,7 +55,7 @@ export class MetadataExtractionController {
   async extractFromUrl(
     @Body('category') category: Category,
     @Body('fileUrl') fileUrl: string,
-  ): Promise<ExtractedMetadata> {
+  ): Promise<ExtractionResult> {
     return this.metadataService.extractMetadataFromUrl(category, fileUrl);
   }
 }

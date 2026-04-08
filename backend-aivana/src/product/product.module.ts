@@ -16,6 +16,7 @@ import { OrderModule } from 'src/order/order.module';
 import { MetadataExtractionController } from './metadata-extraction.controller';
 import { MetadataExtractionService } from './metadata-extraction.service';
 import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
+import { ZipValidationService } from './zip-validation.service';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
     forwardRef(() => OrderModule),
   ],
   controllers: [ProductController, MetadataExtractionController],
-  providers: [ProductService, ProductMapper, MetadataExtractionService],
+  providers: [ProductService, ProductMapper, MetadataExtractionService, ZipValidationService],
   exports: [ProductService, ProductMapper, MetadataExtractionService],
 })
 export class ProductModule {}
