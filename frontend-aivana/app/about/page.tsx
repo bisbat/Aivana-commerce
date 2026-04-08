@@ -25,8 +25,8 @@ const features = [
   },
   {
     icon: "○",
-    title: "ชุมชนส่วนกลาง",
-    desc: "เข้าร่วมชุมชนของผู้พัฒนาและแชร์ความรู้ของคุณ",
+    title: "รองรับ Framework หลากหลาย",
+    desc: "ส่วนประกอบที่ใช้ได้กับ React, Vue, Angular และ Framework อื่นๆ",
     bg: "bg-gradient-to-br from-[#6B5BA0]/15 to-[#4B3B98]/10",
   },
   {
@@ -43,13 +43,6 @@ const features = [
   },
 ];
 
-const stats = [
-  { num: "10k+", desc: "ผู้ใช้งานทั่วโลก" },
-  { num: "500+", desc: "คอมโพแนนต์พร้อมใช้" },
-  { num: "99%", desc: "ความพึงพอใจของผู้ใช้" },
-  { num: "24/7", desc: "อัปเดตสม่ำเสมอ" },
-];
-
 export default function AboutPage() {
   return (
     <main className="bg-[var(--color-background)] min-h-screen text-[#EEEDF5]">
@@ -58,7 +51,7 @@ export default function AboutPage() {
         <div className="max-w-[1400px] mx-auto px-4 py-28 relative overflow-hidden">
           <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-[#534AB7]/10 blur-3xl pointer-events-none" />
           <p className="text-[11px] tracking-[0.18em] uppercase text-purple-400 mb-8 font-normal">
-            Frontend Component Hub
+            Template & Component Marketplace
           </p>
           <h1 className="font-serif text-[clamp(3rem,7vw,5.5rem)] leading-[1.05] italic text-[#EEEDF5] mb-6">
             We are
@@ -66,7 +59,8 @@ export default function AboutPage() {
             <span className="text-[#A89FF0]">AIVANA.</span>
           </h1>
           <p className="text-[#7B7A8E] text-lg max-w-xl leading-relaxed font-light">
-            ศูนย์รวมคอมโพแนนต์ Frontend คุณภาพสูง สำหรับนักพัฒนาและทีมงานทุกขนาด
+            ศูนย์รวม Template & Component —
+            พร้อมให้คุณหยิบใช้และต่อยอดในโปรเจกต์ของคุณได้ทันที
           </p>
         </div>
       </section>
@@ -81,8 +75,8 @@ export default function AboutPage() {
             <div className="text-[#7B7A8E] text-lg leading-relaxed font-light space-y-5">
               <p>
                 AIVANA เป็นแพลตฟอร์มที่ออกแบบมาเพื่อให้ผู้พัฒนา ผู้ออกแบบ
-                และทีมงานสามารถค้นหา แชร์ และใช้งานคอมโพแนนต์ Frontend
-                ที่มีคุณภาพสูง
+                และทีมงานสามารถค้นหา แชร์ และใช้งาน UI Kit, Frontend Template
+                และ Backend Template ที่มีคุณภาพสูง
               </p>
               <p>
                 เราเชื่อว่าการแชร์ความรู้และองค์ประกอบการออกแบบที่เป็นประโยชน์
@@ -129,8 +123,8 @@ export default function AboutPage() {
                 <em className="text-[#A89FF0]">เริ่มต้น</em>แล้วหรือยัง?
               </h2>
               <p className="text-[#7B7A8E] text-base mt-4 leading-relaxed font-light max-w-md">
-                เข้าร่วมผู้ใช้นับหมื่นคนที่ใช้ AIVANA
-                เพื่อเร่งปล่อยโปรเจกต์ของพวกเขา
+                เริ่มต้นโปรเจกต์ได้เร็วขึ้น ด้วย Template และ Component <br />
+                คุณภาพสูงที่พร้อมให้คุณหยิบใช้ได้ทันที
               </p>
             </div>
             <div className="flex flex-col gap-3 items-start md:items-end">

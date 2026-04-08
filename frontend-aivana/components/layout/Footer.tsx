@@ -28,7 +28,7 @@ export const Footer: React.FC = () => {
               </span>
             </Link>
             <p className="text-slate-400 text-sm">
-              ศูนย์รวมคอมโพแนนต์ Frontend สำหรับทุกโปรเจกต์
+              ศูนย์รวม Template & Component
             </p>
           </div>
 
