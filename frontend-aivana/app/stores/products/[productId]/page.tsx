@@ -131,7 +131,7 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
               </span>
             </div>
 
-            {initialProductData.tags.length > 0 && (
+            {initialProductData.tags?.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-5">
                 {initialProductData.tags.map((tag) => (
                   <Pill key={tag.id}>{tag.name}</Pill>
@@ -172,7 +172,7 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
           )}
 
           {/* Features */}
-          {initialProductData.features.length > 0 && (
+          {initialProductData.features?.length > 0 && (
             <div className="rounded-2xl border border-white/[0.06] bg-[#13112a]/50 p-6">
               <SectionHeader>Features</SectionHeader>
               <ul className="space-y-2">
@@ -190,7 +190,7 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
           <div className="rounded-2xl border border-white/[0.06] bg-[#13112a]/50 p-6">
             <SectionHeader>Technical Details</SectionHeader>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              {initialProductData.techstack.length > 0 && (
+              {initialProductData.techstack?.length > 0 && (
                 <div>
                   <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2">Tech Stack</p>
                   <div className="flex flex-wrap gap-1.5">
@@ -198,7 +198,7 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
                   </div>
                 </div>
               )}
-              {initialProductData.compatibility.length > 0 && (
+              {initialProductData.compatibility?.length > 0 && (
                 <div>
                   <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2">Compatibility</p>
                   <div className="flex flex-wrap gap-1.5">
@@ -206,7 +206,7 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
                   </div>
                 </div>
               )}
-              {initialProductData.requirement.length > 0 && (
+              {initialProductData.requirement?.length > 0 && (
                 <div>
                   <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2">Requirements</p>
                   <div className="flex flex-wrap gap-1.5">
