@@ -41,14 +41,14 @@ export default async function ReportsPage() {
         )}
 
         {/* Severity Legend */}
-        <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-5 mb-6">
+        <div className="bg-white/2.5 border border-white/7 rounded-2xl p-5 mb-6">
           <h3 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
             <ShieldAlert size={15} className="text-[#8a57fb]" />
             เกณฑ์ระดับความรุนแรง
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             {/* Safe */}
-            <div className="bg-slate-900/50 border border-green-500/20 rounded-lg p-4 flex items-center gap-3">
+            <div className="bg-white/2.5 border border-white/7 rounded-lg p-4 flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
                 <ShieldCheck size={15} className="text-green-500" />
               </div>
@@ -61,7 +61,7 @@ export default async function ReportsPage() {
             </div>
 
             {/* Low */}
-            <div className="bg-slate-900/50 border border-blue-500/20 rounded-lg p-4 flex items-center gap-3">
+            <div className="bg-white/2.5 border border-white/7 rounded-lg p-4 flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
                 <Info size={15} className="text-blue-400" />
               </div>
@@ -74,7 +74,7 @@ export default async function ReportsPage() {
             </div>
 
             {/* Warning */}
-            <div className="bg-slate-900/50 border border-yellow-500/20 rounded-lg p-4 flex items-center gap-3">
+            <div className="bg-white/2.5 border border-white/7 rounded-lg p-4 flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center flex-shrink-0">
                 <AlertCircle size={15} className="text-yellow-500" />
               </div>
@@ -87,7 +87,7 @@ export default async function ReportsPage() {
             </div>
 
             {/* Critical */}
-            <div className="bg-slate-900/50 border border-red-500/20 rounded-lg p-4 flex items-center gap-3">
+            <div className="bg-white/2.5 border border-white/7 rounded-lg p-4 flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
                 <ShieldAlert size={15} className="text-red-500" />
               </div>

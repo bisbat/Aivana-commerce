@@ -1,4 +1,3 @@
-// ─── Dashboard Types ─────────────────────────────────────────────────────────
 export interface SellerDashboard {
   totalRevenue: number;
   totalItemsSold: number;
@@ -7,7 +6,7 @@ export interface SellerDashboard {
 }
 
 export interface MonthlyPerformance {
-  month: string;          // "2026-01", "2026-02"
+  month: string;   
   revenue: number;
   itemsSold: number;
   ordersCount: number;
