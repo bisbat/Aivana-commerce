@@ -48,7 +48,7 @@ export default async function PayoutRoundsPage() {
         <div className="mb-6">
           <h2 className="text-3xl font-bold text-white mb-2">รอบโอนเงิน</h2>
           <p className="text-slate-400">
-            Payout Rounds — manage seller payment cycles
+            รอบการจ่ายเงิน — จัดการรอบการชำระเงินของผู้ขาย
           </p>
         </div>
 

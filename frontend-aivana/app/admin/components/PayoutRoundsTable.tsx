@@ -62,7 +62,7 @@ export default function PayoutRoundsTable({
       <table className="w-full border-collapse">
         <thead>
           <tr className="border-b border-white/6">
-            {["Period", "Sellers", "Total Amount", "Status", "Action"].map(
+            {["ระยะเวลา", "จำนวนผู้ขาย", "ยอดรวม", "สถานะ", "การดำเนินการ"].map(
               (col) => (
                 <th
                   key={col}
