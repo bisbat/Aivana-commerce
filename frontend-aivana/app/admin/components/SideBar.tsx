@@ -5,16 +5,16 @@ import { Store, DollarSign, BarChart3 } from "lucide-react";
 
 const NAV_ITEMS: SidebarNavItem[] = [
   {
-    label: "Payout Management",
+    label: "จัดการการจ่ายเงิน",
     href: "/admin/payouts",
     icon: <DollarSign size={20} />,
   },
   {
-    label: "Report Management",
+    label: "จัดการรายงาน",
     href: "/admin/reports",
     icon: <BarChart3 size={20} />,
   },
-  { label: "Market Place", icon: <Store size={20} />, href: "/" },
+  { label: "มาร์เก็ตเพลส", icon: <Store size={20} />, href: "/" },
 ];
 
 export default function AdminSidebar() {
