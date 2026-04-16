@@ -25,6 +25,41 @@ export class AuthService {
     private minioService: MinioService,
   ) {}
 
+  private async downloadAndStoreGoogleAvatar(
+    avatarUrl: string,
+    userId: string,
+  ): Promise<string | null> {
+    try {
+      const response = await fetch(avatarUrl);
+      if (!response.ok) {
+        console.error(`Failed to download avatar: ${response.statusText}`);
+        return null;
+      }
+
+      const buffer = Buffer.from(await response.arrayBuffer());
+      const contentType = response.headers.get('content-type') || 'image/jpeg';
+
+      const timestamp = Date.now();
+      const avatarFileName = `avatar-${userId}-${timestamp}-google.jpg`;
+
+      const avatarFullPath = await this.minioService.uploadFile(
+        {
+          buffer,
+          mimetype: contentType,
+          size: buffer.length,
+          originalname: `google-avatar-${userId}.jpg`,
+        },
+        avatarFileName,
+        MINIO_FOLDERS.USERS.AVATARS(userId),
+      );
+
+      return this.minioService.getFileUrl(avatarFullPath);
+    } catch (error) {
+      console.error('Error downloading and storing Google avatar:', error);
+      return null;
+    }
+  }
+
   async register(
     registerDto: RegisterDto,
     avatarFile?: UploadedFileType,
@@ -136,10 +171,23 @@ export class AuthService {
     lastName: string;
     avatarUrl: string | null;
   }): Promise<SignInData> {
-    // 1. ถ้ามี email อยู่แล้ว → ใช้ account เดิมเลย
+    // 1. ถ้ามี email อยู่แล้ว → ใช้ account เดิม (อัปเดต avatar ใหม่จาก Google)
     const existing = await this.userService.findUserByEmail(profile.email);
 
     if (existing) {
+      // Update Google avatar if available
+      if (profile.avatarUrl) {
+        const storedAvatarUrl = await this.downloadAndStoreGoogleAvatar(
+          profile.avatarUrl,
+          existing.id,
+        );
+        if (storedAvatarUrl) {
+          await this.userService.update(existing.id, {
+            avatarUrl: storedAvatarUrl,
+          });
+        }
+      }
+
       return {
         userId: existing.id,
         email: existing.email,
@@ -174,8 +222,24 @@ export class AuthService {
       firstName: profile.firstName || null,
       lastName: profile.lastName || null,
       role: Role.CUSTOMER,
-      avatarUrl: profile.avatarUrl ?? null,
+      avatarUrl: null, // We'll update this after downloading the Google avatar
     });
+
+    // Download and store Google avatar in MinIO instead of using external URL
+    let storedAvatarUrl: string | null = null;
+    if (profile.avatarUrl) {
+      storedAvatarUrl = await this.downloadAndStoreGoogleAvatar(
+        profile.avatarUrl,
+        newUser.id,
+      );
+
+      // Update user with the stored MinIO URL
+      if (storedAvatarUrl) {
+        await this.userService.update(newUser.id, {
+          avatarUrl: storedAvatarUrl,
+        });
+      }
+    }
 
     return {
       userId: newUser.id,
@@ -184,7 +248,7 @@ export class AuthService {
       firstName: newUser.firstName,
       lastName: newUser.lastName,
       role: newUser.role,
-      avatarUrl: profile.avatarUrl,
+      avatarUrl: storedAvatarUrl,
       sellerId: null,
     };
   }
