@@ -288,6 +288,7 @@ export class MetadataExtractionService {
       }
 
       const metadata = this.buildMetadata(category, stats);
+      
 
       return { metadata, validation, flags };
     } finally {

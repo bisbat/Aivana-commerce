@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Upload } from "lucide-react";
+import { Upload, LayoutGrid, Monitor, Server } from "lucide-react";
 import { UploadFileFormData } from "@/lib/types/formCreateProduct/UploadFileFormData";
 import { saveFormStep } from "@/lib/utils/formStorage";
 import { extractMetadataFromUpload } from "@/lib/actions/metadata-extraction.actions";
-import type { ExtractedMetadata } from "@/lib/types/extracted-metadata";
-import { LayoutGrid, Monitor, Server } from "lucide-react";
+import type { ExtractionResult, ValidationFailReason } from "@/lib/types/extracted-metadata";
+import ValidationErrorModal from "@/components/ValidationErrorModal";
 
 interface UploadFileFormProps {
   onNext: (data: UploadFileFormData) => void;
@@ -20,17 +20,15 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
   onNext,
   initialData,
 }) => {
-  // State for form fields
   const [productType, setProductType] = useState<
     "UI Kit" | "frontend-template" | "backend-template" | ""
   >("");
   const [file, setFile] = useState<File | null>(null);
   const [keywords, setKeywords] = useState("");
   const [error, setError] = useState<string | null>(null);
-
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [validationReason, setValidationReason] = useState<ValidationFailReason | null>(null);
 
-  // Reference to file input for triggering click
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const mapProductTypeToCategory = (
@@ -43,22 +41,15 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
 
   useEffect(() => {
     if (!initialData) return;
-
     setProductType(initialData.productType);
     setKeywords(initialData.keywords);
   }, [initialData]);
 
   useEffect(() => {
     if (!productType && !file && !keywords) return;
-
-    saveFormStep(1, {
-      productType,
-      file,
-      keywords,
-    });
+    saveFormStep(1, { productType, file, keywords });
   }, [productType, file, keywords]);
 
-  // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
@@ -67,34 +58,18 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
     }
   };
 
-  // Handle click on upload area
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleUploadClick = () => fileInputRef.current?.click();
 
-  // Handle form submission
   const handleSubmit = async (useAI: boolean) => {
     setError(null);
 
-    if (!productType) {
-      setError("กรุณาเลือกประเภทโพสต์");
-      return;
-    }
-
-    if (!file) {
-      setError("กรุณาอัปโหลดไฟล์");
-      return;
-    }
-
-    if (!keywords.trim()) {
-      setError("กรุณาระบุหัวข้อ");
-      return;
-    }
+    if (!productType) { setError("กรุณาเลือกประเภทโพสต์"); return; }
+    if (!file) { setError("กรุณาอัปโหลดไฟล์"); return; }
+    if (!keywords.trim()) { setError("กรุณาระบุหัวข้อ"); return; }
 
     try {
-      let metadata: ExtractedMetadata | undefined = undefined;
+      let metadata = undefined;
 
-      // 🔥 only call AI if user choose it
       if (useAI) {
         setIsAnalyzing(true);
 
@@ -102,16 +77,21 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
           productType as "UI Kit" | "frontend-template" | "backend-template",
         );
 
-        metadata = await extractMetadataFromUpload(category, file);
+        // รับ ExtractionResult แทน ExtractedMetadata
+        const result: ExtractionResult = await extractMetadataFromUpload(category, file);
 
+        // validation ไม่ผ่าน → เปิด modal หยุดรอ user ตัดสินใจ
+        if (!result.validation.isValid) {
+          setValidationReason(result.validation.reason!);
+          return;
+        }
+
+        metadata = result.metadata ?? undefined;
         console.log("🤖 AI metadata:", metadata);
       }
 
       onNext({
-        productType: productType as
-          | "UI Kit"
-          | "frontend-template"
-          | "backend-template",
+        productType: productType as "UI Kit" | "frontend-template" | "backend-template",
         file,
         keywords,
         metadata,
@@ -152,7 +132,6 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
           สินค้าของคุณเกี่ยวกับหัวข้อใด?
         </label>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* UI Kit */}
           <button
             type="button"
             onClick={() => setProductType("UI Kit")}
@@ -163,26 +142,14 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
             }`}
           >
             <div className="flex items-start gap-3">
-              <LayoutGrid
-                size={22}
-                className={`mt-1 ${
-                  productType === "UI Kit"
-                    ? "text-purple-400"
-                    : "text-slate-400 group-hover:text-purple-400"
-                }`}
-              />
-
+              <LayoutGrid size={22} className={`mt-1 ${productType === "UI Kit" ? "text-purple-400" : "text-slate-400 group-hover:text-purple-400"}`} />
               <div>
                 <div className="font-semibold text-white text-base">UI Kit</div>
-
-                <p className="text-sm text-slate-400 mt-1 leading-relaxed">
-                  Reusable UI components or design systems
-                </p>
+                <p className="text-sm text-slate-400 mt-1 leading-relaxed">Reusable UI components or design systems</p>
               </div>
             </div>
           </button>
 
-          {/* Frontend Template */}
           <button
             type="button"
             onClick={() => setProductType("frontend-template")}
@@ -193,28 +160,14 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
             }`}
           >
             <div className="flex items-start gap-3">
-              <Monitor
-                size={22}
-                className={`mt-1 ${
-                  productType === "frontend-template"
-                    ? "text-purple-400"
-                    : "text-slate-400 group-hover:text-purple-400"
-                }`}
-              />
-
+              <Monitor size={22} className={`mt-1 ${productType === "frontend-template" ? "text-purple-400" : "text-slate-400 group-hover:text-purple-400"}`} />
               <div>
-                <div className="font-semibold text-white text-base">
-                  Frontend Template
-                </div>
-
-                <p className="text-sm text-slate-400 mt-1 leading-relaxed">
-                  Complete frontend apps with pages and routing
-                </p>
+                <div className="font-semibold text-white text-base">Frontend Template</div>
+                <p className="text-sm text-slate-400 mt-1 leading-relaxed">Complete frontend apps with pages and routing</p>
               </div>
             </div>
           </button>
 
-          {/* Backend Template */}
           <button
             type="button"
             onClick={() => setProductType("backend-template")}
@@ -225,45 +178,20 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
             }`}
           >
             <div className="flex items-start gap-3">
-              <Server
-                size={22}
-                className={`mt-1 ${
-                  productType === "backend-template"
-                    ? "text-purple-400"
-                    : "text-slate-400 group-hover:text-purple-400"
-                }`}
-              />
-
+              <Server size={22} className={`mt-1 ${productType === "backend-template" ? "text-purple-400" : "text-slate-400 group-hover:text-purple-400"}`} />
               <div>
-                <div className="font-semibold text-white text-base">
-                  Backend Template
-                </div>
-
-                <p className="text-sm text-slate-400 mt-1 leading-relaxed">
-                  API or backend starter projects
-                </p>
+                <div className="font-semibold text-white text-base">Backend Template</div>
+                <p className="text-sm text-slate-400 mt-1 leading-relaxed">API or backend starter projects</p>
               </div>
             </div>
           </button>
         </div>
       </div>
 
-      {/* File Upload Section */}
+      {/* File Upload */}
       <div className="space-y-3">
-        <label className="block text-white font-medium">
-          อัปโหลดไฟล์สินค้าของคุณ
-        </label>
-
-        {/* Hidden file input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          onChange={handleFileChange}
-          className="hidden"
-          accept=".zip,.rar,.fig,.sketch,.xd"
-        />
-
-        {/* Upload Area */}
+        <label className="block text-white font-medium">อัปโหลดไฟล์สินค้าของคุณ</label>
+        <input ref={fileInputRef} type="file" onChange={handleFileChange} className="hidden" accept=".zip" />
         <div
           onClick={handleUploadClick}
           className="border-2 border-dashed border-slate-600 rounded-lg p-12 text-center cursor-pointer hover:border-purple-500 hover:bg-slate-800/50 transition-all"
@@ -272,29 +200,21 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
           {file ? (
             <div>
               <p className="text-white font-medium mb-1">{file.name}</p>
-              <p className="text-slate-400 text-sm">
-                {(file.size / 1024 / 1024).toFixed(2)} MB
-              </p>
-              <p className="text-purple-400 text-sm mt-2">
-                คลิกเพื่อเปลี่ยนไฟล์
-              </p>
+              <p className="text-slate-400 text-sm">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+              <p className="text-purple-400 text-sm mt-2">คลิกเพื่อเปลี่ยนไฟล์</p>
             </div>
           ) : (
             <div>
-              <p className="text-white mb-2">
-                วางไฟล์นี่หรือคลิกเพื่ออัพโหลดไฟล์
-              </p>
+              <p className="text-white mb-2">วางไฟล์นี่หรือคลิกเพื่ออัพโหลดไฟล์</p>
               <p className="text-slate-400 text-sm">รองรับไฟล์: .zip</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Keywords Input */}
+      {/* Keywords */}
       <div className="space-y-3">
-        <label className="block text-white font-medium">
-          คุณกำลังโพสต์เกี่ยวกับหัวข้ออะไร?
-        </label>
+        <label className="block text-white font-medium">คุณกำลังโพสต์เกี่ยวกับหัวข้ออะไร?</label>
         <textarea
           value={keywords}
           onChange={(e) => setKeywords(e.target.value)}
@@ -302,42 +222,55 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
           rows={4}
           className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all resize-none"
         />
-        <p className="text-slate-400 text-sm">
-          ตัวอย่าง: React Dashboard, Admin Template, E-commerce UI
-        </p>
+        <p className="text-slate-400 text-sm">ตัวอย่าง: React Dashboard, Admin Template, E-commerce UI</p>
       </div>
 
-      {/* Upload Warning */}
+      {/* Warning */}
       <div className="bg-yellow-900/20 border border-yellow-600 rounded-lg p-4 text-sm">
-        <p className="text-yellow-400 font-medium mb-1">
-          ⚠️ คำแนะนำก่อนอัปโหลด
-        </p>
+        <p className="text-yellow-400 font-medium mb-1">⚠️ คำแนะนำก่อนอัปโหลด</p>
         <p className="text-yellow-300">
-          กรุณาลบ{" "}
-          <span className="font-mono text-yellow-200">node_modules</span>
-          ออกจากโปรเจกต์ก่อน zip ไฟล์ เพื่อให้การอัปโหลดเร็วขึ้นและช่วยให้ AI
-          วิเคราะห์ไฟล์ได้แม่นยำขึ้น
+          กรุณาลบ <span className="font-mono text-yellow-200">node_modules</span> ออกจากโปรเจกต์ก่อน zip ไฟล์
+          เพื่อให้การอัปโหลดเร็วขึ้นและช่วยให้ AI วิเคราะห์ไฟล์ได้แม่นยำขึ้น
         </p>
       </div>
 
-      {/* AI Generate Button */}
+      {/* Buttons */}
       <button
         disabled={isAnalyzing}
         onClick={() => handleSubmit(true)}
         className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
       >
-        {isAnalyzing
-          ? "กำลังวิเคราะห์ไฟล์..."
-          : "⚡ วิเคราะห์ไฟล์ด้วย AI (แนะนำ)"}
+        {isAnalyzing ? "กำลังวิเคราะห์ไฟล์..." : "⚡ วิเคราะห์ไฟล์ด้วย AI (แนะนำ)"}
       </button>
 
-      {/* Skip AI Button */}
       <button
         onClick={() => handleSubmit(false)}
         className="w-full bg-slate-700 hover:bg-slate-600 text-white py-4 rounded-lg font-medium transition-colors"
       >
         ดำเนินการต่อโดยไม่ใช้ AI
       </button>
+
+      {/* Validation Error Modal */}
+      {validationReason && (
+        <ValidationErrorModal
+          isOpen={true}
+          reason={validationReason}
+          onUploadNew={() => {
+            setFile(null);
+            setValidationReason(null);
+          }}
+          onContinueWithoutAI={() => {
+            setValidationReason(null);
+            onNext({
+              productType: productType as "UI Kit" | "frontend-template" | "backend-template",
+              file: file!,
+              keywords,
+              metadata: undefined,
+              useAI: false,
+            });
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -8,49 +8,42 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MetadataExtractionService } from './metadata-extraction.service';
-import { ExtractionResult } from '../shared/types/extracted-metadata.types'; 
+import { ExtractionResult } from '../shared/types/extracted-metadata.types';
+
 type Category = 'ui-kit' | 'frontend-template' | 'backend-template';
+
+// ZIP magic bytes — 4 bytes แรกต้องเป็น PK\x03\x04 เสมอ
+function isZipBuffer(buffer: Buffer): boolean {
+  return (
+    buffer.length > 4 &&
+    buffer[0] === 0x50 && // P
+    buffer[1] === 0x4b && // K
+    buffer[2] === 0x03 &&
+    buffer[3] === 0x04
+  );
+}
 
 @Controller('metadata-extraction')
 export class MetadataExtractionController {
   constructor(private readonly metadataService: MetadataExtractionService) {}
 
-  /**
-   * Upload ZIP and extract metadata
-   *
-   * Postman:
-   * form-data
-   * - category: frontend-template
-   * - file: (zip)
-   */
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async extractFromUpload(
     @UploadedFile() file: Express.Multer.File,
     @Body('category') category: Category,
   ): Promise<ExtractionResult> {
-    if (!file) {
-      throw new BadRequestException('Product file is required');
+    if (!file) throw new BadRequestException('Product file is required');
+    if (!category) throw new BadRequestException('Product category is required');
+
+    // เช็ค magic bytes ก่อน — ไม่เชื่อ extension หรือ mimetype จาก client
+    if (!isZipBuffer(file.buffer)) {
+      throw new BadRequestException('File must be a valid ZIP archive');
     }
 
-    if (!category) {
-      throw new BadRequestException('Product category is required');
-    }
-    return this.metadataService.extractMetadataFromBuffer(
-      category,
-      file.buffer,
-    );
+    return this.metadataService.extractMetadataFromBuffer(category, file.buffer);
   }
-  /**
-   * Extract metadata from file URL
-   *
-   * Postman:
-   * JSON body
-   * {
-   *   "category": "frontend-template",
-   *   "fileUrl": "https://..."
-   * }
-   */
+
   @Post('url')
   async extractFromUrl(
     @Body('category') category: Category,
