@@ -15,11 +15,9 @@ export class ReviewEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
-  // ✅ เพิ่ม productId column
   @Column({ type: 'bigint' })
   productId: number;
 
-  // ✅ เพิ่ม buyerId column
   @Column({ type: 'varchar' })
   buyerId: string;
 
@@ -41,6 +39,26 @@ export class ReviewEntity {
 
   @Column({ type: 'int', default: 0 })
   likeCounted: number;
+
+  // --- sentiment fields ---
+  @Column({ type: 'varchar', length: 3, nullable: true })
+  sentimentLabel: 'pos' | 'neu' | 'neg' | null;
+
+  @Column({ type: 'float', nullable: true })
+  confidence: number | null;
+
+  @Column({ type: 'float', nullable: true })
+  posScore: number | null;
+
+  @Column({ type: 'float', nullable: true })
+  neuScore: number | null;
+
+  @Column({ type: 'float', nullable: true })
+  negScore: number | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  analyzedAt: Date | null;
+  // --- end sentiment fields ---
 
   @CreateDateColumn()
   createdAt: Date;
