@@ -79,9 +79,9 @@ export default function SentimentDashboardPage() {
                     negative={stats.negative}
                 />
             </div>
-            <div>
+            {/* <div>
                 <ReviewFeed reviews={reviews} />
-            </div>
+            </div> */}
 
         </div>
     );
