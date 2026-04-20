@@ -39,24 +39,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = "/" }) => {
   }, [sellerId]);
 
   const navItems: SidebarNavItem[] = [
-    { label: "Product", icon: <Package size={20} />, href: "/stores" },
+    { label: "สินค้าของฉัน", icon: <Package size={20} />, href: "/stores" },
     {
-      label: "Dashboard",
+      label: "แดชบอร์ด",
       icon: <LayoutDashboard size={20} />,
       href: "/stores/dashboard",
     },
     {
-      label: "Earning",
+      label: "บอร์ดความรู้สึกของลูกค้า",
+      icon: <LayoutDashboard size={20} />,
+      href: "/stores/sentiment-dashboard",
+    },
+    {
+      label: "รายได้",
       icon: <DollarSign size={20} />,
       href: "/stores/earnings",
     },
     {
-      label: "Report",
+      label: "รายงาน",
       icon: <FileText size={20} />,
       href: "/stores/reports",
       badge: unviewedCount,
     },
-    { label: "Marketplace", icon: <Store size={20} />, href: "/" },
+    { label: "มาร์เก็ตเพลส", icon: <Store size={20} />, href: "/" },
   ];
 
   const handleAddProduct = () => {

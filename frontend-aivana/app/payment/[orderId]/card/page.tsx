@@ -6,7 +6,7 @@ import { createCreditCardToken } from "@/lib/omise";
 import { createCreditCardPayment } from "@/lib/actions/payment.actions";
 import { formatCardNumber, formatExpiry } from "@/lib/utils/card-format";
 import { validateCardForm } from "@/lib/utils/card-validation";
-import { showErrorToast, showSuccessToast } from "@/lib/toast";
+import { showSuccessToast } from "@/lib/toast";
 
 export default function CreditCardPage() {
   const { orderId } = useParams();

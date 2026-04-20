@@ -89,7 +89,7 @@ export default function SellerProfilePage({
           </button>
           {currentUserId && currentUserId === seller.user.id && (
             <EditProfileButton
-              editPath={`/seller/${seller.user.username}/edit`}
+              editPath={`/profile/edit`}
             />
           )}
         </div>

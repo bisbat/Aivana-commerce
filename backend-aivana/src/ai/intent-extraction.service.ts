@@ -6,14 +6,14 @@ const VALID_CATEGORIES = ['ui-kit', 'frontend-template', 'backend-template'];
 
 @Injectable()
 export class IntentExtractionService {
-  constructor(private readonly gemini: GeminiService) {} // ← inject แทน
+  constructor(private readonly gemini: GeminiService) { } // ← inject แทน
 
   async extractIntent(userInput: string) {
     const prompt = `
 You are a developer tool assistant that helps recommend product bundles.
 
 Analyze the user's project idea and extract structured intent.
-The user may write in Thai or English — always respond in English only.
+The user may write in Thai or English — All fields must be in English EXCEPT "reason" which must always be in Thai.
 
 Return ONLY valid JSON. No markdown. No explanation.
 
@@ -47,6 +47,14 @@ TAGS RULES:
 BUNDLE GOAL:
 - Short phrase describing what the user wants to build.
 - Always fill this in, even if vague.
+- This field can be in Thai.
+
+
+REASON:
+- Written in natural Thai as if you are a helpful assistant recommending products to a customer.
+- Start with "แนะนำสินค้าชุดนี้เพราะ..." or similar natural opening.
+- Do NOT explain technical decisions or mention category/tag selection process.
+- Keep it friendly, 1-2 sentences max.
 
 ---
 
@@ -95,7 +103,7 @@ User input: "${userInput}"
         techstack: [],
         tags: [],
         bundleGoal: 'starter project',
-        reason: 'ไม่สามารถวิเคราะห์ความต้องการได้ แนะนำสินค้าพื้นฐานแทน',
+        reason: 'ไม่พบสินค้าที่ตรงกับความต้องการ แนะนำสินค้าพื้นฐานแทน',
       };
     }
   }

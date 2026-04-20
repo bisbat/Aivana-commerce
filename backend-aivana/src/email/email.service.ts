@@ -102,7 +102,7 @@ export class EmailService {
 
                       <!-- CTA Button -->
                       <div style="text-align: center; margin-bottom: 12px;">
-                        <a href="${process.env.NEXT_PUBLIC_FRONTEND_URL}/collections" 
+                        <a href="${process.env.FRONTEND_URL}/collections" 
                            style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 600; padding: 14px 36px; border-radius: 50px; letter-spacing: 0.5px;">
                           ดูสินค้าของฉัน
                         </a>

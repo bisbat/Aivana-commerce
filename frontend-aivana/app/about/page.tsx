@@ -3,40 +3,37 @@
 import React from "react";
 import Link from "next/link";
 import { Footer } from "@/components/layout/Footer";
+import { useState } from "react";
+import { getCurrentUser } from "@/lib/auth";
+import { useEffect } from "react";
 
 const features = [
   {
-    icon: "◈",
     title: "คุณภาพสูง",
     desc: "คอมโพแนนต์ที่ผ่านการตรวจสอบและสร้างโดยผู้เชี่ยวชาญ",
     bg: "bg-gradient-to-br from-[#5B4BA8]/20 to-[#534AB7]/10",
   },
   {
-    icon: "◎",
     title: "ประสิทธิภาพ",
     desc: "โซลูชันที่เร็ว ปลอดภัย และเหมาะสมสำหรับการใช้งานจริง",
     bg: "bg-gradient-to-br from-[#534AB7]/15 to-[#7B5BA8]/10",
   },
   {
-    icon: "◇",
     title: "ง่ายต่อการใช้",
     desc: "ดัดแปลง ปรับแต่ง และรวมเข้ากับโปรเจกต์ของคุณได้ง่ายดาย",
     bg: "bg-gradient-to-br from-[#8A7BB0]/15 to-[#5B4BA8]/10",
   },
   {
-    icon: "○",
     title: "รองรับ Framework หลากหลาย",
     desc: "ส่วนประกอบที่ใช้ได้กับ React, Vue, Angular และ Framework อื่นๆ",
     bg: "bg-gradient-to-br from-[#6B5BA0]/15 to-[#4B3B98]/10",
   },
   {
-    icon: "▭",
     title: "เอกสารครบถ้วน",
     desc: "เอกสารและแนวทางการใช้งานที่ชัดเจนและเข้าใจง่าย",
     bg: "bg-gradient-to-br from-[#534AB7]/15 to-[#7B5BA8]/10",
   },
   {
-    icon: "△",
     title: "อัปเดตสม่ำเสมอ",
     desc: "คอมโพแนนต์และเทมเพลตใหม่ๆ ได้รับการเพิ่มเติมอย่างต่อเนื่อง",
     bg: "bg-gradient-to-br from-[#8A7BB0]/15 to-[#5B4BA8]/10",
@@ -44,6 +41,17 @@ const features = [
 ];
 
 export default function AboutPage() {
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const user = await getCurrentUser();
+      setUserRole(user?.role || null);
+    };
+
+    checkAuth();
+  }, []);
+
   return (
     <main className="bg-[var(--color-background)] min-h-screen text-[#EEEDF5]">
       {/* Hero */}
@@ -99,7 +107,6 @@ export default function AboutPage() {
                 key={i}
                 className="p-8 rounded-2xl border border-white/[0.07] bg-[#262549] hover:bg-[#1e1b3d] hover:border-white/[0.12] transition-all duration-200"
               >
-                <div className="text-[#A89FF0] text-lg mb-5">{f.icon}</div>
                 <div className="text-[#EEEDF5] text-sm font-medium mb-2 tracking-tight">
                   {f.title}
                 </div>
@@ -134,12 +141,14 @@ export default function AboutPage() {
               >
                 สำรวจคอมโพแนนต์
               </Link>
-              <Link
-                href="/seller/become"
-                className="border border-white/30 hover:border-white/60 text-white/70 hover:text-white text-sm px-7 py-3 rounded-xl transition-colors duration-200 whitespace-nowrap"
-              >
-                เป็นผู้ขาย →
-              </Link>
+              {userRole === "customer" && (
+                <Link
+                  href="/seller/become"
+                  className="border border-white/30 hover:border-white/60 text-white/70 hover:text-white text-sm px-7 py-3 rounded-xl transition-colors duration-200 whitespace-nowrap"
+                >
+                  เป็นผู้ขาย →
+                </Link>
+              )}
             </div>
           </div>
         </div>
