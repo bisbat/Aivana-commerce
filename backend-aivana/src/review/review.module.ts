@@ -6,11 +6,13 @@ import { ReviewEntity } from './entities/review.entity';
 import { ProductEntity } from 'src/product/entities/product.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { OrderModule } from '../order/order.module';
+import { SentimentModule } from 'src/sentiment/sentiment.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([ReviewEntity]),
     TypeOrmModule.forFeature([ProductEntity, UserEntity]),
     OrderModule,
+    SentimentModule,
   ],
   controllers: [ReviewController],
   providers: [ReviewService],

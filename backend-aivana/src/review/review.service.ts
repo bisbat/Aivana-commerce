@@ -6,6 +6,7 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { ConflictException } from '@nestjs/common/exceptions/conflict.exception';
 import { OrderService } from 'src/order/order.service';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
+import { SentimentService } from 'src/sentiment/sentiment.service';
 
 @Injectable()
 export class ReviewService {
@@ -13,6 +14,7 @@ export class ReviewService {
     @InjectRepository(ReviewEntity)
     private reviewRepository: Repository<ReviewEntity>,
     private readonly orderService: OrderService,
+    private readonly sentimentService: SentimentService,
   ) {}
 
   async create(
@@ -32,7 +34,7 @@ export class ReviewService {
       );
     }
 
-    //  2. เช็คว่ารีวิวไปแล้วหรือยัง
+    // 2. เช็คว่ารีวิวไปแล้วหรือยัง
     const hasReviewed = await this.hasUserReviewedProduct(
       currentUserId,
       productId,
@@ -42,7 +44,7 @@ export class ReviewService {
       throw new ConflictException('You have already reviewed this product.');
     }
 
-    // 3. สร้าง review (ใช้ currentUserId เป็น buyerId)
+    // 3. สร้าง review
     const review = this.reviewRepository.create({
       productId,
       buyerId: currentUserId,
@@ -51,7 +53,12 @@ export class ReviewService {
       likeCounted: 0,
     });
 
-    return await this.reviewRepository.save(review);
+    const saved = await this.reviewRepository.save(review);
+
+    // 4. วิเคราะห์ sentiment แบบ async ไม่บล็อก response
+    this.sentimentService.analyze(saved.id, saved.comment);
+
+    return saved;
   }
 
   async hasUserReviewedProduct(
