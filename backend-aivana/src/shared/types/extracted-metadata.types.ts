@@ -2,6 +2,30 @@
 // Shared Types
 // ==============================
 
+// shared/types/extracted-metadata.types.ts
+
+// Reason codes — frontend uses these to pick the right modal message
+export type ValidationFailReason =
+  | 'MISSING_PACKAGE_JSON'
+  | 'INVALID_UI_KIT';
+
+export interface ValidationResult {
+  isValid: boolean;
+  reason?: ValidationFailReason; // only present when isValid is false
+}
+
+// Wrap the existing ExtractedMetadata with validation info
+export interface ExtractionResult {
+  metadata: ExtractedMetadata | null; // null when validation fails
+  validation: ValidationResult;
+  // Useful flags for frontend preview (optional advanced UX)
+  flags: {
+    hasPackageJson: boolean;
+    hasDesignFiles: boolean;
+    hasAssets: boolean;
+  };
+}
+
 type PackageManager = 'npm' | 'yarn' | 'pnpm' | 'bun';
 type DesignTool =
   | 'figma'

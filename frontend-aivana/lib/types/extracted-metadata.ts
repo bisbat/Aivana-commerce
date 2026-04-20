@@ -124,3 +124,23 @@ export type ExtractedMetadata =
   | UIKitMetadata
   | FrontendTemplateMetadata
   | BackendTemplateMetadata;
+
+
+  // เพิ่มต่อท้ายไฟล์เดิมได้เลย
+
+export type ValidationFailReason = 'MISSING_PACKAGE_JSON' | 'INVALID_UI_KIT';
+
+export interface ValidationResult {
+  isValid: boolean;
+  reason?: ValidationFailReason;
+}
+
+export interface ExtractionResult {
+  metadata: ExtractedMetadata | null;
+  validation: ValidationResult;
+  flags: {
+    hasPackageJson: boolean;
+    hasDesignFiles: boolean;
+    hasAssets: boolean;
+  };
+}
