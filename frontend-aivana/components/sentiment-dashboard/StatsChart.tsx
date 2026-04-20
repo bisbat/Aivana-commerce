@@ -32,14 +32,14 @@ export default function StatsChart({
 
   if (total === 0) {
     return (
-      <div className="bg-gray-900 p-4 rounded-2xl border border-white/10 text-white">
+      <div className="p-4 rounded-2xl text-white bg-slate-800/40 border border-white/5 ">
         ไม่มีข้อมูลสำหรับแสดง
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-900 p-4 rounded-2xl border border-white/10">
+    <div className="p-4 rounded-2xl bg-slate-800/40 border border-white/5 ">
       <h2 className="text-white text-lg font-semibold mb-4">
         สัดส่วนความรู้สึกทั้งหมด
       </h2>

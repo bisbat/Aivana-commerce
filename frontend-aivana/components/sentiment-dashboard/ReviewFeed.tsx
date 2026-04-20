@@ -16,14 +16,14 @@ interface ReviewFeedProps {
 export default function ReviewFeed({ reviews }: ReviewFeedProps) {
   if (!reviews || reviews.length === 0) {
     return (
-      <div className="bg-gray-900 p-4 rounded-2xl border border-white/10 text-white">
+      <div className=" p-4 rounded-2xl  text-white bg-slate-800/40 border border-white/5 ">
         ไม่มีความคิดเห็นสำหรับแสดง
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-900 p-4 rounded-2xl border border-white/10">
+    <div className="p-4 rounded-2xl bg-slate-800/40 border border-white/5 mt-6">
       <h2 className="text-white text-lg font-semibold mb-4">
         ความคิดเห็นล่าสุด
       </h2>
@@ -58,7 +58,7 @@ function ReviewItem({ review }: { review: Review }) {
     : null;
 
   return (
-    <div className="p-4 rounded-xl border border-white/10 bg-black/30">
+    <div className="p-4 rounded-xl bg-slate-800/40 border border-white/5">
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div className="text-sm text-gray-400">
