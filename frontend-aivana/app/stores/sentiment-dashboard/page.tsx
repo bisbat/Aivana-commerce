@@ -31,14 +31,18 @@ export default function SentimentDashboardPage() {
                 return;
             }
 
+            if(!user.sellerId) {
+                showErrorToast("บัญชีของคุณไม่มีสิทธิ์เข้าถึงแดชบอร์ดนี้");
+                router.push("/");
+                return;
+            }
+
             try {
-                console.log("Loading sentiment dashboard data for user:", user.id);
                 const [data, trend, reviews] = await Promise.all([
-                    fetchSentimentStats(user.id),
-                    fetchSentimentTrend(user.id),
-                    fetchSentimentReviews(user.id),
+                    fetchSentimentStats(user.sellerId),
+                    fetchSentimentTrend(user.sellerId),
+                    fetchSentimentReviews(user.sellerId),
                 ]);
-                console.log("Sentiment stats:", data);
 
                 setStats(data);
                 setTrendData(trend);
