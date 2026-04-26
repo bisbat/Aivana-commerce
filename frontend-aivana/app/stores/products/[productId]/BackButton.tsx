@@ -9,7 +9,7 @@ export default function BackButton() {
 
     return (
         <button onClick={handleBack} className=" text-white px-4 py-2 rounded shadow hover:text-gray-300">
-            &larr; Back
+            &larr; กลับ
         </button>
     );
 }

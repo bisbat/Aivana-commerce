@@ -266,8 +266,8 @@ export default function EditProductPage() {
 
             {/* ── FORM SECTIONS — single column below media ──────────────── */}
             <SectionCard title="ข้อมูลพื้นฐาน" accent>
-              <Input label="Product Name" value={name} onChange={setName} required />
-              <Input label="Short Blurb" value={blurb} onChange={setBlurb} />
+              <Input label="ชื่อสินค้า" value={name} onChange={setName} required />
+              <Input label="คำอธิบายสั้น ๆ" value={blurb} onChange={setBlurb} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Select
                   label="ประเภทสินค้า (Category)"
@@ -313,9 +313,9 @@ export default function EditProductPage() {
               <Input label="API Documentation URL (URL เอกสาร API)" value={apiDocUrl} onChange={setApiDocUrl} />
             </SectionCard>
 
-            <SectionCard title="Pricing & Links">
+            <SectionCard title="ราคาและลิงก์">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input label="Price (USD)" value={price} onChange={setPrice} type="number" required />
+                <Input label="Price (THB)" value={price} onChange={setPrice} type="number" required />
                 <Input label="Live Preview URL (URL ตัวอย่าง)" value={previewUrl} onChange={setpreviewUrl} />
               </div>
             </SectionCard>

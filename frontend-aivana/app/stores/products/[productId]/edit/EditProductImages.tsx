@@ -29,7 +29,7 @@ export default function EditProductImages({
       {/* Existing Images */}
       {existingImages.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Current Images</h4>
+          <h4 className="text-sm font-medium text-gray-700 mb-2">ภาพปัจจุบัน</h4>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {existingImages.map((image) => (
               <div key={image.imageId} className="relative group">
@@ -55,7 +55,7 @@ export default function EditProductImages({
       {/* New Images Preview */}
       {newImageFiles.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-2">New Images (to be added)</h4>
+          <h4 className="text-sm font-medium text-gray-700 mb-2">ภาพใหม่ (ที่จะถูกเพิ่ม)</h4>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {newImageFiles.map((file, index) => (
               <div key={index} className="relative group">
@@ -80,7 +80,7 @@ export default function EditProductImages({
       {/* Upload New Images */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Add New Images
+          Add New Images (เพิ่มภาพใหม่)
         </label>
         <input
           type="file"
@@ -90,7 +90,7 @@ export default function EditProductImages({
           className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
         />
         <p className="text-xs text-gray-500 mt-1">
-          You can select multiple images at once. Supported formats: JPG, PNG, GIF
+          คุณสามารถเลือกภาพหลายภาพได้ในครั้งเดียว รูปแบบที่รองรับ: JPG, PNG, GIF
         </p>
       </div>
     </div>
