@@ -51,13 +51,13 @@ export default function EditProductHeroImage({
                 onClick={handleRemove}
                 className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
               >
-                Remove Image
+                นำภาพออก (Remove Image)
               </button>
             </div>
           </div>
           {newImageFile && (
             <p className="text-sm text-green-600 mt-2">
-              ✓ New image selected (will replace current image when saved)
+              ✓ ภาพใหม่ถูกเลือก (จะถูกแทนที่ภาพปัจจุบันเมื่อบันทึก)
             </p>
           )}
         </div>
@@ -66,7 +66,7 @@ export default function EditProductHeroImage({
       {/* Upload New Hero Image */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          {displayImage ? 'Replace Hero Image' : 'Add Hero Image'}
+          {displayImage ? 'แทนภาพ hero ปัจจุบัน' : 'เพิ่มภาพ hero'}
         </label>
         <input
           type="file"
@@ -75,15 +75,15 @@ export default function EditProductHeroImage({
           className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
         />
         <p className="text-xs text-gray-500 mt-1">
-          Recommended: 1200x600px or higher. Supported formats: JPG, PNG, GIF
+          แนะนำ: 1200x600px หรือสูงกว่านั้น. รูปแบบที่รองรับ: JPG, PNG, GIF
         </p>
       </div>
 
       {!displayImage && (
         <div className="w-full max-w-md h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-500">
           <div className="text-center">
-            <p className="text-sm">No hero image set</p>
-            <p className="text-xs">Upload an image above</p>
+            <p className="text-sm">ไม่มีภาพ hero ถูกตั้งไว้</p>
+            <p className="text-xs">อัปโหลดภาพด้านบน</p>
           </div>
         </div>
       )}

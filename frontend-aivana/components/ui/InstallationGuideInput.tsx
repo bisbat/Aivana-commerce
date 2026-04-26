@@ -20,7 +20,7 @@ export const InstallationGuideInput: React.FC<
             {/* Header */}
             <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-white">
-                    Installation Guide (Markdown supported)
+                    Installation Guide (Markdown supported) - คำแนะนำการติดตั้ง (รองรับ Markdown)
                 </label>
 
                 <div className="flex gap-2 text-sm">
@@ -50,7 +50,7 @@ export const InstallationGuideInput: React.FC<
             {/* Edit Mode */}
             {previewMode === "edit" && (
                 <Textarea
-                    label="Installation Guide"
+                    label="Installation Guide (คำแนะนำการติดตั้ง - ใช้ Markdown ได้)"
                     value={value}
                     onChange={onChange}
                     placeholder={`## Installation\n\n1. Download the file\n2. Install dependencies\n3. Run the app`}
