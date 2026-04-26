@@ -125,7 +125,7 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
             )}
 
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-500/10 border border-violet-500/20">
-              <span className="text-xs text-violet-400 font-medium uppercase tracking-wide">Price</span>
+              <span className="text-xs text-violet-400 font-medium uppercase tracking-wide">ราคา</span>
               <span className="text-xl font-bold text-white">
                 {formatPriceWithCurrency(initialProductData.price)}
               </span>
@@ -143,7 +143,7 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
           {/* Description */}
           {initialProductData.description && (
             <div className="rounded-2xl border border-white/[0.06] bg-[#13112a]/50 p-6">
-              <SectionHeader>Description</SectionHeader>
+              <SectionHeader>รายละเอียด</SectionHeader>
               <p className="text-white/70 text-sm leading-relaxed">
                 {initialProductData.description}
               </p>
@@ -153,7 +153,7 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
           {/* Installation Guide */}
           {initialProductData.installationGuide && (
             <div className="rounded-2xl border border-white/[0.06] bg-[#13112a]/50 p-6">
-              <SectionHeader>Installation Guide</SectionHeader>
+              <SectionHeader>คำแนะนำการติดตั้ง</SectionHeader>
               {installationSteps ? (
                 <ol className="space-y-3">
                   {installationSteps.map((step, i) => (
@@ -174,7 +174,7 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
           {/* Features */}
           {initialProductData.features?.length > 0 && (
             <div className="rounded-2xl border border-white/[0.06] bg-[#13112a]/50 p-6">
-              <SectionHeader>Features</SectionHeader>
+              <SectionHeader>คุณสมบัติ</SectionHeader>
               <ul className="space-y-2">
                 {initialProductData.features.map((feature, i) => (
                   <li key={i} className="flex items-center gap-3 text-sm text-white/75">
@@ -188,11 +188,11 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
 
           {/* Technical details */}
           <div className="rounded-2xl border border-white/[0.06] bg-[#13112a]/50 p-6">
-            <SectionHeader>Technical Details</SectionHeader>
+            <SectionHeader>รายละเอียดทางเทคนิค</SectionHeader>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {initialProductData.techstack?.length > 0 && (
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2">Tech Stack</p>
+                  <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2">เทคโนโลยีที่ใช้ (Tech Stack)</p>
                   <div className="flex flex-wrap gap-1.5">
                     {initialProductData.techstack.map((item, i) => <Pill key={i}>{item}</Pill>)}
                   </div>
@@ -200,7 +200,7 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
               )}
               {initialProductData.compatibility?.length > 0 && (
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2">Compatibility</p>
+                  <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2">ความเข้ากันได้ (Compatibility)</p>
                   <div className="flex flex-wrap gap-1.5">
                     {initialProductData.compatibility.map((item, i) => <Pill key={i}>{item}</Pill>)}
                   </div>
@@ -208,7 +208,7 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
               )}
               {initialProductData.requirement?.length > 0 && (
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2">Requirements</p>
+                  <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2">ข้อกำหนด(Requirements)</p>
                   <div className="flex flex-wrap gap-1.5">
                     {initialProductData.requirement.map((item, i) => <Pill key={i}>{item}</Pill>)}
                   </div>
@@ -219,7 +219,7 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
 
           {/* Links & file */}
           <div className="rounded-2xl border border-white/[0.06] bg-[#13112a]/50 p-6">
-            <SectionHeader>Links & Resources</SectionHeader>
+            <SectionHeader>ลิงก์และไฟล์</SectionHeader>
             <div className="divide-y divide-white/[0.05]">
               <InfoRow label="Preview">
                 {initialProductData.previewUrl ? (
@@ -228,7 +228,7 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
                     {initialProductData.previewUrl}
                   </a>
                 ) : (
-                  <span className="text-white/25">No preview available</span>
+                  <span className="text-white/25">ไม่มีตัวอย่างที่พร้อมใช้งาน</span>
                 )}
               </InfoRow>
               <InfoRow label="API Docs">
@@ -238,17 +238,17 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
                     {initialProductData.apiDocUrl}
                   </a>
                 ) : (
-                  <span className="text-white/25">No API docs available</span>
+                  <span className="text-white/25">ไม่มีเอกสาร API ที่พร้อมใช้งาน</span>
                 )}
               </InfoRow>
               <InfoRow label="File">
                 {initialProductData.uploadedFilePath ? (
                   <a href={initialProductData.uploadedFilePath} download
                     className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 hover:bg-violet-500/20 transition-colors text-xs font-medium">
-                    ↓ Download File
+                    ↓ ดาวน์โหลดไฟล์ที่อัปโหลด
                   </a>
                 ) : (
-                  <span className="text-white/25">No file uploaded</span>
+                  <span className="text-white/25">ไม่มีไฟล์ที่อัปโหลด</span>
                 )}
               </InfoRow>
             </div>

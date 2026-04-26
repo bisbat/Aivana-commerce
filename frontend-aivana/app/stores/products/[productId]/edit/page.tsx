@@ -214,11 +214,11 @@ export default function EditProductPage() {
         <div className="relative rounded-2xl border border-violet-500/20 bg-[#15132a]/60 backdrop-blur-sm p-8 overflow-hidden mb-8">
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent" />
           <p className="text-[10px] uppercase tracking-[0.15em] font-semibold text-violet-400/70 mb-2">
-            Product Management
+            การจัดการสินค้า
           </p>
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Edit Product</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">แก้ไขสินค้า</h1>
           <p className="text-white/30 text-sm">
-            Editing <span className="text-white/60 font-medium">{name || "…"}</span>
+            กำลังแก้ไข <span className="text-white/60 font-medium">{name || "…"}</span>
           </p>
         </div>
 
@@ -227,7 +227,7 @@ export default function EditProductPage() {
 
             {/* ── MEDIA — at the TOP, just like the detail page ─────────── */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <SectionCard title="Hero Image">
+              <SectionCard title="ภาพฮีโร่ (Hero Image)">
                 <EditProductHeroImage
                   currentImage={currentHeroImage}
                   newImageFile={newHeroImageFile}
@@ -239,7 +239,7 @@ export default function EditProductPage() {
                 />
               </SectionCard>
 
-              <SectionCard title="Product File">
+              <SectionCard title="ไฟล์สินค้า (Product File)">
                 <EditProductFile
                   currentFile={currentProductFile}
                   newFile={newProductFile}
@@ -251,7 +251,7 @@ export default function EditProductPage() {
                 />
               </SectionCard>
 
-              <SectionCard title="Gallery Images">
+              <SectionCard title="ภาพแกลเลอรี่ (Gallery Images)">
                 <EditProductImages
                   existingImages={detailImages}
                   newImageFiles={newImageFiles}
@@ -265,19 +265,19 @@ export default function EditProductPage() {
             </div>
 
             {/* ── FORM SECTIONS — single column below media ──────────────── */}
-            <SectionCard title="Basic Information" accent>
+            <SectionCard title="ข้อมูลพื้นฐาน" accent>
               <Input label="Product Name" value={name} onChange={setName} required />
               <Input label="Short Blurb" value={blurb} onChange={setBlurb} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Select
-                  label="Category"
+                  label="ประเภทสินค้า (Category)"
                   value={categoryId}
                   onChange={setCategoryId}
                   options={categories.map((cat) => ({ value: cat.id, label: cat.name }))}
                   required
                 />
                 <MultiSelectTag
-                  label="Tags"
+                  label="แท็ก (Tags)"
                   tags={tags}
                   selectedTagIds={selectedTagIds}
                   onChange={setSelectedTagIds}
@@ -285,38 +285,38 @@ export default function EditProductPage() {
               </div>
             </SectionCard>
 
-            <SectionCard title="Description & Features">
+            <SectionCard title="รายละเอียดสินค้า">
               <Textarea
-                label="Product Description"
+                label="คำอธิบาย (Description)"
                 value={description}
                 onChange={setDescription}
                 rows={5}
               />
               <DynamicTextListInput
-                label="Features"
+                label="คุณสมบัติ (Features)"
                 value={features}
                 onChange={setFeatures}
                 maxItems={6}
               />
             </SectionCard>
 
-            <SectionCard title="Technical Details">
+            <SectionCard title="ข้อมูลทางเทคนิค (Technical Details)">
               <InstallationGuideInput
                 value={installationGuide}
                 onChange={setInstallationGuide}
               />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <DynamicTextListInput label="Tech Stack" value={techstack} onChange={setTechstack} />
-                <DynamicTextListInput label="Requirements" value={requirement} onChange={setRequirement} />
+                <DynamicTextListInput label="Tech Stack (เทคนิคที่ใช้)" value={techstack} onChange={setTechstack} />
+                <DynamicTextListInput label="Requirements (ข้อกำหนด)" value={requirement} onChange={setRequirement} />
               </div>
-              <DynamicTextListInput label="Compatibility" value={compatibility} onChange={setCompatibility} />
-              <Input label="API Documentation URL" value={apiDocUrl} onChange={setApiDocUrl} />
+              <DynamicTextListInput label="Compatibility (ความเข้ากันได้)" value={compatibility} onChange={setCompatibility} />
+              <Input label="API Documentation URL (URL เอกสาร API)" value={apiDocUrl} onChange={setApiDocUrl} />
             </SectionCard>
 
             <SectionCard title="Pricing & Links">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input label="Price (USD)" value={price} onChange={setPrice} type="number" required />
-                <Input label="Live Preview URL" value={previewUrl} onChange={setpreviewUrl} />
+                <Input label="Live Preview URL (URL ตัวอย่าง)" value={previewUrl} onChange={setpreviewUrl} />
               </div>
             </SectionCard>
 
@@ -337,8 +337,8 @@ export default function EditProductPage() {
 
                 {/* Left side */}
                 <div className="flex flex-col">
-                  <p className="text-sm text-slate-300 font-medium">Unsaved changes</p>
-                  <p className="text-xs text-slate-500">Don't forget to save before leaving</p>
+                  <p className="text-sm text-slate-300 font-medium">ยังมีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก</p>
+                  <p className="text-xs text-slate-500">อย่าลืมบันทึกก่อนออกจากหน้านี้</p>
                 </div>
 
                 {/* Right side */}
@@ -353,7 +353,7 @@ export default function EditProductPage() {
                       transition-all
                     "
                   >
-                    Cancel
+                    ยกเลิก
                   </button>
 
                   <button
@@ -372,7 +372,7 @@ export default function EditProductPage() {
                     {isSaving && (
                       <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     )}
-                    {isSaving ? "Saving..." : "Save Changes"}
+                    {isSaving ? "กำลังบันทึก..." : "บันทึกการเปลี่ยนแปลง"}
                   </button>
                 </div>
               </div>
