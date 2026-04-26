@@ -1,37 +1,41 @@
-FROM node:23-alpine AS builder
+FROM node:23-alpine AS deps
 WORKDIR /app
-
-# Copy package.json เข้าไปใน Container เพื่อติดตั้ง Package ต่างๆ
-COPY package.json ./
 
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
-# ติดตั้ง Package ต่างๆที่ต้องใช้
-RUN npm install
+RUN apk add --no-cache libc6-compat
 
-# Copy code ส่วนที่เหลือเช้าไปใน Container
+COPY package.json package-lock.json ./
+
+RUN npm ci
+
+FROM node:23-alpine AS builder
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-# Build Next application
 RUN npm run build
 
-# เราควรจะใช้ Base Image ตัวเดียวกับ Builder ตัวก่อนหน้าเพื่อไม่ให้มีปัญหาเรื่อง Version
 FROM node:23-alpine AS runner
 WORKDIR /app
 
-# ติดตั้ง Next CLI
-RUN npm install -g next
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
-# กำหนด Environment เป็น Production
-ENV NODE_ENV=production
+RUN apk add --no-cache libc6-compat openssl
 
-# Copy output และ dependencies จาก Builder
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
 COPY --from=builder /app/public ./public
 
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone/app ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/.env ./.env
+
+USER nextjs
+
 EXPOSE 3000
-# Start Next application
-CMD ["npm", "run", "start"]
+
+CMD ["node", "server.js"]

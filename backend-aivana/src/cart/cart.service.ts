@@ -78,12 +78,15 @@ export class CartService {
       });
     }
 
+    // Filter out deleted products
+    const activeItems = cart.items.filter((item) => !item.product.isDeleted);
+
     const cartData = {
       message: 'Cart retrieved successfully',
       cartId: cart.cartId,
       userId: cart.userId,
-      totalItems: cart.items.length,
-      items: cart.items.map((item) => ({
+      totalItems: activeItems.length,
+      items: activeItems.map((item) => ({
         cartItemId: item.cartItemId,
         cartId: item.cartId,
         product: {
@@ -95,6 +98,7 @@ export class CartService {
             id: item.product.seller.id,
             firstName: item.product.seller.user.firstName,
             lastName: item.product.seller.user.lastName,
+            username: item.product.seller.user.username,
           },
         },
       })),

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { register, saveAuthData } from "@/lib/actions/auth.actions";
+import { registerAction } from "@/lib/actions/auth.server";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -150,31 +150,33 @@ export default function RegisterPage() {
         formPayload.append("avatar", fileInputRef.current.files[0]);
       }
 
-      const tokenResponse = await register(formPayload);
+      const result = await registerAction(formPayload);
 
-      saveAuthData(tokenResponse.accessToken);
-
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      router.push("/");
+      if (result.success) {
+        router.push("/");
+        router.refresh();
+      } else {
+        // แสดง error ที่ field ที่เกี่ยวข้อง
+        if (result.field) {
+          setErrors({ [result.field]: result.message || "" });
+        } else {
+          setErrors({ submit: result.message || "เกิดข้อผิดพลาด" });
+        }
+      }
     } catch (error: any) {
       console.error("Register error:", error);
-
-      if (error.message) {
-        setErrors({ submit: error.message });
-      } else {
-        setErrors({
-          submit: "เกิดข้อผิดพลาดในการสมัครสมาชิก กรุณาลองใหม่อีกครั้ง",
-        });
-      }
+      setErrors({
+        submit: "เกิดข้อผิดพลาดในการสมัครสมาชิก กรุณาลองใหม่อีกครั้ง",
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleGoogleSignup = () => {
-    // TODO: Implement Google OAuth
-    console.log("Google signup clicked");
+    const apiUrl =
+      process.env.NEXT_PUBLIC_GOOGLE_AUTH_URL || "http://localhost:3001";
+    router.push(`${apiUrl}/auth/google`);
   };
 
   return (

@@ -1,22 +1,19 @@
 "use client";
 
-import Reacts from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { LayoutDashboard, Package, DollarSign, Store } from "lucide-react";
-import { getAuthData } from "@/lib/actions/auth.actions";
-import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
-import { SellerProfile } from "@/lib/types/user.ts/sellerProfile";
-import { getSellerById } from "@/lib/actions/seller.actions";
-import { Product } from "@/lib/types/product/Product";
 import { useState, useEffect } from "react";
-
-interface NavItem {
-  label: string;
-  icon: React.ReactNode;
-  href: string;
-  isActive?: boolean;
-}
+import { useRouter } from "next/navigation";
+import {
+  LayoutDashboard,
+  Package,
+  DollarSign,
+  Store,
+  FileText,
+} from "lucide-react";
+import CommonSidebar, { SidebarNavItem } from "@/components/common/Sidebar";
+import { SellerProfile } from "@/lib/types/user/sellerProfile";
+import { getSellerById } from "@/lib/actions/seller.actions";
+import { getCurrentUser } from "@/lib/auth";
+import { getSellerReportsAction } from "@/lib/actions/report.actions";
 
 interface SidebarProps {
   currentPath?: string;
@@ -25,75 +22,71 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ currentPath = "/" }) => {
   const router = useRouter();
   const [sellerId, setSellerId] = useState<string | null>(null);
+  const [seller, setSeller] = useState<SellerProfile | null>(null);
+  const [unviewedCount, setUnviewedCount] = useState(0);
 
   useEffect(() => {
-    getCurrentUserFromToken().then((user) =>
-      setSellerId(user?.sellerId ?? null)
-    );
+    getCurrentUser().then((user) => setSellerId(user?.sellerId ?? null));
   }, []);
-
-  const [seller, setSeller] = useState<SellerProfile | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       if (!sellerId) return;
-      const token = getAuthData()?.accessToken;
-      if (!token) return;
-
-      const profileData = await getSellerById(sellerId, token);
+      const profileData = await getSellerById(sellerId);
       setSeller(profileData);
     }
     fetchData();
   }, [sellerId]);
 
-  const navItems: NavItem[] = [
-    { label: "Market Place", icon: <Store size={20} />, href: "/" },
+  const navItems: SidebarNavItem[] = [
+    { label: "สินค้าของฉัน", icon: <Package size={20} />, href: "/stores" },
     {
-      label: "Dashboard",
+      label: "แดชบอร์ด",
       icon: <LayoutDashboard size={20} />,
-      href: "/dashboard",
+      href: "/stores/dashboard",
     },
-    { label: "Product", icon: <Package size={20} />, href: "/stores" },
-    { label: "Earning", icon: <DollarSign size={20} />, href: "/earning" },
+    {
+      label: "บอร์ดความรู้สึกของลูกค้า",
+      icon: <LayoutDashboard size={20} />,
+      href: "/stores/sentiment-dashboard",
+    },
+    {
+      label: "รายได้",
+      icon: <DollarSign size={20} />,
+      href: "/stores/earnings",
+    },
+    {
+      label: "รายงาน",
+      icon: <FileText size={20} />,
+      href: "/stores/reports",
+      badge: unviewedCount,
+    },
+    { label: "มาร์เก็ตเพลส", icon: <Store size={20} />, href: "/" },
   ];
+
   const handleAddProduct = () => {
     router.push("/stores/products/new");
   };
 
   return (
-    <aside className="w-64 min-h-screen bg-[var(--linne-purple)] text-white p-6 flex flex-col">
-      <h1 className="text-2xl font-bold mb-5 text-center text-white">
-        {seller?.storeName}
-      </h1>
-
-      <nav className="flex-1 space-y-2">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.href}
-            {...item}
-            isActive={currentPath === item.href}
-          />
-        ))}
-
-        <button
-          onClick={handleAddProduct}
-          className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] cursor-pointer text-white py-3 px-4 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
-        >
-          + Add Product
-        </button>
-      </nav>
-    </aside>
-  );
-};
-
-const NavLink: React.FC<NavItem> = ({ label, icon, href, isActive }) => {
-  return (
-    <Link
-      href={href}
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:text-white hover:bg-[var(--linne-purple-hover)]`}
+    <CommonSidebar
+      brandName={seller?.storeName || "Loading..."}
+      brandSubtitle=""
+      navItems={navItems}
+      bgColor="#262549"
+      width="w-64"
+      editStoreHref={
+        seller?.user?.username
+          ? `/seller/${seller.user.username}/edit`
+          : undefined
+      }
     >
-      {icon}
-      <span>{label}</span>
-    </Link>
+      <button
+        onClick={handleAddProduct}
+        className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] cursor-pointer text-white py-3 px-4 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)] mt-2"
+      >
+        + Add Product
+      </button>
+    </CommonSidebar>
   );
 };

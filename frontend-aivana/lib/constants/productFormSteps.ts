@@ -1,0 +1,5 @@
+export enum PRODUCT_FORM_STEP {
+  UPLOAD_FILE = 1,
+  PRODUCT_INFO = 2,
+  PRODUCT_IMAGES = 3,
+}

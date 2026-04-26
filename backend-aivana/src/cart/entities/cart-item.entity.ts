@@ -7,7 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Cart } from './cart.entity';
-import { ProductEntity } from 'src/products/entities/product.entity';
+import { ProductEntity } from 'src/product/entities/product.entity';
 
 @Entity('cart_item')
 export class CartItem {

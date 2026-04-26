@@ -7,15 +7,19 @@ import {
   UseGuards,
   Request,
   Body,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
-import { PassportLocalGuard } from '../common/guards/passport-local.guard';
-import { PassportJwtAuthGuard } from '../common/guards/passport-jwt.guard';
-import { Public } from 'src/common/decorators/public.decorator';
+import { GoogleOAuthGuard } from './guards/google-oauth.guard';
+import { PassportLocalGuard } from './guards/passport-local.guard';
+import { PassportJwtAuthGuard } from './guards/passport-jwt.guard';
+import { Public } from 'src/auth/decorators/public.decorator';
 import { UseInterceptors, UploadedFile } from '@nestjs/common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BadRequestException } from '@nestjs/common/exceptions';
-import type { UploadedFileType } from 'src/products/interfaces/uploaded-file.interface';
+import type { UploadedFileType } from 'src/product/interfaces/uploaded-file.interface';
 import { RegisterDto } from './dto/register.dto';
 
 @Controller('auth')
@@ -64,5 +68,32 @@ export class PassportAuthController {
   @UseGuards(PassportJwtAuthGuard)
   getUserInfo(@Request() request) {
     return request.user;
+  }
+
+  // ── Google OAuth ──────────────────────────────────────────────────────────
+
+  @Public()
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  googleLogin() {
+    // Passport redirects to Google — no body needed
+  }
+
+  @Public()
+  @Get('google/cancelled')
+  googleCancelled(@Res() res: Response) {
+    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
+    return res.redirect(`${frontendUrl}/login?error=google_cancelled`);
+  }
+
+  @Public()
+  @Get('google/callback')
+  @UseGuards(GoogleOAuthGuard)
+  async googleCallback(@Request() req, @Res() res: Response) {
+    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
+    const { accessToken } = await this.authService.signIn(req.user);
+    res.redirect(
+      `${frontendUrl}/auth/google/callback?token=${encodeURIComponent(accessToken)}`,
+    );
   }
 }

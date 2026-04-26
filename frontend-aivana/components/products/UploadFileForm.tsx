@@ -1,24 +1,55 @@
-'use client';
+"use client";
 
-import React, { useState, useRef } from 'react';
-import { Upload } from 'lucide-react';
-import { UploadFileFormData } from '@/lib/types/formCreateProduct/UploadFileFormData';
+import React, { useState, useRef, useEffect } from "react";
+import { Upload, LayoutGrid, Monitor, Server } from "lucide-react";
+import { UploadFileFormData } from "@/lib/types/formCreateProduct/UploadFileFormData";
+import { saveFormStep } from "@/lib/utils/formStorage";
+import { extractMetadataFromUpload } from "@/lib/actions/metadata-extraction.actions";
+import type { ExtractionResult, ValidationFailReason } from "@/lib/types/extracted-metadata";
+import ValidationErrorModal from "@/components/ValidationErrorModal";
 
 interface UploadFileFormProps {
   onNext: (data: UploadFileFormData) => void;
+  initialData?: {
+    productType: "UI Kit" | "frontend-template" | "backend-template";
+    keywords: string;
+  };
 }
 
-export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext }) => {
-  // State for form fields
-  const [productType, setProductType] = useState<'UI Kit' | 'Coded Template' | ''>('');
+export const UploadFileForm: React.FC<UploadFileFormProps> = ({
+  onNext,
+  initialData,
+}) => {
+  const [productType, setProductType] = useState<
+    "UI Kit" | "frontend-template" | "backend-template" | ""
+  >("");
   const [file, setFile] = useState<File | null>(null);
-  const [keywords, setKeywords] = useState('');
+  const [keywords, setKeywords] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [validationReason, setValidationReason] = useState<ValidationFailReason | null>(null);
 
-  // Reference to file input for triggering click
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Handle file selection
+  const mapProductTypeToCategory = (
+    type: "UI Kit" | "frontend-template" | "backend-template",
+  ): "ui-kit" | "frontend-template" | "backend-template" => {
+    if (type === "UI Kit") return "ui-kit";
+    if (type === "frontend-template") return "frontend-template";
+    return "backend-template";
+  };
+
+  useEffect(() => {
+    if (!initialData) return;
+    setProductType(initialData.productType);
+    setKeywords(initialData.keywords);
+  }, [initialData]);
+
+  useEffect(() => {
+    if (!productType && !file && !keywords) return;
+    saveFormStep(1, { productType, file, keywords });
+  }, [productType, file, keywords]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
@@ -27,37 +58,56 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext }) => {
     }
   };
 
-  // Handle click on upload area
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleUploadClick = () => fileInputRef.current?.click();
 
-  // Handle form submission
-  const handleSubmit = () => {
+  const handleSubmit = async (useAI: boolean) => {
     setError(null);
 
-    // Validate required fields
-    if (!productType) {
-      setError('กรุณาเลือกประเภทโพสต์');
-      return;
-    }
+    if (!productType) { setError("กรุณาเลือกประเภทโพสต์"); return; }
+    if (!file) { setError("กรุณาอัปโหลดไฟล์"); return; }
+    if (!keywords.trim()) { setError("กรุณาระบุหัวข้อ"); return; }
 
-    if (!file) {
-      setError('กรุณาอัปโหลดไฟล์');
-      return;
-    }
+    try {
+      let metadata = undefined;
 
-    if (!keywords.trim()) {
-      setError('กรุณาระบุหัวข้อ');
-      return;
-    }
+      if (useAI) {
+        setIsAnalyzing(true);
 
-    // Pass data to parent
-    onNext({
-      productType: productType as 'UI Kit' | 'Coded Template',
-      file,
-      keywords
-    });
+        const category = mapProductTypeToCategory(
+          productType as "UI Kit" | "frontend-template" | "backend-template",
+        );
+
+        // รับ ExtractionResult แทน ExtractedMetadata
+        const result: ExtractionResult = await extractMetadataFromUpload(category, file);
+
+        // validation ไม่ผ่าน → เปิด modal หยุดรอ user ตัดสินใจ
+        if (!result.validation.isValid) {
+          setValidationReason(result.validation.reason!);
+          return;
+        }
+
+        metadata = result.metadata ?? undefined;
+        console.log("🤖 AI metadata:", metadata);
+      }
+
+      onNext({
+        productType: productType as "UI Kit" | "frontend-template" | "backend-template",
+        file,
+        keywords,
+        metadata,
+        useAI,
+      });
+    } catch (err: any) {
+      console.error(err);
+      const msg = err?.message || "";
+      if (msg.toLowerCase().includes("quota") || msg.includes("429")) {
+        setError("AI quota เต็มแล้ว — กรุณารอสักครู่แล้วลองใหม่อีกครั้ง");
+      } else {
+        setError("AI analysis failed");
+      }
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (
@@ -79,50 +129,69 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext }) => {
       {/* Product Type Selection */}
       <div className="space-y-3">
         <label className="block text-white font-medium">
-          โพสต์นี้เกี่ยวกับหัวข้อใด?
+          สินค้าของคุณเกี่ยวกับหัวข้อใด?
         </label>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <button
             type="button"
-            onClick={() => setProductType('UI Kit')}
-            className={`px-6 py-4 rounded-lg font-medium transition-all ${
-              productType === 'UI Kit'
-                ? 'bg-purple-600 text-white'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+            onClick={() => setProductType("UI Kit")}
+            className={`group text-left p-6 rounded-xl border transition-all duration-200 ${
+              productType === "UI Kit"
+                ? "bg-purple-600/20 border-purple-500 ring-1 ring-purple-500"
+                : "bg-slate-800 border-slate-700 hover:border-purple-400 hover:bg-slate-700"
             }`}
           >
-            UI kits
+            <div className="flex items-start gap-3">
+              <LayoutGrid size={22} className={`mt-1 ${productType === "UI Kit" ? "text-purple-400" : "text-slate-400 group-hover:text-purple-400"}`} />
+              <div>
+                <div className="font-semibold text-white text-base">UI Kit</div>
+                <p className="text-sm text-slate-400 mt-1 leading-relaxed">Reusable UI components or design systems</p>
+              </div>
+            </div>
           </button>
+
           <button
             type="button"
-            onClick={() => setProductType('Coded Template')}
-            className={`px-6 py-4 rounded-lg font-medium transition-all ${
-              productType === 'Coded Template'
-                ? 'bg-purple-600 text-white'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+            onClick={() => setProductType("frontend-template")}
+            className={`group text-left p-6 rounded-xl border transition-all duration-200 ${
+              productType === "frontend-template"
+                ? "bg-purple-600/20 border-purple-500 ring-1 ring-purple-500"
+                : "bg-slate-800 border-slate-700 hover:border-purple-400 hover:bg-slate-700"
             }`}
           >
-            Coded Template
+            <div className="flex items-start gap-3">
+              <Monitor size={22} className={`mt-1 ${productType === "frontend-template" ? "text-purple-400" : "text-slate-400 group-hover:text-purple-400"}`} />
+              <div>
+                <div className="font-semibold text-white text-base">Frontend Template</div>
+                <p className="text-sm text-slate-400 mt-1 leading-relaxed">Complete frontend apps with pages and routing</p>
+              </div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setProductType("backend-template")}
+            className={`group text-left p-6 rounded-xl border transition-all duration-200 ${
+              productType === "backend-template"
+                ? "bg-purple-600/20 border-purple-500 ring-1 ring-purple-500"
+                : "bg-slate-800 border-slate-700 hover:border-purple-400 hover:bg-slate-700"
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              <Server size={22} className={`mt-1 ${productType === "backend-template" ? "text-purple-400" : "text-slate-400 group-hover:text-purple-400"}`} />
+              <div>
+                <div className="font-semibold text-white text-base">Backend Template</div>
+                <p className="text-sm text-slate-400 mt-1 leading-relaxed">API or backend starter projects</p>
+              </div>
+            </div>
           </button>
         </div>
       </div>
 
-      {/* File Upload Section */}
+      {/* File Upload */}
       <div className="space-y-3">
-        <label className="block text-white font-medium">
-          อัปโหลดไฟล์สินค้าของคุณ
-        </label>
-        
-        {/* Hidden file input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          onChange={handleFileChange}
-          className="hidden"
-          accept=".zip,.rar,.fig,.sketch,.xd"
-        />
-
-        {/* Upload Area */}
+        <label className="block text-white font-medium">อัปโหลดไฟล์สินค้าของคุณ</label>
+        <input ref={fileInputRef} type="file" onChange={handleFileChange} className="hidden" accept=".zip" />
         <div
           onClick={handleUploadClick}
           className="border-2 border-dashed border-slate-600 rounded-lg p-12 text-center cursor-pointer hover:border-purple-500 hover:bg-slate-800/50 transition-all"
@@ -131,27 +200,21 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext }) => {
           {file ? (
             <div>
               <p className="text-white font-medium mb-1">{file.name}</p>
-              <p className="text-slate-400 text-sm">
-                {(file.size / 1024 / 1024).toFixed(2)} MB
-              </p>
+              <p className="text-slate-400 text-sm">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
               <p className="text-purple-400 text-sm mt-2">คลิกเพื่อเปลี่ยนไฟล์</p>
             </div>
           ) : (
             <div>
               <p className="text-white mb-2">วางไฟล์นี่หรือคลิกเพื่ออัพโหลดไฟล์</p>
-              <p className="text-slate-400 text-sm">
-                รองรับไฟล์: .zip, .rar, .fig, .sketch, .xd
-              </p>
+              <p className="text-slate-400 text-sm">รองรับไฟล์: .zip</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Keywords Input */}
+      {/* Keywords */}
       <div className="space-y-3">
-        <label className="block text-white font-medium">
-          คุณกำลังโพสต์เกี่ยวกับหัวข้ออะไร?
-        </label>
+        <label className="block text-white font-medium">คุณกำลังโพสต์เกี่ยวกับหัวข้ออะไร?</label>
         <textarea
           value={keywords}
           onChange={(e) => setKeywords(e.target.value)}
@@ -159,18 +222,55 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({ onNext }) => {
           rows={4}
           className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all resize-none"
         />
-        <p className="text-slate-400 text-sm">
-          ตัวอย่าง: React Dashboard, Admin Template, E-commerce UI
+        <p className="text-slate-400 text-sm">ตัวอย่าง: React Dashboard, Admin Template, E-commerce UI</p>
+      </div>
+
+      {/* Warning */}
+      <div className="bg-yellow-900/20 border border-yellow-600 rounded-lg p-4 text-sm">
+        <p className="text-yellow-400 font-medium mb-1">⚠️ คำแนะนำก่อนอัปโหลด</p>
+        <p className="text-yellow-300">
+          กรุณาลบ <span className="font-mono text-yellow-200">node_modules</span> ออกจากโปรเจกต์ก่อน zip ไฟล์
+          เพื่อให้การอัปโหลดเร็วขึ้นและช่วยให้ AI วิเคราะห์ไฟล์ได้แม่นยำขึ้น
         </p>
       </div>
 
-      {/* Next Button */}
+      {/* Buttons */}
       <button
-        onClick={handleSubmit}
-        className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+        disabled={isAnalyzing}
+        onClick={() => handleSubmit(true)}
+        className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
       >
-        ถัดไป →
+        {isAnalyzing ? "กำลังวิเคราะห์ไฟล์..." : "⚡ วิเคราะห์ไฟล์ด้วย AI (แนะนำ)"}
       </button>
+
+      <button
+        onClick={() => handleSubmit(false)}
+        className="w-full bg-slate-700 hover:bg-slate-600 text-white py-4 rounded-lg font-medium transition-colors"
+      >
+        ดำเนินการต่อโดยไม่ใช้ AI
+      </button>
+
+      {/* Validation Error Modal */}
+      {validationReason && (
+        <ValidationErrorModal
+          isOpen={true}
+          reason={validationReason}
+          onUploadNew={() => {
+            setFile(null);
+            setValidationReason(null);
+          }}
+          onContinueWithoutAI={() => {
+            setValidationReason(null);
+            onNext({
+              productType: productType as "UI Kit" | "frontend-template" | "backend-template",
+              file: file!,
+              keywords,
+              metadata: undefined,
+              useAI: false,
+            });
+          }}
+        />
+      )}
     </div>
   );
 };

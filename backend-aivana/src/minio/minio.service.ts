@@ -27,8 +27,12 @@ export class MinioService implements OnModuleInit {
 
     const endpoint = this.getRequired('MINIO_ENDPOINT');
     const port = parseInt(this.getRequired('MINIO_PORT'), 10);
-    const useSSL =
-      (this.configService.get<string>('MINIO_USE_SSL') ?? 'false') === 'true';
+
+    // Use MINIO_CONNECTION_SSL for internal connection, fallback to MINIO_USE_SSL
+    const connectionSSL = this.configService.get<string>('MINIO_CONNECTION_SSL')
+      ?? 'false';
+    const useSSL = connectionSSL === 'true';
+
     const accessKey = this.getRequired('MINIO_ACCESS_KEY');
     const secretKey = this.getRequired('MINIO_SECRET_KEY');
 
@@ -85,8 +89,7 @@ export class MinioService implements OnModuleInit {
       const metaData = {
         'Content-Type': file.mimetype,
       };
-
-      // Add folder prefix if provided
+      
       const fullPath = folder ? `${folder}/${fileName}` : fileName;
 
       await this.minioClient.putObject(
@@ -106,21 +109,29 @@ export class MinioService implements OnModuleInit {
 
   getFileUrl(fileName: string): string {
     try {
-      // Return permanent public URL for e-commerce
+      let hostUrl = this.configService.get<string>('HOST_URL');
+
+      if (hostUrl) {
+        if (!hostUrl.startsWith('http://') && !hostUrl.startsWith('https://')) {
+          const publicSSL = this.configService.get<string>('MINIO_PUBLIC_USE_SSL')
+            ?? 'true';
+          const protocol = publicSSL === 'true' ? 'https' : 'http';
+          hostUrl = `${protocol}://${hostUrl}`;
+        }
+
+        const baseUrl = hostUrl.endsWith('/') ? hostUrl.slice(0, -1) : hostUrl;
+        return `${baseUrl}/${this.bucketName}/${fileName}`;
+      }
+
       const endpoint = this.configService.get<string>('MINIO_ENDPOINT');
       const port = this.configService.get<string>('MINIO_PORT');
-      const useSSL =
-        (this.configService.get<string>('MINIO_USE_SSL') ?? 'false') === 'true';
+      const publicSSL = this.configService.get<string>('MINIO_PUBLIC_USE_SSL')
+        ?? 'false';
 
-      const protocol = useSSL ? 'https' : 'http';
-      const portSuffix =
-        port && port !== '80' && port !== '443' ? `:${port}` : '';
+      const protocol = publicSSL === 'true' ? 'https' : 'http';
+      const portSuffix = port && port !== '80' && port !== '443' ? `:${port}` : '';
 
-      // Public URL format: http://localhost:9000/bucket-name/file-path
-      const publicUrl = `${protocol}://${endpoint}${portSuffix}/${this.bucketName}/${fileName}`;
-
-      
-      return publicUrl;
+      return `${protocol}://${endpoint}${portSuffix}/${this.bucketName}/${fileName}`;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Failed to get file URL: ${message}`);

@@ -14,7 +14,7 @@ export default function ProductImages({ heroSrc, detailImages }: ProductImagesPr
         <div className="space-y-6">
             {/* Hero Image */}
             <div className="bg-linne-purple-hover p-4 rounded shadow">
-                <h3 className="text-xl font-semibold text-primary mb-2">Hero Image</h3>
+                <h3 className="text-xl font-semibold text-primary mb-2">ภาพฮีโร่ (Hero Image)</h3>
                 {heroSrc ? (
                     <img
                         src={heroSrc}
@@ -23,13 +23,13 @@ export default function ProductImages({ heroSrc, detailImages }: ProductImagesPr
                         onClick={() => setModalImg(heroSrc)}
                     />
                 ) : (
-                    <p>No hero image available.</p>
+                    <p>ไม่มีภาพฮีโร่ที่พร้อมใช้งาน</p>
                 )}
             </div>
 
             {/* Detail Images */}
             <div className="bg-linne-purple-hover p-4 rounded shadow">
-                <h3 className="text-xl font-semibold text-primary mb-2">Detail Images</h3>
+                <h3 className="text-xl font-semibold text-primary mb-2">ภาพรายละเอียด (Detail Images)</h3>
                 {detailImages?.length ? (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                         {detailImages.slice(0, 8).map((img) => (
@@ -43,7 +43,7 @@ export default function ProductImages({ heroSrc, detailImages }: ProductImagesPr
                         ))}
                     </div>
                 ) : (
-                    <p>No additional images available.</p>
+                    <p>ไม่มีภาพเพิ่มเติมที่พร้อมใช้งาน</p>
                 )}
             </div>
 

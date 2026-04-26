@@ -13,18 +13,21 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ProductImageService } from './product-image.service';
 import { MinioService } from '../minio/minio.service';
 import { MINIO_FOLDERS } from '../constants/minio-folders.constant';
-import { ProductsService } from '../products/products.service';
-import { UploadedFileType } from 'src/products/interfaces/uploaded-file.interface';
+import { ProductService } from '../product/product.service';
+import { UploadedFileType } from 'src/product/interfaces/uploaded-file.interface';
+import { Role } from 'src/auth/enum/role.enum';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('product-images')
 export class ProductImageController {
   constructor(
     private readonly productImageService: ProductImageService,
     private readonly minioService: MinioService,
-    private readonly productsService: ProductsService,
+    private readonly ProductService: ProductService,
   ) {}
 
   @Post('upload')
+  @Roles(Role.SELLER)
   @UseInterceptors(FilesInterceptor('images', 8)) // Max 8 images per upload
   async uploadProductImages(
     @UploadedFiles() files: UploadedFileType[],
@@ -93,6 +96,7 @@ export class ProductImageController {
   }
 
   @Delete(':imageId')
+  @Roles(Role.SELLER,Role.ADMIN)
   async deleteProductImage(@Param('imageId') imageId: string) {
     const image = await this.productImageService.findOne(parseInt(imageId));
 
@@ -117,6 +121,7 @@ export class ProductImageController {
   }
 
   @Post('hero')
+  @Roles(Role.SELLER)
   @UseInterceptors(FileInterceptor('image'))
   async uploadHeroImage(
     @UploadedFile() file: UploadedFileType[],
@@ -127,7 +132,7 @@ export class ProductImageController {
     }
 
     // Get product to check if hero image already exists
-    const product = await this.productsService.findOne(parseInt(productId));
+    const product = await this.ProductService.findOne(parseInt(productId));
 
     if (!product) {
       throw new Error(`Product with ID ${productId} not found`);
@@ -154,7 +159,7 @@ export class ProductImageController {
     const fileUrl = this.minioService.getFileUrl(fullPath);
 
     // Update hero_image_url in ProductEntity
-    await this.productsService.updateHeroImage(parseInt(productId), fileUrl);
+    await this.ProductService.updateHeroImage(parseInt(productId), fileUrl);
 
     return {
       message: 'Hero image uploaded successfully',

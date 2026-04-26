@@ -2,14 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
+import { getCurrentUser } from "@/lib/auth";
 
 export const Footer: React.FC = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
-      const user = await getCurrentUserFromToken();
+      const user = await getCurrentUser();
       setUserRole(user?.role || null);
     };
 
@@ -18,13 +18,17 @@ export const Footer: React.FC = () => {
 
   return (
     <footer className="bg-[var(--linne-purple)] py-12">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-[1400px] mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
-            <h3 className="text-2xl font-bold text-purple-500 mb-4">AIVANA</h3>
+            <Link href="/" className="flex items-center shrink-0">
+              <span className="text-3xl font-bold bg-gradient-to-br from-[#8a57fb] to-[#a78bfa] bg-clip-text text-transparent tracking-wide">
+                AIVANA
+              </span>
+            </Link>
             <p className="text-slate-400 text-sm">
-              ศูนย์รวมคอมโพแนนต์ Frontend สำหรับทุกโปรเจกต์
+              ศูนย์รวม Template & Component
             </p>
           </div>
 
@@ -33,8 +37,15 @@ export const Footer: React.FC = () => {
             <h4 className="text-white font-semibold mb-4">หมวดหมู่</h4>
             <ul className="space-y-2">
               {[
-                { label: "UI Kits", href: "/ui-kits" },
-                { label: "Code Template", href: "/code-template" },
+                { label: "UI Kit", href: "/products?category=ui-kit" },
+                {
+                  label: "Frontend Template",
+                  href: "/products?category=frontend-template",
+                },
+                {
+                  label: "Backend Template",
+                  href: "/products?category=backend-template",
+                },
               ].map((item, i) => (
                 <li key={i}>
                   <Link

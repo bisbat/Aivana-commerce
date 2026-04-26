@@ -4,13 +4,13 @@ import { ProductImageController } from './product-image.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductImage } from './entities/product-image.entity';
 import { MinioModule } from '../minio/minio.module';
-import { ProductsModule } from '../products/products.module';
+import { ProductModule } from '../product/product.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([ProductImage]),
     MinioModule,
-    forwardRef(() => ProductsModule),
+    forwardRef(() => ProductModule),
   ],
   controllers: [ProductImageController],
   providers: [ProductImageService],

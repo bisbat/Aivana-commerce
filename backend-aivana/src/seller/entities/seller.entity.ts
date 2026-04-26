@@ -1,0 +1,78 @@
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { ProductEntity } from 'src/product/entities/product.entity';
+import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
+import { PayoutEntity } from 'src/payout/entities/payout.entity';
+
+@Entity('seller')
+export class SellerEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @OneToOne(() => UserEntity, (user) => user.sellerProfile, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'userId' })
+  user: UserEntity;
+
+  @Column({ nullable: false })
+  storeName: string;
+
+  @Column({ type: 'text', nullable: true })
+  bio: string;
+
+  @Column({ nullable: true })
+  location: string;
+
+  @Column({ type: 'int', default: 0 })
+  totalSales: number;
+
+  @Column({ type: 'float', default: 0 })
+  averageRating: number;
+
+  @Column({ type: 'int', default: 0 })
+  totalReviews: number;
+
+  @Column({ type: 'text', array: true, default: [] })
+  skills: string[];
+
+  @Column({ type: 'jsonb', nullable: true })
+  socials: {
+    instagram?: string;
+    facebook?: string;
+    tiktok?: string;
+    github?: string;
+    linkedin?: string;
+  };
+
+  @Column({ type: 'jsonb', nullable: true })
+  bankInfo: {
+    bankName: string;
+    accountNumber: string;
+    accountName: string;
+  };
+
+  @OneToMany(() => ProductEntity, (product) => product.seller)
+  products: ProductEntity[];
+
+  @OneToMany(() => OrderItemEntity, (item) => item.seller)
+  orderItems: OrderItemEntity[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @OneToMany(() => PayoutEntity, (payout) => payout.seller)
+  payouts: PayoutEntity[];
+}

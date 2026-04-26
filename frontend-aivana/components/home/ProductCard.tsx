@@ -8,6 +8,15 @@ interface ProductCardProps {
   product: Product;
 }
 
+const getCategoryDisplayName = (categoryName: string): string => {
+  const categoryMap: Record<string, string> = {
+    "ui-kit": "UI Kit",
+    "frontend-template": "Frontend Template",
+    "backend-template": "Backend Template",
+  };
+  return categoryMap[categoryName] || categoryName;
+};
+
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <Link href={`/products/${product.id}`}>
@@ -37,14 +46,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           {/* Creator & Category */}
           <div className="flex items-center gap-2 text-sm text-slate-400">
-            <span>
-              {product.seller?.firstName} {product.seller?.lastName}
-            </span>
+            <span>@{product.seller?.username}</span>
             {product.category && (
               <>
                 <span>•</span>
                 <span className="px-2 py-0.5 bg-slate-800 rounded text-xs">
-                  {product.category.name}
+                  {getCategoryDisplayName(product.category.name)}
                 </span>
               </>
             )}

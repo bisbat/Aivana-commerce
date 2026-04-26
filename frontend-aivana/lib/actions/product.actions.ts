@@ -5,15 +5,19 @@ import { UploadFileFormData } from "../types/formCreateProduct/UploadFileFormDat
 import { UploadImageFormData } from "../types/formCreateProduct/UploadImageFormData";
 import { ProductUpdatePayload } from "../types/product/UpdateProductPayload";
 import { UpdatedProductData } from "@/app/stores/products/[productId]/edit/page";
+import { getAccessToken } from "../auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export async function updateProductAction(
   productId: string,
   updatedData: UpdatedProductData,
-  accessToken?: string
 ) {
+  const token = await getAccessToken();
 
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
   const formData = new FormData();
 
   for (const key in updatedData) {
@@ -22,7 +26,7 @@ export async function updateProductAction(
     if (value === undefined || value === null) continue;
 
     // Handle nested files object
-    if (key === 'files' && typeof value === 'object') {
+    if (key === "files" && typeof value === "object") {
       for (const fileKey in value) {
         const fileOrFiles = value[fileKey as keyof typeof value];
 
@@ -51,11 +55,10 @@ export async function updateProductAction(
 
   console.log(formData);
 
-
   const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
     method: "PUT",
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${token}`,
     },
     body: formData,
   });
@@ -70,19 +73,19 @@ export async function updateProductAction(
   return await res.json();
 }
 
-
-
-
 // ฟังก์ชันสำหรับลบ detail image
-export async function deleteProductImageAction(
-  imageId: number,
-  accessToken?: string
-) {
+export async function deleteProductImageAction(imageId: number) {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
   const res = await fetch(`${API_BASE_URL}/product-images/${imageId}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -94,23 +97,50 @@ export async function deleteProductImageAction(
   throw new Error("Failed to delete image");
 }
 
-export async function deleteProductAction(
-  productId: string,
-  accessToken?: string
-) {
+export async function deleteProductAction(productId: string, reason?: string) {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
   // ส่งคำขอไปยัง API เพื่อลบสินค้า
   const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${token}`,
     },
+    body: JSON.stringify({ reason }),
   });
 
-  if (res.ok) {
-    // 2. ✅ อัปเดตข้อมูลใน Cache
-    revalidatePath(`/stores/products/${productId}`);
+  if (!res.ok) {
+    // Get error message from response
+    const errorData = await res.json().catch(() => ({}));
+    const errorMessage = errorData.message || "Failed to delete product";
+    throw new Error(errorMessage);
   }
+
+  revalidatePath(`/stores/products/${productId}`);
+}
+
+export async function getProductHasOrdersAction(
+  productId: string,
+): Promise<boolean> {
+  const token = await getAccessToken();
+  if (!token) return false;
+
+  const res = await fetch(`${API_BASE_URL}/products/${productId}/has-orders`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) return false;
+  const data = await res.json();
+  return data.hasOrders as boolean;
 }
 
 export async function getAllProductsAction() {
@@ -119,10 +149,9 @@ export async function getAllProductsAction() {
     headers: {
       "Content-Type": "application/json",
     },
-  });  
+  });
 
   console.log(res);
-  
 
   if (res.ok) {
     const data = await res.json();
@@ -133,26 +162,43 @@ export async function getAllProductsAction() {
 }
 
 export async function getProductByIdAction(productId: string) {
+  const token = await getAccessToken();
+
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers,
   });
-  
+
   if (res.ok) {
-    const data = await res.json();
-    return data;
+    const text = await res.text();
+    // ถ้า response เป็น empty หรือ "null" แสดงว่าสินค้าไม่มี
+    if (!text || text === "null") {
+      return null;
+    }
+    return JSON.parse(text);
   }
 
   throw new Error("Failed to fetch product");
 }
+
 export async function createCompleteProduct(
   uploadFileData: UploadFileFormData, // Step 1 data
   productInfoData: ProductInformationFormData, // Step 2 data
   imageData: UploadImageFormData,
-  accessToken?: string | undefined // Step 3 data
 ) {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
   try {
     // Create FormData with ALL information
     const formData = new FormData();
@@ -171,8 +217,11 @@ export async function createCompleteProduct(
     formData.append("features", JSON.stringify(productInfoData.features));
     formData.append(
       "compatibility",
-      JSON.stringify(productInfoData.compatibility)
+      JSON.stringify(productInfoData.compatibility),
     );
+    formData.append("techstack", JSON.stringify(productInfoData.techstack));
+    formData.append("requirement", JSON.stringify(productInfoData.requirement));
+    formData.append("apiDocUrl", productInfoData.apiDocUrl || "");
     formData.append("tagIds", JSON.stringify(productInfoData.tagIds));
 
     // Step 1: Product File (.zip, .fig, etc.)
@@ -192,12 +241,11 @@ export async function createCompleteProduct(
       });
     }
 
-
     // ✨ Single API call with everything
     const response = await fetch(`${API_BASE_URL}/products`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${token}`,
       },
       body: formData,
     });
@@ -216,4 +264,75 @@ export async function createCompleteProduct(
   } catch (error) {
     throw error;
   }
+}
+
+export async function getProductsByTag(tag: string) {
+  const res = await fetch(
+    `${API_BASE_URL}/products?tag=${encodeURIComponent(tag)}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+  if (res.ok) {
+    const data = await res.json();
+    return data;
+  }
+  throw new Error("Failed to fetch products by tag");
+}
+
+export async function getProductsByCategory(category: string) {
+  const res = await fetch(
+    `${API_BASE_URL}/products?category=${encodeURIComponent(category)}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+  if (res.ok) {
+    const data = await res.json();
+    return data;
+  }
+  throw new Error("Failed to fetch products by category");
+}
+
+export async function getProductsBySearchQuery(query: string) {
+  const res = await fetch(
+    `${API_BASE_URL}/products/search?q=${encodeURIComponent(query)}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+  if (res.ok) {
+    const data = await res.json();
+    return data;
+  }
+  throw new Error("Failed to fetch products by search query");
+}
+
+export async function getProductReviews(productId: number, page: number = 1) {
+  const accessToken = await getAccessToken();
+
+  const res = await fetch(
+    `${API_BASE_URL}/products/${productId}/reviews?page=${page}&limit=10`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch reviews");
+  }
+
+  return await res.json();
 }

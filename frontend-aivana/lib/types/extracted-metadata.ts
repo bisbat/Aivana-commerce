@@ -1,0 +1,146 @@
+type PackageManager = 'npm' | 'yarn' | 'pnpm' | 'bun';
+type DesignTool = 'figma' | 'sketch' | 'xd' | 'other';
+
+interface DependencyGroups {
+  main?: string[]; 
+  ui?: string[]; 
+  state?: string[]; 
+  styling?: string[]; 
+  database?: string[]; 
+  auth?: string[];
+}
+
+interface ReadmeInfo {
+  exists: boolean;
+  sections?: string[]; 
+}
+
+export interface UIKitMetadata {
+  category: 'ui-kit';
+
+  tech?: {
+    framework?: string;
+    frameworkVersion?: string;
+    language?: string;
+  };
+
+  files?: {
+    designTools?: string[];
+    assetTypes?: string[];
+    fileExtensions?: string[];
+  };
+
+  design?: {
+    tool?: DesignTool;
+    componentCount?: number;
+    pageCount?: number;
+    hasPrototype?: boolean;
+  };
+
+  styling?: {
+    primaryStyling?: string;
+    hasDarkMode?: boolean;
+  };
+
+  tooling?: {
+    hasTypeScript?: boolean;
+    packageManager?: PackageManager;
+  };
+
+  dependencies?: DependencyGroups;
+
+  readme: ReadmeInfo;
+}
+
+export interface FrontendTemplateMetadata {
+  category: 'frontend-template';
+
+  tech: {
+    framework?: string;
+    frameworkVersion?: string; 
+    language?: string;
+  };
+
+  architecture?: {
+    hasRouting?: boolean;
+    hasAuth?: boolean;
+    stateManagement?: string;
+    pattern?: 'component-based' | 'modular' | 'feature-based';
+  };
+
+  styling?: {
+    primaryStyling?: string;
+    hasDarkMode?: boolean;
+  };
+
+  structure?: {
+    componentCount?: number;
+    pageCount?: number;
+  };
+
+  tooling?: {
+    hasTypeScript?: boolean;
+    packageManager?: PackageManager;
+    buildTool?: string;
+  };
+
+  dependencies?: DependencyGroups;
+
+  readme: ReadmeInfo;
+}
+
+export interface BackendTemplateMetadata {
+  category: 'backend-template';
+
+  tech: {
+    framework?: string;
+    frameworkVersion?: string;
+    language?: string;
+    runtime?: string;
+  };
+
+  architecture?: {
+    hasAuth?: boolean;
+    database?: string;
+    orm?: string;
+    pattern?: 'mvc' | 'modular' | 'layered';
+  };
+
+  structure?: {
+    apiEndpointCount?: number;
+  };
+
+  tooling?: {
+    hasTypeScript?: boolean;
+    packageManager?: PackageManager;
+  };
+
+  dependencies?: DependencyGroups;
+
+  readme: ReadmeInfo;
+}
+
+export type ExtractedMetadata =
+  | UIKitMetadata
+  | FrontendTemplateMetadata
+  | BackendTemplateMetadata;
+
+
+  // เพิ่มต่อท้ายไฟล์เดิมได้เลย
+
+export type ValidationFailReason = 'MISSING_PACKAGE_JSON' | 'INVALID_UI_KIT';
+
+export interface ValidationResult {
+  isValid: boolean;
+  reason?: ValidationFailReason;
+}
+
+export interface ExtractionResult {
+  metadata: ExtractedMetadata | null;
+  validation: ValidationResult;
+  flags: {
+    hasPackageJson: boolean;
+    hasDesignFiles: boolean;
+    hasAssets: boolean;
+  };
+}

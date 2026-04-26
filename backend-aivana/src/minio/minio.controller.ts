@@ -7,13 +7,16 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MinioService } from './minio.service';
-import type { UploadedFileType } from '../products/interfaces/uploaded-file.interface';
+import type { UploadedFileType } from '../product/interfaces/uploaded-file.interface';
+import { Role } from 'src/auth/enum/role.enum';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('files')
 export class MinioController {
   constructor(private readonly minioService: MinioService) {}
 
   @Post('upload')
+  @Roles(Role.ADMIN, Role.SELLER)
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: UploadedFileType) {
     const timestamp = Date.now();

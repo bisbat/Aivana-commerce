@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { login, saveAuthData } from "@/lib/actions/auth.actions";
+import { loginAction } from "@/lib/actions/auth.server";
+import { getCurrentUser } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -51,25 +52,40 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const tokenResponse = await login({
+      const result = await loginAction({
         username: formData.username,
         password: formData.password,
       });
 
-      saveAuthData(tokenResponse.accessToken);
+      if (!result.success) {
+        setErrors({ submit: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });
+        return;
+      }
+
+      const isAdmin = await getCurrentUser().then(
+        (user) => user?.role === "admin",
+      );
+
+      if (isAdmin) {
+        router.push("/admin/payouts");
+        router.refresh();
+        return;
+      }
 
       router.push("/");
+      router.refresh();
     } catch (error) {
-      console.error("Login error:", error);
-      setErrors({ submit: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });
+      console.error("Unexpected error:", error);
+      setErrors({ submit: "เกิดข้อผิดพลาดบางอย่าง" });
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleGoogleLogin = () => {
-    // TODO: Implement Google OAuth
-    console.log("Google login clicked");
+    const apiUrl =
+      process.env.NEXT_PUBLIC_GOOGLE_AUTH_URL || "http://localhost:3001";
+    router.push(`${apiUrl}/auth/google`);
   };
 
   return (

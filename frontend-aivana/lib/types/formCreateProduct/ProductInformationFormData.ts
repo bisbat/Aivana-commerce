@@ -17,4 +17,7 @@ export interface ProductInformationFormData {
   
     features: string[];
     compatibility: string[];
+    techstack: string[];
+    requirement: string[];
+    apiDocUrl: string | null;
   }

@@ -1,12 +1,13 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
-import { JWT_SECRET } from '../common/config/jwt-secret';
+import { JWT_SECRET } from './config/jwt-secret';
 import { PassportModule } from '@nestjs/passport';
 import { PassportAuthController } from './passport-auth.controller';
-import { LocalStrategy } from 'src/common/strategies/local.strategy';
-import { JwtStrategy } from 'src/common/strategies/jwt.strategy';
-import { UsersModule } from 'src/users/users.module';
+import { LocalStrategy } from './strategies/local.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
+import { UserModule } from 'src/user/user.module';
 import { MinioModule } from 'src/minio/minio.module';
 
 @Module({
@@ -17,11 +18,11 @@ import { MinioModule } from 'src/minio/minio.module';
       signOptions: { expiresIn: '1d' },
     }),
     PassportModule,
-    forwardRef(() => UsersModule),
+    forwardRef(() => UserModule),
     MinioModule,
   ],
   controllers: [PassportAuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

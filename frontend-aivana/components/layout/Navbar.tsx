@@ -1,35 +1,44 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, use } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, ChevronDown } from "lucide-react";
+import { UserProfile } from "@/lib/types/user/user";
 import { ProfileModal } from "./ProfileModal";
 import { CartModal } from "../cart/CartModal";
-import { getCurrentUserFromToken } from "@/lib/actions/auth.actions";
-import { getUserByUserId } from "@/lib/actions/user.actions";
+import { getCurrentUser } from "@/lib/auth";
+import { Tag } from "@/lib/types/tag";
+import { getNavbarTagsAction } from "@/lib/actions/tag.actions";
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const [userData, setUserData] = useState<UserProfile | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [activeTag, setActiveTag] = useState<string | null>("all");
+  const [showMoreCategories, setShowMoreCategories] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
-  const searchRef = useRef<HTMLDivElement>(null);
+  const cartRef = useRef<HTMLDivElement>(null);
+  const moreRef = useRef<HTMLDivElement>(null);
+  const [tagNavbar, setTagNavbar] = useState<Tag[]>([]);
 
-  // Check authentication status on mount and when pathname changes
+  // Check authentication status
   useEffect(() => {
     const checkAuth = async () => {
-      const user = await getCurrentUserFromToken();
+      const user = await getCurrentUser();
+      setUser(user);
       setIsAuthenticated(!!user);
       setUserRole(user?.role || null);
       setUserId(user?.id || null);
+      setUserData(user || null);
     };
 
     checkAuth();
@@ -51,255 +60,305 @@ export const Navbar: React.FC = () => {
     };
   }, [pathname]);
 
-  const showSearchBar =
-    pathname?.startsWith("/products") || pathname?.startsWith("/categories");
-
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (
         profileRef.current &&
-        !profileRef.current.contains(event.target as Node)
+        !profileRef.current.contains(e.target as Node)
       ) {
         setIsProfileOpen(false);
       }
-      if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
-      ) {
-        setIsSearchOpen(false);
+      if (cartRef.current && !cartRef.current.contains(e.target as Node)) {
+        setIsCartOpen(false);
+      }
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setShowMoreCategories(false);
       }
     };
 
-    if (isProfileOpen || isSearchOpen) {
+    if (isProfileOpen || showMoreCategories || isCartOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isProfileOpen, isSearchOpen]);
+  }, [isProfileOpen, showMoreCategories, isCartOpen]); // เพิ่ม isCartOpen
 
-  // Handle search submit
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    const loadNavbarTags = async () => {
+      try {
+        const tags = await getNavbarTagsAction();
+        setTagNavbar(tags);
+      } catch (err) {
+        console.error("Failed to load navbar tags", err);
+      }
+    };
+
+    loadNavbarTags();
+  }, []);
+
+  const handleSearch = () => {
     if (searchQuery.trim()) {
-      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-      setIsSearchOpen(false);
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
     }
   };
 
+  const handleAiSearchClick = () => {
+    if (!isAuthenticated) {
+      if (typeof window !== "undefined") {
+        import("@/lib/toast").then(({ showErrorToast }) => {
+          showErrorToast("กรุณาเข้าสู่ระบบก่อนจึงจะใช้ฟีเจอร์ AI ค้นหาได้");
+        });
+      }
+      return;
+    }
+    router.push(`/ai-search`);
+  };
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
+  const handleTagClick = (tagName?: string) => {
+    if (!tagName || tagName === "all") {
+      setActiveTag("all");
+      router.push("/");
+    } else {
+      setActiveTag(tagName);
+      router.push(`/products?tag=${encodeURIComponent(tagName)}`);
+    }
+  };
+
   return (
-    <nav className="bg-[var(--background)] border-b border-slate-800 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-3">
-        <div className="flex items-center h-16 gap-4">
-          {/* Left Side: Logo + Menu Items */}
-          <div className="flex items-center gap-8 shrink-0">
-            {/* Logo */}
-            <Link href="/" className="flex items-center">
-              <span className="font-family text-2xl font-bold text-[var(--primary)]">
-                AIVANA
-              </span>
-            </Link>
+    <nav className="relative z-50">
+      {/* Top Bar - เปลี่ยนจาก bg-[color] เป็น backdrop-blur */}
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+        <div className="flex items-center h-20 gap-5">
+          {/* Logo */}
+          <Link href="/" className="flex items-center shrink-0">
+            <span className="text-3xl font-bold bg-gradient-to-br from-[#8a57fb] to-[#a78bfa] bg-clip-text text-transparent tracking-wide">
+              AIVANA
+            </span>
+          </Link>
 
-            {/* Desktop Navigation */}
-            <div className="flex items-center gap-3 shrink-0 ml-auto">
-              <Link
-                href="/categories"
-                className="px-2 py-2 font-medium text-white hover:text-[var(--primary)] transition-colors text-sm"
-              >
-                หมวดหมู่
-              </Link>
-              <Link
-                href="/about"
-                className="px-2 py-2 font-medium text-white hover:text-[var(--primary)] transition-colors text-sm"
-              >
-                เกี่ยวกับ
-              </Link>
-              {/* Show "Become Seller" button only if user is customer */}
-              {userRole === "customer" && (
-                <Link
-                  href="/seller/become"
-                  className="px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-hover)] transition-colors text-sm font-medium"
-                >
-                  สมัครเป็นผู้ขาย
-                </Link>
-              )}
-            </div>
-          </div>
+          {/* Search Bar - Desktop */}
+          <div className="hidden md:flex flex-1 max-w-3xl mx-4">
+            <div className="w-full relative">
+              <div className="relative flex items-center">
+                <Search className="absolute left-4 text-gray-400" size={20} />
 
-          {/* Middle: Animated Search Bar - ใช้ flex-1 เพื่อให้ยืดเต็ม */}
-          {showSearchBar && (
-            <div ref={searchRef} className="hidden md:flex items-center flex-1">
-              <form
-                onSubmit={handleSearch}
-                className={`flex items-center transition-all duration-300 ease-in-out w-full ${
-                  isSearchOpen ? "bg-slate-800/50 rounded-lg px-3 py-2" : ""
-                }`}
-              >
-                <button
-                  type="button"
-                  onClick={() => setIsSearchOpen(!isSearchOpen)}
-                  className="text-white hover:text-[var(--primary)] transition-colors shrink-0"
-                >
-                  <Search size={20} />
-                </button>
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
                   placeholder="ค้นหาสินค้า..."
-                  className={`bg-transparent text-white placeholder:text-slate-400 focus:outline-none transition-all duration-300 ease-in-out ${
-                    isSearchOpen
-                      ? "w-full ml-2 opacity-100"
-                      : "w-0 ml-0 opacity-0 pointer-events-none"
-                  }`}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSearch(e);
-                    }
+                  className="w-full pl-12 pr-28 py-3.5 rounded-xl text-white placeholder:text-slate-500 bg-[#1e1b3d] border border-[#262549] focus:outline-none focus:border-[#8a57fb] focus:ring-1 focus:ring-[#8a57fb] transition-all text-base"
+                />
+
+                {/* AI Search Button */}
+                <button
+                  className="absolute right-2 px-4 py-1.5 text-sm font-semibold rounded-lg 
+        bg-gradient-to-r from-purple-500 to-indigo-500 
+        hover:from-purple-600 hover:to-indigo-600
+        text-white transition-all shadow-md hover:shadow-lg"
+                  onClick={() => {
+                    handleAiSearchClick();
                   }}
-                />
-              </form>
-            </div>
-          )}
-
-          {/* Right Side: Auth-based content */}
-          {isAuthenticated ? (
-            <div className="flex items-center gap-3 shrink-0 ml-auto">
-              {/* Cart - Show for customers and sellers */}
-              {(userRole === "customer" || userRole === "seller") && (
-                <button
-                  onClick={() => setIsCartOpen(true)}
-                  className="px-2  text-white hover:text-[var(--primary)] transition-colors relative"
-                  aria-label="Shopping cart"
                 >
-                  <ShoppingCart size={20} />
+                  AI Search
                 </button>
-              )}
-              <div ref={profileRef} className="relative">
-                <button
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="px-2  text-white hover:text-[var(--primary)] transition-colors"
-                  aria-label="User profile"
-                >
-                  <User size={20} />
-                </button>
-
-                {/* Profile Modal */}
-                <ProfileModal
-                  isOpen={isProfileOpen}
-                  onClose={() => setIsProfileOpen(false)}
-                />
               </div>
             </div>
-          ) : (
-            <div className="flex items-center gap-3 shrink-0 ml-auto">
-              <Link
-                href="/login"
-                className="px-4 py-2 text-white hover:text-[var(--primary)] transition-colors text-sm font-medium"
-              >
-                เข้าสู่ระบบ
-              </Link>
+          </div>
 
-              <Link
-                href="/register"
-                className="px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-hover)] transition-colors text-sm font-medium"
-              >
-                ลงทะเบียน
-              </Link>
-            </div>
-          )}
+          {/* Right Side Actions */}
+          <div className="flex items-center gap-5 shrink-0 ml-auto">
+            {isAuthenticated ? (
+              <>
+                {/* Cart - Show for customers and sellers */}
+                <div ref={cartRef} className="relative">
+                  {(userRole === "customer" || userRole === "seller") && (
+                    <button
+                      onClick={() => setIsCartOpen(true)}
+                      className="hidden sm:flex items-center gap-2 px-4 py-2.5 text-[#eaeaea] hover:text-[#8a57fb] transition-colors relative"
+                      aria-label="Cart"
+                    >
+                      <ShoppingCart size={22} />
+                    </button>
+                  )}
+                </div>
 
-          {/* Mobile menu button */}
+                {/* Profile */}
+                <div ref={profileRef} className="relative">
+                  {/* Avatar - เพิ่ม cursor-pointer และ onClick */}
+                  <button
+                    onClick={() => setIsProfileOpen(true)}
+                    className="w-12 h-12 mx-auto mt-2 mb-4 rounded-full bg-[var(--background)] border-2 border-slate-500 hover:border-slate-400 flex items-center justify-center overflow-hidden transition-all cursor-pointer"
+                  >
+                    {userData?.avatarUrl ? (
+                      <img
+                        src={userData.avatarUrl}
+                        alt="Avatar"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : userData?.username ? (
+                      <span className="text-2xl font-bold text-slate-300">
+                        {userData.username.charAt(0).toUpperCase()}
+                      </span>
+                    ) : (
+                      <User size={40} className="text-slate-300" />
+                    )}
+                  </button>
+
+                  {/* Profile Modal */}
+                  <ProfileModal
+                    user={userData}
+                    isOpen={isProfileOpen}
+                    onClose={() => setIsProfileOpen(false)}
+                    profileRef={profileRef}
+                  />
+                </div>
+
+                {/* Start Selling Button - Only for customers */}
+                {userRole === "customer" && (
+                  <Link
+                    href="/seller/become"
+                    className="hidden sm:block px-6 py-2.5 rounded-xl bg-[#8a57fb] hover:bg-[#732ee2] text-white transition-colors font-medium text-base"
+                  >
+                    เริ่มขาย
+                  </Link>
+                )}
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="hidden sm:block px-4 py-2 text-[#eaeaea] hover:text-[#8a57fb] transition-colors text-sm font-medium"
+                >
+                  เข้าสู่ระบบ
+                </Link>
+                <Link
+                  href="/register"
+                  className="hidden sm:block px-5 py-2 rounded-lg bg-[#8a57fb] hover:bg-[#732ee2] text-white transition-colors text-sm font-medium"
+                >
+                  ลงทะเบียน
+                </Link>
+              </>
+            )}
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="sm:hidden text-white p-2"
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Tags Bar */}
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+        <div className="flex items-center gap-1.5 py-3 overflow-x-auto scrollbar-hide">
+          {/* ALL */}
           <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-white ml-auto"
-            aria-label="Toggle mobile menu"
+            className={`px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+              activeTag === "all"
+                ? "bg-[#8a57fb] text-white"
+                : "bg-[#262549] text-gray-300 hover:bg-[#1e1b3d] hover:text-white"
+            }`}
+            onClick={() => handleTagClick("all")}
           >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            ทั้งหมด
           </button>
+
+          {/* TAGS */}
+          {tagNavbar.slice(0, 10).map((tag) => (
+            <button
+              key={tag.id}
+              className={`px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                activeTag === tag.name
+                  ? "bg-[#8a57fb] text-white"
+                  : "bg-[#262549] text-gray-300 hover:bg-[#1e1b3d] hover:text-white"
+              }`}
+              onClick={() => handleTagClick(tag.name)}
+            >
+              {tag.name}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-slate-900 border-t border-slate-800">
+        <div className="sm:hidden bg-[#1e1b3d] border-t border-[#262549]">
           <div className="px-4 py-4 space-y-3">
             {/* Mobile Search */}
-            {showSearchBar && (
-              <form onSubmit={handleSearch} className="mb-3">
-                <div className="flex items-center bg-slate-800 rounded-lg px-3 py-2">
-                  <Search size={18} className="text-slate-400 shrink-0" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="ค้นหาสินค้า..."
-                    className="w-full ml-2 bg-transparent text-white placeholder:text-slate-400 focus:outline-none text-sm"
-                  />
-                </div>
-              </form>
-            )}
-
-            <Link
-              href="/categories"
-              className="block text-white hover:text-[var(--primary)] transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              หมวดหมู่
-            </Link>
-            <Link
-              href="/about"
-              className="block text-white hover:text-[var(--primary)] transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              เกี่ยวกับ
-            </Link>
+            <div className="relative">
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={18}
+              />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
+                placeholder="ค้นหาสินค้า..."
+                className="w-full pl-10 pr-4 py-2 rounded-lg text-white placeholder:text-slate-500 bg-[#141332] border border-[#262549] focus:outline-none focus:border-[#8a57fb]"
+              />
+            </div>
 
             {isAuthenticated ? (
               <>
                 {(userRole === "customer" || userRole === "seller") && (
-                  <>
-                    <button
-                      onClick={() => {
-                        setIsCartOpen(true);
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="block text-white hover:text-[var(--primary)] transition-colors text-left w-full"
-                    >
-                      ตะกร้า
-                    </button>
-                    <Link
-                      href="/seller/become"
-                      className="block text-white hover:text-[var(--primary)] transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      สมัครเป็นผู้ขาย
-                    </Link>
-                  </>
+                  <button
+                    onClick={() => {
+                      setIsCartOpen(true);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 text-white hover:text-[#8a57fb] transition-colors py-2 w-full text-left"
+                  >
+                    <ShoppingCart size={20} />
+                    <span>ตะกร้า</span>
+                  </button>
                 )}
-
                 <Link
                   href="/profile"
-                  className="block text-white hover:text-[var(--primary)] transition-colors"
+                  className="flex items-center gap-3 text-white hover:text-[#8a57fb] transition-colors py-2"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  โปรไฟล์
+                  <User size={20} />
+                  <span>โปรไฟล์</span>
                 </Link>
+                {userRole === "customer" && (
+                  <Link
+                    href="/seller/become"
+                    className="block px-4 py-2 rounded-lg text-center font-medium bg-[#8a57fb] hover:bg-[#732ee2] text-white"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    เริ่มขาย
+                  </Link>
+                )}
               </>
             ) : (
-              <div className="pt-3 border-t border-slate-700 space-y-2">
+              <div className="pt-3 space-y-2 border-t border-[#262549]">
                 <Link
                   href="/login"
-                  className="block text-white hover:text-[var(--primary)] transition-colors"
+                  className="block text-white hover:text-[#8a57fb] transition-colors py-2"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   เข้าสู่ระบบ
                 </Link>
                 <Link
                   href="/register"
-                  className="block px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-hover)] transition-colors text-sm font-medium text-center"
+                  className="block px-4 py-2 rounded-lg text-center font-medium bg-[#8a57fb] hover:bg-[#732ee2] text-white"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   ลงทะเบียน
@@ -310,11 +369,27 @@ export const Navbar: React.FC = () => {
         </div>
       )}
 
-      {/* Cart Modal - Only for customers */}
+      {/* Cart Modal - Only for customers and sellers */}
       {isAuthenticated &&
         (userRole === "customer" || userRole === "seller") && (
-          <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+          <CartModal
+            isOpen={isCartOpen}
+            onClose={() => setIsCartOpen(false)}
+            cartRef={cartRef}
+          />
         )}
+
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </nav>
   );
 };
+
+export default Navbar;

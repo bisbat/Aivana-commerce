@@ -1,5 +1,5 @@
 import { Expose, Type } from 'class-transformer';
-import { MinimalSellerDto } from 'src/sellers/dto/minimal-seller.dto';
+import { MinimalSellerDto } from 'src/seller/dto/minimal-seller.dto';
 
 export class CartItemProductDto {
   @Expose()
