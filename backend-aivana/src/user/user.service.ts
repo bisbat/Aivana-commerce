@@ -30,7 +30,7 @@ export class UserService {
   async findUserByName(username: string): Promise<UserEntity | null> {
     return await this.userRepository.findOne({
       where: { username },
-      relations: ['sellerProfile'], // optional
+      relations: ['sellerProfile'], 
     });
   }
 
@@ -44,7 +44,7 @@ export class UserService {
   async findUserByEmail(email: string): Promise<UserEntity | null> {
     return await this.userRepository.findOne({
       where: { email },
-      relations: ['sellerProfile'], // optional
+      relations: ['sellerProfile'],
     });
   }
 
@@ -52,7 +52,7 @@ export class UserService {
     console.log('Service: Searching for user by username:', username);
     const user = await this.userRepository.findOne({
       where: { username },
-      relations: ['sellerProfile'], // optional
+      relations: ['sellerProfile'], 
     });
 
     if (user) {
@@ -89,7 +89,6 @@ export class UserService {
 
     console.log('Update Data:', updateData);
 
-    // Handle avatar upload if provided
     if (avatarFile) {
       console.log('Uploading avatar file:', avatarFile.originalname);
       const timestamp = Date.now();
@@ -103,7 +102,6 @@ export class UserService {
       console.log('Avatar uploaded successfully:', avatarUrl);
     }
 
-    // Merge the updates
     Object.assign(user, updateData);
 
     const updatedUser = await this.userRepository.save(user);

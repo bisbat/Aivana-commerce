@@ -26,7 +26,6 @@ export class UserCollectionEntity {
   @CreateDateColumn()
   createdAt: Date;
 
-  // relations (มีเพื่อความสะดวกในการ join ข้อมูล)
   @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'userId' })
   user: UserEntity;

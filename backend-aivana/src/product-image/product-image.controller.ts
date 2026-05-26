@@ -28,7 +28,7 @@ export class ProductImageController {
 
   @Post('upload')
   @Roles(Role.SELLER)
-  @UseInterceptors(FilesInterceptor('images', 8)) // Max 8 images per upload
+  @UseInterceptors(FilesInterceptor('images', 8))
   async uploadProductImages(
     @UploadedFiles() files: UploadedFileType[],
     @Body('product_id') productId: string,
@@ -37,7 +37,6 @@ export class ProductImageController {
       throw new Error('No files uploaded');
     }
 
-    // Check existing images count
     const existingImages = await this.productImageService.findByProductId(
       parseInt(productId),
     );
@@ -45,7 +44,6 @@ export class ProductImageController {
     const newFilesCount = files.length;
     const totalCount = currentCount + newFilesCount;
 
-    // Limit to 8 images total per product
     if (totalCount > 8) {
       throw new Error(
         `Cannot upload ${newFilesCount} images. Product already has ${currentCount} image(s). Maximum 8 images allowed per product.`,
@@ -58,12 +56,10 @@ export class ProductImageController {
       url: string;
     }> = [];
 
-    // Upload each file to MinIO and save to database
     for (const file of files) {
       const timestamp = Date.now();
       const fileName = `detail-${timestamp}-${file.originalname}`;
 
-      // Upload to MinIO with product-specific folder
       const fullPath = await this.minioService.uploadFile(
         file,
         fileName,
@@ -71,7 +67,6 @@ export class ProductImageController {
       );
       const fileUrl = this.minioService.getFileUrl(fullPath);
 
-      // Save to database
       const productImage = await this.productImageService.create({
         pathImage: fullPath,
         productId: parseInt(productId),
@@ -83,7 +78,6 @@ export class ProductImageController {
         url: fileUrl,
       });
 
-      // Add small delay to ensure unique timestamps
       await new Promise((resolve) => setTimeout(resolve, 10));
     }
 
@@ -104,14 +98,12 @@ export class ProductImageController {
       throw new Error(`Image with ID ${imageId} not found`);
     }
 
-    // Delete from MinIO
     try {
       await this.minioService.deleteFile(image.pathImage);
     } catch (error) {
       console.error('Failed to delete image from MinIO:', error);
     }
 
-    // Delete from database
     await this.productImageService.remove(parseInt(imageId));
 
     return {
@@ -131,14 +123,12 @@ export class ProductImageController {
       throw new Error('No file uploaded');
     }
 
-    // Get product to check if hero image already exists
     const product = await this.ProductService.findOne(parseInt(productId));
 
     if (!product) {
       throw new Error(`Product with ID ${productId} not found`);
     }
 
-    // Delete all files in the hero folder to ensure only one file exists
     const heroFolder = MINIO_FOLDERS.PRODUCTS.HERO(productId);
     try {
       await this.minioService.deleteFolder(heroFolder);
@@ -150,7 +140,6 @@ export class ProductImageController {
     const timestamp = Date.now();
     const fileName = `hero-${timestamp}-${file[0].originalname}`;
 
-    // Upload to MinIO with product-specific hero folder
     const fullPath = await this.minioService.uploadFile(
       file[0],
       fileName,
@@ -158,7 +147,6 @@ export class ProductImageController {
     );
     const fileUrl = this.minioService.getFileUrl(fullPath);
 
-    // Update hero_image_url in ProductEntity
     await this.ProductService.updateHeroImage(parseInt(productId), fileUrl);
 
     return {

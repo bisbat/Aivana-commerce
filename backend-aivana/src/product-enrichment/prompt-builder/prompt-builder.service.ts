@@ -7,7 +7,6 @@ import { BackendTemplateStrategy } from './strategies/backend-template.strategy'
 
 @Injectable()
 export class PromptBuilderService {
-  // Strategy map
   private readonly strategies: Record<string, PromptStrategy> = {
     'ui-kit': new UIKitStrategy(),
     'frontend-template': new FrontendTemplateStrategy(),

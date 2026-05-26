@@ -43,7 +43,6 @@ export class SellerService {
     userId: string,
     sellerData: CreateSellerDto,
   ): Promise<{ accessToken: string }> {
-    // ตรวจสอบว่า user มีอยู่จริง
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['sellerProfile'],
@@ -53,12 +52,10 @@ export class SellerService {
       throw new NotFoundException('User not found');
     }
 
-    // ตรวจสอบว่ายังไม่เป็น seller อยู่แล้ว
     if (user.sellerProfile) {
       throw new Error('User is already a seller');
     }
 
-    // สร้าง seller profile
     const seller = this.sellerRepository.create();
     seller.storeName = user.username + "'s Store";
     seller.user = user;
@@ -66,7 +63,6 @@ export class SellerService {
 
     const savedSeller = await this.sellerRepository.save(seller);
 
-    // อัพเดท user role และ link seller profile
     user.role = Role.SELLER;
     user.sellerProfile = savedSeller;
     await this.userRepository.save(user);
@@ -141,7 +137,6 @@ export class SellerService {
 
     if (!seller) return [];
 
-    // Return all products including deleted ones (seller needs to see deletion notices)
     return this.productMapper.toResponseList(seller.products);
   }
 
@@ -191,8 +186,8 @@ export class SellerService {
         'p.status AS "status"',
         'p.slipUrl AS "slipUrl"',
         'COALESCE(SUM(oi.price), 0) AS "grossSales"',
-        'COALESCE(SUM(oi.commissionAmount), 0) AS "commission"', // ← Fixed: use commissionAmount
-        'COALESCE(SUM(oi.sellerAmount), 0) AS "netAmount"', // ← Fixed: calculate from items
+        'COALESCE(SUM(oi.commissionAmount), 0) AS "commission"',
+        'COALESCE(SUM(oi.sellerAmount), 0) AS "netAmount"',
       ])
       .where('p.sellerId = :sellerId', { sellerId })
       .groupBy('p.id')
@@ -204,7 +199,7 @@ export class SellerService {
       .getRawMany();
 
     return rows.map((r) => ({
-      payoutId: Number(r.payoutId), // ← Also convert to number
+      payoutId: Number(r.payoutId),
       periodStart: r.periodStart,
       periodEnd: r.periodEnd,
       grossSales: Number(r.grossSales),
@@ -303,10 +298,8 @@ export class SellerService {
     };
   }
 
-  // Add this method to your SellerService class
 
   async getSellerDashboard(userId: string): Promise<SellerDashboardDto> {
-    // 1. Find seller by userId
     const seller = await this.sellerRepository.findOne({
       where: { user: { id: userId } },
     });
@@ -314,10 +307,6 @@ export class SellerService {
     if (!seller) {
       throw new NotFoundException('Seller not found');
     }
-
-    // ───────────────────────────────────────────────────────────────────────────
-    // 2. TOTAL REVENUE & TOTAL ITEMS SOLD
-    // ───────────────────────────────────────────────────────────────────────────
     const totals = await this.orderItemRepository
       .createQueryBuilder('oi')
       .innerJoin('oi.order', 'o')
@@ -329,9 +318,6 @@ export class SellerService {
       .andWhere('o.status = :status', { status: 'PAID' })
       .getRawOne();
 
-    // ───────────────────────────────────────────────────────────────────────────
-    // 3. MONTHLY PERFORMANCE (last 12 months)
-    // ───────────────────────────────────────────────────────────────────────────
     const monthlyData = await this.orderItemRepository
       .createQueryBuilder('oi')
       .innerJoin('oi.order', 'o')
@@ -357,9 +343,7 @@ export class SellerService {
       }),
     );
 
-    // ───────────────────────────────────────────────────────────────────────────
-    // 4. TOP SELLING PRODUCTS (top 5)
-    // ───────────────────────────────────────────────────────────────────────────
+
     const topProducts = await this.orderItemRepository
       .createQueryBuilder('oi')
       .innerJoin('oi.order', 'o')
@@ -367,7 +351,7 @@ export class SellerService {
       .select([
         'p.id AS "productId"',
         'p.name AS "productName"',
-        'p.heroImageUrl AS "imageUrl"', // 👈 use this instead
+        'p.heroImageUrl AS "imageUrl"',
         'COALESCE(COUNT(oi.id), 0) AS "totalSold"',
         'COALESCE(SUM(oi.sellerAmount), 0) AS "revenue"',
       ])
@@ -375,7 +359,7 @@ export class SellerService {
       .andWhere('o.status = :status', { status: 'PAID' })
       .groupBy('p.id')
       .addGroupBy('p.name')
-      .addGroupBy('p.heroImageUrl') // ⚠ important because of group by
+      .addGroupBy('p.heroImageUrl') 
       .orderBy('COUNT(oi.id)', 'DESC')
       .limit(5)
       .getRawMany();
@@ -388,9 +372,6 @@ export class SellerService {
       revenue: Number(p.revenue),
     }));
 
-    // ───────────────────────────────────────────────────────────────────────────
-    // RETURN DASHBOARD DATA
-    // ───────────────────────────────────────────────────────────────────────────
     return {
       totalRevenue: Number(totals.totalRevenue),
       totalItemsSold: Number(totals.totalItemsSold),

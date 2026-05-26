@@ -4,7 +4,6 @@ import { MinioService } from 'src/minio/minio.service';
 import { ProductEntity } from 'src/product/entities/product.entity';
 import { ResponseProductDto } from './dto/response-product.dto';
 
-// products.mapper.ts
 @Injectable()
 export class ProductMapper {
   constructor() {}
@@ -36,7 +35,7 @@ export class ProductMapper {
           lastName: product.seller.user?.lastName,
           username: product.seller.user?.username,
           avatarUrl: product.seller.user?.avatarUrl,
-          userId: product.seller.user?.id, // ✅ เพิ่มตรงนี้
+          userId: product.seller.user?.id,
         }
       : null;
 
@@ -70,9 +69,9 @@ export class ProductMapper {
         category,
         tags,
         detailImages,
-        reviews, // ✅ รีวิวทั้งหมด
-        averageRating: Math.round(averageRating * 10) / 10, // ✅ rating เฉลี่ย
-        totalReviews, // ✅ จำนวนรีวิว
+        reviews,
+        averageRating: Math.round(averageRating * 10) / 10,
+        totalReviews,
         isDeleted: product.isDeleted,
         isHidden: product.isHidden,
         deletedAt: product.deletedAt,
