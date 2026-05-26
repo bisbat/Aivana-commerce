@@ -16,15 +16,9 @@ export class CartService {
     private cartItemRepository: Repository<CartItem>,
   ) {}
 
-  /**
-   * Add product to cart
-   * If cart doesn't exist for user, create new cart
-   * Each product can only be added once (no duplicates)
-   */
   async addToCart(addToCartDto: AddToCartDto) {
     const { userId, productId } = addToCartDto;
 
-    // Find or create cart for user
     const existingCart = await this.cartRepository.findOne({
       where: { userId },
     });
@@ -33,7 +27,6 @@ export class CartService {
       ? existingCart
       : await this.cartRepository.save(this.cartRepository.create({ userId }));
 
-    // Check if product already in cart BEFORE creating anything
     const existingItem = await this.cartItemRepository.findOne({
       where: { cartId: cart.cartId, productId: productId },
     });
@@ -42,7 +35,6 @@ export class CartService {
       throw new ConflictException('Product already in cart');
     }
 
-    // Only create and save if validation passed
     const cartItem = await this.cartItemRepository.save({
       cartId: cart.cartId,
       productId: productId,
@@ -54,9 +46,6 @@ export class CartService {
     };
   }
 
-  /**
-   * Get cart by user ID with all items and product details
-   */
   async getCartByUserId(userId: string): Promise<CartResponseDto> {
     const cart = await this.cartRepository.findOne({
       where: { userId },
@@ -78,7 +67,6 @@ export class CartService {
       });
     }
 
-    // Filter out deleted products
     const activeItems = cart.items.filter((item) => !item.product.isDeleted);
 
     const cartData = {
@@ -104,7 +92,6 @@ export class CartService {
       })),
     };
 
-    // ลบ excludeExtraneousValues ออก
     return plainToInstance(CartResponseDto, cartData);
   }
 

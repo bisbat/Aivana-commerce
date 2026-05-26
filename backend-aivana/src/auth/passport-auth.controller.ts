@@ -70,13 +70,11 @@ export class PassportAuthController {
     return request.user;
   }
 
-  // ── Google OAuth ──────────────────────────────────────────────────────────
-
   @Public()
   @Get('google')
   @UseGuards(AuthGuard('google'))
   googleLogin() {
-    // Passport redirects to Google — no body needed
+    // This route will redirect to Google for authentication
   }
 
   @Public()

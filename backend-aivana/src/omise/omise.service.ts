@@ -10,7 +10,6 @@ export class OmiseService {
     });
   }
 
-  // promtpay
   createChargeWithSource(sourceId:string, amount: number){
     const expiresAt = new Date(Date.now() + 2 * 60 * 1000).toISOString(); // +2 นาที
     return this.omise.charges.create({
@@ -21,7 +20,6 @@ export class OmiseService {
     });
   }
 
-  // credit card
   createChargeWithToken(token:string, amount: number){
     return this.omise.charges.create({
       amount: amount,

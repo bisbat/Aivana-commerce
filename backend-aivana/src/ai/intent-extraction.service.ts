@@ -1,5 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { Injectable } from '@nestjs/common';
 import { GeminiService } from './gemini.service';
 
 const VALID_CATEGORIES = ['ui-kit', 'frontend-template', 'backend-template'];

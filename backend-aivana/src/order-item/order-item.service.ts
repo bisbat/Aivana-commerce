@@ -5,7 +5,6 @@ import { ProductEntity } from 'src/product/entities/product.entity';
 import { Repository } from 'typeorm';
 import { OrderItemEntity } from './entities/order-item.entity';
 import { COMMISSION_RATE } from 'src/common/instance';
-import { CartItem } from 'src/cart/entities/cart-item.entity';
 
 @Injectable()
 export class OrderItemService {
