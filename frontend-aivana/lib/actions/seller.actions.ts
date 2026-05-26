@@ -123,7 +123,6 @@ export async function getSellerByUsername(
       },
     );
 
-    console.log("Response status:", response.status);
 
     if (!response.ok) {
       const error = await response.json();
@@ -131,7 +130,6 @@ export async function getSellerByUsername(
     }
     return await response.json();
   } catch (error) {
-    console.error("Error fetching seller by username:", error);
     throw error;
   }
 }

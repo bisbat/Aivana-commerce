@@ -1,4 +1,3 @@
-// ─── Payout Round (returned by GET /rounds) ────────────────────────────────
 export interface PayoutRound {
   periodStart: string;
   periodEnd: string;
@@ -7,8 +6,6 @@ export interface PayoutRound {
   roundStatus: "processing" | "completed";
 }
 
-// ─── NEW: Response from GET /rounds/:start/:end ─────────────────────────────
-// Your backend now wraps the data in {round, sellers[]}
 export interface RoundDetailResponse {
   round: {
     periodStart: string;
@@ -19,18 +16,15 @@ export interface RoundDetailResponse {
   sellers: Payout[];
 }
 
-// ─── Single seller payout (inside the sellers[] array) ──────────────────────
 export interface Payout {
   payoutId: number;
-  sellerName: string;        // Backend sends "sellerName", not "seller"
-  orderCount: number;         // Now included in the response
-  grossSales: number;         // Now included in the response
-  netPayout: number;          // Backend sends "netPayout", not "totalAmount"
-  status: string;             // "รอโอน" or "โอนแล้ว" (Thai text)
+  sellerName: string;        
+  orderCount: number;         
+  grossSales: number;         
+  netPayout: number;          
+  status: string;             
 }
 
-// ─── For Page 3 (single seller detail) ─────────────────────────────────────
-// This type stays the same since GET /:id still returns the full payout entity
 export interface PayoutDetail {
   id: number;
   seller: {
@@ -65,7 +59,7 @@ export interface PayoutDetailResponse {
     end: string;
   };
   payout: {
-    status: string;        // "รอโอน" or "โอนแล้ว"
+    status: string;       
     amountDue: number;
     slipUrl: string | null;
     paidAt: string | null;

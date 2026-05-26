@@ -25,7 +25,6 @@ export async function addToCart(
 
   if (!response.ok) {
     const error = await response.json();
-    // Check if it's a 409 Conflict (product already in cart)
     if (response.status === 409) {
       throw new Error("PRODUCT_ALREADY_IN_CART");
     }
