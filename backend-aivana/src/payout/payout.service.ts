@@ -32,13 +32,6 @@ export class PayoutService {
   async generatePayout(periodStart: Date, periodEnd: Date) {
     const start = new Date(periodStart);
     const end = new Date(periodEnd);
-    // const now = new Date();
-
-    // if (now < end) {
-    //   throw new BadRequestException(
-    //     'Cannot generate payout before period ends',
-    //   );
-    // }
 
     const existingPayout = await this.payoutRepo.findOne({
       where: {
@@ -53,7 +46,6 @@ export class PayoutService {
       );
     }
 
-    // 1. หา order_item ที่ยังไม่ถูก payout
     const orderItems = await this.orderItemRepo
       .createQueryBuilder('oi')
       .leftJoin(PayoutItemEntity, 'pi', 'pi.orderItemId = oi.id')
@@ -69,7 +61,6 @@ export class PayoutService {
       throw new NotFoundException('No order items found for payout');
     }
 
-    // 2. group ตาม seller
     const sellerMap = new Map<string, typeof orderItems>();
 
     for (const item of orderItems) {
@@ -79,7 +70,6 @@ export class PayoutService {
       sellerMap.get(item.sellerId)!.push(item);
     }
 
-    // 3. สร้าง payout ต่อ seller
     for (const [sellerId, items] of sellerMap.entries()) {
       const totalAmount = items.reduce(
         (sum, item) => sum + Number(item.sellerAmount),
@@ -196,9 +186,6 @@ export class PayoutService {
 
     const url = this.minioService.getFileUrl(path);
 
-    // ─────────────────────────────────────────────
-    // 4️⃣ Mark payout as PAID
-    // ─────────────────────────────────────────────
     payout.slipPath = path;
     payout.slipUrl = url;
     payout.paidAt = new Date();
@@ -249,10 +236,6 @@ export class PayoutService {
       throw new BadRequestException('Invalid date format');
     }
 
-    /**
-     * 🟦 ROUND SUMMARY (CARD)
-     * รวมยอดโอนทั้งรอบ + จำนวนร้าน
-     */
     const roundSummary = await this.payoutRepo
       .createQueryBuilder('p')
       .select('COUNT(p.id)', 'sellerCount')
@@ -261,9 +244,6 @@ export class PayoutService {
       .andWhere('p.periodEnd <= :end', { end })
       .getRawOne();
 
-    /**
-     * 🟨 SELLER TABLE
-     */
     const sellers = await this.payoutRepo
       .createQueryBuilder('p')
       .leftJoin('p.seller', 's')
@@ -330,7 +310,6 @@ export class PayoutService {
 
     const items = payout.payoutItem.map(pi => pi.orderItem);
 
-    // ───────────────── SUMMARY CALCULATION ─────────────────
     const grossSales = items.reduce((sum, i) => sum + Number(i.price), 0);
     const totalCommission = items.reduce(
       (sum, i) => sum + Number(i.commissionAmount),
@@ -344,23 +323,20 @@ export class PayoutService {
     return {
       payoutId: payout.id,
 
-      // SELLER CARD
       seller: {
         id: payout.seller.id,
         name: payout.seller.storeName,
-        avatar: payout.seller.user?.avatarUrl || null, // ถ้ามีใน user
+        avatar: payout.seller.user?.avatarUrl || null,
         bankName: payout.seller.bankInfo?.bankName,
         accountNumber: payout.seller.bankInfo?.accountNumber,
         accountName: payout.seller.bankInfo?.accountName,
       },
 
-      // PERIOD
       period: {
         start: payout.periodStart,
         end: payout.periodEnd,
       },
 
-      // STATUS + AMOUNT DUE
       payout: {
         status: payout.status === "paid" ? 'โอนแล้ว' : 'รอโอน',
         amountDue: Number(payout.totalAmount),
@@ -368,7 +344,6 @@ export class PayoutService {
         paidAt: payout.paidAt,
       },
 
-      // ORDER BREAKDOWN TABLE
       orders: items.map(i => ({
         orderId: i.order.id,
         date: i.createdAt,
@@ -378,7 +353,6 @@ export class PayoutService {
         sellerEarn: Number(i.sellerAmount),
       })),
 
-      // SUMMARY BOX
       summary: {
         grossSales,
         totalCommission,
@@ -393,16 +367,13 @@ export class PayoutService {
   ) {
     const bangkokOffset = 7 * 60;
 
-    // Thailand start midnight
     const startBangkok = new Date(`${periodStart}T00:00:00`);
     const endBangkok = new Date(`${periodEnd}T00:00:00`);
 
-    // Convert to UTC
     const startUTC = new Date(
       startBangkok.getTime() - bangkokOffset * 60 * 1000,
     );
 
-    // End is exclusive → add 1 day
     const endUTC = new Date(
       endBangkok.getTime() +
       24 * 60 * 60 * 1000 -
@@ -417,8 +388,8 @@ export class PayoutService {
     if (!name) return '';
 
     return name
-      .replace(/^นาย\s?|^นางสาว\s?|^นาง\s?/, '') // remove Thai title
-      .replace(/\s+/g, '') // remove spaces
+      .replace(/^นาย\s?|^นางสาว\s?|^นาง\s?/, '')
+      .replace(/\s+/g, '')
       .toLowerCase()
       .trim();
   }
@@ -429,7 +400,6 @@ export class PayoutService {
 
     if (!normalizedReceiver || !normalizedExpected) return false;
 
-    // allow partial matching (Thunder may shorten surname)
     return (
       normalizedExpected.includes(normalizedReceiver) ||
       normalizedReceiver.includes(normalizedExpected)

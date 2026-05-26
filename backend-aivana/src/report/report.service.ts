@@ -32,7 +32,6 @@ export class ReportService {
     createReportDto: CreateReportDto,
   ): Promise<ReportEntity> {
     const { orderItemId, reason, message } = createReportDto;
-    // ตรวจสอบว่า orderItem มีอยู่จริง
     const orderItem = await this.orderItemRepository.findOne({
       where: { id: orderItemId },
       relations: ['order', 'product'],
@@ -42,7 +41,6 @@ export class ReportService {
       throw new NotFoundException('Order item not found');
     }
 
-    // Check if user owns this order
     if (!orderItem.order) {
       throw new NotFoundException('Order information not found');
     }
@@ -52,8 +50,6 @@ export class ReportService {
         'You do not have permission to report this item',
       );
     }
-
-    // Find existing report
     let existingReport = await this.reportRepository.findOne({
       where: { orderItem: { id: orderItemId } },
       relations: ['reportedBy', 'orderItem', 'orderItem.product'],
@@ -91,13 +87,11 @@ export class ReportService {
   async checkAutoHide(productId: number, reason: string): Promise<void> {
     const threshold = ReasonAutoHide[reason];
     if (!threshold) return;
-
-    // นับเฉพาะ report ที่ reason เดียวกัน และยังไม่ถูก reject
     const count = await this.reportRepository.count({
       where: {
         reason,
         orderItem: { product: { id: productId } },
-        status: Not(ReportStatus.REJECTED), // import Not from typeorm
+        status: Not(ReportStatus.REJECTED), 
       },
     });
 
@@ -136,9 +130,7 @@ export class ReportService {
     userId?: string,
     userRole?: string,
   ): Promise<ReportEntity[]> {
-    // ถ้าไม่ใช่ admin ต้องเช็คว่าเป็นเจ้าของสินค้าหรือไม่
     if (userRole !== 'admin' && userId) {
-      // ตรวจสอบว่า user เป็นเจ้าของสินค้านี้หรือไม่
       const user = await this.userRepository.findOne({
         where: { id: userId },
         relations: ['sellerProfile'],
@@ -149,8 +141,6 @@ export class ReportService {
           'You do not have permission to view reports for this product',
         );
       }
-
-      // เช็คว่าสินค้าเป็นของ seller นี้จริงหรือไม่
       const reports = await this.reportRepository
         .createQueryBuilder('report')
         .leftJoinAndSelect('report.reportedBy', 'reportedBy')
@@ -165,7 +155,6 @@ export class ReportService {
       return reports;
     }
 
-    // สำหรับ admin ดูได้ทั้งหมด
     return await this.reportRepository.find({
       where: {
         orderItem: {
@@ -202,7 +191,6 @@ export class ReportService {
   }
 
   async findBySellerUserId(userId: string): Promise<ReportEntity[]> {
-    // ตรวจสอบว่า user มี seller profile หรือไม่
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['sellerProfile'],
@@ -246,7 +234,6 @@ export class ReportService {
 
     const productId = report.orderItem?.product?.id;
 
-    // cancel_sale → soft delete สินค้า
     if (status === ReportStatus.CANCEL_SALE && productId) {
       await this.productService.deleteProduct(
         productId,
@@ -256,7 +243,6 @@ export class ReportService {
       return report;
     }
 
-    // resolved / rejected → unhide สินค้า (ถ้าถูกซ่อนอยู่)
     if (
       (status === ReportStatus.RESOLVED || status === ReportStatus.REJECTED) &&
       productId

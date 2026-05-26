@@ -26,7 +26,6 @@ export class ReportEntity {
   })
   status: ReportStatus;
 
-  // User 1 คน report ได้หลายครั้ง (หลาย order)
   @ManyToOne(() => UserEntity, (user) => user.reports, {
     nullable: false,
     onDelete: 'CASCADE',
@@ -34,7 +33,6 @@ export class ReportEntity {
   @JoinColumn({ name: 'reportedById' })
   reportedBy: UserEntity;
 
-  // OrderItem 1 ชิ้น = report ได้ครั้งเดียว
   @OneToOne(() => OrderItemEntity, {
     nullable: false,
     onDelete: 'CASCADE',
@@ -48,7 +46,6 @@ export class ReportEntity {
   @Column({ type: 'text', nullable: true })
   message?: string;
 
-  // Seller Response (เก็บเฉพาะเวลาที่ตอบกลับ)
   @Column({ type: 'timestamp', nullable: true })
   sellerRespondedAt?: Date;
 

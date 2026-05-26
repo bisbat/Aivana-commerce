@@ -1,4 +1,3 @@
-// DTO for the response
 export class SellerRoundDetailDto {
   payoutId: number;
   periodStart: string;
@@ -11,7 +10,7 @@ export class SellerRoundDetailDto {
 
 export class SellerRoundItemDto {
   productName: string;
-  price: number;           // ราคาขาย
-  commission: number;      // ค่าธรรมเนียม
-  sellerEarning: number;   // เงินที่ seller ได้รับจริง
+  price: number;         
+  commission: number;     
+  sellerEarning: number;   
 }

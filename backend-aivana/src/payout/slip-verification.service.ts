@@ -1,5 +1,3 @@
-// payout/slip-verification.service.ts
-
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';

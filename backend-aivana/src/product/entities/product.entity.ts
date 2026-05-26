@@ -64,7 +64,6 @@ export class ProductEntity {
   @JoinColumn({ name: 'categoryId' })
   category: CategoryEntity;
 
-  // Owner should be a User with SELLER role or specific SellerEntity
   @ManyToOne(() => SellerEntity, (seller) => seller.products, {
     nullable: false,
   })
@@ -92,7 +91,6 @@ export class ProductEntity {
   @OneToMany(() => ProductImage, (image) => image.product)
   productImages: ProductImage[];
 
-  // Tags relationship
   @ManyToMany(() => TagEntity, (tag) => tag.products, { cascade: true })
   @JoinTable()
   tags: TagEntity[];

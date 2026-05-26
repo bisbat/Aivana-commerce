@@ -8,8 +8,6 @@ export interface AiGeneratedProduct {
   requirements: string[];
   tags: string[];
   installationGuide?: string | null;
-  /** Exact category name chosen from availableCategories list */
   suggestedCategoryName?: string;
-  /** Swagger/OpenAPI doc URL — backend-template only, null otherwise */
   apiDocUrl?: string | null;
 }

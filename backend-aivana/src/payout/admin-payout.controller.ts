@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Patch } from '@nestjs/common';
+import { Controller, Get, Patch } from '@nestjs/common';
 import { PayoutService } from './payout.service';
 import { Param, UploadedFile, UseInterceptors } from '@nestjs/common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors/file.interceptor';
