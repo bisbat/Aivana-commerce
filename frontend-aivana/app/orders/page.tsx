@@ -161,13 +161,11 @@ export default function OrderHistoryPage() {
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-10">
-      {/* Header with gradient */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold  mb-4">ประวัติการซื้อ</h1>
         <p className="text-slate-400">รายการคำสั่งซื้อทั้งหมดของคุณ</p>
       </div>
 
-      {/* Orders List */}
       {orders.length === 0 ? (
         <div className="bg-linear-to-br from-[#1e1b3d] to-[#1a1733] rounded-xl border border-purple-500/20 p-12 text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-linear-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
@@ -193,7 +191,6 @@ export default function OrderHistoryPage() {
                 key={order.id}
                 className="bg-gradient-to-br from-[#1e1b3d] to-[#1a1733] rounded-xl border border-[#262549] overflow-hidden hover:border-purple-500/50 transition-all"
               >
-                {/* Order Header */}
                 <div
                   className="p-6 cursor-pointer"
                   onClick={() => toggleOrderExpand(order.id)}
@@ -251,8 +248,6 @@ export default function OrderHistoryPage() {
                     </div>
                   </div>
                 </div>
-
-                {/* Order Items (Expandable) */}
                 {isExpanded && order.items && (
                   <div className="border-t border-[#262549] bg-[#1a1733]/50 backdrop-blur-sm">
                     <div className="p-6 space-y-4">
@@ -264,7 +259,6 @@ export default function OrderHistoryPage() {
                             href={`/products/${item.productId}`}
                             className="flex gap-4 p-4 bg-[#1e1b3d]/80 rounded-lg border border-[#262549] hover:border-purple-500/30 transition-all group cursor-pointer"
                           >
-                            {/* Overlay for deleted products - แทนการใช้ opacity ทั้ง card */}
                             {product?.isDeleted && (
                               <div className="absolute inset-0 bg-black/30 z-[1] pointer-events-none"></div>
                             )}

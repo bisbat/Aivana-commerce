@@ -26,7 +26,6 @@ export default function EditProductImages({
 
   return (
     <div className="space-y-4">
-      {/* Existing Images */}
       {existingImages.length > 0 && (
         <div>
           <h4 className="text-sm font-medium text-gray-700 mb-2">ภาพปัจจุบัน</h4>
@@ -51,8 +50,6 @@ export default function EditProductImages({
 
         </div>
       )}
-
-      {/* New Images Preview */}
       {newImageFiles.length > 0 && (
         <div>
           <h4 className="text-sm font-medium text-gray-700 mb-2">ภาพใหม่ (ที่จะถูกเพิ่ม)</h4>
@@ -77,7 +74,6 @@ export default function EditProductImages({
         </div>
       )}
 
-      {/* Upload New Images */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Add New Images (เพิ่มภาพใหม่)

@@ -219,7 +219,6 @@ export default function AddProductPage() {
     <div className="flex min-h-screen bg-[var(--background)]">
       <main className="flex-1 p-8">
         <div className="max-w-4xl mx-auto">
-          {/* Global Error Message */}
           {error && (
             <div className="mb-6 bg-red-900/20 border border-red-500 rounded-lg p-4 flex items-start gap-3">
               <AlertCircle className="text-red-400 flex-shrink-0 mt-0.5" size={20} />
@@ -235,8 +234,6 @@ export default function AddProductPage() {
               </button>
             </div>
           )}
-
-          {/* Step 1: Upload File */}
           {currentStep === 1 && (
             <UploadFileForm
               onNext={handleUploadNext}
@@ -250,9 +247,6 @@ export default function AddProductPage() {
               }
             />
           )}
-
-
-          {/* Step 2: Product Information */}
           {currentStep === 2 && uploadData && (
             <ProductForm
               sellerId={sellerId ?? ""}
@@ -262,8 +256,6 @@ export default function AddProductPage() {
               onBack={handleBackToStep1}
             />
           )}
-
-          {/* Step 3: Product Images */}
           {currentStep === 3 && (
             <UploadImageForm
               onPublish={handlePublish}

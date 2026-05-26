@@ -227,7 +227,6 @@ export default function MyCollectionPage() {
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-10">
-      {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
           <Package className="text-purple-400" size={32} />
@@ -237,8 +236,6 @@ export default function MyCollectionPage() {
           สินค้าทั้งหมดที่คุณซื้อไว้ ({collections.length} รายการ)
         </p>
       </div>
-
-      {/* Search Bar */}
       <div className="mb-6">
         <div className="relative max-w-md">
           <Search
@@ -255,25 +252,19 @@ export default function MyCollectionPage() {
         </div>
       </div>
 
-      {/* Collection Grid */}
       {filteredCollections.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
           {filteredCollections.map((item) => (
             <div
               key={item.id}
               onClick={() => router.push(`/products/${item.product.id}`)}
-              className="group cursor-pointer rounded-lg p-0 shadow hover:shadow-xl transition-all duration-300 h-auto w-full overflow-hidden bg-slate-800/60 relative flex flex-col" // เพิ่ม flex flex-col ที่ container หลัก
+              className="group cursor-pointer rounded-lg p-0 shadow hover:shadow-xl transition-all duration-300 h-auto w-full overflow-hidden bg-slate-800/60 relative flex flex-col"
             >
-              {/* Overlay for deleted or temporarily suspended products */}
               {item.product.isDeleted ||
                 (item.product.isHidden && (
                   <div className="absolute inset-0 bg-black/30 z-[1] pointer-events-none"></div>
                 ))}
-
-              {/* Thumbnail */}
               <div className="relative h-48 overflow-hidden shrink-0">
-                {" "}
-                {/* เพิ่ม shrink-0 ป้องกันรูปโดนบีบ */}
                 <img
                   src={
                     item.product.heroImageUrl ||
@@ -353,11 +344,7 @@ export default function MyCollectionPage() {
                   )}
                 </div>
               </div>
-
-              {/* Content Section (จัด Flex ให้เต็มพื้นที่) */}
               <div className="flex flex-col flex-1">
-                {" "}
-                {/* flex-1 เพื่อให้ส่วนนี้ยืดเต็มที่เหลือ */}
                 <div className="p-3 flex flex-col gap-3 flex-1">
                   <h3
                     className={`text-base font-semibold line-clamp-2 mb-1 truncate group-hover:text-purple-400 transition-colors ${
@@ -369,14 +356,10 @@ export default function MyCollectionPage() {
                   </h3>
 
                   <div className="flex items-center justify-between">
-                    {" "}
-                    {/* mt-auto ดันราคาและปุ่มไปล่างสุดของ content block */}
                     <span className="text-xl font-bold">
                       {formatPriceWithCurrency(item.product.price)}
                     </span>
                   </div>
-
-                  {/* Action Buttons */}
                   <div className="flex items-center gap-2 mt-auto">
                     <button
                       type="button"
@@ -389,8 +372,6 @@ export default function MyCollectionPage() {
                       <Download className="w-4 h-4" />
                       <span>ดาวน์โหลด</span>
                     </button>
-
-                    {/* Review Button */}
                     <button
                       type="button"
                       disabled={
@@ -418,8 +399,6 @@ export default function MyCollectionPage() {
                         }
                       />
                     </button>
-
-                    {/* Report Button Logic */}
                     {(() => {
                       const report = item.orderItemId
                         ? reportsByOrderItemId[item.orderItemId]
@@ -531,8 +510,6 @@ export default function MyCollectionPage() {
           <p className="text-slate-400 text-lg">ไม่พบสินค้าที่ค้นหา</p>
         </div>
       )}
-
-      {/* Review Modal */}
       {currentUser && (
         <ReviewModal
           isOpen={isReviewModalOpen}
@@ -545,8 +522,6 @@ export default function MyCollectionPage() {
           onSubmit={handleReviewSubmit}
         />
       )}
-
-      {/* Report Modal */}
       {currentUser && (
         <ReportModal
           isOpen={isReportModalOpen}

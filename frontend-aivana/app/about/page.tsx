@@ -54,7 +54,6 @@ export default function AboutPage() {
 
   return (
     <main className="bg-[var(--color-background)] min-h-screen text-[#EEEDF5]">
-      {/* Hero */}
       <section className="border-b border-white/[0.07]">
         <div className="max-w-[1400px] mx-auto px-4 py-28 relative overflow-hidden">
           <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-[#534AB7]/10 blur-3xl pointer-events-none" />
@@ -73,7 +72,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* About */}
       <section className="border-b border-white/[0.07]">
         <div className="max-w-[1400px] mx-auto px-4 py-20 ">
           <div>
@@ -95,7 +93,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Features */}
       <section className="border-b border-white/[0.07]">
         <div className="max-w-[1400px] mx-auto px-4 py-20">
           <p className="text-[11px] tracking-[0.18em] uppercase text-[#7B7A8E] mb-10 font-normal">
@@ -119,7 +116,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="border-b border-white/[0.07]">
         <div className="max-w-[1400px] mx-auto px-4 py-20">
           <div className="bg-[#262549] border border-white/[0.07] rounded-2xl p-12 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-10 items-center">
@@ -154,7 +150,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Contact */}
       <Footer />
     </main>
   );

@@ -11,7 +11,6 @@ export default function SellerRoundDetailTable({ data }: { data: SellerRoundDeta
 
   return (
     <>
-      {/* Summary cards */}
       <div style={{ display: "flex", gap: 16, marginBottom: 28 }}>
         <div
           style={{
@@ -64,8 +63,6 @@ export default function SellerRoundDetailTable({ data }: { data: SellerRoundDeta
           </p>
         </div>
       </div>
-
-      {/* Products table */}
       <div
         style={{
           background: "#fff",

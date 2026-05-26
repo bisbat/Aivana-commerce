@@ -76,13 +76,9 @@ export default function SellerProfilePage({
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex items-center gap-3">
           <button
             className="px-5 py-2 bg-[#8a57fb]/90 hover:bg-[#8a57fb] text-white rounded-lg transition-colors flex items-center gap-2 border border-[#8a57fb] text-sm"
-            onClick={() => {
-              /* Add contact functionality */
-            }}
           >
             <MessageCircle size={16} />
             <span>ติดต่อร้านค้า</span>
@@ -95,7 +91,6 @@ export default function SellerProfilePage({
         </div>
       </div>
 
-      {/* Stats Section - Beautiful Cards like User Profile */}
       <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent my-8" />
       <div>
         <div className="flex items-center justify-between mb-4">
@@ -104,7 +99,6 @@ export default function SellerProfilePage({
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Products Card */}
           <div className="relative bg-slate-800/40 border border-white/5 rounded-2xl p-4 overflow-hidden">
             <div className="absolute top-0 right-0 p-3 opacity-10">
               <Package size={64} />
@@ -124,7 +118,6 @@ export default function SellerProfilePage({
             </div>
           </div>
 
-          {/* Sales Card */}
           <div className="relative bg-slate-800/40 border border-white/5 rounded-2xl p-4 overflow-hidden">
             <div className="absolute top-0 right-0 p-3 opacity-10">
               <ShoppingBag size={64} />
@@ -144,7 +137,6 @@ export default function SellerProfilePage({
             </div>
           </div>
 
-          {/* Rating Card */}
           <div className="relative bg-slate-800/40 border border-white/5 rounded-2xl p-4 overflow-hidden">
             <div className="absolute top-0 right-0 p-3 opacity-10">
               <Star size={64} />
@@ -164,7 +156,6 @@ export default function SellerProfilePage({
             </div>
           </div>
 
-          {/* Reviews Card */}
           <div className="relative bg-slate-800/40 border border-white/5 rounded-2xl p-4 overflow-hidden">
             <div className="absolute top-0 right-0 p-3 opacity-10">
               <MessageCircle size={64} />
@@ -186,7 +177,6 @@ export default function SellerProfilePage({
         </div>
       </div>
 
-      {/* About Section */}
       <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent my-8" />
       <div className="space-y-3">
         <h2 className="text-lg font-semibold text-white flex items-center gap-2">
@@ -195,7 +185,6 @@ export default function SellerProfilePage({
         <p className="text-slate-300 leading-relaxed">{seller.bio}</p>
       </div>
 
-      {/* Skills Section */}
       {seller.skills && seller.skills.length > 0 && (
         <>
           <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent my-8" />
@@ -218,7 +207,6 @@ export default function SellerProfilePage({
         </>
       )}
 
-      {/* Socials Section */}
       {seller.socials && Object.keys(seller.socials).length > 0 && (
         <>
           <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent my-8" />
@@ -244,7 +232,6 @@ export default function SellerProfilePage({
         </>
       )}
 
-      {/* Products Section */}
       <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent my-8" />
       <div>
         <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">

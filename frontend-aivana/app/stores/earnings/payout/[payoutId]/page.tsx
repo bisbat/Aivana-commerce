@@ -27,7 +27,6 @@ export default async function PayoutDetailPage({
 
   return (
     <div style={{ maxWidth: 1200, padding: "32px 24px" }}>
-      {/* Back Button */}
       <Link
         href="/stores/earnings"
         style={{
@@ -43,7 +42,6 @@ export default async function PayoutDetailPage({
         ← กลับ
       </Link>
 
-      {/* Title */}
       <h1 style={{ fontSize: 24, fontWeight: 700, color: "#fff", marginBottom: 8 }}>
         รายการขายในรอบนี้
       </h1>
@@ -54,7 +52,6 @@ export default async function PayoutDetailPage({
         </p>
       )}
 
-      {/* Error */}
       {error && (
         <div
           style={{
@@ -71,7 +68,6 @@ export default async function PayoutDetailPage({
         </div>
       )}
 
-      {/* Table */}
       {data && <SellerRoundDetailTable data={data} />}
     </div>
   );

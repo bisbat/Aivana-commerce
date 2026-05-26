@@ -63,15 +63,11 @@ export default function DeleteButton({
         isOpen &&
         createPortal(
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop */}
             <div
               className="absolute inset-0 bg-black/60"
               onClick={() => !isDeleting && setIsOpen(false)}
             />
-
-            {/* Modal */}
             <div className="relative bg-[#1e1b3d] border border-[#262549] rounded-3xl p-6 max-w-lg w-full shadow-2xl overflow-hidden">
-              {/* Icon + Title */}
               <div className="text-center mb-6">
                 <div className="w-14 h-14 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-3">
                   <Trash2 size={28} className="text-red-500" />
@@ -85,14 +81,10 @@ export default function DeleteButton({
                     : "สินค้านี้ยังไม่มีคำสั่งซื้อ — จะถูกลบออกจากระบบทั้งหมดอย่างถาวร"}
                 </p>
               </div>
-
-              {/* Product Info */}
               <div className="bg-[#262549] rounded-xl p-4 mb-5">
                 <div className="text-sm text-slate-400 mb-1">ชื่อสินค้า</div>
                 <div className="text-white font-semibold">{productName}</div>
               </div>
-
-              {/* Warning */}
               <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 mb-5">
                 <p className="text-yellow-500 text-xs">
                   {hasOrders
@@ -100,8 +92,6 @@ export default function DeleteButton({
                     : "⚠️ การลบสินค้าจะไม่สามารถย้อนกลับได้ ไฟล์และข้อมูลทั้งหมดจะถูกลบถาวร"}
                 </p>
               </div>
-
-              {/* Reason — only required when product has orders */}
               {hasOrders && (
                 <div className="mb-5">
                   <label className="block text-sm font-medium text-slate-300 mb-2">
@@ -124,8 +114,6 @@ export default function DeleteButton({
                   )}
                 </div>
               )}
-
-              {/* Actions */}
               <div className="flex gap-3">
                 <button
                   onClick={() => setIsOpen(false)}

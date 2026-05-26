@@ -50,7 +50,6 @@ export default function AiSearch() {
 
     return (
         <div className="fixed inset-0 z-50 bg-[#0f0d24] flex flex-col font-sans">
-            {/* ── Header ── */}
             <header className="flex items-center gap-3 px-5 py-4 border-b border-[#1e1b3d] bg-[#0f0d24]/95 backdrop-blur-md shrink-0">
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center shrink-0">
                     <Sparkles size={17} className="text-white" />
@@ -67,8 +66,6 @@ export default function AiSearch() {
                     <X size={15} />
                 </button>
             </header>
-
-            {/* Body */}
             <div className="flex-1 overflow-hidden flex flex-col">
                 {isEmpty ? (
                     <EmptyState onSuggestionClick={handleSearch} />
@@ -81,8 +78,6 @@ export default function AiSearch() {
                 )}
             </div>
 
-
-            {/* ── Input bar ── */}
             <SearchInput
                 value={query}
                 onChange={setQuery}

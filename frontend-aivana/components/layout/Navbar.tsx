@@ -135,17 +135,14 @@ export const Navbar: React.FC = () => {
 
   return (
     <nav className="relative z-50">
-      {/* Top Bar - เปลี่ยนจาก bg-[color] เป็น backdrop-blur */}
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         <div className="flex items-center h-20 gap-5">
-          {/* Logo */}
           <Link href="/" className="flex items-center shrink-0">
             <span className="text-3xl font-bold bg-gradient-to-br from-[#8a57fb] to-[#a78bfa] bg-clip-text text-transparent tracking-wide">
               AIVANA
             </span>
           </Link>
 
-          {/* Search Bar - Desktop */}
           <div className="hidden md:flex flex-1 max-w-3xl mx-4">
             <div className="w-full relative">
               <div className="relative flex items-center">
@@ -160,7 +157,6 @@ export const Navbar: React.FC = () => {
                   className="w-full pl-12 pr-28 py-3.5 rounded-xl text-white placeholder:text-slate-500 bg-[#1e1b3d] border border-[#262549] focus:outline-none focus:border-[#8a57fb] focus:ring-1 focus:ring-[#8a57fb] transition-all text-base"
                 />
 
-                {/* AI Search Button */}
                 <button
                   className="absolute right-2 px-4 py-1.5 text-sm font-semibold rounded-lg 
         bg-gradient-to-r from-purple-500 to-indigo-500 
@@ -176,11 +172,9 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Side Actions */}
           <div className="flex items-center gap-5 shrink-0 ml-auto">
             {isAuthenticated ? (
               <>
-                {/* Cart - Show for customers and sellers */}
                 <div ref={cartRef} className="relative">
                   {(userRole === "customer" || userRole === "seller") && (
                     <button
@@ -193,9 +187,7 @@ export const Navbar: React.FC = () => {
                   )}
                 </div>
 
-                {/* Profile */}
                 <div ref={profileRef} className="relative">
-                  {/* Avatar - เพิ่ม cursor-pointer และ onClick */}
                   <button
                     onClick={() => setIsProfileOpen(true)}
                     className="w-12 h-12 mx-auto mt-2 mb-4 rounded-full bg-[var(--background)] border-2 border-slate-500 hover:border-slate-400 flex items-center justify-center overflow-hidden transition-all cursor-pointer"
@@ -215,7 +207,6 @@ export const Navbar: React.FC = () => {
                     )}
                   </button>
 
-                  {/* Profile Modal */}
                   <ProfileModal
                     user={userData}
                     isOpen={isProfileOpen}
@@ -224,7 +215,6 @@ export const Navbar: React.FC = () => {
                   />
                 </div>
 
-                {/* Start Selling Button - Only for customers */}
                 {userRole === "customer" && (
                   <Link
                     href="/seller/become"
@@ -251,7 +241,6 @@ export const Navbar: React.FC = () => {
               </>
             )}
 
-            {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="sm:hidden text-white p-2"
@@ -263,10 +252,8 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Tags Bar */}
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         <div className="flex items-center gap-1.5 py-3 overflow-x-auto scrollbar-hide">
-          {/* ALL */}
           <button
             className={`px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
               activeTag === "all"
@@ -278,7 +265,6 @@ export const Navbar: React.FC = () => {
             ทั้งหมด
           </button>
 
-          {/* TAGS */}
           {tagNavbar.slice(0, 10).map((tag) => (
             <button
               key={tag.id}
@@ -295,11 +281,9 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="sm:hidden bg-[#1e1b3d] border-t border-[#262549]">
           <div className="px-4 py-4 space-y-3">
-            {/* Mobile Search */}
             <div className="relative">
               <Search
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
@@ -369,7 +353,6 @@ export const Navbar: React.FC = () => {
         </div>
       )}
 
-      {/* Cart Modal - Only for customers and sellers */}
       {isAuthenticated &&
         (userRole === "customer" || userRole === "seller") && (
           <CartModal

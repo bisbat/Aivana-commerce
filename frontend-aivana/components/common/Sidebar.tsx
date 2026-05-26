@@ -40,7 +40,6 @@ export default function Sidebar({
       className={`${width} min-h-screen border-r border-white/5 px-5 py-9 flex flex-col gap-2 shrink-0  z-20`}
       style={{ backgroundColor: bgColor }}
     >
-      {/* Brand */}
       <div className="mb-8 pl-3">
         <div className="flex items-center justify-between gap-2">
           <h1 className="text-2xl font-bold text-white tracking-tight">
@@ -61,10 +60,7 @@ export default function Sidebar({
         </span>
       </div>
 
-      {/* Nav Items */}
       {navItems.map((item) => {
-        // ── FIXED: Better active state logic
-        // ──────────────────────────────
         const isActive = activeItem?.href === item.href;
 
         return (
@@ -84,8 +80,6 @@ export default function Sidebar({
           </Link>
         );
       })}
-
-      {/* Additional children elements */}
       {children}
     </nav>
   );

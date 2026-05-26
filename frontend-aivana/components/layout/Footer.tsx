@@ -20,7 +20,6 @@ export const Footer: React.FC = () => {
     <footer className="bg-[var(--linne-purple)] py-12">
       <div className="max-w-[1400px] mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Brand */}
           <div>
             <Link href="/" className="flex items-center shrink-0">
               <span className="text-3xl font-bold bg-gradient-to-br from-[#8a57fb] to-[#a78bfa] bg-clip-text text-transparent tracking-wide">
@@ -32,7 +31,6 @@ export const Footer: React.FC = () => {
             </p>
           </div>
 
-          {/* หมวดหมู่ */}
           <div>
             <h4 className="text-white font-semibold mb-4">หมวดหมู่</h4>
             <ul className="space-y-2">
@@ -59,7 +57,6 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* เกี่ยวกับเรา */}
           <div>
             <h4 className="text-white font-semibold mb-4">เกี่ยวกับเรา</h4>
             <ul className="space-y-2">

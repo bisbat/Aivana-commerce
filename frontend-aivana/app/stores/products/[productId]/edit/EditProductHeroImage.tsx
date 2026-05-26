@@ -36,7 +36,6 @@ export default function EditProductHeroImage({
 
   return (
     <div className="space-y-4">
-      {/* Current/Preview Hero Image */}
       {displayImage && (
         <div className="relative">
           <div className="relative group w-full max-w-md">
@@ -62,8 +61,6 @@ export default function EditProductHeroImage({
           )}
         </div>
       )}
-
-      {/* Upload New Hero Image */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {displayImage ? 'แทนภาพ hero ปัจจุบัน' : 'เพิ่มภาพ hero'}

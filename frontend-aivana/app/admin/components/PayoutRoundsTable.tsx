@@ -6,7 +6,6 @@ import type { PayoutRound } from "@/lib/types/admin/payout";
 import { formatDate, formatBaht } from "@/lib/utils/formatPayout";
 import StatusBadge from "./StatusBagde";
 
-// ─── Single "View Round" button with hover state ────────────────────────────
 function ViewRoundButton({
   periodStart,
   periodEnd,
@@ -20,7 +19,6 @@ function ViewRoundButton({
     const start = new Date(periodStart);
     const end = new Date(periodEnd);
 
-    // 🔥 normalize to Asia/Bangkok date
     const startDate = start.toLocaleDateString("en-CA", {
       timeZone: "Asia/Bangkok",
     });
@@ -44,7 +42,6 @@ function ViewRoundButton({
   );
 }
 
-// ─── Main exported component ─────────────────────────────────────────────────
 export default function PayoutRoundsTable({
   rounds,
 }: {
@@ -52,7 +49,6 @@ export default function PayoutRoundsTable({
 }) {
   return (
     <div className="bg-white/2.5 border border-white/7 rounded-2xl overflow-hidden">
-      {/* Table title */}
       <div className="px-5 py-4 border-b border-white/6">
         <h3 className="text-lg font-semibold text-white">
           ตารางรอบโอนเงินของระบบ
@@ -80,8 +76,6 @@ export default function PayoutRoundsTable({
           ))}
         </tbody>
       </table>
-
-      {/* Empty state */}
       {rounds.length === 0 && (
         <div className="text-center py-12 px-5 text-white/30 text-sm">
           ไม่มีรอบโอนเงินในขณะนี้
@@ -91,7 +85,6 @@ export default function PayoutRoundsTable({
   );
 }
 
-// ─── Single table row — isolated so each row manages its own hover state ─────
 function RoundRow({ round, index }: { round: PayoutRound; index: number }) {
   const [hovered, setHovered] = useState(false);
 
@@ -106,29 +99,24 @@ function RoundRow({ round, index }: { round: PayoutRound; index: number }) {
         animation: `fadeSlideIn 0.35s ease ${index * 0.07}s both`,
       }}
     >
-      {/* Period */}
       <td className="px-5 py-4 text-sm text-slate-400">
         {formatDate(round.periodStart)}
         <span className="text-white/20 mx-1.5">–</span>
         {formatDate(round.periodEnd)}
       </td>
 
-      {/* Seller count */}
       <td className="px-5 py-4 text-sm text-white/55">
         {round.sellerCount} <span className="text-white/25 text-xs">ร้าน</span>
       </td>
 
-      {/* Total amount */}
       <td className="px-5 py-4 text-sm font-semibold text-slate-200">
         {formatBaht(round.totalAmount)}
       </td>
 
-      {/* Status */}
       <td className="px-5 py-4">
         <StatusBadge status={round.roundStatus} />
       </td>
 
-      {/* Action */}
       <td className="px-5 py-4">
         <ViewRoundButton
           periodStart={round.periodStart}

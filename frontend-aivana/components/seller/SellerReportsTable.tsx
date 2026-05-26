@@ -193,7 +193,6 @@ function GroupedReportRow({
       }`}
       style={{ animation: `fadeSlideIn 0.35s ease ${index * 0.05}s both` }}
     >
-      {/* Product Info */}
       <td className="px-6 py-5">
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-2 flex-wrap">
@@ -216,7 +215,6 @@ function GroupedReportRow({
         </div>
       </td>
 
-      {/* จำนวนรายงาน */}
       <td className="px-6 py-4">
         <div className="flex items-baseline gap-1">
           <span className="text-lg font-bold text-[#a881fc]">
@@ -226,17 +224,14 @@ function GroupedReportRow({
         </div>
       </td>
 
-      {/* Severity */}
       <td className="px-6 py-4">
         <SeverityBadge reportCount={group.totalReports} />
       </td>
 
-      {/* Date */}
       <td className="px-6 py-4 text-sm text-slate-400 font-medium">
         {formatDate(group.latestReportDate)}
       </td>
 
-      {/* Action */}
       <td className="px-6 py-4">
         <ViewDetailButton productId={group.productId} />
       </td>
@@ -244,7 +239,6 @@ function GroupedReportRow({
   );
 }
 
-// ─── Main Table Component ───────────────────────────────────────────────────
 export default function SellerReportsTable({ reports }: { reports: Report[] }) {
   const groupedReports = useMemo(
     () => groupReportsByProduct(reports),
@@ -253,7 +247,6 @@ export default function SellerReportsTable({ reports }: { reports: Report[] }) {
 
   return (
     <div className="bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden shadow-xl">
-      {/* Header */}
       <div className="px-6 py-5 border-b border-white/5 bg-gradient-to-r from-transparent to-white/[0.02]">
         <div className="flex items-center justify-between">
           <div className="space-y-1">

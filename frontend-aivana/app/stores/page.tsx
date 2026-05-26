@@ -64,9 +64,8 @@ export default function StorePage() {
 
   return (
     <div className="flex min-h-screen">
-      {/* Main Content */}
       <main className="flex-1 p-10">
-        {/* Avatar Section */}
+  
         <div className="avatar-section w-full flex justify-end mb-6">
           <div
             onClick={() => router.push(`/seller/${userData?.username ?? ""}`)}
@@ -94,8 +93,6 @@ export default function StorePage() {
             )}
           </div>
         </div>
-
-        {/* Loading State */}
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader className="animate-spin text-purple-600 mb-4" size={48} />
@@ -103,7 +100,6 @@ export default function StorePage() {
           </div>
         )}
 
-        {/* Error State */}
         {error && !isLoading && (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
@@ -124,7 +120,6 @@ export default function StorePage() {
           </div>
         )}
 
-        {/* Empty State */}
         {!isLoading &&
           !error &&
           products.filter((p) => !p.isDeleted).length === 0 && (
@@ -139,7 +134,6 @@ export default function StorePage() {
             </div>
           )}
 
-        {/* Products Grid - แสดงเฉพาะสินค้าที่ไม่ถูกลบ */}
         {!isLoading &&
           !error &&
           products.filter((p) => !p.isDeleted).length > 0 && (

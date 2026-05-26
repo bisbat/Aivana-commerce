@@ -30,7 +30,6 @@ export default async function ReportDetailPage({
           รายละเอียดรายงานปัญหา
         </h2>
 
-        {/* Error state */}
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 rounded-2xl px-5 py-4 text-red-400 text-sm mb-6 flex items-center gap-3">
             <AlertCircle size={20} />
@@ -38,7 +37,6 @@ export default async function ReportDetailPage({
           </div>
         )}
 
-        {/* Pass data to client component */}
         {report && <ReportDetailCard report={report} />}
       </div>
     </div>

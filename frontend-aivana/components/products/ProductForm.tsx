@@ -16,8 +16,6 @@ import { DynamicTextListInput } from "../ui/DynamicTextListInput";
 import { InstallationGuideInput } from "../ui/InstallationGuideInput";
 import { enrichProduct } from "@/lib/actions/product-enrichment.actions";
 
-// NEW: This component no longer submits to backend
-// It just collects data and passes to next step
 interface ProductFormProps {
   sellerId: string;
   uploadData: UploadFileFormData;
@@ -39,7 +37,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     description.trim() !== "" ||
     price !== "";
 
-  // Form state
   const [name, setName] = useState("");
   const [blurb, setBlurb] = useState("");
   const [description, setDescription] = useState("");
@@ -60,7 +57,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const [tags, setTags] = useState<Array<{ id: string; name: string }>>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
 
-  // const [tags, setTags] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isEnriching, setIsEnriching] = useState(false);
 
@@ -145,7 +141,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           setSelectedTagIds(matchedIds);
         }
 
-        // Map AI category suggestion → real category ID (case-insensitive)
         if (ai.suggestedCategoryName) {
           const matched = categories.find(
             (c) =>
@@ -274,31 +269,26 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     return (
       <div className="flex items-center justify-center py-20">
         <div className="w-full max-w-md">
-          {/* Glowing card */}
           <div className="relative rounded-2xl border border-purple-500/40 bg-[#1a1840] p-8 shadow-[0_0_60px_-15px_#8a57fb]">
-            {/* Animated gradient top bar */}
             <div className="absolute inset-x-0 top-0 h-1 rounded-t-2xl overflow-hidden">
               <div className="h-full w-full bg-linear-to-r from-purple-600 via-violet-400 to-purple-600 animate-[shimmer_1.8s_linear_infinite] bg-size-[200%_100%]" />
             </div>
 
-            {/* Icon */}
             <div className="flex justify-center mb-6">
               <div className="relative flex items-center justify-center w-16 h-16 rounded-full bg-purple-600/20 border border-purple-500/40">
                 <span className="text-3xl animate-pulse">⚡</span>
-                {/* Orbit ring */}
+
                 <div className="absolute inset-0 rounded-full border-2 border-purple-500/30 animate-spin [animation-duration:3s]" />
               </div>
             </div>
 
-            {/* Title */}
             <h3 className="text-center text-white font-semibold text-lg mb-1">
               AI กำลังวิเคราะห์สินค้าของคุณ
             </h3>
             <p className="text-center text-slate-400 text-sm mb-8">
               กรุณารอสักครู่ อาจใช้เวลาประมาณ 10-20 วินาที
             </p>
-
-            {/* Step list */}
+            
             <div className="space-y-3">
               {[
                 { label: "อ่านข้อมูลจากไฟล์ที่อัปโหลด", delay: "0s" },
@@ -314,7 +304,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   className="flex items-center gap-3 opacity-0 animate-[fadeSlideIn_0.5s_ease_forwards]"
                   style={{ animationDelay: delay }}
                 >
-                  {/* Dot */}
                   <div className="relative shrink-0 w-5 h-5 flex items-center justify-center">
                     <div className="w-2 h-2 rounded-full bg-purple-400" />
                     <div className="absolute inset-0 rounded-full bg-purple-500/30 animate-ping" />
@@ -324,14 +313,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               ))}
             </div>
 
-            {/* Progress bar */}
             <div className="mt-8 h-1.5 rounded-full bg-slate-700 overflow-hidden">
               <div className="h-full rounded-full bg-linear-to-r from-purple-600 to-violet-400 animate-[progressBar_18s_ease-in-out_forwards]" />
             </div>
           </div>
         </div>
 
-        {/* Keyframes injected inline for Tailwind arbitrary */}
         <style>{`
           @keyframes shimmer {
             0%   { background-position: 200% 0; }
@@ -354,7 +341,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Step Indicator */}
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={onBack}
@@ -388,9 +374,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             รูปภาพสินค้า
           </span>
         </div>
-      </div>
-
-      {/* Show uploaded file info */}
+      </div>\
       <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
         <p className="text-slate-400 text-sm mb-2">ไฟล์ที่อัปโหลด:</p>
 
@@ -408,7 +392,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         )}
       </div>
 
-      {/* AI auto-filled badge */}
       {uploadData.useAI && uploadData.metadata && !isEnriching && !error && (
         <div className="bg-purple-900/30 border border-purple-500 rounded-lg p-3 flex items-center gap-2">
           <span className="text-purple-300 text-sm">
@@ -417,14 +400,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         </div>
       )}
 
-      {/* Error Message */}
       {error && (
         <div className="bg-red-900/20 border border-red-500 rounded-lg p-4">
           <p className="text-red-400 text-sm">{error}</p>
         </div>
       )}
 
-      {/* All form fields - same as before */}
       <Input
         label="ชื่อสินค้า"
         value={name}
@@ -537,7 +518,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         />
       )}
 
-      {/* Continue Button - No longer submits to backend */}
       <div className="flex justify-end pt-4">
         <button
           onClick={handleContinue}

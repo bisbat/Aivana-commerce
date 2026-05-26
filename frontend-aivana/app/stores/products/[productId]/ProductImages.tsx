@@ -12,7 +12,6 @@ export default function ProductImages({ heroSrc, detailImages }: ProductImagesPr
 
     return (
         <div className="space-y-6">
-            {/* Hero Image */}
             <div className="bg-linne-purple-hover p-4 rounded shadow">
                 <h3 className="text-xl font-semibold text-primary mb-2">ภาพฮีโร่ (Hero Image)</h3>
                 {heroSrc ? (
@@ -26,8 +25,6 @@ export default function ProductImages({ heroSrc, detailImages }: ProductImagesPr
                     <p>ไม่มีภาพฮีโร่ที่พร้อมใช้งาน</p>
                 )}
             </div>
-
-            {/* Detail Images */}
             <div className="bg-linne-purple-hover p-4 rounded shadow">
                 <h3 className="text-xl font-semibold text-primary mb-2">ภาพรายละเอียด (Detail Images)</h3>
                 {detailImages?.length ? (
@@ -46,8 +43,6 @@ export default function ProductImages({ heroSrc, detailImages }: ProductImagesPr
                     <p>ไม่มีภาพเพิ่มเติมที่พร้อมใช้งาน</p>
                 )}
             </div>
-
-            {/* Modal */}
             {modalImg && (
                 <div
                     className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"

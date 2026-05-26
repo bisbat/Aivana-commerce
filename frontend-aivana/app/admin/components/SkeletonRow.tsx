@@ -1,5 +1,3 @@
-// ─── Generic skeleton row for any table ─────────────────────────────────────
-// Pass `columns` to match the number of <th> in your table header
 const DEFAULT_WIDTHS = [140, 100, 110, 100, 120];
 
 export default function SkeletonRow({ columns = 5 }: { columns?: number }) {

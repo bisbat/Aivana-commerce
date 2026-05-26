@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
-// ─── Reason Severity Config ─────────────────────────────────────────────────
 const REASON_CONFIG: Record<
   string,
   {
@@ -71,7 +70,6 @@ const REASON_CONFIG: Record<
   },
 };
 
-// ─── Reason Severity Badge ───────────────────────────────────────────────────
 function ReasonSeverityBadge({ reason }: { reason: string }) {
   const config = REASON_CONFIG[reason];
   if (!config) return null;
@@ -104,7 +102,6 @@ function ReasonSeverityBadge({ reason }: { reason: string }) {
   );
 }
 
-// ─── Product Status Banner ───────────────────────────────────────────────────
 function ProductStatusBanner({
   isDeleted,
   isHidden,
@@ -131,7 +128,6 @@ function ProductStatusBanner({
   return null;
 }
 
-// ─── Status Badge ───────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: ReportStatus }) {
   const config = {
     pending: {
@@ -187,7 +183,6 @@ function StatusBadge({ status }: { status: ReportStatus }) {
   );
 }
 
-// ─── Format Helpers ──────────────────────────────────────────────────────────
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString("th-TH", {
     year: "numeric",
@@ -205,7 +200,6 @@ function formatPrice(price: number) {
   })}`;
 }
 
-// ─── Main Component ─────────────────────────────────────────────────────────
 export default function ReportDetailCard({ report }: { report: Report }) {
   const router = useRouter();
   const [selectedStatus, setSelectedStatus] = useState<ReportStatus>(
@@ -232,13 +226,11 @@ export default function ReportDetailCard({ report }: { report: Report }) {
     }
   };
 
-  // cancel_sale ไม่ควรกดได้ถ้าสินค้าถูกลบไปแล้ว
   const isOptionDisabled = (value: ReportStatus) =>
     value === "cancel_sale" && isProductDeleted;
 
   return (
     <div className="space-y-6">
-      {/* Report Header */}
       <div className="bg-white/2.5 border border-white/7 rounded-2xl p-6">
         <div className="flex justify-between items-start">
           <div>
@@ -256,7 +248,6 @@ export default function ReportDetailCard({ report }: { report: Report }) {
         </div>
       </div>
 
-      {/* Reporter Information */}
       <div className="bg-white/2.5 border border-white/7 rounded-2xl p-6">
         <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
           <User size={20} className="text-purple-400" />
@@ -272,14 +263,12 @@ export default function ReportDetailCard({ report }: { report: Report }) {
         </div>
       </div>
 
-      {/* Product Information */}
       <div className="bg-white/2.5 border border-white/7 rounded-2xl p-6">
         <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
           <Package size={20} className="text-purple-400" />
           ข้อมูลสินค้าที่รายงาน
         </h4>
 
-        {/* Product Status Banner */}
         <ProductStatusBanner
           isDeleted={isProductDeleted}
           isHidden={isProductHidden}
@@ -307,7 +296,6 @@ export default function ReportDetailCard({ report }: { report: Report }) {
         </div>
       </div>
 
-      {/* Report Details */}
       <div className="bg-white/2.5 border border-white/7 rounded-2xl p-6">
         <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
           <FileText size={20} className="text-purple-400" />
@@ -337,7 +325,6 @@ export default function ReportDetailCard({ report }: { report: Report }) {
         )}
       </div>
 
-      {/* Update Status */}
       <div className="bg-white/2.5 border border-white/7 rounded-2xl p-6">
         <h4 className="text-lg font-semibold text-white mb-4">อัปเดตสถานะ</h4>
 
@@ -386,7 +373,6 @@ export default function ReportDetailCard({ report }: { report: Report }) {
   );
 }
 
-// ─── Info Row ────────────────────────────────────────────────────────────────
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div>

@@ -212,7 +212,7 @@ export default function ProductDetailPage({
         <div className="space-y-4" />
 
         <div className="grid grid-cols-1 lg:grid-cols-8 gap-8 mt-10">
-          {/* Left Side */}
+
           <div className="lg:col-span-5">
             <div className="space-y-6">
               <div
@@ -368,11 +368,9 @@ export default function ProductDetailPage({
             </div>
           </div>
 
-          {/* Right Side */}
           <div className="lg:col-span-3 space-y-6">
             <div className="bg-purple-900/5 backdrop-blur-sm rounded-lg p-6 space-y-4 border border-purple-500/5">
               <div className="bg-gradient-to-r from-purple-700/60 via-purple-900/50 to-[#141332]/60 rounded-xl p-5 shadow-lg flex flex-col gap-4 overflow-hidden">
-                {/* Product Name */}
                 <div className="pb-3 border-b border-white/10 flex flex-col gap-2">
                   <h2 className="text-2xl font-bold text-white leading-tight">
                     {product.name}
@@ -396,7 +394,6 @@ export default function ProductDetailPage({
                   </div>
                 </div>
 
-                {/* Hidden Banner */}
                 {product.isHidden && !product.isDeleted && (
                   <div className="bg-orange-500/15 border border-orange-500/40 rounded-lg p-4">
                     <div className="flex items-start gap-3">
@@ -439,7 +436,6 @@ export default function ProductDetailPage({
                   </div>
                 )}
 
-                {/* ✅ Deleted Banner */}
                 {product.isDeleted && (
                   <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4">
                     <div className="flex items-start gap-3">
@@ -523,7 +519,6 @@ export default function ProductDetailPage({
                 </div>
               )}
 
-              {/* Compatibility - ซ่อนเมื่อเป็น UI Kit */}
               {product.category?.name !== "ui-kit" && (
                 <>
                   <h3 className="text-lg font-semibold text-white/90 flex items-center gap-2">
@@ -564,7 +559,6 @@ export default function ProductDetailPage({
                 </>
               )}
 
-              {/* Tech Stack - แสดงเสมอ */}
               <h3 className="text-lg font-semibold text-white/90 flex items-center gap-2">
                 <svg
                   className="w-5 h-5 text-purple-400/70"
@@ -600,7 +594,6 @@ export default function ProductDetailPage({
                 </div>
               )}
 
-              {/* Requirements - ซ่อนเมื่อเป็น UI Kit */}
               {product.category?.name !== "ui-kit" && (
                 <>
                   <h3 className="text-lg font-semibold text-white/90 flex items-center gap-2">
@@ -640,7 +633,6 @@ export default function ProductDetailPage({
                 </>
               )}
 
-              {/* API Documentation - แสดงเฉพาะ Backend Template ที่ user ซื้อแล้ว */}
               {product.category?.name === "backend-template" &&
                 product.apiDocUrl &&
                 (isUserProduct || isOwner || isAdmin) && (
@@ -691,7 +683,6 @@ export default function ProductDetailPage({
           </div>
         </div>
 
-        {/* Reviews */}
         <div className="mt-16">
           <h2 className="text-2xl font-bold text-white mb-8">
             ความคิดเห็น ({product.reviews.length})
@@ -749,7 +740,6 @@ export default function ProductDetailPage({
           </div>
         </div>
 
-        {/* Related Products */}
         <div className="mt-16">
           <h2 className="text-2xl font-bold text-white mb-8">แนะนำสำหรับคุณ</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

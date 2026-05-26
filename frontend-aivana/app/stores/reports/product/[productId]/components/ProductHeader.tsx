@@ -50,7 +50,6 @@ export default function ProductHeader({
 
   return (
     <>
-      {/* Deleted Product Alert */}
       {product.isDeleted && (
         <div className="bg-red-500/10 border-2 border-red-500/30 rounded-xl p-5 mb-6">
           <div className="flex items-start gap-4">
@@ -119,7 +118,6 @@ export default function ProductHeader({
               </div>
             </div>
 
-            {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
               <div className="bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/20">
                 <div className="text-xs text-yellow-400 mb-1">รอดำเนินการ</div>
@@ -147,7 +145,6 @@ export default function ProductHeader({
               </div>
             </div>
 
-            {/* Severity Level Badge */}
             <div className="flex items-center gap-3 pt-3 border-t border-white/5">
               <div className="text-sm text-slate-400">ระดับความรุนแรง:</div>
               <div

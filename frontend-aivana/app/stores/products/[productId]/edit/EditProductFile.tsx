@@ -71,12 +71,9 @@ export default function EditProductFile({
 
   return (
     <div className="space-y-4">
-      {/* Current/New Product File */}
       {displayFile && (
         <div className="border border-slate-700 rounded-2xl p-4 bg-slate-900/60">
           <div className="flex items-center justify-between gap-4">
-
-            {/* LEFT */}
             <div className="flex items-center gap-3 min-w-0">
               <span className="text-2xl shrink-0">{fileIcon}</span>
 
@@ -104,7 +101,6 @@ export default function EditProductFile({
               </div>
             </div>
 
-            {/* RIGHT */}
             <button
               type="button"
               onClick={handleRemove}
@@ -124,7 +120,6 @@ export default function EditProductFile({
         </div>
       )}
 
-      {/* Upload New Product File */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {displayFile ? 'Replace Product File' : 'Upload Product File'}
