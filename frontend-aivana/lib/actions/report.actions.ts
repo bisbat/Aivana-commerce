@@ -73,8 +73,6 @@ export async function getSellerReportsAction(): Promise<Report[]> {
     cache: "no-store",
   });
 
-  console.log("Seller reports fetched successfully");
-  console.log(res);
   if (!res.ok) {
     const error = await res.json();
     throw new Error(error.message || "Failed to fetch seller reports");
@@ -123,12 +121,7 @@ export async function getReportByOrderItemAction(orderItemId: number) {
   }
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// Admin Actions
-// ────────────────────────────────────────────────────────────────────────────
-
 export async function getAllReportsAction(): Promise<Report[]> {
-  console.log("getAllReportsAction called");
   const token = await getAccessToken();
 
   if (!token) {
@@ -225,10 +218,6 @@ export async function updateReportStatusAction(
 
   return await res.json();
 }
-
-// ────────────────────────────────────────────────────────────────────────────
-// Seller Actions
-// ────────────────────────────────────────────────────────────────────────────
 
 export async function addSellerResponseAction(
   reportId: number,

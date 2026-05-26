@@ -59,7 +59,6 @@ function ReviewItem({ review }: { review: Review }) {
 
   return (
     <div className="p-4 rounded-xl bg-slate-800/40 border border-white/5">
-      {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div className="text-sm text-gray-400">
           {review.productName}
@@ -73,13 +72,9 @@ function ReviewItem({ review }: { review: Review }) {
           </span>
         )}
       </div>
-
-      {/* Review text */}
       <p className="text-white text-sm mb-2 line-clamp-2">
         {review.text}
       </p>
-
-      {/* Footer */}
       <div className="flex items-center justify-between text-xs text-gray-400">
         <div>
           confidence:{" "}
@@ -87,7 +82,6 @@ function ReviewItem({ review }: { review: Review }) {
             ? (review.confidence * 100).toFixed(1) + "%"
             : "-"}
         </div>
-
         <div>
           {formatDate(review.analyzedAt)}
         </div>

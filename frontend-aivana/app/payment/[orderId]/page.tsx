@@ -126,7 +126,6 @@ export default function PromptpayPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
-        {/* Header */}
         <div className="text-center mb-2">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-2">
             <svg
@@ -147,7 +146,6 @@ export default function PromptpayPage() {
           <p className="text-gray-600">สแกน QR Code เพื่อชำระเงิน</p>
         </div>
 
-        {/* Timer */}
         <div className="mb-2 text-center">
           <div
             className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${isExpired
@@ -188,7 +186,6 @@ export default function PromptpayPage() {
           </div>
         </div>
 
-        {/* QR Code Section */}
         <div className="mb-6 relative">
           {isExpired && (
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-xl flex items-center justify-center z-10">
@@ -250,7 +247,6 @@ export default function PromptpayPage() {
           )}
         </div>
 
-        {/* Amount Section */}
         <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-2 text-center">
           <p className="text-blue-100 text-sm font-medium mb-1">ยอดชำระ</p>
           <p className="text-white text-2xl font-bold">
@@ -258,7 +254,6 @@ export default function PromptpayPage() {
           </p>
         </div>
 
-        {/* Cancel Order Button */}
         <div className="mt-6">
           <button
             onClick={handleCancelOrder}
@@ -268,7 +263,6 @@ export default function PromptpayPage() {
           </button>
         </div>
 
-        {/* Instructions */}
         <div className="mt-6 bg-blue-50 rounded-lg p-4">
           <p className="text-sm text-blue-800 text-center">
             🔒 Secured by Omise

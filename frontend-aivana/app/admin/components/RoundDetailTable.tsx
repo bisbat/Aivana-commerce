@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import type { Payout } from "@/lib/types/admin/payout";
 import { formatBaht } from "@/lib/utils/formatPayout";
 
-// ─── Status Dot (dark theme friendly) ───────────────────────────────────────
 function SellerStatusDot({ status }: { status: string }) {
   const isPending = status === "รอโอน";
 
@@ -30,7 +29,6 @@ function SellerStatusDot({ status }: { status: string }) {
   );
 }
 
-// ─── View Details Button ─────────────────────────────────────────────────────
 function ViewDetailsLink({ payoutId }: { payoutId: number }) {
   const router = useRouter();
   const [hovered, setHovered] = useState(false);
@@ -57,7 +55,6 @@ function ViewDetailsLink({ payoutId }: { payoutId: number }) {
   );
 }
 
-// ─── Row ─────────────────────────────────────────────────────────────────────
 function SellerRow({ payout, index }: { payout: Payout; index: number }) {
   const [hovered, setHovered] = useState(false);
 
@@ -76,8 +73,12 @@ function SellerRow({ payout, index }: { payout: Payout; index: number }) {
       <td style={cellStyle}>{payout.orderCount}</td>
       <td style={cellStyle}>{formatBaht(payout.grossSales)}</td>
       <td style={cellStyleStrong}>{formatBaht(payout.netPayout)}</td>
-      <td style={cellStyle}><SellerStatusDot status={payout.status} /></td>
-      <td style={cellStyle}><ViewDetailsLink payoutId={payout.payoutId} /></td>
+      <td style={cellStyle}>
+        <SellerStatusDot status={payout.status} />
+      </td>
+      <td style={cellStyle}>
+        <ViewDetailsLink payoutId={payout.payoutId} />
+      </td>
     </tr>
   );
 }
@@ -94,7 +95,6 @@ const cellStyleStrong: React.CSSProperties = {
   fontWeight: 600,
 };
 
-// ─── Main Component ──────────────────────────────────────────────────────────
 export default function RoundDetailTable({ payouts }: { payouts: Payout[] }) {
   const HEADERS = [
     "Seller",
@@ -114,8 +114,12 @@ export default function RoundDetailTable({ payouts }: { payouts: Payout[] }) {
         overflow: "hidden",
       }}
     >
-      {/* Title bar (optional, remove if not needed) */}
-      <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+      <div
+        style={{
+          padding: "16px 20px",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+        }}
+      >
         <h3 style={{ fontSize: 15, fontWeight: 600, color: "#fff" }}>
           รายละเอียดผู้ขายในรอบนี้
         </h3>

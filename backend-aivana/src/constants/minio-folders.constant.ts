@@ -1,7 +1,3 @@
-/**
- * MinIO folder structure constants
- * Centralized location for bucket folder paths
- */
 export const 
 MINIO_FOLDERS = {
   PRODUCTS: {

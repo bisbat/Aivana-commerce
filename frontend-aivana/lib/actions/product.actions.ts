@@ -3,7 +3,6 @@ import { revalidatePath } from "next/cache";
 import { ProductInformationFormData } from "../types/formCreateProduct/ProductInformationFormData";
 import { UploadFileFormData } from "../types/formCreateProduct/UploadFileFormData";
 import { UploadImageFormData } from "../types/formCreateProduct/UploadImageFormData";
-import { ProductUpdatePayload } from "../types/product/UpdateProductPayload";
 import { UpdatedProductData } from "@/app/stores/products/[productId]/edit/page";
 import { getAccessToken } from "../auth";
 
@@ -24,36 +23,29 @@ export async function updateProductAction(
     const value = updatedData[key as keyof UpdatedProductData];
 
     if (value === undefined || value === null) continue;
-
-    // Handle nested files object
     if (key === "files" && typeof value === "object") {
       for (const fileKey in value) {
         const fileOrFiles = value[fileKey as keyof typeof value];
 
         if (!fileOrFiles) continue;
 
-        // Single file
         if (fileOrFiles instanceof File) {
           formData.append(fileKey, fileOrFiles);
         }
-        // Array of files (e.g., detailImages)
+
         else if (Array.isArray(fileOrFiles)) {
           fileOrFiles.forEach((f) => formData.append(fileKey, f));
         }
       }
     }
 
-    // Handle arrays by stringifying them
     else if (Array.isArray(value)) {
       formData.append(key, JSON.stringify(value));
     }
-    // Handle primitive values
     else {
       formData.append(key, String(value));
     }
   }
-
-  console.log(formData);
 
   const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
     method: "PUT",
@@ -67,13 +59,11 @@ export async function updateProductAction(
     throw new Error("Failed to update product");
   }
 
-  // Revalidate cache
   revalidatePath(`/stores/products/${productId}`);
 
   return await res.json();
 }
 
-// ฟังก์ชันสำหรับลบ detail image
 export async function deleteProductImageAction(imageId: number) {
   const token = await getAccessToken();
 
@@ -103,7 +93,7 @@ export async function deleteProductAction(productId: string, reason?: string) {
   if (!token) {
     throw new Error("Unauthorized");
   }
-  // ส่งคำขอไปยัง API เพื่อลบสินค้า
+
   const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
     method: "DELETE",
     headers: {
@@ -114,7 +104,7 @@ export async function deleteProductAction(productId: string, reason?: string) {
   });
 
   if (!res.ok) {
-    // Get error message from response
+
     const errorData = await res.json().catch(() => ({}));
     const errorMessage = errorData.message || "Failed to delete product";
     throw new Error(errorMessage);
@@ -151,8 +141,6 @@ export async function getAllProductsAction() {
     },
   });
 
-  console.log(res);
-
   if (res.ok) {
     const data = await res.json();
     return data;
@@ -179,7 +167,6 @@ export async function getProductByIdAction(productId: string) {
 
   if (res.ok) {
     const text = await res.text();
-    // ถ้า response เป็น empty หรือ "null" แสดงว่าสินค้าไม่มี
     if (!text || text === "null") {
       return null;
     }
@@ -190,8 +177,8 @@ export async function getProductByIdAction(productId: string) {
 }
 
 export async function createCompleteProduct(
-  uploadFileData: UploadFileFormData, // Step 1 data
-  productInfoData: ProductInformationFormData, // Step 2 data
+  uploadFileData: UploadFileFormData, 
+  productInfoData: ProductInformationFormData, 
   imageData: UploadImageFormData,
 ) {
   const token = await getAccessToken();
@@ -200,10 +187,9 @@ export async function createCompleteProduct(
     throw new Error("Unauthorized");
   }
   try {
-    // Create FormData with ALL information
+
     const formData = new FormData();
 
-    // Step 2: Product Information (metadata)
     formData.append("name", productInfoData.name);
     formData.append("description", productInfoData.description);
     formData.append("price", productInfoData.price.toString());
@@ -212,8 +198,6 @@ export async function createCompleteProduct(
     formData.append("previewUrl", productInfoData.previewUrl || "");
     formData.append("categoryId", productInfoData.categoryId.toString());
     formData.append("sellerId", productInfoData.sellerId.toString());
-
-    // Arrays as JSON strings
     formData.append("features", JSON.stringify(productInfoData.features));
     formData.append(
       "compatibility",
@@ -224,24 +208,20 @@ export async function createCompleteProduct(
     formData.append("apiDocUrl", productInfoData.apiDocUrl || "");
     formData.append("tagIds", JSON.stringify(productInfoData.tagIds));
 
-    // Step 1: Product File (.zip, .fig, etc.)
     if (uploadFileData.file) {
       formData.append("productFile", uploadFileData.file);
     }
 
-    // Step 3: Hero Image
     if (imageData.heroImage) {
       formData.append("heroImage", imageData.heroImage);
     }
 
-    // Step 3: Detail Images (multiple files)
     if (imageData.detailImages.length > 0) {
       imageData.detailImages.forEach((image) => {
         formData.append("detailImages", image);
       });
     }
 
-    // ✨ Single API call with everything
     const response = await fetch(`${API_BASE_URL}/products`, {
       method: "POST",
       headers: {
@@ -257,7 +237,6 @@ export async function createCompleteProduct(
 
     const createdProduct = await response.json();
 
-    // Revalidate cache
     revalidatePath("/stores");
 
     return createdProduct;

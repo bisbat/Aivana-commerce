@@ -112,21 +112,18 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="text-center">
         <h2 className="text-3xl font-bold text-white mb-2">
           คุณกำลังทำงานอะไรอยู่?
         </h2>
       </div>
 
-      {/* Error Message */}
       {error && (
         <div className="bg-red-900/20 border border-red-500 rounded-lg p-4">
           <p className="text-red-400 text-sm">{error}</p>
         </div>
       )}
 
-      {/* Product Type Selection */}
       <div className="space-y-3">
         <label className="block text-white font-medium">
           สินค้าของคุณเกี่ยวกับหัวข้อใด?
@@ -188,7 +185,6 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
         </div>
       </div>
 
-      {/* File Upload */}
       <div className="space-y-3">
         <label className="block text-white font-medium">อัปโหลดไฟล์สินค้าของคุณ</label>
         <input ref={fileInputRef} type="file" onChange={handleFileChange} className="hidden" accept=".zip" />
@@ -212,7 +208,6 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
         </div>
       </div>
 
-      {/* Keywords */}
       <div className="space-y-3">
         <label className="block text-white font-medium">คุณกำลังโพสต์เกี่ยวกับหัวข้ออะไร?</label>
         <textarea
@@ -225,7 +220,6 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
         <p className="text-slate-400 text-sm">ตัวอย่าง: React Dashboard, Admin Template, E-commerce UI</p>
       </div>
 
-      {/* Warning */}
       <div className="bg-yellow-900/20 border border-yellow-600 rounded-lg p-4 text-sm">
         <p className="text-yellow-400 font-medium mb-1">⚠️ คำแนะนำก่อนอัปโหลด</p>
         <p className="text-yellow-300">
@@ -234,7 +228,6 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
         </p>
       </div>
 
-      {/* Buttons */}
       <button
         disabled={isAnalyzing}
         onClick={() => handleSubmit(true)}
@@ -250,7 +243,6 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
         ดำเนินการต่อโดยไม่ใช้ AI
       </button>
 
-      {/* Validation Error Modal */}
       {validationReason && (
         <ValidationErrorModal
           isOpen={true}

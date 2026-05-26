@@ -22,7 +22,6 @@ const ProductCardSeller: React.FC<ProductCardSellerProps> = ({
   return (
     <Link href={`/stores/products/${product.id}`}>
       <div className="rounded-lg p-0 shadow hover:shadow-xl transition-all duration-300 w-full overflow-hidden bg-[var(--linne-purple)] relative">
-        {/* Image Section */}
         <div className="relative h-48  overflow-hidden">
           {product.heroImageUrl ? (
             <img
@@ -41,7 +40,6 @@ const ProductCardSeller: React.FC<ProductCardSellerProps> = ({
             />
           )}
 
-          {/* Status Badge */}
           {isDeleted ? (
             <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 rounded-full bg-red-500/90 backdrop-blur-sm text-white text-[10px] font-bold shadow-lg">
               <AlertTriangle size={10} className="stroke-[3px]" />
@@ -53,14 +51,11 @@ const ProductCardSeller: React.FC<ProductCardSellerProps> = ({
               ถูกซ่อนชั่วคราว
             </div>
           ) : null}
-
-          {/* Overlay */}
           {(isDeleted || isHidden) && (
             <div className="absolute inset-0 bg-black/30 z-[1] pointer-events-none"></div>
           )}
         </div>
 
-        {/* Content Section */}
         <div className="p-3 flex flex-col flex-1 gap-2">
 
           <h3

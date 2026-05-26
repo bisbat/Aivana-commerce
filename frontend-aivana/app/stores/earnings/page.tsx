@@ -22,12 +22,9 @@ export default async function SellerEarningsPage() {
 
   return (
     <div style={{ maxWidth: 1200, padding: "32px 24px" }}>
-      {/* Page title */}
       <h1 style={{ fontSize: 24, fontWeight: 700, color: "#fff", marginBottom: 28 }}>
         ภาพรวมยอดขาย
       </h1>
-
-      {/* Error state */}
       {error && (
         <div
           style={{
@@ -44,9 +41,6 @@ export default async function SellerEarningsPage() {
         </div>
       )}
 
-
-
-      {/* Summary cards */}
       {summary ? (
         <EarningsSummaryCards summary={summary} />
       ) : (
@@ -67,8 +61,6 @@ export default async function SellerEarningsPage() {
         )
       )}
 
-
-      {/* Rounds table */}
       <h2
         style={{
           fontSize: 18,

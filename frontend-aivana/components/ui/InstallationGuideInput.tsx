@@ -17,10 +17,9 @@ export const InstallationGuideInput: React.FC<
 
     return (
         <div className="space-y-3">
-            {/* Header */}
             <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-white">
-                    Installation Guide (Markdown supported)
+                    Installation Guide (Markdown supported) - คำแนะนำการติดตั้ง (รองรับ Markdown)
                 </label>
 
                 <div className="flex gap-2 text-sm">
@@ -47,10 +46,9 @@ export const InstallationGuideInput: React.FC<
                 </div>
             </div>
 
-            {/* Edit Mode */}
             {previewMode === "edit" && (
                 <Textarea
-                    label="Installation Guide"
+                    label="Installation Guide (คำแนะนำการติดตั้ง - ใช้ Markdown ได้)"
                     value={value}
                     onChange={onChange}
                     placeholder={`## Installation\n\n1. Download the file\n2. Install dependencies\n3. Run the app`}
@@ -59,14 +57,12 @@ export const InstallationGuideInput: React.FC<
 
             )}
 
-            {/* Preview Mode */}
             {previewMode === "preview" && (
                 <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
                     {value ? (
                         <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={{
-                                /* HEADINGS */
                                 h1: ({ children }) => (
                                     <h1 className="text-3xl font-bold mt-6 mb-4 text-white">
                                         {children}

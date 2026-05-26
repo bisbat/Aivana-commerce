@@ -44,7 +44,6 @@ export default function ValidationErrorModal({
             onClick={(e) => e.target === e.currentTarget && onUploadNew()}
         >
             <div className="bg-[#1e1b3d] border border-[#262549] rounded-3xl shadow-2xl w-full max-w-md relative overflow-hidden">
-                {/* Close button */}
                 <button
                     onClick={onUploadNew}
                     className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors z-10"
@@ -53,7 +52,6 @@ export default function ValidationErrorModal({
                 </button>
 
                 <div className="p-8">
-                    {/* Icon + Header */}
                     <div className="text-center mb-6">
                         <div className="w-14 h-14 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                             <FileX className="text-red-400" size={28} />
@@ -66,17 +64,13 @@ export default function ValidationErrorModal({
                         </p>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex flex-col gap-3">
-                        {/* Primary — upload new (recommended) */}
                         <button
                             onClick={onUploadNew}
                             className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-full transition-all duration-200"
                         >
                             เลือกไฟล์ใหม่ (แนะนำ)
                         </button>
-
-                        {/* Secondary — continue without AI */}
                         <button
                             onClick={onContinueWithoutAI}
                             className="w-full py-3 bg-transparent hover:bg-slate-800 text-slate-400 hover:text-white font-medium rounded-full border border-slate-700 transition-all duration-200"

@@ -71,8 +71,6 @@ export default function StatsChart({
           </PieChart>
         </ResponsiveContainer>
       </div>
-
-      {/* total ตรงกลาง */}
       <div className="text-center text-white mt-2 text-sm opacity-70">
         ทั้งหมด {total.toLocaleString()} รีวิว
       </div>

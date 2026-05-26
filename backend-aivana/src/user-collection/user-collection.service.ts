@@ -1,4 +1,3 @@
-// user-collection.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -6,7 +5,6 @@ import { UserCollectionEntity } from './entities/user-collection.entity';
 import { ReviewService } from 'src/review/review.service';
 import { ReportService } from 'src/report/report.service';
 
-// ===== user-collection.service.ts =====
 @Injectable()
 export class UserCollectionService {
   constructor(

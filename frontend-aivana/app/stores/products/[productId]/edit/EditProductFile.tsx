@@ -71,12 +71,9 @@ export default function EditProductFile({
 
   return (
     <div className="space-y-4">
-      {/* Current/New Product File */}
       {displayFile && (
         <div className="border border-slate-700 rounded-2xl p-4 bg-slate-900/60">
           <div className="flex items-center justify-between gap-4">
-
-            {/* LEFT */}
             <div className="flex items-center gap-3 min-w-0">
               <span className="text-2xl shrink-0">{fileIcon}</span>
 
@@ -87,7 +84,7 @@ export default function EditProductFile({
 
                 {newFile && (
                   <p className="text-xs text-green-400">
-                    ✓ New file selected (will replace on save)
+                    ✓ ไฟล์ใหม่ถูกเลือก (จะถูกแทนที่ไฟล์ปัจจุบันเมื่อบันทึก)
                   </p>
                 )}
 
@@ -98,13 +95,12 @@ export default function EditProductFile({
                     rel="noopener noreferrer"
                     className="text-xs text-blue-400 hover:underline"
                   >
-                    Download current file
+                    ดาวน์โหลดไฟล์ปัจจุบัน (Download Current File)
                   </a>
                 )}
               </div>
             </div>
 
-            {/* RIGHT */}
             <button
               type="button"
               onClick={handleRemove}
@@ -117,14 +113,13 @@ export default function EditProductFile({
         transition-all
       "
             >
-              Remove
+              นำไฟล์ออก (Remove File)
             </button>
 
           </div>
         </div>
       )}
 
-      {/* Upload New Product File */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {displayFile ? 'Replace Product File' : 'Upload Product File'}
@@ -136,15 +131,15 @@ export default function EditProductFile({
           className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
         />
         <p className="text-xs text-gray-500 mt-1">
-          Supported formats: ZIP, RAR, 7Z, FIG, PSD, PDF, DOC, DOCX
+          รูปแบบที่รองรับ: ZIP, RAR, 7Z, FIG, PSD, PDF, DOC, DOCX
         </p>
       </div>
 
       {!displayFile && (
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
           <span className="text-4xl text-gray-400">📁</span>
-          <p className="text-sm text-gray-500 mt-2">No product file uploaded</p>
-          <p className="text-xs text-gray-400">Upload a file above</p>
+          <p className="text-sm text-gray-500 mt-2">ไม่มีไฟล์ผลิตภัณฑ์ถูกอัปโหลด</p>
+          <p className="text-xs text-gray-400">อัปโหลดไฟล์ด้านบน</p>
         </div>
       )}
     </div>

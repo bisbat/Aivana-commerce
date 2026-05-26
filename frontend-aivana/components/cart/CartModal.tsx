@@ -11,7 +11,11 @@ import { createPayment } from "@/lib/actions/payment.actions";
 import { createOrder } from "@/lib/actions/order.actions";
 import { PaymentMethod } from "@/lib/constants/paymentMethod";
 import { number } from "framer-motion";
-import { createCreditCardToken, createPromptpaySource, initOmise } from "@/lib/omise";
+import {
+  createCreditCardToken,
+  createPromptpaySource,
+  initOmise,
+} from "@/lib/omise";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 interface CartModalProps {
@@ -25,12 +29,14 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
   const [cartData, setCartData] = useState<GetCartResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [removingItemId, setRemovingItemId] = useState<number | null>(null);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'promptpay' | 'credit-card'>('promptpay');
-  const omisePublicKey = process.env.NEXT_PUBLIC_OMISE_PUBLIC_KEY
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
+    "promptpay" | "credit-card"
+  >("promptpay");
+  const omisePublicKey = process.env.NEXT_PUBLIC_OMISE_PUBLIC_KEY;
 
   useEffect(() => {
     (window as any).Omise.setPublicKey(
-      process.env.NEXT_PUBLIC_OMISE_PUBLIC_KEY
+      process.env.NEXT_PUBLIC_OMISE_PUBLIC_KEY,
     );
     // initOmise();
   }, []);
@@ -47,7 +53,6 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
       const data = await getCart(user.id);
       console.log("Fetched cart data:", data);
       setCartData(data);
-
     } catch (error) {
       console.error("Failed to fetch cart:", error);
     } finally {
@@ -107,30 +112,32 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
     }, 0);
   })();
 
-
   if (!isOpen) return null;
 
-  const createSource = async (amount: number, orderId: number, paymentMethod: PaymentMethod) => {
+  const createSource = async (
+    amount: number,
+    orderId: number,
+    paymentMethod: PaymentMethod,
+  ) => {
     if (paymentMethod === PaymentMethod.CREDIT_CARD) {
       router.push(`/payment/${orderId}/card`);
     }
     if (paymentMethod === PaymentMethod.PROMPTPAY) {
       try {
         const source = await createPromptpaySource(amount);
-        console.log('source:', source);
+        console.log("source:", source);
 
         await createPayment(source.id, orderId);
 
         router.push(`/payment/${orderId}`);
       } catch (err) {
-        console.error('Create source failed', err);
+        console.error("Create source failed", err);
       }
     }
   };
 
-
   const handleCheckout = async () => {
-    if (selectedPaymentMethod == 'promptpay') {
+    if (selectedPaymentMethod == "promptpay") {
       const order = await createOrder(PaymentMethod.PROMPTPAY);
       createSource(numericTotal, order.id, PaymentMethod.PROMPTPAY);
     } else {
@@ -139,13 +146,10 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
     }
   };
 
-
   return (
     <>
-      {/* Backdrop - below navbar */}
       <div className="fixed inset-0 bg-black/60 z-40 transition-opacity" />
 
-      {/* Modal Container with max-width constraint */}
       <div
         className="fixed inset-0 z-50 pointer-events-none overflow-hidden"
         style={{ top: "15px" }}
@@ -155,22 +159,15 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
             ref={cartRef}
             className="bg-[#1e1b3d] rounded-xl w-4/12 h-auto max-h-[calc(100vh-2rem)] mt-16 overflow-hidden shadow-xl pointer-events-auto flex flex-col fixed border border-[#262549]"
           >
-            {/* Header */}
             <div className="px-4 py-2 border-b border-[#262549] flex items-center justify-between">
               <div className="flex flex-col">
                 <p className="text-white font-medium text-2xl">รถเข็น</p>
-                {/* <p className="text-slate-400 text-md mt-0.5">
-                  {cartData?.items.length || 0} สินค้า
-                </p> */}
               </div>
-              {/* Footer - Total and Checkout */}
               {!loading && cartData && cartData.items.length > 0 && (
                 <div className="py-2 border-t border-[#262549]">
                   <div className="px-4 py-2">
                     <div className="flex items-center justify-between flex-col">
-                      <span className="text-md text-slate-400">
-                        ราคารวม
-                      </span>
+                      <span className="text-md text-slate-400">ราคารวม</span>
                       <span className="text-xl font-semibold text-white">
                         {formatPriceWithCurrency(displayTotal)}
                       </span>
@@ -179,8 +176,6 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                 </div>
               )}
             </div>
-
-            {/* Content - Scrollable */}
             <div className="flex-1 overflow-y-auto py-2">
               {loading ? (
                 <div className="flex justify-center items-center py-12">
@@ -188,7 +183,6 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                 </div>
               ) : (
                 <>
-                  {/* Cart Items */}
                   {cartData?.items.map((item) => (
                     <div
                       key={item.cartItemId}
@@ -199,7 +193,6 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                       }}
                     >
                       <div className="flex items-start gap-3">
-                        {/* Product Image */}
                         <div className="w-28 h-26 bg-[#1a1733] rounded overflow-hidden shrink-0">
                           <img
                             src={
@@ -210,8 +203,6 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                             className="w-full h-full object-cover"
                           />
                         </div>
-
-                        {/* Product Info */}
                         <div className="flex-1 min-w-0">
                           <p className="text-md text-white font-medium truncate">
                             {item.product.name}
@@ -224,7 +215,6 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                           </p>
                         </div>
 
-                        {/* Remove Button */}
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -255,8 +245,6 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                       </div>
                     </div>
                   ))}
-
-                  {/* Empty Cart Message */}
                   {!loading &&
                     (!cartData?.items || cartData.items.length === 0) && (
                       <div className="text-center py-12 px-4">
@@ -268,34 +256,33 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                 </>
               )}
             </div>
-            {/* Payment method */}
+
             {!loading && cartData && cartData.items.length > 0 && (
               <div>
-                {/* Payment Method Section */}
                 <div className="border-t border-[#262549] bg-[#1a1733]">
-                  {/* Payment Options */}
                   <div className="p-4 space-y-3">
                     <p className="text-white font-medium text-md mb-3">
                       วิธีการชำระเงิน
                     </p>
                     <div className="flex gap-3">
-                      {/* Credit Card Option */}
                       <button
                         onClick={() => handlePaymentMethod("credit-card")}
                         className={`w-full p-3 cursor-pointer rounded-xl transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-purple-500 group
-    ${selectedPaymentMethod === "credit-card"
-                            ? "bg-[#2d2a52] border-2 border-purple-500" // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
-                            : "bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30"
-                          }
+    ${
+      selectedPaymentMethod === "credit-card"
+        ? "bg-[#2d2a52] border-2 border-purple-500" // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
+        : "bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30"
+    }
   `}
                       >
                         <div className="flex items-center gap-3">
                           <div
                             className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors
-      ${selectedPaymentMethod === "credit-card"
-                                ? "bg-purple-500/20" // เมื่อถูกเลือก
-                                : "bg-[#1e1b3d] group-hover:bg-[#262549]"
-                              }
+      ${
+        selectedPaymentMethod === "credit-card"
+          ? "bg-purple-500/20" // เมื่อถูกเลือก
+          : "bg-[#1e1b3d] group-hover:bg-[#262549]"
+      }
     `}
                           >
                             <svg
@@ -332,23 +319,24 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                         </div>
                       </button>
 
-                      {/* PromptPay Option */}
                       <button
                         onClick={() => handlePaymentMethod("promptpay")}
                         className={`w-full p-3 cursor-pointer rounded-xl transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-purple-500 group
-    ${selectedPaymentMethod === "promptpay"
-                            ? "bg-[#2d2a52] border-2 border-purple-500" // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
-                            : "bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30"
-                          }
+    ${
+      selectedPaymentMethod === "promptpay"
+        ? "bg-[#2d2a52] border-2 border-purple-500" // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
+        : "bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30"
+    }
   `}
                       >
                         <div className="flex items-center gap-3">
                           <div
                             className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors
-      ${selectedPaymentMethod === "promptpay"
-                                ? "bg-purple-500/20" // เมื่อถูกเลือก
-                                : "bg-[#1e1b3d] group-hover:bg-[#262549]"
-                              }
+      ${
+        selectedPaymentMethod === "promptpay"
+          ? "bg-purple-500/20" // เมื่อถูกเลือก
+          : "bg-[#1e1b3d] group-hover:bg-[#262549]"
+      }
     `}
                           >
                             <img
@@ -378,7 +366,6 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                       </button>
                     </div>
 
-                    {/* Security Badge */}
                     <div className="flex items-center justify-center gap-2 pt-2">
                       <svg
                         className="w-4 h-4 text-green-500"

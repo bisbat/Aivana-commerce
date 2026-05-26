@@ -40,12 +40,7 @@ export async function extractMetadataFromUpload(
   if (!res.ok) {
     throw new Error(text || `API error ${res.status}`);
   }
-
-  // ✅ Backend ส่ง ExtractionResult กลับมาแล้ว (มี metadata + validation + flags)
-  // ไม่ต้อง validate เองอีก แค่ parse แล้ว return เลย
   const result = JSON.parse(text) as ExtractionResult;
-
-  console.log("📦 ExtractionResult from backend:", JSON.stringify(result, null, 2));
 
   return result;
 }

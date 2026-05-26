@@ -275,7 +275,6 @@ export default function BecomeSellerPage() {
     <div className="relative min-h-screen">
       <BackgroundAivana />
       <div className="w-full max-w-2xl relative z-10 mx-auto px-4 py-10">
-        {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-white mb-2">
             สมัครเป็นผู้ขาย
@@ -283,11 +282,8 @@ export default function BecomeSellerPage() {
           <p className="text-slate-400">กรอกข้อมูลเพื่อเริ่มต้นขายสินค้า</p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Basic Information */}
           <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-6 space-y-6">
-            {/* Bio */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 แนะนำตัวเอง <span className="text-red-500">*</span>
@@ -309,7 +305,6 @@ export default function BecomeSellerPage() {
               )}
             </div>
 
-            {/* Location */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 ที่อยู่ <span className="text-red-500">*</span>
@@ -332,7 +327,6 @@ export default function BecomeSellerPage() {
             </div>
           </div>
 
-          {/* Skills */}
           <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-6">
             <label className="block text-sm font-medium text-slate-300 mb-2">
               ทักษะ <span className="text-red-500">*</span>
@@ -374,7 +368,6 @@ export default function BecomeSellerPage() {
             )}
           </div>
 
-          {/* Social Links */}
           <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-6">
             <label className="block text-sm font-medium text-slate-300 mb-2">
               โซเชียลมีเดีย (ไม่บังคับ)
@@ -430,7 +423,6 @@ export default function BecomeSellerPage() {
             </div>
           </div>
 
-          {/* Bank Information */}
           <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-6 space-y-6">
             <h3 className="text-lg font-semibold text-white">
               ข้อมูลบัญชีธนาคาร
@@ -526,12 +518,10 @@ export default function BecomeSellerPage() {
             </div>
           </div>
 
-          {/* Submit Error */}
           {errors.submit && (
             <p className="text-red-500 text-sm text-center">{errors.submit}</p>
           )}
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}

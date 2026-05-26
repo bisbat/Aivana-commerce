@@ -26,12 +26,10 @@ export default function StatsCard({ title, value, type = "total" }: StatsCardPro
     <div
       className={`rounded-2xl p-4 shadow-md border border-white/10 ${colorMap[type]}`}
     >
-      {/* Title */}
       <div className={`text-sm ${textColorMap[type]} mb-2`}>
         {title}
       </div>
 
-      {/* Value */}
       <div className="text-2xl font-bold">
         {value !== null ? value.toLocaleString() : "-"}
       </div>

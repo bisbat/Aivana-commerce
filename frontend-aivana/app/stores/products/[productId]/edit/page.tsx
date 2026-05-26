@@ -196,21 +196,15 @@ export default function EditProductPage() {
 
   return (
     <div className="min-h-screen text-white">
-
-      {/* Ambient glows */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-violet-800/[0.08] blur-[120px]" />
         <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-indigo-800/[0.06] blur-[100px]" />
       </div>
 
       <div className="relative max-w-5xl mx-auto px-6 py-8">
-
-        {/* Back button */}
         <div className="mb-8">
           <BackButton productId={productId} />
         </div>
-
-        {/* Page title block */}
         <div className="relative rounded-2xl border border-violet-500/20 bg-[#15132a]/60 backdrop-blur-sm p-8 overflow-hidden mb-8">
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent" />
           <p className="text-[10px] uppercase tracking-[0.15em] font-semibold text-violet-400/70 mb-2">
@@ -224,8 +218,6 @@ export default function EditProductPage() {
 
         <form onSubmit={handleSubmit}>
           <div className="space-y-6">
-
-            {/* ── MEDIA — at the TOP, just like the detail page ─────────── */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <SectionCard title="ภาพฮีโร่ (Hero Image)">
                 <EditProductHeroImage
@@ -263,11 +255,9 @@ export default function EditProductPage() {
                 />
               </SectionCard>
             </div>
-
-            {/* ── FORM SECTIONS — single column below media ──────────────── */}
             <SectionCard title="ข้อมูลพื้นฐาน" accent>
-              <Input label="Product Name" value={name} onChange={setName} required />
-              <Input label="Short Blurb" value={blurb} onChange={setBlurb} />
+              <Input label="ชื่อสินค้า" value={name} onChange={setName} required />
+              <Input label="คำอธิบายสั้น ๆ" value={blurb} onChange={setBlurb} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Select
                   label="ประเภทสินค้า (Category)"
@@ -313,16 +303,14 @@ export default function EditProductPage() {
               <Input label="API Documentation URL (URL เอกสาร API)" value={apiDocUrl} onChange={setApiDocUrl} />
             </SectionCard>
 
-            <SectionCard title="Pricing & Links">
+            <SectionCard title="ราคาและลิงก์">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input label="Price (USD)" value={price} onChange={setPrice} type="number" required />
+                <Input label="Price (THB)" value={price} onChange={setPrice} type="number" required />
                 <Input label="Live Preview URL (URL ตัวอย่าง)" value={previewUrl} onChange={setpreviewUrl} />
               </div>
             </SectionCard>
 
           </div>
-
-          {/* ── Action bar — floating centered pill ───────────────────── */}
           <div className="sticky bottom-4 z-50 flex justify-center mt-10">
             <div className="w-full max-w-5xl">
               <div className="
@@ -334,14 +322,10 @@ export default function EditProductPage() {
                 backdrop-blur-xl
                 shadow-xl
               ">
-
-                {/* Left side */}
                 <div className="flex flex-col">
                   <p className="text-sm text-slate-300 font-medium">ยังมีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก</p>
                   <p className="text-xs text-slate-500">อย่าลืมบันทึกก่อนออกจากหน้านี้</p>
                 </div>
-
-                {/* Right side */}
                 <div className="flex items-center gap-3">
                   <button
                     type="button"

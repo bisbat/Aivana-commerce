@@ -9,7 +9,6 @@ export class PayoutCronService {
 
     @Cron('0 40 16 28 * *', { timeZone: 'Asia/Bangkok' })
     async handleHalfMonthPayout() {
-        console.log('[CRON] Half-month payout triggered');
         const { start, end } = getHalfMonthRange(new Date());
 
         await this.payoutService.generatePayout(start, end);

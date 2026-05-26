@@ -70,17 +70,12 @@ export default function DeleteProductButton({
         <Trash2 size={14} />
         ยกเลิกการขายสินค้า
       </button>
-
-      {/* Confirmation Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/60"
             onClick={() => !isDeleting && setShowModal(false)}
           />
-
-          {/* Modal */}
           <div className="relative bg-[#1e1b3d] border border-[#262549] rounded-3xl p-6 max-w-lg w-full shadow-2xl overflow-hidden">
             <div className="text-center mb-6">
               <div className="w-14 h-14 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-3">
@@ -110,8 +105,6 @@ export default function DeleteProductButton({
                 และจะส่งผลต่อข้อมูลในระบบที่เกี่ยวข้องทั้งหมด
               </p>
             </div>
-
-            {/* Reason Textarea */}
             <div className="mb-5">
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 เหตุผลในการลบสินค้า <span className="text-red-500">*</span>

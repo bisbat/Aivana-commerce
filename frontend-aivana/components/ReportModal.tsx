@@ -77,7 +77,6 @@ export default function ReportModal({
       onClick={handleBackdropClick}
     >
       <div className="bg-[#1e1b3d] border border-[#262549] rounded-3xl shadow-2xl w-full max-w-md relative overflow-hidden">
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors z-10"
@@ -86,7 +85,6 @@ export default function ReportModal({
         </button>
 
         <div className="p-6">
-          {/* Header */}
           <div className="text-center mb-6">
             <div className="w-14 h-14 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
               <AlertTriangle className="text-orange-500" size={28} />
@@ -99,7 +97,6 @@ export default function ReportModal({
             </p>
           </div>
 
-          {/* Reason Selection */}
           <div className="mb-5">
             <label className="block text-white font-medium mb-3 text-sm">
               เลือกเหตุผลในการรีพอร์ต
@@ -144,7 +141,6 @@ export default function ReportModal({
             </div>
           </div>
 
-          {/* Message Textarea */}
           <div className="mb-5">
             <label className="block text-white font-medium mb-2 text-sm">
               รายละเอียดเพิ่มเติม (ถ้ามี)
@@ -156,8 +152,6 @@ export default function ReportModal({
               className="w-full h-24 p-3 bg-[#262549] rounded-xl text-white text-sm placeholder:text-slate-500 resize-none border border-transparent focus:outline-none focus:border-orange-500 transition"
             />
           </div>
-
-          {/* Submit Button */}
           <div className="flex justify-end">
             <button
               onClick={handleSubmit}

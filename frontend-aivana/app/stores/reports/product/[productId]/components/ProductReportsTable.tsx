@@ -103,14 +103,12 @@ function ReportRow({ report, index }: { report: Report; index: number }) {
         }`}
         style={{ animation: `fadeSlideIn 0.35s ease ${index * 0.05}s both` }}
       >
-        {/* Report ID */}
         <td className="px-6 py-4">
           <div className="text-sm font-semibold text-[#8a57fb]">
             #{report.id}
           </div>
         </td>
 
-        {/* Reporter */}
         <td className="px-6 py-4">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-slate-700/50 flex items-center justify-center border border-white/10">
@@ -127,7 +125,6 @@ function ReportRow({ report, index }: { report: Report; index: number }) {
           </div>
         </td>
 
-        {/* Reason */}
         <td className="px-6 py-4">
           <div className="text-sm text-slate-300 font-medium mb-1">
             {report.reason}
@@ -144,24 +141,17 @@ function ReportRow({ report, index }: { report: Report; index: number }) {
             </div>
           )}
         </td>
-
-        {/* Status */}
         <td className="px-6 py-4">
           <ReportStatusBadge status={report.status} />
         </td>
-
-        {/* Created Date */}
         <td className="px-6 py-4">
           <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium whitespace-nowrap">
             <Clock size={12} className="shrink-0" />
             {formatDate(report.createdAt)}
           </div>
         </td>
-
-        {/* Action / Response */}
         <td className="px-6 py-4">
           {report.sellerRespondedAt ? (
-            // ─── Case 1: ตอบกลับแล้ว (Responded) ───
             <div className="flex items-center gap-2 px-3 py-1.5 bg-[#8a57fb]/10 rounded-lg border border-[#8a57fb]/20 w-fit min-h-[34px]">
               <CheckCircle2 size={14} className="text-[#8a57fb] shrink-0" />
               <div className="flex flex-col leading-none">
@@ -174,11 +164,9 @@ function ReportRow({ report, index }: { report: Report; index: number }) {
               </div>
             </div>
           ) : report.status !== "resolved" && report.status !== "rejected" ? (
-            // ─── Case 2: ปุ่มกดแจ้งแก้ไข (Action Button) ───
             <button
               onClick={handleConfirmResponse}
               disabled={isSubmitting}
-              // ใช้ min-h-[34px] เพื่อล็อคความสูงขั้นต่ำให้เท่ากันทุกสถานะ
               className="group min-h-[34px] w-fit text-xs px-3 py-1.5 rounded-lg bg-[#8a57fb]/10 hover:bg-[#8a57fb]/20 border border-[#8a57fb]/30 text-[#8a57fb] font-semibold transition-all flex items-center gap-2 disabled:opacity-50"
             >
               <CheckCircle2
@@ -188,10 +176,7 @@ function ReportRow({ report, index }: { report: Report; index: number }) {
               <span>แจ้งว่าแก้ไขแล้ว</span>
             </button>
           ) : (
-            // ─── Case 3: ปิดโดยแอดมิน (Closed by Admin) ───
-            // ปรับ style ให้ขนาดเท่ากับปุ่ม (px-3 py-1.5 text-xs) แต่เป็นสีเทา
             <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 rounded-lg border border-white/5 w-fit min-h-[34px] select-none opacity-75">
-              {/* ใส่ Icon (เช่น Lock หรือ Check) เพื่อให้ visual balance เท่ากับปุ่มอื่น */}
               <Lock size={13} className="text-slate-500" />
               <span className="text-xs font-medium text-slate-400">
                 ปิดโดยแอดมินแล้ว
@@ -204,25 +189,21 @@ function ReportRow({ report, index }: { report: Report; index: number }) {
   );
 }
 
-// ─── Main Table Component ───────────────────────────────────────────────────
 export default function ProductReportsTable({
   reports,
 }: {
   reports: Report[];
 }) {
-  // สร้าง Config สำหรับหัวตาราง เพื่อกำหนดความกว้างแต่ละช่อง
   const tableHeaders = [
     { label: "ID", className: "w-[80px]" },
     { label: "รายงานโดย", className: "w-[200px]" },
     { label: "เหตุผล", className: "w-[35%]" },
-    // ปรับตรงนี้: เพิ่มความกว้างให้สถานะ (เช่น w-[180px] หรือ w-[15%])
     { label: "สถานะ", className: "w-[150px]" },
     { label: "วันที่รายงาน", className: "w-[15%]" },
     { label: "การดำเนินการ", className: "w-auto" },
   ];
   return (
     <div className="bg-slate-800/40 border border-white/5 rounded-2xl overflow-hidden">
-      {/* Table title */}
       <div className="px-6 py-4 border-b border-white/5">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-white">

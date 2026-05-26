@@ -59,7 +59,6 @@ export async function getUserStats() {
       reviewCount: reviews.length || 0,
     };
   } catch (error) {
-    console.error("Error fetching user stats:", error);
     return {
       purchasedCount: 0,
       reviewCount: 0,
@@ -82,14 +81,12 @@ export async function getUserByUsername(
     });
 
     if (!response.ok) {
-      console.error("Response not OK for username:", username);
       return null;
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error fetching user by username:", error);
     return null;
   }
 }

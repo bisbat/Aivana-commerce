@@ -122,7 +122,6 @@ export default function CreditCardPage() {
         }}
       />
       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
-        {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
             <svg
@@ -145,7 +144,6 @@ export default function CreditCardPage() {
           <p className="text-gray-600">กรอกข้อมูลบัตรเพื่อชำระเงิน</p>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-start gap-3">
@@ -167,9 +165,7 @@ export default function CreditCardPage() {
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Cardholder Name */}
           <div>
             <label
               htmlFor="name"
@@ -188,7 +184,6 @@ export default function CreditCardPage() {
             />
           </div>
 
-          {/* Card Number */}
           <div>
             <label
               htmlFor="cc-number"
@@ -210,7 +205,6 @@ export default function CreditCardPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {/* Expiry Date */}
             <div>
               <label
                 htmlFor="cc-expiry"
@@ -231,7 +225,6 @@ export default function CreditCardPage() {
               />
             </div>
 
-            {/* CVC */}
             <div>
               <label
                 htmlFor="cc-cvc"
@@ -252,7 +245,6 @@ export default function CreditCardPage() {
             </div>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
@@ -269,7 +261,6 @@ export default function CreditCardPage() {
           </button>
         </form>
 
-        {/* Security Badge */}
         <div className="mt-6 bg-gray-50 rounded-lg p-4">
           <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
             <svg

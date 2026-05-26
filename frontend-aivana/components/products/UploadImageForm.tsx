@@ -125,18 +125,15 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
       return;
     }
 
-    // Pass data to parent
     onPublish({
       heroImage,
       detailImages,
     });
   };
 
-  // ... rest of your component (JSX) stays exactly the same ...
 
   return (
     <div className="space-y-8">
-      {/* Step Indicator */}
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={onBack}
@@ -172,7 +169,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
         </div>
       </div>
 
-      {/* Hero Image Section */}
       <div className="space-y-3">
         <label className="block text-white font-medium">
           Hero section <span className="text-red-400">*</span>
@@ -184,7 +180,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
           </p>
         )}
 
-        {/* Hidden file input */}
         <input
           ref={heroInputRef}
           type="file"
@@ -193,7 +188,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
           className="hidden"
         />
 
-        {/* Upload Area or Preview */}
         {heroImagePreview ? (
           <div className="relative border-2 border-dashed border-slate-600 rounded-lg p-4">
             <img
@@ -232,7 +226,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
         )}
       </div>
 
-      {/* Detail Images Section */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <label className="block text-white font-medium">
@@ -251,7 +244,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
           Upload up to 8 images showing product details (minimum 2 required)
         </p>
 
-        {/* Min 2 warning bar */}
         {detailImages.length < 2 && (
           <div className="flex items-start gap-2 bg-yellow-900/20 border border-yellow-600/50 rounded-lg px-4 py-3">
             <span className="text-yellow-400 text-base mt-0.5">⚠️</span>
@@ -263,7 +255,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
           </div>
         )}
 
-        {/* Hidden file input (multiple) */}
         <input
           ref={detailInputRef}
           type="file"
@@ -273,7 +264,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
           className="hidden"
         />
 
-        {/* Upload Area */}
         <div
           onClick={() => detailInputRef.current?.click()}
           className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center cursor-pointer hover:border-purple-500 hover:bg-slate-800/50 transition-all"
@@ -285,8 +275,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
           </p>
           <p className="text-slate-400 text-sm">Supports: JPG, JPEG</p>
         </div>
-
-        {/* Detail Images Grid */}
         {detailImagePreviews.length > 0 && (
           <div className="grid grid-cols-3 gap-4 mt-4">
             {detailImagePreviews.map((preview, index) => (
@@ -305,7 +293,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
                 >
                   <X size={16} />
                 </button>
-                {/* Lock icon overlay */}
                 <div className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                   <div className="bg-slate-800/90 p-2 rounded-full">
                     <ImageIcon size={20} className="text-white" />
@@ -323,7 +310,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
         )}
       </div>
 
-      {/* Publish Button */}
       <div className="flex justify-end pt-4">
         <button
           onClick={handlePublish}

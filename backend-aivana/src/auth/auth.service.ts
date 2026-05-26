@@ -64,7 +64,6 @@ export class AuthService {
     registerDto: RegisterDto,
     avatarFile?: UploadedFileType,
   ): Promise<{ accessToken: string }> {
-    // 1. ตรวจสอบว่า email ซ้ำหรือไม่
     const existingUserByEmail = await this.userService.findUserByEmail(
       registerDto.email,
     );
@@ -72,7 +71,6 @@ export class AuthService {
       throw new ConflictException('Email already exists');
     }
 
-    // 2. ตรวจสอบว่า username ซ้ำหรือไม่
     const existingUserByUsername = await this.userService.findUserByName(
       registerDto.username,
     );
@@ -80,10 +78,8 @@ export class AuthService {
       throw new ConflictException('Username already exists');
     }
 
-    // 3. Hash password
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
-    // 4. สร้าง user โดยเป็น CUSTOMER ทุกคน (ยังไม่มี avatarUrl)
     const user = await this.userService.create({
       ...registerDto,
       password: hashedPassword,
@@ -91,7 +87,6 @@ export class AuthService {
       avatarUrl: null,
     });
 
-    // 5. ถ้ามีไฟล์ avatar ให้ upload ไป MinIO
     let avatarUrl: string | undefined = undefined;
     if (avatarFile) {
       const timestamp = Date.now();
@@ -105,11 +100,9 @@ export class AuthService {
 
       avatarUrl = this.minioService.getFileUrl(avatarFullPath);
 
-      // อัปเดต avatarUrl ใน database
       await this.userService.update(user.id, { avatarUrl });
     }
 
-    // 6. เตรียมข้อมูล sign in
     const userData: SignInData = {
       userId: user.id,
       email: user.email,
@@ -164,18 +157,16 @@ export class AuthService {
     return { accessToken };
   }
 
-  // ── Google OAuth: find existing user by email, or create new one ──────────
   async googleLogin(profile: {
     email: string;
     firstName: string;
     lastName: string;
     avatarUrl: string | null;
   }): Promise<SignInData> {
-    // 1. ถ้ามี email อยู่แล้ว → ใช้ account เดิม (อัปเดต avatar ใหม่จาก Google)
+
     const existing = await this.userService.findUserByEmail(profile.email);
 
     if (existing) {
-      // Update Google avatar if available
       if (profile.avatarUrl) {
         const storedAvatarUrl = await this.downloadAndStoreGoogleAvatar(
           profile.avatarUrl,
@@ -200,8 +191,6 @@ export class AuthService {
       };
     }
 
-    // 2. ถ้าไม่มี → สร้าง user ใหม่ด้วยข้อมูลจาก Google
-    // username = email prefix ถ้าซ้ำให้ต่อ random 4 digits
     const emailPrefix = profile.email
       .split('@')[0]
       .replace(/[^a-zA-Z0-9_]/g, '');
@@ -212,7 +201,6 @@ export class AuthService {
       username = `${username}${Math.floor(1000 + Math.random() * 9000)}`;
     }
 
-    // password = random hash (Google users จะไม่ login ด้วย password)
     const randomPassword = await bcrypt.hash(uuidv4(), 10);
 
     const newUser = await this.userService.create({
@@ -222,10 +210,9 @@ export class AuthService {
       firstName: profile.firstName || null,
       lastName: profile.lastName || null,
       role: Role.CUSTOMER,
-      avatarUrl: null, // We'll update this after downloading the Google avatar
+      avatarUrl: null, 
     });
 
-    // Download and store Google avatar in MinIO instead of using external URL
     let storedAvatarUrl: string | null = null;
     if (profile.avatarUrl) {
       storedAvatarUrl = await this.downloadAndStoreGoogleAvatar(
@@ -233,7 +220,6 @@ export class AuthService {
         newUser.id,
       );
 
-      // Update user with the stored MinIO URL
       if (storedAvatarUrl) {
         await this.userService.update(newUser.id, {
           avatarUrl: storedAvatarUrl,

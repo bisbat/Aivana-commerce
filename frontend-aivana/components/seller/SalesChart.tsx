@@ -25,7 +25,6 @@ export default function SalesChart({ data }: Props) {
         height: "100%",
       }}
     >
-      {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, color: "#1e1e2e" }}>
           Sales Performance
@@ -38,11 +37,9 @@ export default function SalesChart({ data }: Props) {
             padding: 4,
           }}
         >
-          {/* <span style={{ fontSize: 18, color: "#6b7280" }}>⚙️</span> */}
         </button>
       </div>
 
-      {/* Chart */}
       <ResponsiveContainer width="100%" height={320}>
         <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />

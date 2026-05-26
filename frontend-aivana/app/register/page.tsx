@@ -181,7 +181,6 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--background)] px-4 py-12 relative overflow-hidden">
-      {/* Background Pattern - Repeating AIVANA Text */}
       <div className="absolute inset-0 pointer-events-none flex flex-col justify-center items-center gap-0 opacity-[0.01]">
         {Array.from({ length: 10 }).map((_, index) => (
           <span
@@ -195,7 +194,6 @@ export default function RegisterPage() {
       </div>
 
       <div className="w-full max-w-md relative z-10">
-        {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-[var(--primary)] mb-2">
             AIVANA
@@ -203,7 +201,6 @@ export default function RegisterPage() {
           <h2 className="text-2xl font-semibold text-white">ลงทะเบียน</h2>
         </div>
 
-        {/* Avatar Upload */}
         <div className="flex flex-col items-center mb-6">
           <div className="relative">
             <div
@@ -272,9 +269,7 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name Fields */}
           <div>
             <label className="block text-white text-sm mb-2">ชื่อ</label>
             <div className="grid grid-cols-2 gap-3">
@@ -317,7 +312,6 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* Username */}
           <div>
             <label className="block text-white text-sm mb-2">ชื่อผู้ใช้</label>
             <input
@@ -337,7 +331,6 @@ export default function RegisterPage() {
             )}
           </div>
 
-          {/* Email */}
           <div>
             <label className="block text-white text-sm mb-2">อีเมล</label>
             <input
@@ -357,7 +350,6 @@ export default function RegisterPage() {
             )}
           </div>
 
-          {/* Password */}
           <div>
             <label className="block text-white text-sm mb-2">รหัสผ่าน</label>
             <input
@@ -377,7 +369,6 @@ export default function RegisterPage() {
             )}
           </div>
 
-          {/* Confirm Password */}
           <div>
             <label className="block text-white text-sm mb-2">
               ยืนยันรหัสผ่าน
@@ -401,12 +392,10 @@ export default function RegisterPage() {
             )}
           </div>
 
-          {/* Submit Error */}
           {errors.submit && (
             <p className="text-red-500 text-sm text-center">{errors.submit}</p>
           )}
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
@@ -415,7 +404,6 @@ export default function RegisterPage() {
             {isLoading ? "กำลังสมัครสมาชิก..." : "ลงทะเบียน"}
           </button>
 
-          {/* Google Signup */}
           <button
             type="button"
             onClick={handleGoogleSignup}
@@ -442,7 +430,6 @@ export default function RegisterPage() {
             ลงทะเบียนกับ Google
           </button>
 
-          {/* Login Link */}
           <p className="text-center text-slate-400 text-sm">
             มีบัญชีผู้ใช้แล้วใช่ไหม?{" "}
             <Link

@@ -127,7 +127,6 @@ const ProfilePage = () => {
         )}
       </div>
 
-      {/* แสดง stats เฉพาะเมื่อดูโปรไฟล์ตัวเอง */}
       {currentUser?.id === user.id && (
         <>
           <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent my-8" />

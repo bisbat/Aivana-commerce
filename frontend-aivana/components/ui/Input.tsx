@@ -19,13 +19,11 @@ export const Input: React.FC<InputProps> = ({
 }) => {
     return (
         <div className="space-y-2">
-            {/* Label */}
             <label className="block text-sm font-medium text-white">
                 {label}
                 {required && <span className="text-red-400 ml-1">*</span>}
             </label>
 
-            {/* Input field */}
             <input
                 type={type}
                 value={value}
