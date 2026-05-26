@@ -16,7 +16,6 @@ interface EmptyStateProps {
 export function EmptyState({ onSuggestionClick }: EmptyStateProps) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center text-center gap-3 px-6 animate-[fadeIn_0.4s_ease]">
-      {/* Orb */}
       <div className="w-18 h-18 rounded-2xl bg-gradient-to-br from-violet-500/10 to-blue-500/10 border border-violet-500/20 flex items-center justify-center mb-2 animate-pulse">
         <Sparkles size={32} className="text-violet-400" />
       </div>
@@ -29,7 +28,6 @@ export function EmptyState({ onSuggestionClick }: EmptyStateProps) {
         ลองระบุ tech stack ที่ใช้, environment ที่ทำงานอยู่ และ keyword สำคัญของโปรเจกต์ เพื่อให้คำแนะนำแม่นยำมากขึ้น เช่น: "React + Tailwind, ทำเว็บ ecommerce, มีระบบ cart และ payment"
       </p>
 
-      {/* Suggestion chips */}
       <div className="flex flex-wrap gap-2 justify-center mt-3">
         {SUGGESTION_PROMPTS.map((prompt) => (
           <button

@@ -59,8 +59,6 @@ export default function ProductHeader({
               </div>
             </div>
           </div>
-
-          {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             <div className="bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/20">
               <div className="text-xs text-yellow-400 mb-1">รอดำเนินการ</div>
@@ -87,8 +85,6 @@ export default function ProductHeader({
               </div>
             </div>
           </div>
-
-          {/* Delete Button - Show when critical */}
           {severity.level === "critical" && (
             <div className="flex items-center gap-3 pt-3 border-t border-white/5">
               <div className="flex-1 text-sm text-red-400">

@@ -1,16 +1,13 @@
 import { fetchRoundDetail } from "@/lib/actions/payout.actions";
 import { formatDate, formatBaht } from "@/lib/utils/formatPayout";
-import RoundDetailTable from "@/app/admin/components/RoundDetailTable";
 import BackButton from "@/app/admin/components/BackButton";
 import BackgroundAivana from "@/components/common/BackgroundAivana";
 
-// ─── Server Component (Next.js 15 — params is now a Promise) ────────────────
 export default async function RoundDetailPage({
   params,
 }: {
-  params: Promise<{ start: string; end: string }>; // ← Changed to Promise
+  params: Promise<{ start: string; end: string }>;
 }) {
-  // ── CRITICAL: await params in Next.js 15 ──────────────────────────────────
   const { start, end } = await params;
 
   let roundData = null;
@@ -24,8 +21,6 @@ export default async function RoundDetailPage({
 
   const round = roundData?.round;
   const sellers = roundData?.sellers ?? [];
-
-  // Format dates for display (start/end are already "YYYY-MM-DD")
   const displayStart = round
     ? formatDate(round.periodStart + "T00:00:00.000Z")
     : "";
@@ -38,8 +33,6 @@ export default async function RoundDetailPage({
       <BackgroundAivana />
       <div className="relative z-10 max-w-[1400px]">
         <BackButton />
-
-        {/* ── Round info card ──────────────────────────────────────────────── */}
         {round && (
           <div
             style={{
@@ -54,7 +47,6 @@ export default async function RoundDetailPage({
               boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
             }}
           >
-            {/* LEFT SIDE — ROUND PERIOD */}
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <span
                 style={{
@@ -89,10 +81,7 @@ export default async function RoundDetailPage({
                 </strong>
               </div>
             </div>
-
-            {/* RIGHT SIDE — STATS */}
             <div style={{ display: "flex", gap: 40 }}>
-              {/* TOTAL AMOUNT */}
               <div style={{ textAlign: "right" }}>
                 <p
                   style={{
@@ -107,8 +96,6 @@ export default async function RoundDetailPage({
                   {formatBaht(round.totalAmount)}
                 </p>
               </div>
-
-              {/* SELLER COUNT */}
               <div style={{ textAlign: "right" }}>
                 <p
                   style={{
@@ -134,8 +121,6 @@ export default async function RoundDetailPage({
             </div>
           </div>
         )}
-
-        {/* ── Error banner ─────────────────────────────────────────────────── */}
         {error && (
           <div
             style={{
@@ -151,8 +136,6 @@ export default async function RoundDetailPage({
             Failed to load round detail: {error}
           </div>
         )}
-
-        {/* ── Table title ──────────────────────────────────────────────────── */}
         <h3
           style={{
             fontSize: 22,
@@ -164,9 +147,6 @@ export default async function RoundDetailPage({
         >
           ตารางรอบโอนเงินของระบบ
         </h3>
-
-        {/* ── Seller list table ─────────────────────────────────────────────── */}
-        <RoundDetailTable payouts={sellers} />
       </div>
     </div>
   );

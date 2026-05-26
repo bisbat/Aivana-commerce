@@ -17,7 +17,6 @@ export const HeroSection: React.FC = () => {
 
   return (
     <section className="relative overflow-hidden -mt-[160px] pt-[160px]">
-      {/* Video Background */}
       <video
         ref={videoRef}
         autoPlay
@@ -35,13 +34,9 @@ export const HeroSection: React.FC = () => {
           type="video/mp4"
         />
       </video>
-
-      {/* Fallback Background - แสดงเมื่อวิดีโอโหลดไม่ได้ */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 opacity-50 -z-20" />
 
-      {/* Content */}
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center py-24 md:py-28">
-        {/* Main Title */}
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
           ศูนย์รวม Template & Component
           <br />
@@ -50,7 +45,6 @@ export const HeroSection: React.FC = () => {
           </span>
         </h1>
 
-        {/* Subtitle */}
         <p className="text-slate-300 text-base md:text-lg mb-10 max-w-2xl mx-auto leading-relaxed font-light">
           รวม UI Kit, Frontend Template และ Backend Template
           คุณภาพสูงไว้ในที่เดียว ให้นักพัฒนาและนักออกแบบ ค้นหา ซื้อขาย

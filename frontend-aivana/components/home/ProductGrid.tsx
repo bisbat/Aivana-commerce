@@ -50,24 +50,21 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     }
   };
 
-  // Sort products
   const sortedProducts = [...products].sort((a, b) => {
     if (sortBy === "price") {
       return a.price - b.price;
     }
-    // Sort by created_at (latest first)
+
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
   return (
     <section className="py-12 px-4">
       <div className="max-w-[1400px] mx-auto">
-        {/* Header */}
+   
         {showHeader && (
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold text-purple-400">{title}</h2>
-
-            {/* Sort Dropdown */}
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as "latest" | "price")}
@@ -79,14 +76,12 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
           </div>
         )}
 
-        {/* Loading State */}
         {isLoading && (
           <div className="flex justify-center items-center py-20">
             <Loader className="animate-spin text-purple-500" size={48} />
           </div>
         )}
 
-        {/* Error State */}
         {error && !isLoading && (
           <div className="flex flex-col items-center justify-center py-20">
             <AlertCircle className="text-red-500 mb-4" size={48} />
@@ -102,7 +97,6 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
           </div>
         )}
 
-        {/* Products Grid */}
         {!isLoading && !error && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {sortedProducts.map((product) => (
@@ -111,7 +105,6 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
           </div>
         )}
 
-        {/* Empty State */}
         {!isLoading && !error && products.length === 0 && (
           <div className="text-center py-20">
             <p className="text-slate-400 text-lg">ไม่พบสินค้า</p>

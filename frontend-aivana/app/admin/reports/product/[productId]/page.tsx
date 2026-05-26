@@ -65,7 +65,6 @@ export default async function ProductReportsPage({ params }: PageProps) {
     <div className="relative mx-auto">
       <BackgroundAivana />
       <div className="relative z-10 max-w-[1400px]">
-        {/* Back button */}
         <Link
           href="/admin/reports"
           className="inline-flex items-center gap-2 text-[#8a57fb] hover:text-[#7145d9] transition-colors mb-6"
@@ -73,8 +72,6 @@ export default async function ProductReportsPage({ params }: PageProps) {
           <ArrowLeft size={20} />
           <span>กลับไปหน้ารายงาน</span>
         </Link>
-
-        {/* Product Header */}
         <ProductHeader
           product={product}
           reportCount={productReports.length}
@@ -83,16 +80,12 @@ export default async function ProductReportsPage({ params }: PageProps) {
           resolvedCount={resolvedCount}
           rejectedCount={rejectedCount}
         />
-
-        {/* Error state */}
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 rounded-2xl px-5 py-4 text-red-400 text-sm mb-6 flex items-center gap-3">
             <AlertCircle size={20} />
             <span>Failed to load reports: {error}</span>
           </div>
         )}
-
-        {/* Reports list */}
         <ProductReportsTable reports={productReports} />
       </div>
     </div>

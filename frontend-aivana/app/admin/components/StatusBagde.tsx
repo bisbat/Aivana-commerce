@@ -4,7 +4,6 @@ type RoundStatus = "processing" | "completed";
 type SellerStatus = "PENDING" | "PAID";
 type Status = RoundStatus | SellerStatus;
 
-// ─── Static config map — extend here if new statuses are added later ────────
 const CONFIG: Record<
   string,
   { label: string; bg: string; text: string; border: string; pulse: boolean }

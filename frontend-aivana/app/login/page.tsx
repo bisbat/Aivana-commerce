@@ -90,7 +90,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--background)] px-4 py-12 relative overflow-hidden">
-      {/* Background Pattern - Repeating AIVANA Text */}
       <div className="absolute inset-0 pointer-events-none flex flex-col justify-center items-center gap-0 opacity-[0.01]">
         {Array.from({ length: 10 }).map((_, index) => (
           <span
@@ -104,7 +103,6 @@ export default function LoginPage() {
       </div>
 
       <div className="w-full max-w-md relative z-10">
-        {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-[var(--primary)] mb-2">
             AIVANA
@@ -112,9 +110,7 @@ export default function LoginPage() {
           <h2 className="text-2xl font-semibold text-white">เข้าสู่ระบบ</h2>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Username */}
           <div>
             <label className="block text-white text-sm mb-2">ชื่อผู้ใช้</label>
             <div className="relative">
@@ -150,8 +146,6 @@ export default function LoginPage() {
               <p className="text-red-500 text-xs mt-1">{errors.username}</p>
             )}
           </div>
-
-          {/* Password */}
           <div>
             <label className="block text-white text-sm mb-2">รหัสผ่าน</label>
             <div className="relative">
@@ -187,13 +181,9 @@ export default function LoginPage() {
               <p className="text-red-500 text-xs mt-1">{errors.password}</p>
             )}
           </div>
-
-          {/* Submit Error */}
           {errors.submit && (
             <p className="text-red-500 text-sm text-center">{errors.submit}</p>
           )}
-
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
@@ -201,8 +191,6 @@ export default function LoginPage() {
           >
             {isLoading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
           </button>
-
-          {/* Google Login */}
           <button
             type="button"
             onClick={handleGoogleLogin}
@@ -228,8 +216,6 @@ export default function LoginPage() {
             </svg>
             เข้าสู่ระบบกับ Google
           </button>
-
-          {/* Register Link */}
           <p className="text-center text-slate-400 text-sm">
             ยังไม่มีบัญชีผู้ใช้ใช่ไหม?{" "}
             <Link

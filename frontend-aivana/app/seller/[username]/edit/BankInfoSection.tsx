@@ -47,7 +47,6 @@ export default function BankInfoSection({
         ข้อมูลบัญชีธนาคาร
       </h2>
 
-      {/* BANK SELECT */}
       <label className="block text-sm font-medium text-slate-300 mb-2">
         ธนาคาร
       </label>
@@ -74,7 +73,6 @@ export default function BankInfoSection({
         </select>
       </div>
 
-      {/* Account Holder */}
       <label className="block text-sm font-medium text-slate-300 mb-2">
         ชื่อบัญชี
       </label>
@@ -86,7 +84,6 @@ export default function BankInfoSection({
         onChange={(e) => onChange({ accountName: e.target.value })}
       />
 
-      {/* Account Number */}
       <label className="block text-sm font-medium text-slate-300 mb-2">
         เลขที่บัญชี
       </label>

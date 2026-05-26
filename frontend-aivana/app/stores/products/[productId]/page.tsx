@@ -77,16 +77,12 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen text-white">
-
-      {/* Ambient glows */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-violet-800/[0.08] blur-[120px]" />
         <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-indigo-800/[0.06] blur-[100px]" />
       </div>
 
       <div className="relative max-w-5xl mx-auto px-6 py-8">
-
-        {/* Top action bar */}
         <div className="flex items-center justify-between mb-8">
           <BackButton />
           <div className="flex items-center gap-3">
@@ -99,18 +95,13 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* ── Images at the TOP ─────────────────────────────────────── */}
         <div className="mb-8">
           <ProductImages
             heroSrc={initialProductData.heroImageUrl}
             detailImages={initialProductData.detailImages}
           />
         </div>
-
-        {/* ── Product info — single column below images ──────────────── */}
         <div className="space-y-6">
-
-          {/* Name, price, tags */}
           <div className="relative rounded-2xl border border-white/[0.07] bg-[#15132a]/60 backdrop-blur-sm p-8 overflow-hidden">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent" />
 
@@ -139,8 +130,6 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
               </div>
             )}
           </div>
-
-          {/* Description */}
           {initialProductData.description && (
             <div className="rounded-2xl border border-white/[0.06] bg-[#13112a]/50 p-6">
               <SectionHeader>รายละเอียด</SectionHeader>
@@ -150,7 +139,6 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
             </div>
           )}
 
-          {/* Installation Guide */}
           {initialProductData.installationGuide && (
             <div className="rounded-2xl border border-white/[0.06] bg-[#13112a]/50 p-6">
               <SectionHeader>คำแนะนำการติดตั้ง</SectionHeader>
@@ -170,8 +158,6 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
               )}
             </div>
           )}
-
-          {/* Features */}
           {initialProductData.features?.length > 0 && (
             <div className="rounded-2xl border border-white/[0.06] bg-[#13112a]/50 p-6">
               <SectionHeader>คุณสมบัติ</SectionHeader>
@@ -186,7 +172,6 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
             </div>
           )}
 
-          {/* Technical details */}
           <div className="rounded-2xl border border-white/[0.06] bg-[#13112a]/50 p-6">
             <SectionHeader>รายละเอียดทางเทคนิค</SectionHeader>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -216,8 +201,6 @@ export default async function ProductStoreDetailPage({ params }: PageProps) {
               )}
             </div>
           </div>
-
-          {/* Links & file */}
           <div className="rounded-2xl border border-white/[0.06] bg-[#13112a]/50 p-6">
             <SectionHeader>ลิงก์และไฟล์</SectionHeader>
             <div className="divide-y divide-white/[0.05]">

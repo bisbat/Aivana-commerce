@@ -50,9 +50,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
   return (
     <>
-      {/* Backdrop - below navbar */}
       <div className="fixed inset-0 bg-black/60 z-40 transition-opacity" />
-
       <div
         className="absolute right-0 w-64 rounded-xl shadow-xl overflow-hidden bg-[#1e1b3d] border border-[#262549] z-50"
         ref={profileRef}

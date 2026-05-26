@@ -175,7 +175,6 @@ export default function EditSellerSellerInfo() {
     <div className="relative min-h-screen">
       <BackgroundAivana />
       <div className="w-full max-w-4xl relative z-10 mx-auto px-4 py-10">
-        {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-white mb-2">
             แก้ไขข้อมูล Store
@@ -185,9 +184,7 @@ export default function EditSellerSellerInfo() {
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSave} className="space-y-6">
-          {/* Store Information */}
           <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-6 space-y-6">
             <div>
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
@@ -196,7 +193,6 @@ export default function EditSellerSellerInfo() {
               </h3>
             </div>
 
-            {/* Store Name (Disabled) */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 ชื่อ Store
@@ -211,8 +207,6 @@ export default function EditSellerSellerInfo() {
                 ไม่สามารถเปลี่ยนชื่อ Store ได้
               </p>
             </div>
-
-            {/* Location */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
                 <MapPin size={16} />
@@ -227,7 +221,6 @@ export default function EditSellerSellerInfo() {
               />
             </div>
 
-            {/* Bio */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
                 <FileText size={16} />
@@ -243,7 +236,6 @@ export default function EditSellerSellerInfo() {
             </div>
           </div>
 
-          {/* Skills Section */}
           <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-6">
             <Skills
               skills={formData.skills || []}
@@ -253,7 +245,6 @@ export default function EditSellerSellerInfo() {
             />
           </div>
 
-          {/* Social Links Section */}
           <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-6">
             <SocialLinks
               socials={formData.socials || {}}
@@ -263,7 +254,6 @@ export default function EditSellerSellerInfo() {
             />
           </div>
 
-          {/* Bank Information Section */}
           <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-6">
             <BankInfoSection
               bankInfo={
@@ -282,7 +272,6 @@ export default function EditSellerSellerInfo() {
             />
           </div>
 
-          {/* Action Buttons */}
           <div className="flex gap-4 justify-end">
             <button
               type="button"

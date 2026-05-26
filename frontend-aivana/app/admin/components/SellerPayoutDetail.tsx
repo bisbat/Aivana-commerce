@@ -13,9 +13,6 @@ const cardStyle: React.CSSProperties = {
   padding: "22px 24px",
 };
 
-
-
-// ─── Seller info card (left side) ───────────────────────────────────────────
 function SellerInfoCard({ data }: { data: PayoutDetailResponse }) {
   const periodStart = formatDate(data.period.start);
   const periodEnd = formatDate(data.period.end);
@@ -32,7 +29,6 @@ function SellerInfoCard({ data }: { data: PayoutDetailResponse }) {
         alignItems: "flex-start",
       }}
     >
-      {/* Avatar */}
       <div
         style={{
           width: 52,
@@ -48,8 +44,6 @@ function SellerInfoCard({ data }: { data: PayoutDetailResponse }) {
       >
         <span style={{ fontSize: 22, color: "rgba(255,255,255,0.4)" }}>👤</span>
       </div>
-
-      {/* Info */}
       <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
         <p style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>
           ชื่อผู้ขาย:{" "}
@@ -78,32 +72,61 @@ function SellerInfoCard({ data }: { data: PayoutDetailResponse }) {
   );
 }
 
-// ─── Amount + status card (right side) ──────────────────────────────────────
 function AmountStatusCard({ data }: { data: PayoutDetailResponse }) {
   const isPending = data.payout.status === "รอโอน";
 
   return (
     <div style={{ ...cardStyle }}>
-      <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>ยอดที่ต้องจ่าย</p>
-      <p style={{ fontSize: 26, fontWeight: 700, color: "#a78bfa", marginBottom: 10 }}>
+      <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>
+        ยอดที่ต้องจ่าย
+      </p>
+      <p
+        style={{
+          fontSize: 26,
+          fontWeight: 700,
+          color: "#a78bfa",
+          marginBottom: 10,
+        }}
+      >
         {formatBaht(data.payout.amountDue)}
       </p>
       <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>สถานะ</p>
-      <p style={{ fontSize: 22, color: isPending ? "#fb923c" : "#4ade80", fontWeight: 600 }}>
+      <p
+        style={{
+          fontSize: 22,
+          color: isPending ? "#fb923c" : "#4ade80",
+          fontWeight: 600,
+        }}
+      >
         {data.payout.status}
       </p>
     </div>
   );
 }
 
-// ─── Order breakdown table ──────────────────────────────────────────────────
 function OrderTable({ data }: { data: PayoutDetailResponse }) {
-  const HEADERS = ["Order ID", "วันที่", "สินค้า", "ราคาขาย", "คอมมิสชั่น", "เงินที่ได้"];
+  const HEADERS = [
+    "Order ID",
+    "วันที่",
+    "สินค้า",
+    "ราคาขาย",
+    "คอมมิสชั่น",
+    "เงินที่ได้",
+  ];
 
   return (
-    <div style={{ ...cardStyle, padding: 0, overflow: "hidden", marginBottom: 28 }}>
-      <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <h3 style={{ fontSize: 15, color: "#fff", fontWeight: 600 }}>รายการที่ขายได้</h3>
+    <div
+      style={{ ...cardStyle, padding: 0, overflow: "hidden", marginBottom: 28 }}
+    >
+      <div
+        style={{
+          padding: "16px 20px",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+        }}
+      >
+        <h3 style={{ fontSize: 15, color: "#fff", fontWeight: 600 }}>
+          รายการที่ขายได้
+        </h3>
       </div>
 
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -129,19 +152,43 @@ function OrderTable({ data }: { data: PayoutDetailResponse }) {
 
         <tbody>
           {data.orders.map((o, i) => (
-            <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-              <td style={{ padding: "14px 20px", color: "#a78bfa", fontWeight: 600 }}>#{o.orderId}</td>
-              <td style={{ padding: "14px 20px", color: "rgba(255,255,255,0.55)" }}>
+            <tr
+              key={i}
+              style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+            >
+              <td
+                style={{
+                  padding: "14px 20px",
+                  color: "#a78bfa",
+                  fontWeight: 600,
+                }}
+              >
+                #{o.orderId}
+              </td>
+              <td
+                style={{
+                  padding: "14px 20px",
+                  color: "rgba(255,255,255,0.55)",
+                }}
+              >
                 {formatDate(o.date)}
               </td>
-              <td style={{ padding: "14px 20px", color: "#e2e8f0" }}>{o.productName}</td>
-              <td style={{ padding: "14px 20px", color: "rgba(255,255,255,0.6)" }}>
+              <td style={{ padding: "14px 20px", color: "#e2e8f0" }}>
+                {o.productName}
+              </td>
+              <td
+                style={{ padding: "14px 20px", color: "rgba(255,255,255,0.6)" }}
+              >
                 {formatBaht(o.price)}
               </td>
-              <td style={{ padding: "14px 20px", color: "rgba(255,255,255,0.6)" }}>
+              <td
+                style={{ padding: "14px 20px", color: "rgba(255,255,255,0.6)" }}
+              >
                 {formatBaht(o.commission)}
               </td>
-              <td style={{ padding: "14px 20px", color: "#fff", fontWeight: 600 }}>
+              <td
+                style={{ padding: "14px 20px", color: "#fff", fontWeight: 600 }}
+              >
                 {formatBaht(o.sellerEarn)}
               </td>
             </tr>
@@ -152,16 +199,32 @@ function OrderTable({ data }: { data: PayoutDetailResponse }) {
   );
 }
 
-
 function SummaryBox({ data }: { data: PayoutDetailResponse }) {
   return (
     <div style={cardStyle}>
-      <h4 style={{ fontSize: 14, color: "#fff", fontWeight: 600, marginBottom: 14 }}>สรุปยอด</h4>
+      <h4
+        style={{
+          fontSize: 14,
+          color: "#fff",
+          fontWeight: 600,
+          marginBottom: 14,
+        }}
+      >
+        สรุปยอด
+      </h4>
 
       <Row label="ยอดขายรวม" value={formatBaht(data.summary.grossSales)} />
-      <Row label="- ค่าคอมมิสชั่น" value={formatBaht(data.summary.totalCommission)} />
+      <Row
+        label="- ค่าคอมมิสชั่น"
+        value={formatBaht(data.summary.totalCommission)}
+      />
 
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", margin: "12px 0" }} />
+      <div
+        style={{
+          borderTop: "1px solid rgba(255,255,255,0.08)",
+          margin: "12px 0",
+        }}
+      />
 
       <Row
         label="ยอดโอนสุทธิ"
@@ -174,17 +237,28 @@ function SummaryBox({ data }: { data: PayoutDetailResponse }) {
 
 function Row({ label, value, bold = false }: any) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-      <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 13 }}>{label}</span>
-      <span style={{ color: bold ? "#a78bfa" : "#e2e8f0", fontWeight: bold ? 700 : 500 }}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        marginBottom: 6,
+      }}
+    >
+      <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 13 }}>
+        {label}
+      </span>
+      <span
+        style={{
+          color: bold ? "#a78bfa" : "#e2e8f0",
+          fontWeight: bold ? 700 : 500,
+        }}
+      >
         {value}
       </span>
     </div>
   );
 }
 
-
-// ─── Upload zone (right) ────────────────────────────────────────────────────
 function UploadZone({ file, preview, onFileSelect, onRemove }: any) {
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -192,7 +266,7 @@ function UploadZone({ file, preview, onFileSelect, onRemove }: any) {
     e.stopPropagation();
 
     if (fileRef.current) {
-      fileRef.current.value = ""; // ✅ reset input จริง ๆ
+      fileRef.current.value = "";
     }
 
     onRemove();
@@ -200,7 +274,14 @@ function UploadZone({ file, preview, onFileSelect, onRemove }: any) {
 
   return (
     <div style={cardStyle}>
-      <h4 style={{ fontSize: 14, color: "#fff", fontWeight: 600, marginBottom: 12 }}>
+      <h4
+        style={{
+          fontSize: 14,
+          color: "#fff",
+          fontWeight: 600,
+          marginBottom: 12,
+        }}
+      >
         อัพโหลดหลักฐานการโอน
       </h4>
 
@@ -260,11 +341,11 @@ function UploadZone({ file, preview, onFileSelect, onRemove }: any) {
   );
 }
 
-
-
-
-// ─── Main component ─────────────────────────────────────────────────────────
-export default function SellerPayoutDetail({ data }: { data: PayoutDetailResponse }) {
+export default function SellerPayoutDetail({
+  data,
+}: {
+  data: PayoutDetailResponse;
+}) {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -279,7 +360,6 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
       }
     };
   }, [preview]);
-
 
   const isPending = data.payout.status === "รอโอน";
 
@@ -310,7 +390,6 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
     try {
       const res = await markPayoutAsPaid(data.payoutId, file);
 
-      // ❗ ต้องเช็ค success เอง
       if (!res.success) {
         const message = res.message || "เกิดข้อผิดพลาด";
 
@@ -324,15 +403,12 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
           setError(message);
         }
 
-        return; // ❗ สำคัญมาก
+        return;
       }
 
-      // ✅ success case
       setSuccess(true);
       setTimeout(() => router.refresh(), 2000);
-
     } catch (e) {
-      // ⚠️ จะเข้าแค่กรณี network error จริง ๆ
       console.error("Unexpected error:", e);
       setError("เกิดข้อผิดพลาดบางอย่าง");
     } finally {
@@ -355,7 +431,9 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
         <p style={{ fontSize: 18, color: "#4ade80", fontWeight: 700 }}>
           โอนเงินสำเร็จ
         </p>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginTop: 6 }}>
+        <p
+          style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginTop: 6 }}
+        >
           Payment slip uploaded & status updated
         </p>
       </div>
@@ -364,7 +442,6 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
 
   return (
     <div>
-      {/* Top row: Seller info + Amount/Status */}
       <div style={{ display: "flex", gap: 16, marginBottom: 32 }}>
         <div style={{ flex: "1 1 60%" }}>
           <SellerInfoCard data={data} />
@@ -374,10 +451,8 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
         </div>
       </div>
 
-      {/* Order table */}
       <OrderTable data={data} />
 
-      {/* Bottom row: Summary + Upload (only if PENDING) */}
       {isPending && (
         <div style={{ display: "flex", gap: 16, marginBottom: 28 }}>
           <div style={{ flex: "1 1 45%" }}>
@@ -394,14 +469,12 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
         </div>
       )}
 
-      {/* If PAID, show summary without upload */}
       {!isPending && (
         <div style={{ marginBottom: 28 }}>
           <SummaryBox data={data} />
         </div>
       )}
 
-      {/* Mark as Paid button (only when PENDING) */}
       {isPending && (
         <div
           style={{
@@ -421,7 +494,9 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
               padding: "11px 28px",
               borderRadius: 10,
               border: "none",
-              background: loading ? "rgba(139,92,246,0.4)" : "rgba(139,92,246,0.85)",
+              background: loading
+                ? "rgba(139,92,246,0.4)"
+                : "rgba(139,92,246,0.85)",
               color: "#fff",
               fontSize: 14,
               fontWeight: 600,
@@ -433,7 +508,13 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
             {loading ? "กำลังบันทึก..." : "Mark as paid"}
           </button>
 
-          <p style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", lineHeight: 1.5 }}>
+          <p
+            style={{
+              fontSize: 11,
+              color: "rgba(255,255,255,0.3)",
+              lineHeight: 1.5,
+            }}
+          >
             * หมายเหตุ: กรุณาตรวจสอบยอดจำนวนเงิน เลขบัญชี
             และหลักฐานการโอนให้ถูกต้องก่อนกดปุ่มนี้
             เมื่ออนุมัติแล้วจะไม่สามารถยกเว้นหรือเปลี่ยนแปลงได้
@@ -441,7 +522,6 @@ export default function SellerPayoutDetail({ data }: { data: PayoutDetailRespons
         </div>
       )}
 
-      {/* Error toast */}
       {error && (
         <div
           style={{

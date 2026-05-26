@@ -28,7 +28,6 @@ export default async function SellerReportsPage() {
       style={{ maxWidth: 1400, padding: "32px 24px" }}
     >
       <div className="relative z-10">
-        {/* Page title */}
         <div className="mb-6">
           <h2 className="text-3xl font-bold text-white mb-2">
             รายงานปัญหาสินค้า
@@ -37,16 +36,12 @@ export default async function SellerReportsPage() {
             ดูรายงานปัญหาที่ลูกค้ารายงานเกี่ยวกับสินค้าของคุณ
           </p>
         </div>
-
-        {/* Error state */}
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 rounded-2xl px-5 py-4 text-red-400 text-sm mb-6 flex items-center gap-3">
             <AlertCircle size={20} />
             <span>Failed to load reports: {error}</span>
           </div>
         )}
-
-        {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-slate-800/40 border border-white/5 rounded-xl p-5">
             <div className="text-sm text-slate-400 mb-1">รายงานทั้งหมด</div>
@@ -69,8 +64,6 @@ export default async function SellerReportsPage() {
             </div>
           </div>
         </div>
-
-        {/* Reports table */}
         <SellerReportsTable reports={reports} />
       </div>
     </div>

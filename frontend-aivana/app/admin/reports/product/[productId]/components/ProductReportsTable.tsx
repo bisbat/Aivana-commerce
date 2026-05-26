@@ -3,9 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Report, ReportStatus } from "@/lib/types/report";
-import { User, Clock, CheckCircle2, MessageSquare } from "lucide-react";
+import { User, Clock, CheckCircle2 } from "lucide-react";
 
-// ─── Status Badge Component ─────────────────────────────────────────────────
 function ReportStatusBadge({ status }: { status: ReportStatus }) {
   const config = {
     pending: {
@@ -61,7 +60,6 @@ function ReportStatusBadge({ status }: { status: ReportStatus }) {
   );
 }
 
-// ─── View Detail Button ─────────────────────────────────────────────────────
 function ViewDetailButton({ reportId }: { reportId: number }) {
   const router = useRouter();
   const [hovered, setHovered] = useState(false);
@@ -86,7 +84,6 @@ function ViewDetailButton({ reportId }: { reportId: number }) {
   );
 }
 
-// ─── Single Report Row ──────────────────────────────────────────────────────
 function ReportRow({ report, index }: { report: Report; index: number }) {
   const [hovered, setHovered] = useState(false);
 
@@ -110,12 +107,9 @@ function ReportRow({ report, index }: { report: Report; index: number }) {
       }`}
       style={{ animation: `fadeSlideIn 0.35s ease ${index * 0.05}s both` }}
     >
-      {/* Report ID */}
       <td className="px-6 py-4">
         <div className="text-sm font-semibold text-[#8a57fb]">#{report.id}</div>
       </td>
-
-      {/* Reporter */}
       <td className="px-6 py-4">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-slate-700/50 flex items-center justify-center border border-white/10">
@@ -131,28 +125,20 @@ function ReportRow({ report, index }: { report: Report; index: number }) {
           </div>
         </div>
       </td>
-
-      {/* Reason */}
       <td className="px-6 py-4">
         <div className="text-sm text-slate-300 font-medium mb-1">
           {report.reason}
         </div>
       </td>
-
-      {/* Status */}
       <td className="px-6 py-4">
         <ReportStatusBadge status={report.status} />
       </td>
-
-      {/* Created Date */}
       <td className="px-6 py-4">
         <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium whitespace-nowrap">
           <Clock size={12} className="shrink-0" />
           {formatDate(report.createdAt)}
         </div>
       </td>
-
-      {/* Seller Response */}
       <td className="px-6 py-4">
         {report.sellerRespondedAt ? (
           <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#8a57fb]/10 rounded-lg border border-[#8a57fb]/20 w-fit min-h-[34px]">
@@ -172,8 +158,6 @@ function ReportRow({ report, index }: { report: Report; index: number }) {
           </span>
         )}
       </td>
-
-      {/* Action */}
       <td className="px-6 py-4">
         <ViewDetailButton reportId={report.id} />
       </td>
@@ -181,7 +165,6 @@ function ReportRow({ report, index }: { report: Report; index: number }) {
   );
 }
 
-// ─── Main Table Component ───────────────────────────────────────────────────
 export default function ProductReportsTable({
   reports,
 }: {
@@ -199,7 +182,6 @@ export default function ProductReportsTable({
 
   return (
     <div className="bg-slate-800/40 border border-white/5 rounded-2xl overflow-hidden">
-      {/* Table title */}
       <div className="px-6 py-4 border-b border-white/5">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-white">

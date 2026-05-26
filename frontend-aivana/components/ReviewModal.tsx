@@ -71,7 +71,6 @@ export default function ReviewModal({
       onClick={handleBackdropClick}
     >
       <div className="bg-[#1e1b3d] border border-[#262549] rounded-3xl shadow-2xl w-full max-w-lg relative overflow-hidden">
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors z-10"
@@ -80,15 +79,12 @@ export default function ReviewModal({
         </button>
 
         <div className="p-8">
-          {/* Header */}
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-white mb-2">รีวิวสินค้า</h2>
             <p className="text-slate-400 text-sm leading-relaxed">
               {productName}
             </p>
           </div>
-
-          {/* Star Rating */}
           <div className="flex justify-center gap-4 mb-8">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
@@ -112,8 +108,6 @@ export default function ReviewModal({
               </button>
             ))}
           </div>
-
-          {/* Message Textarea */}
           <div className="mb-6">
             <textarea
               value={comment}
@@ -122,8 +116,6 @@ export default function ReviewModal({
               className="w-full h-32 p-4 bg-[#262549] rounded-2xl text-white resize-none border border-transparent placeholder:text-slate-500 focus:outline-none focus:border-purple-500 transition"
             />
           </div>
-
-          {/* Footer with Avatar and Submit Button */}
           <div className="flex justify-end">
             <button
               onClick={handleSubmit}

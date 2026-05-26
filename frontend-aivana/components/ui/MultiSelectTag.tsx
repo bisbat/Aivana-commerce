@@ -40,7 +40,6 @@ export const MultiSelectTag: React.FC<MultiSelectTagProps> = ({
         {required && <span className="text-red-400 ml-1">*</span>}
       </label>
 
-      {/* Selected Tags Display */}
       {selectedTags.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-2">
           {selectedTags.map((tag) => (
@@ -61,7 +60,6 @@ export const MultiSelectTag: React.FC<MultiSelectTagProps> = ({
         </div>
       )}
 
-      {/* Dropdown */}
       <div className="relative">
         <button
           type="button"
@@ -71,16 +69,13 @@ export const MultiSelectTag: React.FC<MultiSelectTagProps> = ({
           {selectedTags.length === 0 ? 'Select tags...' : `${selectedTags.length} tag(s) selected`}
         </button>
 
-        {/* Dropdown Menu */}
         {isOpen && (
           <>
-            {/* Backdrop */}
             <div
               className="fixed inset-0 z-10"
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Menu */}
             <div className="absolute z-20 w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto">
               {tags.map((tag) => {
                 const isSelected = selectedTagIds.includes(Number(tag.id));

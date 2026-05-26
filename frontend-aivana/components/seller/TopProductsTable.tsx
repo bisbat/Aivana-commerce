@@ -57,12 +57,10 @@ export default function TopProductsTable({ products }: Props) {
                   background: idx % 2 === 0 ? "#fff" : "#fafafa",
                 }}
               >
-                {/* Rank */}
                 <td style={{ padding: "12px 16px", fontSize: 13, color: "#6b7280", width: 80 }}>
                   #{idx + 1}
                 </td>
 
-                {/* Product (with image) */}
                 <td style={{ padding: "12px 16px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     {product.imageUrl ? (
@@ -99,12 +97,10 @@ export default function TopProductsTable({ products }: Props) {
                   </div>
                 </td>
 
-                {/* Total sold */}
                 <td style={{ padding: "12px 16px", fontSize: 13, color: "#374151" }}>
                   {product.totalSold} ชิ้น
                 </td>
 
-                {/* Revenue */}
                 <td style={{ padding: "12px 16px", fontSize: 13, fontWeight: 600, color: "#1e1e2e" }}>
                   {formatBaht(product.revenue)}
                 </td>

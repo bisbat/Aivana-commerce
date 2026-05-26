@@ -133,15 +133,12 @@ const ProfileSettingsPage = () => {
     <div className="relative min-h-screen">
       <BackgroundAivana />
       <div className="w-full max-w-2xl relative z-10 mx-auto px-4 py-10">
-        {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-white mb-2">แก้ไขโปรไฟล์</h1>
           <p className="text-slate-400">อัพเดทข้อมูลส่วนตัวของคุณ</p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Avatar Section */}
           <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-6">
             <div className="flex items-center gap-6">
               <div className="relative">
@@ -196,7 +193,6 @@ const ProfileSettingsPage = () => {
             </div>
           </div>
 
-          {/* User Information */}
           <div className="bg-slate-800/40 border border-white/5 rounded-2xl p-6 space-y-6">
             <div>
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
@@ -205,7 +201,6 @@ const ProfileSettingsPage = () => {
               </h3>
             </div>
 
-            {/* Username */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 ชื่อผู้ใช้ <span className="text-red-400">*</span>
@@ -221,7 +216,6 @@ const ProfileSettingsPage = () => {
               />
             </div>
 
-            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
                 <Mail size={16} />
@@ -238,7 +232,6 @@ const ProfileSettingsPage = () => {
               />
             </div>
 
-            {/* First Name */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 ชื่อจริง <span className="text-red-400">*</span>
@@ -254,7 +247,6 @@ const ProfileSettingsPage = () => {
               />
             </div>
 
-            {/* Last Name */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 นามสกุล <span className="text-red-400">*</span>
@@ -270,7 +262,6 @@ const ProfileSettingsPage = () => {
               />
             </div>
 
-            {/* Bio */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 เกี่ยวกับตัวเอง
@@ -292,7 +283,6 @@ const ProfileSettingsPage = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex gap-4">
             <button
               type="button"

@@ -3,7 +3,6 @@ import BackButton from "@/app/admin/components/BackButton";
 import SellerPayoutDetail from "@/app/admin/components/SellerPayoutDetail";
 import BackgroundAivana from "@/components/common/BackgroundAivana";
 
-// ─── Server Component (Next.js 15 — params is a Promise) ────────────────────
 export default async function PayoutDetailPage({
   params,
 }: {
@@ -36,8 +35,6 @@ export default async function PayoutDetailPage({
         >
           ข้อมูลผู้ขาย
         </h2>
-
-        {/* Error state */}
         {error && (
           <div
             style={{
@@ -54,7 +51,6 @@ export default async function PayoutDetailPage({
           </div>
         )}
 
-        {/* Pass data to client component */}
         {data && <SellerPayoutDetail data={data} />}
       </div>
     </div>

@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { calculateSeverity } from "@/lib/utils/reportSeverity";
 
-// ─── Types ─────────────────────────────────────────────────────────────────
 interface GroupedReport {
   productId: number;
   productName: string;
@@ -28,7 +27,6 @@ interface GroupedReport {
   isHidden: boolean;
 }
 
-// ─── Helper Functions ──────────────────────────────────────────────────────
 function groupReportsByProduct(reports: Report[]): GroupedReport[] {
   const grouped = new Map<number, GroupedReport>();
 
@@ -75,7 +73,6 @@ function groupReportsByProduct(reports: Report[]): GroupedReport[] {
   );
 }
 
-// ─── Severity Badge ─────────────────────────────────────────────────────────
 function SeverityBadge({ reportCount }: { reportCount: number }) {
   const severity = calculateSeverity(reportCount);
   const Icon =
@@ -106,7 +103,6 @@ function SeverityBadge({ reportCount }: { reportCount: number }) {
   );
 }
 
-// ─── Product Status Badge ────────────────────────────────────────────────────
 function ProductStatusBadge({
   isDeleted,
   isHidden,
@@ -131,7 +127,6 @@ function ProductStatusBadge({
   return null;
 }
 
-// ─── Status Count ────────────────────────────────────────────────────────────
 function StatusCount({
   count,
   label,
@@ -155,7 +150,6 @@ function StatusCount({
   );
 }
 
-// ─── View Detail Button ─────────────────────────────────────────────────────
 function ViewDetailButton({ productId }: { productId: number }) {
   const router = useRouter();
   const [hovered, setHovered] = useState(false);
@@ -180,7 +174,6 @@ function ViewDetailButton({ productId }: { productId: number }) {
   );
 }
 
-// ─── Grouped Report Row ──────────────────────────────────────────────────────
 function GroupedReportRow({
   group,
   index,
@@ -210,7 +203,6 @@ function GroupedReportRow({
       }`}
       style={{ animation: `fadeSlideIn 0.35s ease ${index * 0.05}s both` }}
     >
-      {/* Product Info */}
       <td className="px-6 py-4">
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-2 flex-wrap">
@@ -236,7 +228,6 @@ function GroupedReportRow({
         </div>
       </td>
 
-      {/* Total Reports */}
       <td className="px-6 py-4">
         <div className="flex items-center gap-2">
           <span className="text-lg font-bold text-[#8a57fb]">
@@ -246,12 +237,10 @@ function GroupedReportRow({
         </div>
       </td>
 
-      {/* Severity */}
       <td className="px-6 py-4">
         <SeverityBadge reportCount={group.totalReports} />
       </td>
 
-      {/* Status Breakdown */}
       <td className="px-6 py-4">
         <div className="flex flex-wrap gap-3">
           <StatusCount count={group.pending} label="รอ" color="#fbbf24" />
@@ -261,12 +250,10 @@ function GroupedReportRow({
         </div>
       </td>
 
-      {/* Latest Report Date */}
       <td className="px-6 py-4 text-sm text-slate-400">
         {formatDate(group.latestReportDate)}
       </td>
 
-      {/* Action */}
       <td className="px-6 py-4">
         <ViewDetailButton productId={group.productId} />
       </td>
@@ -274,7 +261,6 @@ function GroupedReportRow({
   );
 }
 
-// ─── Main Table Component ───────────────────────────────────────────────────
 export default function ReportsTable({ reports }: { reports: Report[] }) {
   const groupedReports = useMemo(
     () => groupReportsByProduct(reports),
