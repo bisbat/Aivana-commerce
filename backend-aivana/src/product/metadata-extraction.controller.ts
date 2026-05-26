@@ -12,12 +12,11 @@ import { ExtractionResult } from '../shared/types/extracted-metadata.types';
 
 type Category = 'ui-kit' | 'frontend-template' | 'backend-template';
 
-// ZIP magic bytes — 4 bytes แรกต้องเป็น PK\x03\x04 เสมอ
 function isZipBuffer(buffer: Buffer): boolean {
   return (
     buffer.length > 4 &&
-    buffer[0] === 0x50 && // P
-    buffer[1] === 0x4b && // K
+    buffer[0] === 0x50 &&
+    buffer[1] === 0x4b && 
     buffer[2] === 0x03 &&
     buffer[3] === 0x04
   );
@@ -36,7 +35,6 @@ export class MetadataExtractionController {
     if (!file) throw new BadRequestException('Product file is required');
     if (!category) throw new BadRequestException('Product category is required');
 
-    // เช็ค magic bytes ก่อน — ไม่เชื่อ extension หรือ mimetype จาก client
     if (!isZipBuffer(file.buffer)) {
       throw new BadRequestException('File must be a valid ZIP archive');
     }

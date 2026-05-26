@@ -32,13 +32,11 @@ export class ReportController {
     );
   }
 
-  // ดูรายงานของตัวเอง
   @Get('my-reports')
   async getMyReports(@Req() req: any) {
     return await this.reportService.findByUser(req.user.userId);
   }
 
-  // ดู report ตาม orderItemId
   @Get('order-item/:orderItemId')
   async getByOrderItem(@Param('orderItemId') orderItemId: string) {
     const report = await this.reportService.findByOrderItem(+orderItemId);
@@ -48,14 +46,12 @@ export class ReportController {
     return report;
   }
 
-  // ดู report ทั้งหมด (สำหรับ admin)
   @Roles(Role.ADMIN)
   @Get()
   async findAll() {
     return await this.reportService.findAll();
   }
 
-  // ดู report ตาม productId (สำหรับ admin และ seller ที่เป็นเจ้าของสินค้า)
   @Roles(Role.ADMIN, Role.SELLER, Role.CUSTOMER)
   @Get('product/:productId')
   async getByProduct(@Req() req: any, @Param('productId') productId: string) {
@@ -66,21 +62,18 @@ export class ReportController {
     );
   }
 
-  // ดูรายงานที่เกี่ยวกับสินค้าของตัวเอง (สำหรับ seller)
   @Roles(Role.SELLER, Role.CUSTOMER)
   @Get('received')
   async getReportsForSeller(@Req() req: any) {
     return this.reportService.findBySellerUserId(req.user.userId);
   }
 
-  // ดู report by id (สำหรับ admin)
   @Roles(Role.ADMIN)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.reportService.findOne(+id);
   }
 
-  // อัปเดตสถานะ report (สำหรับ admin)
   @Roles(Role.ADMIN)
   @Patch(':id/status')
   async updateStatus(
@@ -90,7 +83,6 @@ export class ReportController {
     return await this.reportService.updateStatus(+id, updateReportStatusDto);
   }
 
-  // Seller ตอบกลับรายงาน (บันทึกเฉพาะเวลาที่ตอบกลับ)
   @Roles(Role.SELLER)
   @Patch(':id/seller-response')
   async addSellerResponse(@Req() req: any, @Param('id') id: string) {

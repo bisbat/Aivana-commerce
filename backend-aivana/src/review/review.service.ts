@@ -22,7 +22,6 @@ export class ReviewService {
     productId: number,
     createReviewDto: CreateReviewDto,
   ): Promise<ReviewEntity> {
-    // 1. เช็คว่าคนที่ login นี้ซื้อสินค้าแล้วหรือยัง
     const hasPurchased = await this.orderService.hasUserPurchasedProduct(
       currentUserId,
       productId,
@@ -34,7 +33,6 @@ export class ReviewService {
       );
     }
 
-    // 2. เช็คว่ารีวิวไปแล้วหรือยัง
     const hasReviewed = await this.hasUserReviewedProduct(
       currentUserId,
       productId,
@@ -44,7 +42,6 @@ export class ReviewService {
       throw new ConflictException('You have already reviewed this product.');
     }
 
-    // 3. สร้าง review
     const review = this.reviewRepository.create({
       productId,
       buyerId: currentUserId,
@@ -55,7 +52,6 @@ export class ReviewService {
 
     const saved = await this.reviewRepository.save(review);
 
-    // 4. วิเคราะห์ sentiment แบบ async ไม่บล็อก response
     this.sentimentService.analyze(saved.id, saved.comment);
 
     return saved;

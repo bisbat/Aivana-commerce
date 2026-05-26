@@ -84,7 +84,6 @@ export class ProductService {
   ): Promise<ProductEntity> {
     const { tagIds, categoryId, sellerId, ...productData } = createProductDto;
 
-    // 1. Prevent duplicate product name under same seller
     const existingProduct = await this.productsRepository.findOne({
       where: {
         name: productData.name,
@@ -99,7 +98,6 @@ export class ProductService {
       );
     }
 
-    // 2. Validate seller
     const seller = await this.sellerRepository.findOne({
       where: { id: sellerId },
     });
@@ -108,7 +106,6 @@ export class ProductService {
       throw new NotFoundException(`Seller with ID ${sellerId} not found`);
     }
 
-    // 3. Validate category
     const category = await this.categoryRepository.findOne({
       where: { id: categoryId },
     });
@@ -117,7 +114,6 @@ export class ProductService {
       throw new NotFoundException(`Category with ID ${categoryId} not found`);
     }
 
-    // 4. Validate tag IDs
     let tags: TagEntity[] = [];
     if (tagIds?.length) {
       tags = await this.tagRepository.findBy({ id: In(tagIds) });
@@ -126,8 +122,6 @@ export class ProductService {
         throw new NotFoundException('One or more tags not found');
       }
     }
-
-    // 5. Create & save product
     const product = this.productsRepository.create({
       ...productData,
       seller,
@@ -169,7 +163,6 @@ export class ProductService {
 
     const { tagIds, categoryId, ...productData } = updateProductDto;
 
-    // Update tags if provided
     if (tagIds) {
       const tags = await this.tagRepository.findBy({ id: In(tagIds) });
       if (tags.length !== tagIds.length) {
@@ -178,12 +171,10 @@ export class ProductService {
       product.tags = tags;
     }
 
-    // Update category if provided
     if (categoryId) {
       product.category = { id: categoryId } as CategoryEntity;
     }
 
-    // Update other fields
     Object.assign(product, productData);
 
     await this.productsRepository.save(product);
@@ -207,11 +198,9 @@ export class ProductService {
   }
 
   async hardDeleteProduct(id: number): Promise<void> {
-    // Delete all MinIO assets for the product
     try {
       await this.minioService.deleteFolder(MINIO_FOLDERS.PRODUCTS.ROOT(id));
     } catch {
-      // ignore MinIO errors — proceed with DB delete
     }
     await this.productsRepository.delete(id);
   }
@@ -281,18 +270,11 @@ export class ProductService {
       detailImages: UploadedFileType[];
     },
   ): Promise<{ product: ResponseProductDto | null }> {
-    // 1. Create product first (with tags, category, owner relations)
     const product = await this.createProduct(createProductDto);
     const productId = product.id.toString();
-
-    /* ------------------------------------------------------
-     * 2. Upload hero image
-     * ------------------------------------------------------ */
     const heroFile = files.heroImage[0];
     const heroTimestamp = Date.now();
     const heroFileName = `hero-${heroTimestamp}-${heroFile.originalname}`;
-
-    // Clear old hero folder
     await this.minioService.deleteFolder(
       MINIO_FOLDERS.PRODUCTS.HERO(productId),
     );
@@ -306,9 +288,6 @@ export class ProductService {
     const heroFileUrl = this.minioService.getFileUrl(heroFullPath);
     await this.updateHeroImage(product.id, heroFileUrl);
 
-    /* ------------------------------------------------------
-     * 3. Upload product file (.zip)
-     * ------------------------------------------------------ */
     const productFile = files.productFile[0];
     const fileExtension = productFile.originalname
       .split('.')
@@ -337,9 +316,6 @@ export class ProductService {
     const fileUrl = this.minioService.getFileUrl(fileFullPath);
     await this.updateUploadedFilePath(product.id, fileUrl);
 
-    /* ------------------------------------------------------
-     * 4. Upload detail images (min 2, max 8)
-     * ------------------------------------------------------ */
     const detailFiles = files.detailImages;
     if (detailFiles.length < 2) {
       throw new Error('At least 2 detail images are required');
@@ -363,15 +339,13 @@ export class ProductService {
       const imageUrl = this.minioService.getFileUrl(fullPath);
 
       await this.productImageService.create({
-        pathImage: imageUrl, // Save URL for frontend compatibility
+        pathImage: imageUrl,
         productId: product.id,
       });
 
       await new Promise((resolve) => setTimeout(resolve, 10));
     }
-    /* ------------------------------------------------------
-     * 5. Final response → return DTO format
-     * ------------------------------------------------------ */
+
     const savedProduct = await this.getProductById(product.id);
 
     return {
@@ -389,14 +363,12 @@ export class ProductService {
       detailImages?: UploadedFileType[];
     },
   ): Promise<ResponseProductDto> {
-    /* 1. Find seller by userId */
     const seller = await this.sellerRepository.findOne({
       where: { user: { id: userId } },
     });
 
     if (!seller) throw new NotFoundException(`Seller not found`);
 
-    /* 2. Find product & check owner */
     const product = await this.productsRepository.findOne({
       where: { id },
       relations: ['seller', 'productImages'],
@@ -410,7 +382,6 @@ export class ProductService {
 
     const productId = product.id.toString();
 
-    /* 3. Update hero image */
     if (files?.heroImage?.length) {
       const heroFile = files.heroImage[0];
       const fileName = `hero-${Date.now()}-${heroFile.originalname}`;
@@ -430,7 +401,6 @@ export class ProductService {
       await this.updateHeroImage(product.id, url);
     }
 
-    /* 4. Update product file (.zip) */
     if (files?.productFile?.length) {
       const pf = files.productFile[0];
       const ext = pf.originalname.split('.').pop()?.toLowerCase();
@@ -453,7 +423,6 @@ export class ProductService {
       await this.updateUploadedFilePath(product.id, url);
     }
 
-    /* 5. Update detail images */
     if (files?.detailImages?.length) {
       const newFiles = files.detailImages;
 
@@ -463,15 +432,12 @@ export class ProductService {
       if (newFiles.length > 8)
         throw new Error(`Maximum 8 detail images allowed`);
 
-      // Delete old images in Minio
       await this.minioService.deleteFolder(
         MINIO_FOLDERS.PRODUCTS.DETAILS(productId),
       );
 
-      // Delete old DB data
       await this.productImageRepository.delete({ product: { id } });
 
-      // Upload new ones
       for (const file of newFiles) {
         const fileName = `detail-${Date.now()}-${file.originalname}`;
 
@@ -485,14 +451,13 @@ export class ProductService {
 
         await this.productImageService.create({
           productId: product.id,
-          pathImage: imageUrl, // Use URL instead of path for frontend compatibility
+          pathImage: imageUrl,
         });
 
-        await new Promise((r) => setTimeout(r, 10)); // ensure unique timestamp
+        await new Promise((r) => setTimeout(r, 10));
       }
     }
 
-    /* 6. Update product fields */
     const updatedProduct = await this.updateProduct(id, updateProductDto);
 
     return plainToInstance(ResponseProductDto, updatedProduct, {
@@ -624,7 +589,7 @@ export class ProductService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    if (product.isHidden) return; // ซ่อนอยู่แล้ว ไม่ต้องทำอะไร
+    if (product.isHidden) return;
 
     await this.productsRepository.update(id, {
       isHidden: true,
@@ -641,7 +606,7 @@ export class ProductService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    if (!product.isHidden) return; // ไม่ได้ซ่อนอยู่ ไม่ต้องทำอะไร
+    if (!product.isHidden) return;
 
     await this.productsRepository.update(id, {
       isHidden: false,

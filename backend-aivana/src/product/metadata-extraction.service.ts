@@ -14,14 +14,10 @@ import {
 } from '../shared/types/extracted-metadata.types';
 
 import { ZipValidationService } from './zip-validation.service';
-// ─────────────────────────────────────────────
-// Internal types
-// ─────────────────────────────────────────────
 
 type Category = 'ui-kit' | 'frontend-template' | 'backend-template';
 type PackageManager = 'npm' | 'yarn' | 'pnpm' | 'bun';
 
-// Explicit aliases — avoids NonNullable<interface['field']>['key'] gymnastics
 type FrontendPattern = 'component-based' | 'modular' | 'feature-based';
 type BackendPattern = 'mvc' | 'modular' | 'layered';
 
@@ -38,10 +34,6 @@ interface FolderStats {
   packageJson: ParsedPackageJson | null;
   lockFile: string | null;
 }
-
-// ─────────────────────────────────────────────
-// Static rule maps
-// ─────────────────────────────────────────────
 
 const DEP_GROUPS = {
   ui: [
@@ -189,30 +181,12 @@ const DB_MAP: Record<string, string> = {
   '@planetscale/database': 'PlanetScale',
 };
 
-// ─────────────────────────────────────────────
-// Service
-// ─────────────────────────────────────────────
 
 @Injectable()
 export class MetadataExtractionService {
   private readonly logger = new Logger(MetadataExtractionService.name);
   constructor(private readonly validator: ZipValidationService) { }
 
-
-  // ── PUBLIC: called from ProductService with multer buffer ───────────────
-
-  /**
-   * Main entry point for the product creation flow.
-   *
-   * Multer stores the uploaded ZIP in memory as a Buffer.
-   * We write it to /tmp, extract, analyze, then clean up both.
-   *
-   * Flow:
-   *   Buffer → write /tmp/<uuid>.zip
-   *          → extractMetadata(tmpZipPath)
-   *          → delete /tmp/<uuid>.zip
-   *          → return ExtractedMetadata
-   */
   async extractMetadataFromBuffer(
     category: Category,
     buffer: Buffer,
@@ -220,11 +194,9 @@ export class MetadataExtractionService {
     const tmpZipPath = path.join(os.tmpdir(), `aivana-zip-${uuidv4()}.zip`);
 
     try {
-      // Write buffer to disk so unzipper can stream it
       fs.writeFileSync(tmpZipPath, buffer);
       return await this.extractMetadata(category, tmpZipPath);
     } finally {
-      // Delete the temp .zip file — extraction folder cleaned up inside extractMetadata
       try {
         if (fs.existsSync(tmpZipPath)) fs.unlinkSync(tmpZipPath);
       } catch (err) {
@@ -233,12 +205,6 @@ export class MetadataExtractionService {
     }
   }
 
-  // ── PUBLIC: called from MetadataExtractionController (manual re-trigger) ─
-
-  /**
-   * Re-extraction endpoint — works when ZIP already lives in MinIO.
-   * Downloads ZIP to /tmp, delegates to extractMetadata(), cleans up.
-   */
   async extractMetadataFromUrl(
     category: Category,
     fileUrl: string,
@@ -257,21 +223,10 @@ export class MetadataExtractionService {
     }
   }
 
-  // ── PRIVATE: core extraction pipeline ──────────────────────────────────
-
-  /**
-   * Steps 2–6 from the spec:
-   *   Copy ZIP → isolated /tmp sandbox  (already done by caller)
-   *   Extract ZIP safely                ← extractZip()
-   *   Rule-based analyze project        ← scanFolder()
-   *   Build structured metadata JSON    ← build*Metadata()
-   *   Delete /tmp extraction folder     ← cleanup() in finally
-   */
   private async extractMetadata(
     category: Category,
     zipPath: string,
   ): Promise<ExtractionResult> {
-    // Each extraction gets its own UUID folder → fully isolated
     const tempDir = path.join(os.tmpdir(), `aivana-extract-${uuidv4()}`);
 
     try {
@@ -296,11 +251,8 @@ export class MetadataExtractionService {
     }
   }
 
-  // ── Download (for URL-based entry point) ───────────────────────────────
-
   private downloadToFile(url: string, destPath: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      // Lazy-require so http/https is only loaded when needed
       const protocol = url.startsWith('https')
         ? require('https')
         : require('http');
@@ -309,7 +261,6 @@ export class MetadataExtractionService {
 
       protocol
         .get(url, (response: any) => {
-          // Follow redirects — MinIO signed URLs may redirect
           if (
             response.statusCode >= 300 &&
             response.statusCode < 400 &&
@@ -338,8 +289,6 @@ export class MetadataExtractionService {
     });
   }
 
-  // ── Step 2: Safe ZIP extraction ─────────────────────────────────────────
-
   private async extractZip(zipPath: string, destDir: string): Promise<void> {
     fs.mkdirSync(destDir, { recursive: true });
 
@@ -350,16 +299,12 @@ export class MetadataExtractionService {
           const entryPath: string = entry.path;
           const type: string = entry.type;
 
-          // ── Zip-slip guard ─────────────────────────────────────────────
-          // path.normalize resolves ".." — if result escapes destDir, block it
           const fullPath = path.normalize(path.join(destDir, entryPath));
           if (!fullPath.startsWith(path.normalize(destDir) + path.sep)) {
             this.logger.warn(`Zip-slip blocked: ${entryPath}`);
             entry.autodrain();
             return;
           }
-
-          // node_modules is useless for metadata — skip entirely
           if (entryPath.includes('node_modules/')) {
             entry.autodrain();
             return;
@@ -377,8 +322,6 @@ export class MetadataExtractionService {
         .on('error', reject);
     });
   }
-
-  // ── Step 3: Folder scan ─────────────────────────────────────────────────
 
   private async scanFolder(dir: string): Promise<FolderStats> {
     const allFiles = this.walkDir(dir, dir);
@@ -427,7 +370,6 @@ export class MetadataExtractionService {
     baseDir: string,
     allFiles: string[],
   ): ParsedPackageJson | null {
-    // Sort by depth → prefer root-level package.json
     const candidates = allFiles
       .filter((f) => path.basename(f) === 'package.json')
       .sort((a, b) => a.split(path.sep).length - b.split(path.sep).length);
@@ -443,7 +385,6 @@ export class MetadataExtractionService {
   }
 
   private detectLockFile(files: string[]): string | null {
-    // Order matters — bun first (most specific)
     const priority = [
       'bun.lockb',
       'pnpm-lock.yaml',
@@ -455,8 +396,6 @@ export class MetadataExtractionService {
     }
     return null;
   }
-
-  // ── Step 4: Route to category builder ──────────────────────────────────
 
   private buildMetadata(
     category: Category,
@@ -471,8 +410,6 @@ export class MetadataExtractionService {
         return this.buildBackendMetadata(stats);
     }
   }
-
-  // ── Step 5: Shared analysis helpers ────────────────────────────────────
 
   private allDeps(pkg: ParsedPackageJson | null): Record<string, string> {
     return { ...(pkg?.dependencies ?? {}), ...(pkg?.devDependencies ?? {}) };
@@ -518,7 +455,6 @@ export class MetadataExtractionService {
       }
     }
 
-    // Strip empty buckets — keeps JSON clean
     return Object.fromEntries(
       Object.entries(result).filter(([, v]) => v.length > 0),
     );
@@ -595,9 +531,6 @@ export class MetadataExtractionService {
     return undefined;
   }
 
-  // ── Step 5a: UI Kit ─────────────────────────────────────────────────────
-
-  // Priority order: figma > sketch > xd > photoshop > illustrator > other
   private detectDesignTool(
     files: string[],
   ):
@@ -746,8 +679,6 @@ export class MetadataExtractionService {
     };
   }
 
-  // ── Step 5b: Frontend Template ──────────────────────────────────────────
-
   private buildFrontendMetadata(stats: FolderStats): FrontendTemplateMetadata {
     const deps = this.allDeps(stats.packageJson);
     const { framework, version } = this.detectFramework(deps);
@@ -816,7 +747,6 @@ export class MetadataExtractionService {
     return undefined;
   }
 
-  // ── Step 5c: Backend Template ───────────────────────────────────────────
 
   private buildBackendMetadata(stats: FolderStats): BackendTemplateMetadata {
     const deps = this.allDeps(stats.packageJson);
@@ -867,11 +797,8 @@ export class MetadataExtractionService {
     return undefined;
   }
 
-  // ── Step 6: Cleanup ─────────────────────────────────────────────────────
-
   private async cleanupDir(dir: string): Promise<void> {
     try {
-      // Use async fs.promises.rm with maxRetries to handle Windows ENOTEMPTY race conditions
       await fs.promises.rm(dir, {
         recursive: true,
         force: true,

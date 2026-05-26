@@ -17,7 +17,6 @@ import {
   BadRequestException,
   ForbiddenException,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common/exceptions';
 import { plainToInstance } from 'class-transformer';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -98,7 +97,6 @@ export class ProductController {
     const userRole = req.user?.role;
     const userId = req.user?.userId;
 
-    // admin เห็นทุกอย่าง
     if (userRole === Role.ADMIN) {
       const product = await this.productService.getProductById(id, {
         includeHidden: true,
@@ -108,7 +106,6 @@ export class ProductController {
       return product;
     }
 
-    // seller เห็นสินค้าของตัวเองแม้ถูกซ่อน
     if (userRole === Role.SELLER) {
       const product = await this.productService.getProductById(id, {
         includeHidden: true,
@@ -129,7 +126,6 @@ export class ProductController {
 
     if (!product) throw new NotFoundException('Product not found');
 
-    // ถ้าสินค้าถูกซ่อน/ลบ → ต้องเคยซื้อเท่านั้นถึงจะดูได้
     if (product.isHidden || product.isDeleted) {
       if (!userId) throw new NotFoundException('Product not found');
 
@@ -187,7 +183,7 @@ export class ProductController {
     return { hasOrders };
   }
 
-  // ✅ แก้ deleteProduct ให้ส่ง deletedBy ด้วย
+
   @Delete(':id')
   @Roles(Role.SELLER, Role.ADMIN)
   async deleteProduct(
@@ -199,7 +195,6 @@ export class ProductController {
     const userRole = req.user?.role;
     const reason = body?.reason || 'ไม่ระบุเหตุผล';
 
-    // seller ลบได้เฉพาะสินค้าตัวเอง
     if (userRole === Role.SELLER) {
       const product = await this.productService.getProductById(id, {
         includeHidden: true,
@@ -214,10 +209,8 @@ export class ProductController {
 
     const hasOrders = await this.productService.hasProductOrders(id);
     if (hasOrders) {
-      // Product has purchases — soft delete so existing buyers can still download
       await this.productService.deleteProduct(id, reason);
     } else {
-      // No orders — hard delete: remove from DB and MinIO completely
       await this.productService.hardDeleteProduct(id);
     }
     return { message: 'Product deleted successfully', hardDeleted: !hasOrders };
