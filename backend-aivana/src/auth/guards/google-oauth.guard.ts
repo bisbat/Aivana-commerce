@@ -7,7 +7,6 @@ export class GoogleOAuthGuard extends AuthGuard('google') {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
 
-    // If Google returned an error (e.g. user cancelled), redirect gracefully
     if (request.query?.error) {
       const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
       response.redirect(`${frontendUrl}/login?error=google_cancelled`);

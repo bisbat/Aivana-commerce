@@ -80,7 +80,6 @@ export class OrderService {
   }
 
   async getOrderById(orderId: number) {
-    console.log('order id : ' + orderId);
     const order = await this.orderRepository.findOne({
       where: { id: orderId },
       relations: ['items', 'items.product', 'user'],
@@ -149,8 +148,6 @@ export class OrderService {
       where: { orderId: In([order.id]) },
     });
 
-    console.log('Order Items:', orderItems);
-
     for (const item of orderItems) {
       const product = await this.productRepository.findOne({
         where: { id: item.productId },
@@ -194,8 +191,6 @@ export class OrderService {
     if (!payment) {
       throw new NotFoundException('Payment not found');
     }
-
-    // กัน webhook ยิงซ้ำ
     if (
       payment.status === PaymentStatusEnum.FAILED ||
       payment.status === PaymentStatusEnum.EXPIRED
@@ -205,7 +200,6 @@ export class OrderService {
 
     const now = new Date();
 
-    // แยกกรณีหมดอายุ vs failed
     if (reason === 'expired') {
       payment.status = PaymentStatusEnum.EXPIRED;
       payment.failureReason = 'QR expired';
@@ -242,13 +236,9 @@ export class OrderService {
       throw new NotFoundException('Payment not found');
     }
 
-    console.log('payment', payment);
-
     const cart = await this.cartRepository.findOne({
       where: { userId: order.userId },
     });
-
-    console.log('Cart:', cart);
 
     if (cart) {
       const cartItems = await this.cartItemRepository.find({
@@ -265,8 +255,6 @@ export class OrderService {
     const orderItems = await this.orderItemRepository.find({
       where: { orderId: In([order.id]) },
     });
-
-    console.log('Order Items:', orderItems);
 
     for (const item of orderItems) {
       const product = await this.productRepository.findOne({
@@ -314,7 +302,6 @@ export class OrderService {
 
     const now = new Date();
 
-    // แยกกรณีหมดอายุ vs failed
     if (reason === 'expired') {
       payment.status = PaymentStatusEnum.EXPIRED;
       payment.failureReason = 'QR expired';

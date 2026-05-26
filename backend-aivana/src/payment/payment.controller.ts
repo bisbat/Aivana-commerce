@@ -36,16 +36,13 @@ export class PaymentController {
   @Public()
   @Post('webhook/omise/charge')
   async webhookOmiseCharge(@Req() req: Request, @Body() body: any) {
-    console.log('Received webhook:', body);
     await this.paymentService.webhookOmiseCharge(body);
 
-    // Return 200 OK แบบชัดเจน
     return { received: true };
   }
 
   @Post('cancel/:orderId')
   async cancelPayment(@Param('orderId', ParseIntPipe) orderId: number) {
-    console.log(`Cancelling payment for orderId eieiei: ${orderId}`);
     return this.paymentService.cancelPayment(orderId);
   }
 

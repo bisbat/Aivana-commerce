@@ -7,11 +7,9 @@ export class PaymentEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // ---- relation ----
   @Column()
   orderId: number;
 
-  // ---- provider ----
   @Column({ default: 'omise' })
   provider: string;
 
@@ -21,14 +19,12 @@ export class PaymentEntity {
   })
   paymentMethod: PaymentMethodEnum;
 
-  // ---- money ----
   @Column({ type: 'int' }) // สตางค์
   amount: number;
 
   @Column({ default: 'THB' })
   currency: string;
 
-  // ---- omise ----
   @Column({ nullable: true })
   chargeId: string;
 
@@ -38,7 +34,6 @@ export class PaymentEntity {
   @Column({ nullable: true })
   qrImageUrl: string;
 
-  // ---- status ----
   @Column({
     type: 'enum',
     enum: PaymentStatusEnum,
@@ -46,7 +41,6 @@ export class PaymentEntity {
   })
   status: PaymentStatusEnum;
 
-  // qr exprires at
   @Column({ type: 'timestamp', nullable: true })
   expiredAt: Date;
 
@@ -59,7 +53,6 @@ export class PaymentEntity {
   @Column({ type: 'text', nullable: true })
   failureReason: string;
 
-  // ---- audit ----
   @CreateDateColumn()
   createdAt: Date;
 
