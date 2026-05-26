@@ -28,7 +28,6 @@ export class MinioService implements OnModuleInit {
     const endpoint = this.getRequired('MINIO_ENDPOINT');
     const port = parseInt(this.getRequired('MINIO_PORT'), 10);
 
-    // Use MINIO_CONNECTION_SSL for internal connection, fallback to MINIO_USE_SSL
     const connectionSSL = this.configService.get<string>('MINIO_CONNECTION_SSL')
       ?? 'false';
     const useSSL = connectionSSL === 'true';
@@ -54,10 +53,8 @@ export class MinioService implements OnModuleInit {
       const exists = await this.minioClient.bucketExists(this.bucketName);
       if (!exists) {
         await this.minioClient.makeBucket(this.bucketName, 'us-east-1');
-        console.log(`Bucket ${this.bucketName} created successfully`);
       }
 
-      // Set bucket policy to public read for e-commerce product images
       const publicReadPolicy = {
         Version: '2012-10-17',
         Statement: [
@@ -74,7 +71,6 @@ export class MinioService implements OnModuleInit {
         this.bucketName,
         JSON.stringify(publicReadPolicy),
       );
-      console.log(`Bucket ${this.bucketName} set to public read access`);
     } catch (error) {
       console.error('Error creating bucket:', error);
     }
@@ -201,7 +197,6 @@ export class MinioService implements OnModuleInit {
         });
       });
 
-      // Delete all objects found in the folder
       for (const objectName of objectsToDelete) {
         await this.minioClient.removeObject(this.bucketName, objectName);
       }

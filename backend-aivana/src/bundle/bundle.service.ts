@@ -58,7 +58,6 @@ export class BundleService {
       }
     }
 
-    // ── debug: ดู score แต่ละตัว ──────────────────────────────
     const scored = products.map(product => ({
       product,
       score: this.scoreProduct(product, input)
@@ -69,12 +68,11 @@ export class BundleService {
       score: r.score,
       category: r.product.category?.name
     })));
-    // ─────────────────────────────────────────────────────────
 
     const TOP_N = 3;
 
     const ranked = scored
-      .filter(({ score }) => score > 0)   // ✅ ตัด score 0 ออก
+      .filter(({ score }) => score > 0)  
       .sort((a, b) => b.score - a.score)
       .map(({ product }) => product);
 
@@ -94,45 +92,39 @@ export class BundleService {
   private scoreProduct(product: ProductEntity, input: CreateBundleDto) {
     let score = 0;
 
-    // feature match — สำคัญสุด
     const featureMatches = product.features?.filter(f =>
       input.tags.some(tag => f.toLowerCase().includes(tag)) ||
       f.toLowerCase().includes(input.bundleGoal.toLowerCase())
     ).length ?? 0;
     score += featureMatches * 4;
 
-    // techstack match — normalize เป็น %
     const totalTech = input.techstack.length || 1;
     const techMatches = product.techstack?.filter(t =>
       input.techstack.includes(t.toLowerCase())
     ).length ?? 0;
     score += (techMatches / totalTech) * 10;
 
-    // tag match
     const tagMatches = product.tags?.filter(tag =>
       input.tags.includes(tag.name.toLowerCase())
     ).length ?? 0;
     score += tagMatches * 2;
 
-    // name match — exact vs partial
     const goalLower = input.bundleGoal.toLowerCase();
     const goalWords = goalLower.split(' ');
 
     if (product.name.toLowerCase().includes(goalLower)) {
-      score += 5;   // exact match
+      score += 5; 
     } else {
       const wordMatches = goalWords.filter(w =>
         product.name.toLowerCase().includes(w)
       ).length;
-      score += wordMatches * 1;   // partial match
+      score += wordMatches * 1;   
     }
 
-    // description match
     if (product.description?.toLowerCase().includes(goalLower)) {
       score += 1;
     }
 
-    // category match
     if (input.category.includes(product.category?.name)) {
       score += 1;
     }
