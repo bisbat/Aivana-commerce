@@ -77,17 +77,14 @@ export const UploadFileForm: React.FC<UploadFileFormProps> = ({
           productType as "UI Kit" | "frontend-template" | "backend-template",
         );
 
-        // รับ ExtractionResult แทน ExtractedMetadata
         const result: ExtractionResult = await extractMetadataFromUpload(category, file);
 
-        // validation ไม่ผ่าน → เปิด modal หยุดรอ user ตัดสินใจ
         if (!result.validation.isValid) {
           setValidationReason(result.validation.reason!);
           return;
         }
 
         metadata = result.metadata ?? undefined;
-        console.log("🤖 AI metadata:", metadata);
       }
 
       onNext({

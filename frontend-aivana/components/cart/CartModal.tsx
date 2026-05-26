@@ -38,7 +38,6 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
     (window as any).Omise.setPublicKey(
       process.env.NEXT_PUBLIC_OMISE_PUBLIC_KEY,
     );
-    // initOmise();
   }, []);
 
   const fetchCart = async () => {
@@ -51,7 +50,6 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
       }
 
       const data = await getCart(user.id);
-      console.log("Fetched cart data:", data);
       setCartData(data);
     } catch (error) {
       console.error("Failed to fetch cart:", error);
@@ -125,7 +123,6 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
     if (paymentMethod === PaymentMethod.PROMPTPAY) {
       try {
         const source = await createPromptpaySource(amount);
-        console.log("source:", source);
 
         await createPayment(source.id, orderId);
 
@@ -270,7 +267,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                         className={`w-full p-3 cursor-pointer rounded-xl transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-purple-500 group
     ${
       selectedPaymentMethod === "credit-card"
-        ? "bg-[#2d2a52] border-2 border-purple-500" // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
+        ? "bg-[#2d2a52] border-2 border-purple-500" 
         : "bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30"
     }
   `}
@@ -280,7 +277,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                             className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors
       ${
         selectedPaymentMethod === "credit-card"
-          ? "bg-purple-500/20" // เมื่อถูกเลือก
+          ? "bg-purple-500/20" 
           : "bg-[#1e1b3d] group-hover:bg-[#262549]"
       }
     `}
@@ -324,7 +321,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                         className={`w-full p-3 cursor-pointer rounded-xl transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-purple-500 group
     ${
       selectedPaymentMethod === "promptpay"
-        ? "bg-[#2d2a52] border-2 border-purple-500" // เมื่อถูกเลือก - เน้นด้วย border สีม่วง
+        ? "bg-[#2d2a52] border-2 border-purple-500" 
         : "bg-[#262549] hover:bg-[#2d2a52] border-2 border-transparent hover:border-blue-500/30"
     }
   `}
@@ -334,7 +331,7 @@ export function CartModal({ isOpen, onClose, cartRef }: CartModalProps) {
                             className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors
       ${
         selectedPaymentMethod === "promptpay"
-          ? "bg-purple-500/20" // เมื่อถูกเลือก
+          ? "bg-purple-500/20" 
           : "bg-[#1e1b3d] group-hover:bg-[#262549]"
       }
     `}

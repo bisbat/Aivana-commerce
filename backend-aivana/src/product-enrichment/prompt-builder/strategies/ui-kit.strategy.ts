@@ -16,8 +16,6 @@ export class UIKitStrategy implements PromptStrategy {
       ? `Pick EXACTLY ONE from this list (exact spelling):\n${availableCategories.map((c) => c.name).join(', ')}`
       : 'Suggest a category name.';
 
-    // Resolve design tools: prefer files.designTools (works for Illustrator, Photoshop, etc.)
-    // Fall back to design.tool for Figma/Sketch kits
     const designTools = meta.files?.designTools?.length
       ? meta.files.designTools.join(', ')
       : (meta.design?.tool ?? 'unknown');

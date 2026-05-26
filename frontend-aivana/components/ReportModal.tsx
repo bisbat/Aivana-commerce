@@ -128,7 +128,7 @@ export default function ReportModal({
                               }
                             : reason === "อื่นๆ"
                               ? {
-                                  background: "rgba(100,116,139,0.15)", // สีเทาอ่อน
+                                  background: "rgba(100,116,139,0.15)", 
                                   borderColor: "#64748b",
                                 }
                               : {}

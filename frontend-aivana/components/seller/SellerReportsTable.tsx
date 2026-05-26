@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { calculateSeverity } from "@/lib/utils/reportSeverity";
 
-// ─── Types ─────────────────────────────────────────────────────────────────
 interface GroupedReport {
   productId: number;
   productName: string;
@@ -26,12 +25,11 @@ interface GroupedReport {
   rejected: number;
   latestReportDate: string;
   isDeleted: boolean;
-  isHidden: boolean; // ✅ เพิ่ม
+  isHidden: boolean; 
   deletedAt?: string;
   deletionReason?: string;
 }
 
-// ─── Helper Functions ──────────────────────────────────────────────────────
 function groupReportsByProduct(reports: Report[]): GroupedReport[] {
   const grouped = new Map<number, GroupedReport>();
 
@@ -53,7 +51,7 @@ function groupReportsByProduct(reports: Report[]): GroupedReport[] {
         rejected: 0,
         latestReportDate: report.createdAt,
         isDeleted: report.orderItem.product.isDeleted,
-        isHidden: report.orderItem.product.isHidden ?? false, // ✅ เพิ่ม
+        isHidden: report.orderItem.product.isHidden ?? false, 
         deletedAt: report.orderItem.product.deletedAt,
         deletionReason: report.orderItem.product.deletionReason,
       });
@@ -80,7 +78,6 @@ function groupReportsByProduct(reports: Report[]): GroupedReport[] {
   );
 }
 
-// ─── Severity Badge ─────────────────────────────────────────────────────────
 function SeverityBadge({ reportCount }: { reportCount: number }) {
   const severity = calculateSeverity(reportCount);
   const Icon =
@@ -111,7 +108,6 @@ function SeverityBadge({ reportCount }: { reportCount: number }) {
   );
 }
 
-// ─── View Detail Button ─────────────────────────────────────────────────────
 function ViewDetailButton({ productId }: { productId: number }) {
   const router = useRouter();
   const [hovered, setHovered] = useState(false);
@@ -136,7 +132,6 @@ function ViewDetailButton({ productId }: { productId: number }) {
   );
 }
 
-// ─── Product Status Badge ────────────────────────────────────────────────────
 function ProductStatusBadge({
   isDeleted,
   isHidden,
@@ -163,7 +158,6 @@ function ProductStatusBadge({
   return null;
 }
 
-// ─── Grouped Report Row ──────────────────────────────────────────────────────
 function GroupedReportRow({
   group,
   index,

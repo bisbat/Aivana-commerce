@@ -51,7 +51,6 @@ export default function OrderHistoryPage() {
           });
         });
 
-        // ดึงข้อมูลสินค้าทั้งหมดพร้อมกัน
         const products: Record<string, any> = {};
         for (const productId of uniqueProductIds) {
           try {

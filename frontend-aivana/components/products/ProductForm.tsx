@@ -98,10 +98,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     setSelectedTagIds(initialData.tagIds ?? []);
   }, [initialData]);
 
-  // Auto-enrich with AI — waits for tags & categories to load first (fixes race condition)
   useEffect(() => {
     if (!uploadData.useAI || !uploadData.metadata || initialData) return;
-    // Wait until data has finished loading
     if (isLoadingData) return;
 
     const keywords = uploadData.keywords
@@ -130,7 +128,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         setInstallationGuide(ai.installationGuide ?? "");
         if (ai.apiDocUrl) setApiDocUrl(ai.apiDocUrl);
 
-        // Map AI tag names → real tag IDs (case-insensitive)
         if (ai.tags?.length) {
           const matchedIds = ai.tags
             .map((aiName) =>
@@ -162,8 +159,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         );
       })
       .finally(() => setIsEnriching(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoadingData]); // fire once after tags & categories finish loading
+  }, [isLoadingData]);
 
   useEffect(() => {
     if (!isFormMeaningful()) return;
@@ -202,11 +198,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     sellerId,
   ]);
 
-  // Handle continue to next step
   const handleContinue = () => {
     setError(null);
 
-    // Validate required fields
     if (!name) {
       setError("กรุณากรอกข้อมูลให้ครบถ้วน");
       return;
@@ -227,7 +221,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       return;
     }
 
-    // Pass data to parent (page.tsx)
     const formData: ProductInformationFormData = {
       name,
       blurb,
@@ -246,7 +239,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       requirement,
       apiDocUrl,
     };
-    console.log("Product Information Form Data:", formData);
 
     onNext(formData);
   };

@@ -26,7 +26,6 @@ export function Skills({ skills, onChange }: SkillsProps) {
     onChange([...skills, ""]);
   }
 
-  // Ensure at least one input field is shown
   const displaySkills = skills.length > 0 ? skills : [""];
 
   return (

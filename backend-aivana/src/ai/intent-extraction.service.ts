@@ -5,7 +5,7 @@ const VALID_CATEGORIES = ['ui-kit', 'frontend-template', 'backend-template'];
 
 @Injectable()
 export class IntentExtractionService {
-  constructor(private readonly gemini: GeminiService) { } // ← inject แทน
+  constructor(private readonly gemini: GeminiService) { } 
 
   async extractIntent(userInput: string) {
     const prompt = `
@@ -70,7 +70,7 @@ User input: "${userInput}"
 `;
 
     try {
-      console.log('hi this is extracting');
+
       const text = await this.gemini.generate(prompt);
 
       const cleaned = text

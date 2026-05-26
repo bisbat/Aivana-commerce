@@ -1,4 +1,3 @@
-// dashboard.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DashboardController } from './dashboard.controller';

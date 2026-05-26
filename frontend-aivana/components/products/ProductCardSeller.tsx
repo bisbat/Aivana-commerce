@@ -78,7 +78,7 @@ const ProductCardSeller: React.FC<ProductCardSellerProps> = ({
               <button
                 type="button"
                 onClick={(e) => {
-                  e.preventDefault(); // IMPORTANT (prevent Link navigation)
+                  e.preventDefault(); 
                   router.push(`/stores/products/${product.id}/edit`);
                 }}
                 className="w-9 h-9 flex items-center justify-center rounded-full bg-[var(--linne-purple-hover)] hover:bg-[var(--linne-purple-hover-2)] transition"

@@ -23,10 +23,8 @@ export const MultiSelectTag: React.FC<MultiSelectTagProps> = ({
 
   const toggleTag = (tagId: number) => {
     if (selectedTagIds.includes(tagId)) {
-      // Remove tag
       onChange(selectedTagIds.filter(id => id !== tagId));
     } else {
-      // Add tag
       onChange([...selectedTagIds, tagId]);
     }
   };

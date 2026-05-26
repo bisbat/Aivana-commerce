@@ -55,7 +55,6 @@ export default function MyCollectionPage() {
       try {
         setLoading(true);
         const user = await getCurrentUser();
-        // ตรวจสอบ authentication
         if (!user) {
           router.push("/");
           return;
@@ -66,7 +65,6 @@ export default function MyCollectionPage() {
         const data = await getUserCollections();
         setCollections(data);
 
-        // Load report status for items that were reported (simple + fast)
         const reportedOrderItemIds = Array.from(
           new Set(
             data
@@ -115,11 +113,7 @@ export default function MyCollectionPage() {
   };
 
   const handleReviewSubmit = async (rating: number, message: string) => {
-    console.log("Review submitted:", {
-      productId: selectedProduct?.id,
-      rating,
-      message,
-    });
+
     setCollections((prev) =>
       prev.map((item) =>
         item.product.id === selectedProduct?.id
@@ -166,7 +160,6 @@ export default function MyCollectionPage() {
         message: message.trim() || null,
       });
 
-      // Refresh status after submit/update (so user sees it immediately)
       try {
         const report = await getReportByOrderItemAction(
           selectedProduct.orderItemId,
@@ -176,10 +169,9 @@ export default function MyCollectionPage() {
           [selectedProduct.orderItemId!]: report,
         }));
       } catch (e) {
-        // ignore
+        console.error("Error fetching updated report:", e);
       }
 
-      // Update collections state to reflect hasReported
       setCollections((prev) =>
         prev.map((item) =>
           item.orderItemId === selectedProduct.orderItemId
@@ -213,7 +205,6 @@ export default function MyCollectionPage() {
     );
   }
 
-  // Error State
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -407,7 +398,6 @@ export default function MyCollectionPage() {
                       const isRejected = report?.status === "rejected";
 
                       if (isResolved) {
-                        // ✅ Case: แก้ไขแล้ว (แสดงปุ่มเขียว)
                         return (
                           <button
                             type="button"
@@ -420,7 +410,6 @@ export default function MyCollectionPage() {
                           </button>
                         );
                       } else if (isRejected) {
-                        // ❌ Case: ถูกปฏิเสธ (แสดงปุ่มแดง)
                         return (
                           <button
                             type="button"
@@ -434,7 +423,6 @@ export default function MyCollectionPage() {
                         );
                       }
 
-                      // 🚩 Case: ยังไม่แก้ไข หรือยังไม่มี Report
                       return (
                         <button
                           type="button"

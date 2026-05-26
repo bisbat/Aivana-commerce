@@ -22,7 +22,6 @@ export const Select: React.FC<SelectProps> = ({
   placeholder = 'Select an option',
   required = false
 }) => {
-  // Check if options is array of objects or strings
   const isObjectArray = options.length > 0 && typeof options[0] === 'object';
 
   return (

@@ -39,27 +39,17 @@ export default function CreditCardPage() {
     try {
       const formData = new FormData(e.currentTarget);
 
-      // ดึงค่าจาก form
       const name = formData.get("name") as string;
       const cardNumber = (formData.get("cc-number") as string).replace(
         /\s/g,
         "",
-      ); // ลบ space
-      const expiry = formData.get("cc-expiry") as string; // MM/YY
+      ); 
+      const expiry = formData.get("cc-expiry") as string; 
       const cvc = formData.get("cc-cvc") as string;
 
-      // แปลง expiry date
       const [expiryMonth, expiryYear] = expiry.split("/");
-      const fullYear = `20${expiryYear.trim()}`; // 25 → 2025
+      const fullYear = `20${expiryYear.trim()}`; 
 
-      console.log("Creating token with:", {
-        name,
-        cardNumber: cardNumber.substring(0, 4) + "...",
-        expiryMonth,
-        expiryYear: fullYear,
-      });
-
-      // Validate form data
       const validationError = validateCardForm({
         cardNumber,
         expiry,
@@ -72,7 +62,6 @@ export default function CreditCardPage() {
         return;
       }
 
-      // สร้าง token
       const token = await createCreditCardToken({
         name,
         number: cardNumber,
@@ -81,7 +70,6 @@ export default function CreditCardPage() {
         cvc,
       });
 
-      // สร้าง payment
       const res = await createCreditCardPayment(token.id, Number(orderId));
 
       if (res.status === "successful") {

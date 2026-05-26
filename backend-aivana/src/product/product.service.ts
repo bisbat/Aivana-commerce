@@ -334,8 +334,6 @@ export class ProductService {
         MINIO_FOLDERS.PRODUCTS.DETAILS(productId),
       );
 
-      console.log('Uploaded detail image to:', fullPath);
-
       const imageUrl = this.minioService.getFileUrl(fullPath);
 
       await this.productImageService.create({

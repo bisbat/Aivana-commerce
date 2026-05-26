@@ -16,7 +16,6 @@ export function saveFormStep(stepNumber: number, data: any) {
   try {
     const key = `product-form-step${stepNumber}`;
     storage.setItem(key, JSON.stringify(data));
-    console.log(`Saved step ${stepNumber}`);
   } catch (error) {
     console.error(`Failed to save step ${stepNumber}:`, error);
   }
@@ -55,7 +54,6 @@ export function clearAllFormData() {
 
   try {
     Object.values(STORAGE_KEYS).forEach((key) => storage.removeItem(key));
-    console.log('Cleared all form data');
   } catch (error) {
     console.error('Failed to clear form data:', error);
   }

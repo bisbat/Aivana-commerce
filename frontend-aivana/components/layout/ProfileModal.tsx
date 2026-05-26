@@ -63,7 +63,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         </div>
         <div className="py-2">
           {userData?.role === "admin" ? (
-            // เมนูสำหรับ Admin
             <Link
               className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"
               href="/admin/payouts"
@@ -72,7 +71,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               แดชบอร์ดแอดมิน
             </Link>
           ) : (
-            // เมนูสำหรับ Customer และ Seller
             <>
               <Link
                 className="block px-4 py-2 text-sm text-white hover:bg-[#262549] transition-colors"

@@ -26,13 +26,10 @@ interface SocialLinkItem {
 }
 
 export function SocialLinks({ socials, onChange }: SocialLinksProps) {
-  // Convert socials object to array format for local state
   const [socialLinks, setSocialLinks] = useState<SocialLinkItem[]>(() => {
     const links = Object.entries(socials)
       .filter(([_, url]) => url && url.trim() !== "")
       .map(([platform, url]) => ({ platform, url: url || "" }));
-
-    // Always have at least one row
     return links.length > 0 ? links : [{ platform: "", url: "" }];
   });
 
@@ -45,8 +42,6 @@ export function SocialLinks({ socials, onChange }: SocialLinksProps) {
     newLinks[index] = { ...newLinks[index], [field]: value };
 
     setSocialLinks(newLinks);
-
-    // Convert back to SocialLink object format
     const newSocials: SocialLink = {};
     newLinks.forEach((link) => {
       if (link.platform && link.url.trim()) {
@@ -60,8 +55,6 @@ export function SocialLinks({ socials, onChange }: SocialLinksProps) {
   function removeSocialLink(index: number) {
     const newLinks = socialLinks.filter((_, i) => i !== index);
     setSocialLinks(newLinks);
-
-    // Convert back to SocialLink object format
     const newSocials: SocialLink = {};
     newLinks.forEach((link) => {
       if (link.platform && link.url.trim()) {

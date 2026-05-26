@@ -9,7 +9,6 @@ export class TagEntity {
   @Column({ type: 'varchar', length: 255, unique: true })
   name: string;
 
-  // Many-to-Many relationship with ProductEntity
   @ManyToMany(() => ProductEntity, (product) => product.tags)
   products: ProductEntity[];
 }

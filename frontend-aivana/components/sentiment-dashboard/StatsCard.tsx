@@ -7,7 +7,6 @@ interface StatsCardProps {
 }
 
 export default function StatsCard({ title, value, type = "total" }: StatsCardProps) {
-  // 🎨 สีตาม sentiment
   const colorMap = {
     total: "bg-gray-800 text-white",
     positive: "bg-green-500/20 text-green-400",

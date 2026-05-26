@@ -41,7 +41,6 @@ export default function EditSellerSellerInfo() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // load seller
   useEffect(() => {
     async function load() {
       setLoading(true);
@@ -72,18 +71,12 @@ export default function EditSellerSellerInfo() {
     load();
   }, []);
 
-  console.log(formData);
-  console.log(formData.bankInfo);
-
-  // simple handler for normal fields
   function handleChange(field: "bio" | "location", value: string) {
     setFormData((prev) => ({ ...prev, [field]: value }));
   }
 
-  // build payload for updateSellerProfile
   function buildUpdatePayload() {
-    // convert skills -> string[]
-    const skills = formData.skills.map((s) => s.trim()).filter(Boolean); // remove empty strings
+    const skills = formData.skills.map((s) => s.trim()).filter(Boolean); 
 
     return {
       bio: formData.bio,

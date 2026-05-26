@@ -8,13 +8,11 @@ export default async function SellerReportsPage() {
   let error: string | null = null;
 
   try {
-    console.log("Fetching seller reports...");
     reports = await getSellerReportsAction();
   } catch (e) {
     error = (e as Error).message;
   }
 
-  // Count unique products (with defensive check)
   const uniqueProducts = new Set(
     reports
       .map((r) => r.orderItem.product?.id)

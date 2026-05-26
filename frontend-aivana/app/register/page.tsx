@@ -27,7 +27,7 @@ export default function RegisterPage() {
       ...prev,
       [name]: value,
     }));
-    // Clear error when user starts typing
+
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -39,7 +39,6 @@ export default function RegisterPage() {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith("image/")) {
         setErrors((prev) => ({
           ...prev,
@@ -48,7 +47,6 @@ export default function RegisterPage() {
         return;
       }
 
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setErrors((prev) => ({
           ...prev,
@@ -57,13 +55,11 @@ export default function RegisterPage() {
         return;
       }
 
-      // Clear avatar error
       setErrors((prev) => ({
         ...prev,
         avatar: "",
       }));
 
-      // Create preview URL
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatarPreview(reader.result as string);
@@ -156,7 +152,7 @@ export default function RegisterPage() {
         router.push("/");
         router.refresh();
       } else {
-        // แสดง error ที่ field ที่เกี่ยวข้อง
+
         if (result.field) {
           setErrors({ [result.field]: result.message || "" });
         } else {

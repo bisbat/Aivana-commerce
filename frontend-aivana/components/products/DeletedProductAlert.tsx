@@ -12,14 +12,6 @@ export default function DeletedProductAlert({
   product,
   onDismiss,
 }: DeletedProductAlertProps) {
-  // Debug log
-  console.log("DeletedProductAlert - Product:", {
-    id: product.id,
-    name: product.name,
-    isDeleted: product.isDeleted,
-    deletedAt: product.deletedAt,
-    deletionReason: product.deletionReason,
-  });
 
   if (!product.isDeleted) return null;
 

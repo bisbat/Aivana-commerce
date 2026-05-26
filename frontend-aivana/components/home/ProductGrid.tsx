@@ -22,14 +22,12 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<"latest" | "price">("latest");
 
-  // Fetch products on mount only if no external products provided
   useEffect(() => {
     if (!externalProducts) {
       fetchProducts();
     }
   }, [externalProducts]);
 
-  // Update internal state when external products change
   useEffect(() => {
     if (externalProducts) {
       setProducts(externalProducts);

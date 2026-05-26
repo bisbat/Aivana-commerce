@@ -132,7 +132,6 @@ export class ProductImageController {
     const heroFolder = MINIO_FOLDERS.PRODUCTS.HERO(productId);
     try {
       await this.minioService.deleteFolder(heroFolder);
-      console.log(`Cleared all files from ${heroFolder}`);
     } catch (error) {
       console.error('Failed to clear hero folder from MinIO:', error);
     }

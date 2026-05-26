@@ -24,12 +24,10 @@ export default function EditProductHeroImage({
 
   const handleRemove = () => {
     onRemoveImage();
-    // Clear the input
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     if (input) input.value = '';
   };
 
-  // Determine which image to show
   const displayImage = newImageFile 
     ? URL.createObjectURL(newImageFile)
     : currentImage;

@@ -10,7 +10,6 @@ type SearchPageProps = {
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const q = params?.q || "";
-  console.log("Searching for:", q);
 
   const results = await getProductsBySearchQuery(q);
 

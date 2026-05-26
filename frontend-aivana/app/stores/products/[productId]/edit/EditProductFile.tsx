@@ -24,26 +24,21 @@ export default function EditProductFile({
 
   const handleRemove = () => {
     onRemoveFile();
-    // Clear the input
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     if (input) input.value = '';
   };
 
-  // Extract filename from URL path
   const getFileName = (url: string | null) => {
     if (!url) return '';
     const parts = url.split('/');
     const filename = parts[parts.length - 1];
-    // Remove timestamp prefix if exists (e.g., "uploaded-1763474259391-MochikokEieie.zip" -> "MochikokEieie.zip")
     return filename.replace(/^uploaded-\d+-/, '');
   };
 
-  // Get file extension for icon display
   const getFileExtension = (filename: string) => {
     return filename.split('.').pop()?.toLowerCase() || '';
   };
 
-  // Get icon based on file type
   const getFileIcon = (extension: string) => {
     switch (extension) {
       case 'zip':

@@ -30,7 +30,6 @@ export const Navbar: React.FC = () => {
   const moreRef = useRef<HTMLDivElement>(null);
   const [tagNavbar, setTagNavbar] = useState<Tag[]>([]);
 
-  // Check authentication status
   useEffect(() => {
     const checkAuth = async () => {
       const user = await getCurrentUser();
@@ -83,7 +82,7 @@ export const Navbar: React.FC = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isProfileOpen, showMoreCategories, isCartOpen]); // เพิ่ม isCartOpen
+  }, [isProfileOpen, showMoreCategories, isCartOpen]); 
 
   useEffect(() => {
     const loadNavbarTags = async () => {

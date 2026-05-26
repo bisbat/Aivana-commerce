@@ -7,11 +7,10 @@ type ValidationFailReason = "MISSING_PACKAGE_JSON" | "INVALID_UI_KIT";
 interface ValidationErrorModalProps {
     isOpen: boolean;
     reason: ValidationFailReason;
-    onUploadNew: () => void;       // ปิด modal → user เลือกไฟล์ใหม่
-    onContinueWithoutAI: () => void; // ไปต่อโดยไม่ใช้ AI
+    onUploadNew: () => void;       
+    onContinueWithoutAI: () => void; 
 }
 
-// content แยกตาม reason — เพิ่ม case ใหม่ได้ง่าย
 const MODAL_CONTENT: Record<
   ValidationFailReason,
   { title: string; description: string }

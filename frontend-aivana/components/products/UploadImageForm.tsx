@@ -14,7 +14,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
   onPublish,
   onBack,
 }) => {
-  // State
   const [heroImage, setHeroImage] = useState<File | null>(null);
   const [heroImagePreview, setHeroImagePreview] = useState<string | null>(null);
   const [detailImages, setDetailImages] = useState<File[]>([]);
@@ -23,7 +22,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
 
   const [heroError, setHeroError] = useState(false);
 
-  // Refs for file inputs
   const heroInputRef = useRef<HTMLInputElement>(null);
   const detailInputRef = useRef<HTMLInputElement>(null);
 
@@ -37,13 +35,12 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
   const handleHeroImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file type
+
       if (!file.type.startsWith("image/")) {
         setError("Please upload an image file (JPG, PNG, JPEG)");
         return;
       }
 
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setError("Hero image must be less than 5MB");
         return;
@@ -52,7 +49,6 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
       setHeroImage(file);
       setError(null);
 
-      // Create preview URL
       const reader = new FileReader();
       reader.onloadend = () => {
         setHeroImagePreview(reader.result as string);
@@ -61,19 +57,16 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
     }
   };
 
-  // Handle detail images upload
   const handleDetailImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
 
     if (files.length === 0) return;
 
-    // Check total number of images (max 10)
     if (detailImages.length + files.length > 8) {
       setError("You can upload maximum 8 detail images");
       return;
     }
 
-    // Validate each file
     for (const file of files) {
       if (!file.type.startsWith("image/")) {
         setError("All files must be images (JPG, PNG, JPEG)");
@@ -87,10 +80,8 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
 
     setError(null);
 
-    // Add to existing images
     setDetailImages((prev) => [...prev, ...files]);
 
-    // Create preview URLs
     files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -100,24 +91,19 @@ export const UploadImageForm: React.FC<UploadImageFormProps> = ({
     });
   };
 
-  // Remove detail image
   const removeDetailImage = (index: number) => {
     setDetailImages((prev) => prev.filter((_, i) => i !== index));
     setDetailImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Handle publish
   const handlePublish = () => {
     setError(null);
     setHeroError(false);
 
-    // Validate hero image
     if (!heroImage) {
       setHeroError(true);
       return;
     }
-
-    // Validate minimum 2 detail images
     if (detailImages.length < 2) {
       setError(
         `กรุณาอัปโหลด Detail Images อย่างน้อย 2 รูป (ตอนนี้มี ${detailImages.length} รูป)`,

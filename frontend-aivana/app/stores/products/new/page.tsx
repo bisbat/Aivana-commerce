@@ -12,7 +12,6 @@ import { createCompleteProduct } from "@/lib/actions/product.actions";
 import { Loader, CheckCircle, AlertCircle } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 
-// Import storage helpers
 import {
   saveFormStep,
   loadFormStep,
@@ -25,48 +24,38 @@ export default function AddProductPage() {
   const router = useRouter();
   const [sellerId, setSellerId] = useState<string | null>(null);
 
-  // Track current step
   const [currentStep, setCurrentStep] = useState(1);
 
-  // Store data from each step
   const [uploadData, setUploadData] = useState<UploadFileFormData | null>(null);
   const [productData, setProductData] = useState<ProductInformationFormData | null>(null);
 
-  // UI state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Load saved data on mount
   useEffect(() => {
     async function initializePage() {
       try {
         setIsLoadingData(true);
 
-        // Fetch user data
         const user = await getCurrentUser();
         setSellerId(user?.sellerId || null);
 
-        // Load saved form data
         const [savedStep1, savedStep2, savedCurrentStep] = await Promise.all([
           loadFormStep(1),
           loadFormStep(2),
           loadCurrentStep()
         ]);
 
-        // Restore saved data if exists
         if (savedStep1) {
           setUploadData(savedStep1);
-          console.log('✅ Restored Step 1 data');
         }
 
         if (savedStep2) {
           setProductData(savedStep2);
-          console.log('✅ Restored Step 2 data');
         }
 
-        // Restore current step
         setCurrentStep(savedCurrentStep);
 
       } catch (error) {
@@ -79,22 +68,17 @@ export default function AddProductPage() {
     initializePage();
   }, []);
 
-  // Save current step whenever it changes
   useEffect(() => {
     if (!isLoadingData) {
       saveCurrentStep(currentStep);
     }
   }, [currentStep, isLoadingData]);
 
-  // Step 1 → Step 2
   const handleUploadNext = async (data: UploadFileFormData) => {
     try {
-      console.log("✅ Step 1 completed:", data);
 
-      // Save to storage
       await saveFormStep(1, data);
 
-      // Update state
       setUploadData(data);
       setCurrentStep(2);
     } catch (error) {
@@ -103,15 +87,9 @@ export default function AddProductPage() {
     }
   };
 
-  // Step 2 → Step 3
   const handleProductNext = async (data: ProductInformationFormData) => {
     try {
-      console.log("✅ Step 2 completed:", data);
-
-      // Save to storage
       await saveFormStep(2, data);
-
-      // Update state
       setProductData(data);
       setCurrentStep(3);
     } catch (error) {
@@ -120,7 +98,6 @@ export default function AddProductPage() {
     }
   };
 
-  // Step 3 → Submit everything
   const handlePublish = async (imageData: UploadImageFormData) => {
     if (!uploadData || !productData) {
       setError("Missing data from previous steps");
@@ -131,24 +108,16 @@ export default function AddProductPage() {
     setError(null);
 
     try {
-      console.log("📤 Submitting complete product...");
-
-      // Submit to backend
       const createdProduct = await createCompleteProduct(
         uploadData,
         productData,
         imageData
       );
 
-      console.log("✅ Product created:", createdProduct);
-
-      // Clear saved form data after successful publish
       await clearAllFormData();
 
-      // Show success
       setSuccess(true);
 
-      // Redirect after 2 seconds
       setTimeout(() => {
         router.push("/stores");
       }, 2000);
@@ -156,13 +125,11 @@ export default function AddProductPage() {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to create product";
       setError(errorMessage);
-      console.error("❌ Error:", err);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Back button handlers
   const handleBackToStep1 = () => {
     setCurrentStep(1);
     setError(null);
@@ -173,7 +140,6 @@ export default function AddProductPage() {
     setError(null);
   };
 
-  // Loading screen
   if (isLoadingData) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[var(--background)]">
@@ -185,7 +151,6 @@ export default function AddProductPage() {
     );
   }
 
-  // Success screen
   if (success) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[var(--background)]">
@@ -200,7 +165,6 @@ export default function AddProductPage() {
     );
   }
 
-  // Submitting screen
   if (isSubmitting) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[var(--background)]">

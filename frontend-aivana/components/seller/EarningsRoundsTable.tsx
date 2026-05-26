@@ -49,7 +49,6 @@ function StatusBadge({ status }: { status: "paid" | "pending" }) {
   );
 }
 
-// ─── UPDATED: Navigate by payoutId instead of dates ─────────────────────────
 function RoundRow({ round, index }: { round: SellerEarningsRound; index: number }) {
   const router = useRouter();
   const [hovered, setHovered] = useState(false);

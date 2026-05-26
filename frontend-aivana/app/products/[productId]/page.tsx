@@ -56,7 +56,7 @@ export default function ProductDetailPage({
     prohibitedForPurchase ||
     isUserProduct ||
     product?.isDeleted ||
-    product?.isHidden; // ✅ ซ่อนอยู่ก็ซื้อไม่ได้
+    product?.isHidden; 
 
   const allImages = product
     ? [

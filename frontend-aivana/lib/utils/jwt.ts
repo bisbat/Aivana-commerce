@@ -11,7 +11,6 @@ export function decodeJWT(token: string): JwtPayload | null {
         .join("")
     );
 
-    console.log("Decoded JWT Payload:", jsonPayload);
     return JSON.parse(jsonPayload);
   } catch (error) {
     return null;

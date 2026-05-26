@@ -2,7 +2,6 @@ import { fetchSellerRoundDetail } from "@/lib/actions/earning.actions";
 import SellerRoundDetailTable from "@/components/seller/EarningRoundsDetailTable";
 import Link from "next/link";
 
-// ── Next.js 15: params is a Promise ──────────────────────────────────────────
 export default async function PayoutDetailPage({
   params,
 }: {

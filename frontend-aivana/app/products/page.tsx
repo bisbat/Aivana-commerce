@@ -20,12 +20,9 @@ export default async function ProductsPage({
   const tag = params?.tag;
   const category = params?.category;
 
-  console.log("Fetching products for:", { tag, category });
-
   let products;
   let title = "สินค้าทั้งหมด";
 
-  // Category name mapping for display
   const categoryNameMap: Record<string, string> = {
     "ui-kit": "UI Kit",
     "frontend-template": "Frontend Template",

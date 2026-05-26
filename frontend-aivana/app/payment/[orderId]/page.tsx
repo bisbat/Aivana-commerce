@@ -18,7 +18,6 @@ export default function PromptpayPage() {
   const [isExpired, setIsExpired] = useState(false);
   const [expiresAt, setExpiresAt] = useState<Date | null>(null);
 
-  // Fetch QR Code
   useEffect(() => {
     if (!orderId) return;
 
@@ -57,7 +56,6 @@ export default function PromptpayPage() {
       }
     };
 
-    // initial fetch
     fetchQr();
 
     const interval = setInterval(() => {
@@ -67,10 +65,8 @@ export default function PromptpayPage() {
     return () => clearInterval(interval);
   }, [orderId]);
 
-
-  // Timer Countdown
   useEffect(() => {
-    if (loading) return; // รอให้โหลด QR เสร็จก่อน
+    if (loading) return; 
 
     const checkExpiry = () => {
       if (!expiresAt) return;
@@ -95,7 +91,6 @@ export default function PromptpayPage() {
     return () => clearInterval(timer);
   }, [timeLeft, loading]);
 
-  // ----------------------------------------
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;

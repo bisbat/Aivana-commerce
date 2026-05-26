@@ -41,8 +41,6 @@ export default function AiSearch() {
     };
 
     const handleAddAll = (products: Product[]) => {
-        // TODO: hook into your cart context / store
-        console.log("Add to cart:", products);
         alert(`เพิ่ม ${products.length} รายการลงตะกร้าแล้ว!`);
     };
 

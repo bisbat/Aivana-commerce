@@ -1,11 +1,7 @@
 import { fetchSellerEarningsSummary, fetchSellerEarningsRounds } from "@/lib/actions/earning.actions";
 import EarningsSummaryCards from "@/components/seller/EarningsSummaryCards";
 import EarningsRoundsTable from "@/components/seller/EarningsRoundsTable";
-// ─── Server Component ────────────────────────────────────────────────────────
-// You'll need to get sellerId from your auth context or params
 export default async function SellerEarningsPage() {
-  // TODO: Replace with actual seller ID from session/auth
-
 
   let summary = null;
   let rounds: any[] = [];

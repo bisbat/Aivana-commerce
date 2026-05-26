@@ -7,7 +7,6 @@ import { addSellerResponseAction } from "@/lib/actions/report.actions";
 import { useRouter } from "next/navigation";
 import { showSuccessToast, showErrorToast } from "@/lib/toast";
 
-// ─── Status Badge Component ─────────────────────────────────────────────────
 function ReportStatusBadge({ status }: { status: ReportStatus }) {
   const config = {
     pending: {
@@ -63,7 +62,6 @@ function ReportStatusBadge({ status }: { status: ReportStatus }) {
   );
 }
 
-// ─── Single Report Row ──────────────────────────────────────────────────────
 function ReportRow({ report, index }: { report: Report; index: number }) {
   const [hovered, setHovered] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -231,7 +229,6 @@ export default function ProductReportsTable({
                 {tableHeaders.map((col) => (
                   <th
                     key={col.label}
-                    // เพิ่ม col.className เข้าไปเพื่อบังคับความกว้าง
                     className={`text-left px-6 py-4 text-sm text-slate-400 font-medium ${col.className}`}
                   >
                     {col.label}

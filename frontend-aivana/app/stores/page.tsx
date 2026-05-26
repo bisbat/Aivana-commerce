@@ -1,20 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ProductCardSeller } from "@/components/products/ProductCardSeller";
 import { Product } from "@/lib/types/product/Product";
 import { Loader, AlertCircle, Package } from "lucide-react";
 import { getProductsBySellerId } from "@/lib/actions/seller.actions";
 import { UserProfile } from "@/lib/types/user/user";
 import { getCurrentUser } from "@/lib/auth";
-import DeletedProductAlert from "@/components/products/DeletedProductAlert";
 
 export default function StorePage() {
   const router = useRouter();
   const [sellerId, setSellerId] = useState<string | null>(null);
 
-  // State for products
   const [products, setProducts] = useState<Product[]>([]);
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,10 +27,9 @@ export default function StorePage() {
     fetchCurrentUser();
   }, []);
 
-  // Fetch products when component mounts
   useEffect(() => {
     fetchProducts();
-  }, [sellerId]); // Run when sellerId changes
+  }, [sellerId]); 
 
   const fetchProducts = async () => {
     setIsLoading(true);
@@ -41,11 +38,6 @@ export default function StorePage() {
     try {
       if (!sellerId) return;
       const data = await getProductsBySellerId(sellerId);
-      console.log("Fetched products:", data);
-      console.log(
-        "Deleted products:",
-        data.filter((p) => p.isDeleted),
-      );
       setProducts(data);
     } catch (err) {
       const errorMessage =
@@ -57,7 +49,6 @@ export default function StorePage() {
     }
   };
 
-  // Handle edit button click
   const handleEditProduct = (productId: number) => {
     router.push(`stores/products/${productId}/edit`);
   };

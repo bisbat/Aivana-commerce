@@ -8,11 +8,10 @@ interface Props {
 }
 
 export default function SalesChart({ data }: Props) {
-  // Transform data for the chart
   const chartData = data.map((item) => ({
     name: formatMonthThai(item.month),
     ยอดขาย: item.revenue,
-    จำนวนสินค้า: item.itemsSold * 100, // Scale up for visibility
+    จำนวนสินค้า: item.itemsSold * 100, 
     จำนวนออเดอร์: item.ordersCount * 50,
   }));
 

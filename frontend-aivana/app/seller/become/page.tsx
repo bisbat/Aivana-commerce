@@ -201,16 +201,13 @@ export default function BecomeSellerPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("🚀 Form submitted");
 
     if (!validate()) {
-      console.log("❌ Validation failed");
       showErrorToast("กรุณากรอกข้อมูลให้ครบถ้วน");
       return;
     }
 
     setIsLoading(true);
-    console.log("⏳ Loading started...");
 
     try {
       const submitData: CreateSellerProfileDto = {
@@ -237,20 +234,14 @@ export default function BecomeSellerPage() {
         },
       };
 
-      console.log("📝 Submit data:", submitData);
-
       const user = await getCurrentUser();
-      console.log("👤 Current user:", user);
 
       if (!user) {
         showErrorToast("กรุณาเข้าสู่ระบบก่อนสมัครเป็นผู้ขาย");
         throw new Error("Not authenticated");
       }
 
-      // Call backend API to become seller
-      console.log("🔄 Calling becomeSeller API...");
       await becomeSeller(submitData, user.id);
-      console.log("✅ Become seller success!");
 
       showSuccessToast("สมัครเป็นผู้ขายสำเร็จ!");
 
@@ -267,7 +258,6 @@ export default function BecomeSellerPage() {
       showErrorToast(errorMessage);
     } finally {
       setIsLoading(false);
-      console.log("✅ Loading ended");
     }
   };
 

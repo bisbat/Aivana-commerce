@@ -49,17 +49,10 @@ export class UserService {
   }
 
   async findUserByUsername(username: string): Promise<UserEntity | null> {
-    console.log('Service: Searching for user by username:', username);
     const user = await this.userRepository.findOne({
       where: { username },
       relations: ['sellerProfile'], 
     });
-
-    if (user) {
-      console.log('Service: Found user:', user.id, user.username, user.email);
-    } else {
-      console.log('Service: No user found with username:', username);
-    }
 
     return user;
   }
@@ -87,10 +80,7 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    console.log('Update Data:', updateData);
-
     if (avatarFile) {
-      console.log('Uploading avatar file:', avatarFile.originalname);
       const timestamp = Date.now();
       const folderPath = MINIO_FOLDERS.USERS.AVATARS(userId);
       const fileName = `${folderPath}/${timestamp}-${avatarFile.originalname}`;
@@ -99,7 +89,6 @@ export class UserService {
       const avatarUrl = this.minioService.getFileUrl(fileName);
 
       updateData.avatarUrl = avatarUrl;
-      console.log('Avatar uploaded successfully:', avatarUrl);
     }
 
     Object.assign(user, updateData);

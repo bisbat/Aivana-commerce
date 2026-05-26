@@ -32,10 +32,6 @@ export default function SellerProfilePage({
   productsTotal,
   currentUserId,
 }: Props) {
-  // Debug: ตรวจสอบค่า
-  console.log("currentUserId:", currentUserId, typeof currentUserId);
-  console.log("seller.user.id:", seller.user.id, typeof seller.user.id);
-  console.log("Are they equal?", currentUserId === seller.user.id);
 
   return (
     <div className="relative max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-2 py-15">
