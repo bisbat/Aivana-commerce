@@ -13,7 +13,6 @@ export async function createTagAction(
   if (!token) {
     throw new Error("Unauthorized");
   }
-  // ส่งคำขอไปยัง API เพื่อสร้างแท็กใหม่
   const res = await fetch(`${API_BASE_URL}/tags`, {
     method: "POST",
     headers: {

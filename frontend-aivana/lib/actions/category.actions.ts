@@ -4,7 +4,6 @@ import { Category } from "@/lib/types/category";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-// Fetch all categories
 export async function getAllCategories(): Promise<Category[]> {
   const response = await fetch(`${API_BASE_URL}/category`, {
     method: 'GET',

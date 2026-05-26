@@ -6,9 +6,6 @@ import type { PayoutRound, RoundDetailResponse, PayoutDetail, PayoutDetailRespon
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const PAYOUT_BASE = `${API_BASE_URL}/admin/payouts`;
 
-
-// ─── Shared error wrapper ───────────────────────────────────────────────────
-// Throws a readable error when the backend returns a non-2xx status
 async function parseResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const body = await res.text();
@@ -17,7 +14,6 @@ async function parseResponse<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-// ─── GET /admin/payouts/rounds ──────────────────────────────────────────────
 export async function fetchPayoutRounds(): Promise<PayoutRound[]> {
   const token = await getAccessToken();
   const res = await fetch(`${PAYOUT_BASE}/rounds`,{
@@ -28,8 +24,6 @@ export async function fetchPayoutRounds(): Promise<PayoutRound[]> {
   return parseResponse<PayoutRound[]>(res);
 }
 
-
-// ─── GET /admin/payouts/rounds/:start/:end ──────────────────────────────────
 export async function fetchRoundDetail(
   start: string,
   end: string
@@ -41,7 +35,6 @@ export async function fetchRoundDetail(
   return parseResponse<RoundDetailResponse>(res);
 }
 
-// ─── GET /admin/payouts/:id ─────────────────────────────────────────────────
 export async function fetchPayoutById(id: number): Promise<PayoutDetail> {
   const token = await getAccessToken();
   const res = await fetch(`${PAYOUT_BASE}/${id}`, {
@@ -62,7 +55,6 @@ export async function fetchSellerPayoutDetail(
   return parseResponse<PayoutDetailResponse>(res);
 }
 
-// ─── PATCH /admin/payouts/:id/mark-paid (multipart/form-data) ──────────────
 export async function markPayoutAsPaid(
   id: number,
   slipFile: File
@@ -78,7 +70,6 @@ export async function markPayoutAsPaid(
     body: formData,
   });
 
-  // ❗ IMPORTANT: ห้าม throw
   if (!res.ok) {
     let message = "เกิดข้อผิดพลาด";
 

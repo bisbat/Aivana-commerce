@@ -125,9 +125,6 @@ export type ExtractedMetadata =
   | FrontendTemplateMetadata
   | BackendTemplateMetadata;
 
-
-  // เพิ่มต่อท้ายไฟล์เดิมได้เลย
-
 export type ValidationFailReason = 'MISSING_PACKAGE_JSON' | 'INVALID_UI_KIT';
 
 export interface ValidationResult {

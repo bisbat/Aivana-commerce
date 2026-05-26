@@ -28,7 +28,6 @@ export async function loginAction(data: LoginRequest) {
   return { success: true };
 }
 
-// REGISTER
 export async function registerAction(data: FormData) {
   try {
     const res = await fetch(`${API_URL}/auth/register`, {
@@ -72,7 +71,6 @@ export async function registerAction(data: FormData) {
 
     const { accessToken } = await res.json();
 
-    // auto login หลัง register
     (await cookies()).set("accessToken", accessToken, {
       httpOnly: true,
       sameSite: "lax",
@@ -94,7 +92,7 @@ export async function registerAction(data: FormData) {
 export async function logoutAction() {
   (await cookies()).set("accessToken", "", {
     httpOnly: true,
-    maxAge: 0, // ลบทันที
+    maxAge: 0, 
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/capstone25/cp25ssi3",

@@ -15,7 +15,6 @@ async function parseResponse<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-// ─── GET /seller/earnings/summary/:sellerId ─────────────────────────────────
 export async function fetchSellerEarningsSummary(): Promise<SellerEarningsSummary> {
   const token = await getAccessToken();
   const res = await fetch(`${BASE_URL}/seller/earnings/summary`, {
@@ -23,11 +22,9 @@ export async function fetchSellerEarningsSummary(): Promise<SellerEarningsSummar
     cache: "no-store",
   });
 
-  console.log("Fetching seller earnings summary:", res);
   return parseResponse<SellerEarningsSummary>(res);
 }
 
-// ─── GET /seller/earnings/round/:sellerId ───────────────────────────────────
 export async function fetchSellerEarningsRounds(
 ): Promise<SellerEarningsRound[]> {
   const token = await getAccessToken();
@@ -42,7 +39,6 @@ export async function fetchSellerRoundDetail(
   payoutId: string | number,
 ): Promise<SellerRoundDetail> {
   const token = await getAccessToken();
-  console.log('Fetching seller round detail for payoutId:', payoutId);
   const res = await fetch(
     `${BASE_URL}/seller/earnings/round/payout/${payoutId}`,
     {
