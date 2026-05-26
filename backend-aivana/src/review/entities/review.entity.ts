@@ -40,7 +40,6 @@ export class ReviewEntity {
   @Column({ type: 'int', default: 0 })
   likeCounted: number;
 
-  // --- sentiment fields ---
   @Column({ type: 'varchar', length: 3, nullable: true })
   sentimentLabel: 'pos' | 'neu' | 'neg' | null;
 
@@ -58,7 +57,6 @@ export class ReviewEntity {
 
   @Column({ type: 'timestamp', nullable: true })
   analyzedAt: Date | null;
-  // --- end sentiment fields ---
 
   @CreateDateColumn()
   createdAt: Date;

@@ -1,4 +1,3 @@
-// zip-validation.service.ts
 import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import {
@@ -8,10 +7,8 @@ import {
 
 type Category = 'ui-kit' | 'frontend-template' | 'backend-template';
 
-// File extensions that count as "design files" for ui-kit
 const DESIGN_EXTENSIONS = new Set(['.fig', '.sketch', '.xd', '.psd', '.ai']);
 
-// File extensions that count as "assets" for ui-kit
 const ASSET_EXTENSIONS = new Set([
   '.svg', '.png', '.jpg', '.jpeg', '.webp', '.gif',
   '.woff', '.woff2', '.ttf', '.otf',
@@ -25,10 +22,7 @@ export interface ValidationFlags {
 
 @Injectable()
 export class ZipValidationService {
-  /**
-   * Validates extracted file list against category rules.
-   * Never throws — always returns a structured result.
-   */
+
   validate(
     category: Category,
     allFiles: string[],
@@ -38,8 +32,6 @@ export class ZipValidationService {
     const result = this.checkRules(category, flags);
     return { result, flags };
   }
-
-  // ── Build detection flags from file list ──────────────────────────────
 
   private buildFlags(allFiles: string[]): ValidationFlags {
     const exts = allFiles.map((f) => path.extname(f).toLowerCase());
@@ -53,8 +45,6 @@ export class ZipValidationService {
     };
   }
 
-  // ── Apply rules per category ──────────────────────────────────────────
-
   private checkRules(
     category: Category,
     flags: ValidationFlags,
@@ -62,14 +52,12 @@ export class ZipValidationService {
     switch (category) {
       case 'frontend-template':
       case 'backend-template':
-        // package.json is REQUIRED — no exceptions
         if (!flags.hasPackageJson) {
           return this.fail('MISSING_PACKAGE_JSON');
         }
         return this.pass();
 
       case 'ui-kit':
-        // At least one design file OR asset is REQUIRED
         if (!flags.hasDesignFiles && !flags.hasAssets) {
           return this.fail('INVALID_UI_KIT');
         }

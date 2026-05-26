@@ -1,5 +1,3 @@
-// ai/gemini.service.ts
-
 import {
   Injectable,
   BadRequestException,

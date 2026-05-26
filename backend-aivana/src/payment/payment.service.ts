@@ -36,7 +36,6 @@ export class PaymentService {
       sourceId,
       amount,
     );
-    console.log(charge.source.expires_at);
 
     order.omiseChargeId = charge.id;
     await this.orderService['orderRepository'].save(order);
@@ -109,9 +108,6 @@ export class PaymentService {
     if (event.data.object !== 'charge') return;
     const charge = event.data;
 
-    console.log('Processing charge webhook:', charge);
-    console.log('status: eiei', charge.status);
-
     const payment = await this.paymentRepository.findOne({
       where: {
         chargeId: charge.id,
@@ -121,7 +117,7 @@ export class PaymentService {
     const orderId = payment.orderId;
 
     const order = await this.orderService.getOrderById(orderId);
-    console.log('order in webhook', order);
+
     if (!order) return;
 
     if (charge.status === 'successful') {
@@ -173,7 +169,6 @@ export class PaymentService {
   }
 
   async cancelPayment(orderId: number) {
-    console.log(`Cancelling payment for orderId: ${orderId}`);
     const payment = await this.paymentRepository.findOne({
       where: {
         orderId,

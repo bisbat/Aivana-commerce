@@ -1,24 +1,16 @@
-// ==============================
-// Shared Types
-// ==============================
-
-// shared/types/extracted-metadata.types.ts
-
-// Reason codes — frontend uses these to pick the right modal message
 export type ValidationFailReason =
   | 'MISSING_PACKAGE_JSON'
   | 'INVALID_UI_KIT';
 
 export interface ValidationResult {
   isValid: boolean;
-  reason?: ValidationFailReason; // only present when isValid is false
+  reason?: ValidationFailReason; 
 }
 
-// Wrap the existing ExtractedMetadata with validation info
+
 export interface ExtractionResult {
-  metadata: ExtractedMetadata | null; // null when validation fails
+  metadata: ExtractedMetadata | null; 
   validation: ValidationResult;
-  // Useful flags for frontend preview (optional advanced UX)
   flags: {
     hasPackageJson: boolean;
     hasDesignFiles: boolean;
@@ -36,22 +28,18 @@ type DesignTool =
   | 'other';
 
 interface DependencyGroups {
-  main?: string[]; // core framework libs
-  ui?: string[]; // ui / component libs
-  state?: string[]; // state management
-  styling?: string[]; // styling systems
-  database?: string[]; // db related
-  auth?: string[]; // auth related
+  main?: string[]; 
+  ui?: string[]; 
+  state?: string[]; 
+  styling?: string[]; 
+  database?: string[]; 
+  auth?: string[]; 
 }
 
 interface ReadmeInfo {
   exists: boolean;
-  sections?: string[]; // ["installation", "features", "usage"]
+  sections?: string[]; 
 }
-
-// ==============================
-// 1️⃣ UI KIT
-// ==============================
 
 export interface UIKitMetadata {
   category: 'ui-kit';
@@ -95,16 +83,13 @@ export interface UIKitMetadata {
   readme: ReadmeInfo;
 }
 
-// ==============================
-// 2️⃣ FRONTEND TEMPLATE
-// ==============================
 
 export interface FrontendTemplateMetadata {
   category: 'frontend-template';
 
   tech: {
     framework?: string;
-    frameworkVersion?: string; // normalized (no ^ ~)
+    frameworkVersion?: string; 
     language?: string;
   };
 
@@ -136,9 +121,6 @@ export interface FrontendTemplateMetadata {
   readme: ReadmeInfo;
 }
 
-// ==============================
-// 3️⃣ BACKEND TEMPLATE
-// ==============================
 
 export interface BackendTemplateMetadata {
   category: 'backend-template';
@@ -171,9 +153,6 @@ export interface BackendTemplateMetadata {
   readme: ReadmeInfo;
 }
 
-// ==============================
-// UNION TYPE
-// ==============================
 
 export type ExtractedMetadata =
   | UIKitMetadata

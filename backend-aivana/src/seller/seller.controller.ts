@@ -18,10 +18,6 @@ import { Public } from 'src/auth/decorators/public.decorator';
 export class SellerController {
   constructor(private readonly sellerService: SellerService) {}
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // ⚠️ CRITICAL: Specific routes MUST come BEFORE :param routes!
-  // ═══════════════════════════════════════════════════════════════════════════
-
   @Post('upgrade/:userId')
   @Roles(Role.CUSTOMER)
   upgradeToSeller(
@@ -30,10 +26,6 @@ export class SellerController {
   ) {
     return this.sellerService.upgradeToSeller(userId, createSellerDto);
   }
-
-  // ──────────────────────────────────────────────────────────────────────────
-  // SECTION 1: SPECIFIC ROUTES (no :param at this level)
-  // ──────────────────────────────────────────────────────────────────────────
 
   @Get('dashboard')
   @Roles(Role.SELLER)
@@ -69,19 +61,12 @@ export class SellerController {
     return this.sellerService.getSellerByUsername(username);
   }
 
-  // ──────────────────────────────────────────────────────────────────────────
-  // SECTION 2: COLLECTION ROUTES (no params)
-  // ──────────────────────────────────────────────────────────────────────────
 
   @Get()
   @Roles(Role.ADMIN)
   getAllSellers() {
     return this.sellerService.getAllSellers();
   }
-
-  // ──────────────────────────────────────────────────────────────────────────
-  // SECTION 3: PARAMETERIZED ROUTES (MUST BE LAST!)
-  // ──────────────────────────────────────────────────────────────────────────
 
   @Get(':sellerId')
   @Roles(Role.SELLER, Role.ADMIN)
@@ -103,10 +88,6 @@ export class SellerController {
   ) {
     return this.sellerService.updateSellerProfile(sellerId, updateSellerDto);
   }
-
-  // ──────────────────────────────────────────────────────────────────────────
-  // DEPRECATED (kept for backward compatibility)
-  // ──────────────────────────────────────────────────────────────────────────
 
   @Get('earnings/summary/:sellerId')
   @Roles(Role.SELLER)
